@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { RedirectIfAuthenticated } from "./guards/RedirectIfAuthenticated";
 import { RequireAuth } from "./guards/RequireAuth";
 import {
@@ -9,9 +9,9 @@ import {
   VehiclesPage,
 } from "./pages";
 import { ROUTES } from "@/constants/routes";
-import { ComingSoonPage } from "@/pages/coming-soon";
-import { LoginPage } from "@/pages/login";
-import { NotFoundPage } from "@/pages/not-found";
+import { ComingSoonPage } from "@/pages/comum/coming-soon";
+import { LoginPage } from "@/pages/gestao/login";
+import { NotFoundPage } from "@/pages/comum/not-found";
 
 export const router = createBrowserRouter([
   {
@@ -30,5 +30,6 @@ export const router = createBrowserRouter([
       { path: ROUTES.finance, element: <ComingSoonPage title="Financeiro" /> },
     ],
   },
+  { path: ROUTES.root, element: <Navigate to={ROUTES.dashboard} replace /> },
   { path: "*", element: <NotFoundPage /> },
 ]);

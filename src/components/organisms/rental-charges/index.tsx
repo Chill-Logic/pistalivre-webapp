@@ -14,7 +14,7 @@ import {
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { QueryError } from "@/components/organisms/query-error";
-import { useRentalCharges } from "@/hooks/api/rentals/useRentalCharges";
+import { useRentalCharges } from "@/hooks/api/gestao/rentals/useRentalCharges";
 
 const SKELETON_ROWS = 3;
 

@@ -10,7 +10,7 @@ import { chargeSituation, chargeSituationBadge } from "@/helpers/charge";
 import { useCopy } from "@/hooks/ui/useCopy";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { Charge } from "@/types/rental";
-import { formatCalendarDate, formatCurrency, formatDate } from "@/utils/format";
+import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
 /**
  * One charge, read-only. The amount shown is `amounts.amount` from the API
@@ -60,7 +60,7 @@ export function ChargeItem({ charge }: { charge: Charge }) {
       )}
       {amounts.isPaid && charge.paidAt && (
         <Text size="xs" tone="muted">
-          Pago em {formatDate(charge.paidAt)}
+          Pago em {formatCalendarDate(charge.paidAt)}
           {amounts.shortfall > 0 &&
             ` · falta ${formatCurrency(amounts.shortfall)}`}
         </Text>

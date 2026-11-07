@@ -4,8 +4,8 @@ import { Pagination } from "@/components/molecules/pagination";
 import { QueryError } from "@/components/organisms/query-error";
 import { VehicleFilters } from "@/components/organisms/vehicle-filters";
 import { VehicleList } from "@/components/organisms/vehicle-list";
-import { useVehicles } from "@/hooks/api/vehicles/useVehicles";
-import { useVehicleTypes } from "@/hooks/api/vehicles/useVehicleTypes";
+import { useVehicles } from "@/hooks/api/gestao/vehicles/useVehicles";
+import { useVehicleTypes } from "@/hooks/api/gestao/vehicles/useVehicleTypes";
 import { useVehicleFilters } from "@/hooks/ui/useVehicleFilters";
 
 export function VehiclesPage() {

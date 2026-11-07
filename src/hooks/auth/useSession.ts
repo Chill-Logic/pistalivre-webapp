@@ -1,5 +1,5 @@
 import { useAuthToken } from "@/hooks/auth/useAuthToken";
-import { useMe } from "@/hooks/api/auth/useMe";
+import { useMe } from "@/hooks/api/comum/session/useMe";
 import type { AuthUser } from "@/types/auth";
 
 export type Session =

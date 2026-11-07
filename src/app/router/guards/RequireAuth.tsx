@@ -3,7 +3,7 @@ import { AppShellSkeleton } from "@/components/templates/app-shell-skeleton";
 import { AppShell } from "@/components/templates/app-shell";
 import { loginUrlFor } from "@/helpers/safe-redirect";
 import { useSession } from "@/hooks/auth/useSession";
-import { useLabelCatalog } from "@/hooks/api/labels/useLabelCatalog";
+import { useLabelCatalog } from "@/hooks/api/comum/labels/useLabelCatalog";
 
 /**
  * Private area: no session → login, keeping the deep link as callbackUrl.

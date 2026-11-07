@@ -1,22 +1,22 @@
 import { lazyPage } from "@/helpers/lazy-page";
 
 export const DashboardPage = lazyPage(
-  () => import("@/pages/dashboard"),
+  () => import("@/pages/gestao/dashboard"),
   "DashboardPage",
 );
 export const VehiclesPage = lazyPage(
-  () => import("@/pages/vehicles"),
+  () => import("@/pages/gestao/vehicles"),
   "VehiclesPage",
 );
 export const VehicleDetailPage = lazyPage(
-  () => import("@/pages/vehicle-detail"),
+  () => import("@/pages/gestao/vehicle-detail"),
   "VehicleDetailPage",
 );
 export const RentalsPage = lazyPage(
-  () => import("@/pages/rentals"),
+  () => import("@/pages/gestao/rentals"),
   "RentalsPage",
 );
 export const RentalDetailPage = lazyPage(
-  () => import("@/pages/rental-detail"),
+  () => import("@/pages/gestao/rental-detail"),
   "RentalDetailPage",
 );

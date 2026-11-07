@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/constants/query-keys";
-import { rentalsService } from "@/services/api/rentals.service";
+import { rentalsService } from "@/services/api/gestao/rentals.service";
 
 export function useRental(id: string) {
   return useQuery({

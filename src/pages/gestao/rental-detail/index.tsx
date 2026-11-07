@@ -24,7 +24,7 @@ import {
 import { RentalDetailLayout } from "@/components/templates/rental-detail-layout";
 import { ROUTES } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
-import { useRental } from "@/hooks/api/rentals/useRental";
+import { useRental } from "@/hooks/api/gestao/rentals/useRental";
 import { useBackToList } from "@/hooks/ui/useBackToList";
 
 export function RentalDetailPage() {

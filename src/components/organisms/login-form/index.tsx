@@ -7,7 +7,7 @@ import { Spinner } from "@/components/atoms/spinner";
 import { FormField } from "@/components/molecules/form-field";
 import { loginSchema, type LoginFormValues } from "./schema";
 import { errorMessage } from "@/helpers/api-error";
-import { useLogin } from "@/hooks/api/auth/useLogin";
+import { useLogin } from "@/hooks/api/gestao/auth/useLogin";
 
 type LoginFormProps = {
   onSuccess: () => void;

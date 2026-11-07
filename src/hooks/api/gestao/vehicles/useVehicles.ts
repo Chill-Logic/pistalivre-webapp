@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/constants/query-keys";
-import { vehiclesService } from "@/services/api/vehicles.service";
+import { vehiclesService } from "@/services/api/gestao/vehicles.service";
 import type { VehicleFilters } from "@/types/vehicle";
 
 export function useVehicles(filters: VehicleFilters) {

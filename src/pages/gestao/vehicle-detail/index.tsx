@@ -20,7 +20,7 @@ import {
 import { VehicleDetailLayout } from "@/components/templates/vehicle-detail-layout";
 import { ROUTES } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
-import { useVehicle } from "@/hooks/api/vehicles/useVehicle";
+import { useVehicle } from "@/hooks/api/gestao/vehicles/useVehicle";
 import { useBackToList } from "@/hooks/ui/useBackToList";
 
 export function VehicleDetailPage() {

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import type { LabelMapName } from "@/constants/label-maps";
-import { useLabelCatalog } from "@/hooks/api/labels/useLabelCatalog";
+import { useLabelCatalog } from "@/hooks/api/comum/labels/useLabelCatalog";
 import { labelFrom, mapOf, optionsFrom } from "@/helpers/labels";
 
 /**

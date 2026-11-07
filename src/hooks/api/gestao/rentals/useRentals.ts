@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/constants/query-keys";
-import { rentalsService } from "@/services/api/rentals.service";
+import { rentalsService } from "@/services/api/gestao/rentals.service";
 import type { RentalFilters } from "@/types/rental";
 
 export function useRentals(filters: RentalFilters) {

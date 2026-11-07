@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { errorMessage } from "@/helpers/api-error";
 import { openBlobInNewTab, saveBlob } from "@/helpers/files";
-import { filesService } from "@/services/api/files.service";
+import { filesService } from "@/services/api/comum/files.service";
 import type { DocumentFile } from "@/types/document";
 
 /** View/download for authenticated files, with feedback on failure. */

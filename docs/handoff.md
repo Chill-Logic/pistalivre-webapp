@@ -38,18 +38,26 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
 - Veículos: lista (busca, tipo da API, situação, paginação na URL, km e locatário) + detalhe (resumo, locação ativa, documentos com ver/baixar via blob).
 - Shell: sidebar colapsável, gaveta no mobile, barra inferior, tema claro/escuro/sistema.
 - Loaders: skeletons, barra de topo, páginas lazy.
+- Locações: lista + detalhe, com cobranças **somente leitura** (`amounts.amount` da API; vencido por status ou por data em Brasília; copiar pix; abrir fatura).
+- Rótulos vêm de `GET /labels` (o shell espera o catálogo carregar).
+
+## Organização (pedido do dono)
+
+- `pages/`, `hooks/api/` e `services/api/` são divididos **por domínio**: `gestao/`, `cliente/` e `comum/`. Os **componentes são compartilhados** (`components/` único).
+- URLs: `/gestao/...` (login em `/gestao/entrar`) e `/area-cliente/...` para o portal; `/` redireciona para `/gestao`.
+- O portal ainda **não existe** no SPA. Ao começar: `pages/cliente/`, `hooks/api/cliente/`, `services/api/cliente/`, um login próprio em `/area-cliente/entrar` (`POST /auth/customer/login`) e um guard por `kind` (`/auth/me` devolve `kind: "user" | "customer"`). Hoje o `RequireAuth` só confere se há sessão: ele precisa passar a barrar cliente na gestão, e vice-versa, com o redirecionamento cruzado igual ao `middleware.ts` do Next.
 
 ## Próximo (em ordem)
 
-1. **Locações**: lista + detalhe, com cobranças **somente leitura** (`GET /rentals`, `/rentals/:id`, `/rentals/:id/charges`). Mostre `amounts.amount` como valor principal e nunca recalcule multa no front.
-2. **Rótulos**: carregar `GET /api/v1/labels` (público, 37 mapas) com `staleTime: Infinity` e parar de copiar rótulos para `constants/labels.ts`.
-3. **Clientes**: lista + detalhe (`/customers`).
-4. **Painel**: `/dashboard`. Saldo `null` = indisponível, **nunca R$ 0,00**.
-5. Manutenções e vistorias (listas; os detalhes vêm do backend em seguida).
-6. Portal do cliente (`/auth/customer/login` + rotas de cliente, quando o backend publicar).
+1. **Clientes**: lista + detalhe (`/customers`).
+2. **Painel**: `/dashboard`. Saldo `null` = indisponível, **nunca R$ 0,00**.
+3. Manutenções e vistorias (listas; os detalhes vêm do backend em seguida).
+4. **Portal do cliente** (ver Organização acima). Os endpoints já existem: `/me/rentals`, `/me/rentals/:id/sections` (a página inteira numa chamada, com a divulgação progressiva feita no servidor), `/me/charges`, `/me/invoices`, `/me/wallet` e `/me/reimbursements`. Só leitura.
 
 ## Pendências e decisões anotadas
 
 - Logo `public/logo.svg` é provisório (um "P"); troque e rode `npm run pwa:assets`.
 - No dev, o S3 está com credencial quebrada: abrir/baixar documento dá 500 (problema anterior a este trabalho).
 - Barra inferior no mobile **mantida** junto com a gaveta (decisão minha; o dalila só tem a gaveta). Se o dono preferir, basta tirar `<BottomNav />` do `AppShell`.
+- **Divergência de dinheiro, já existente** (anotada pelo backend): a caução vencida aparece como R$ 730,16 na visão da equipe (multa e juros calculados localmente) e como R$ 650 no `/me/charges` (read-through do Asaas). As telas Next fazem igual. Decisão do dono.
+- **Datas**: `paidAt` das cobranças também é data de calendário (meia-noite UTC), então use `formatCalendarDate`. Com `formatDate` (Brasília) ele volta um dia.

@@ -93,6 +93,7 @@ export type Charge = {
   referenceDate: string | null;
   surchargeFree: boolean;
   paidValue: number | null;
+  /** Calendar date (midnight UTC), like dueDate: format with formatCalendarDate. */
   paidAt: string | null;
   amounts: ChargeAmounts;
   invoiceUrl: string | null;

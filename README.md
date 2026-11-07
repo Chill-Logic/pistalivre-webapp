@@ -20,19 +20,30 @@ Scripts: `npm run build` (typecheck + build) · `npm run lint` (zero warnings) �
 
 ## Estrutura
 
+Organizada **por domínio** nas camadas que mudam de área para área. Os **componentes são compartilhados**:
+
 ```
 src/
-  app/           App, providers (QueryClient, toasts, prompt do PWA) e router (+ guards)
-  components/    Atomic Design — atoms/ molecules/ organisms/ templates/ (uma pasta por componente, index.tsx)
-  pages/         telas; só compõem organisms/templates
+  app/           App, providers (QueryClient, tooltip, sidebar, toasts, prompt do PWA), router e guards
+  components/    COMPARTILHADOS entre gestão e portal, em Atomic Design:
+                 atoms/ molecules/ organisms/ templates/ (uma pasta por componente, index.tsx)
+  pages/
+    gestao/      área da equipe (URLs /gestao/...)
+    cliente/     portal do locatário (URLs /area-cliente/...)
+    comum/       404, "em migração"
   hooks/
-    api/<recurso>/   useQuery/useMutation por endpoint (useVehicles, useLogin…)
-    auth/            sessão (useSession, useAuthToken, useLogout)
-    ui/              comportamento de tela (filtros na URL, debounce, tema, PWA, online)
-  services/      http/client.ts (axios + Bearer + erro normalizado) e api/<recurso>.service.ts
-  helpers/       lógica com efeito/estado do app (token, storage, erro da API, redirect, paginação)
-  utils/         funções puras (cn, formatação, placa)
-  constants/     rotas, query keys, labels PT, navegação, chaves de storage
+    api/
+      gestao/    useQuery/useMutation da área da equipe (veículos, locações, login da equipe…)
+      cliente/   idem, do portal (Bearer de cliente, rotas /me/*)
+      comum/     o que as duas áreas usam (sessão /me, rótulos, arquivos)
+    auth/        sessão (useSession, useAuthToken, useLogout)
+    ui/          comportamento de tela (filtros na URL, rótulos, debounce, tema, sidebar, PWA)
+  services/
+    api/{gestao,cliente,comum}/   um <recurso>.service.ts por recurso, mesma divisão dos hooks
+    http/client.ts                axios + Bearer + erro normalizado
+  helpers/       lógica que depende do app (token, storage, erro da API, cobrança, grid, rótulos…)
+  utils/         funções puras (cn, formatação, datas, placa)
+  constants/     rotas, query keys, nomes dos mapas de rótulo, navegação, layout
   types/         contratos da API e do domínio
   config/        env validado com zod
 ```

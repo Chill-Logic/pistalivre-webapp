@@ -8,7 +8,7 @@ import {
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { DocumentItem } from "@/components/molecules/document-item";
-import { useFileActions } from "@/hooks/api/files/useFileActions";
+import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
 import type { DocumentFile } from "@/types/document";
 
 export function VehicleDocuments({ documents }: { documents: DocumentFile[] }) {
