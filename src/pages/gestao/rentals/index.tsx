@@ -3,29 +3,37 @@ import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { PageHeader } from "@/components/molecules/page-header";
-import { Pagination } from "@/components/molecules/pagination";
+import { ViewToggle } from "@/components/molecules/view-toggle";
+import { ListFooter } from "@/components/organisms/list-footer";
 import { QueryError } from "@/components/organisms/query-error";
 import { RentalFilters } from "@/components/organisms/rental-filters";
+import { RentalTable } from "@/components/organisms/rental-table";
 import { RentalList } from "@/components/organisms/rental-list";
 import { ROUTES } from "@/constants/routes";
-import { useRentals } from "@/hooks/api/gestao/rentals/useRentals";
+import { useRentalList } from "@/hooks/api/gestao/rentals/useRentals";
+import { useListView } from "@/hooks/ui/useListView";
 import { useRentalFilters } from "@/hooks/ui/useRentalFilters";
 
 export function RentalsPage() {
-  const { filters, setSearch, setStatus, setPage } = useRentalFilters();
-  const rentals = useRentals(filters);
+  const { filters, setSearch, setStatus, setPage, setPageSize } =
+    useRentalFilters();
+  const { view, setView, isDesktop } = useListView();
+  const rentals = useRentalList(filters, isDesktop);
 
   return (
     <Box className="space-y-4 md:space-y-6">
       <PageHeader
         title="Locações"
         actions={
-          <Button asChild>
-            <Link to={ROUTES.rentalNew}>
-              <Plus />
-              Nova locação
-            </Link>
-          </Button>
+          <>
+            <ViewToggle view={view} onChange={setView} />
+            <Button asChild>
+              <Link to={ROUTES.rentalNew}>
+                <Plus />
+                Nova locação
+              </Link>
+            </Button>
+          </>
         }
       />
       <RentalFilters
@@ -35,21 +43,24 @@ export function RentalsPage() {
       />
       {rentals.isError ? (
         <QueryError error={rentals.error} onRetry={() => rentals.refetch()} />
+      ) : view === "tabela" ? (
+        <RentalTable
+          rentals={rentals.items}
+          isLoading={rentals.isPending}
+          isRefreshing={rentals.isRefreshing}
+        />
       ) : (
         <RentalList
-          rentals={rentals.data?.items}
+          rentals={rentals.items}
           isLoading={rentals.isPending}
-          isRefreshing={rentals.isPlaceholderData}
+          isRefreshing={rentals.isRefreshing}
         />
       )}
-      {rentals.data && rentals.data.total > 0 && (
-        <Pagination
-          page={rentals.data.page}
-          pageSize={rentals.data.pageSize}
-          total={rentals.data.total}
-          onPageChange={setPage}
-        />
-      )}
+      <ListFooter
+        result={rentals}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+      />
     </Box>
   );
 }
