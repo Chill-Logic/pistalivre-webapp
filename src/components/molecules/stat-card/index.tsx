@@ -28,7 +28,12 @@ export function StatCard({
           size="2xl"
           weight="bold"
           tone={tone === "default" ? "foreground" : tone}
-          className={cn("tabular-nums leading-tight")}
+          // Half-width cards on a phone: smaller there. A muted value is a
+          // state, not a number ("Indisponível"), so it reads smaller still.
+          className={cn(
+            "tabular-nums leading-tight",
+            tone === "muted" ? "text-lg sm:text-xl" : "text-xl sm:text-2xl",
+          )}
         >
           {value}
         </Text>
