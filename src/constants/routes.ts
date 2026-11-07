@@ -14,6 +14,7 @@ export const ROUTES = {
   rentals: `${GESTAO}/locacoes`,
   rentalDetail: `${GESTAO}/locacoes/:id`,
   customers: `${GESTAO}/clientes`,
+  customerDetail: `${GESTAO}/clientes/:id`,
   finance: `${GESTAO}/financeiro`,
 } as const;
 
@@ -21,4 +22,5 @@ export const ROUTES = {
 export const routeTo = {
   vehicle: (id: string) => `${ROUTES.vehicles}/${id}`,
   rental: (id: string) => `${ROUTES.rentals}/${id}`,
+  customer: (id: string) => `${ROUTES.customers}/${id}`,
 };

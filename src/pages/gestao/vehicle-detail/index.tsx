@@ -6,9 +6,9 @@ import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { QueryError } from "@/components/organisms/query-error";
 import {
-  VehicleDocuments,
-  VehicleDocumentsSkeleton,
-} from "@/components/organisms/vehicle-documents";
+  DocumentsCard,
+  DocumentsCardSkeleton,
+} from "@/components/organisms/documents-card";
 import {
   VehicleRentalCard,
   VehicleRentalCardSkeleton,
@@ -36,7 +36,7 @@ export function VehicleDetailPage() {
           <VehicleDetailLayout
             summary={<VehicleSummarySkeleton />}
             rental={<VehicleRentalCardSkeleton />}
-            documents={<VehicleDocumentsSkeleton />}
+            documents={<DocumentsCardSkeleton />}
           />
         </SkeletonRegion>
       )}
@@ -54,7 +54,7 @@ export function VehicleDetailPage() {
         <VehicleDetailLayout
           summary={<VehicleSummary vehicle={vehicle.data} />}
           rental={<VehicleRentalCard rental={vehicle.data.activeRental} />}
-          documents={<VehicleDocuments documents={vehicle.data.documents} />}
+          documents={<DocumentsCard documents={vehicle.data.documents} />}
         />
       )}
     </Box>

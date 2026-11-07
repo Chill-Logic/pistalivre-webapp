@@ -1,3 +1,4 @@
+import type { CustomerFilters } from "@/types/customer";
 import type { RentalFilters } from "@/types/rental";
 import type { VehicleFilters } from "@/types/vehicle";
 
@@ -22,6 +23,12 @@ export const queryKeys = {
       [...queryKeys.rentals.all, "list", filters] as const,
     detail: (id: string) => [...queryKeys.rentals.all, "detail", id] as const,
     charges: (id: string) => [...queryKeys.rentals.all, "charges", id] as const,
+  },
+  customers: {
+    all: ["customers"] as const,
+    list: (filters: CustomerFilters) =>
+      [...queryKeys.customers.all, "list", filters] as const,
+    detail: (id: string) => [...queryKeys.customers.all, "detail", id] as const,
   },
   labels: {
     all: ["labels"] as const,

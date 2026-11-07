@@ -15,3 +15,11 @@ export function fromSelectValue(value: string) {
 }
 
 export const ALL_SELECT_VALUE = ALL;
+
+/** `value` if it is one of `allowed`, else "" (no filter / API default). */
+export function pickOption<T extends string>(
+  allowed: readonly T[],
+  value: string,
+): T | "" {
+  return (allowed as readonly string[]).includes(value) ? (value as T) : "";
+}

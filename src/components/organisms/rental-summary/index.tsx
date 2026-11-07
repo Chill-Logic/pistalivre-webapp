@@ -36,7 +36,9 @@ export function RentalSummary({ rental }: { rental: RentalDetail }) {
       <CardContent>
         <Row as="dl" className="gap-y-4">
           <InfoItem md={6} label="Locatário">
-            {rental.customer.name}
+            <TextLink to={routeTo.customer(rental.customer.id)}>
+              {rental.customer.name}
+            </TextLink>
           </InfoItem>
           <InfoItem md={6} label="Veículo">
             <TextLink to={routeTo.vehicle(rental.vehicle.id)}>

@@ -20,3 +20,11 @@ export const RentalDetailPage = lazyPage(
   () => import("@/pages/gestao/rental-detail"),
   "RentalDetailPage",
 );
+export const CustomersPage = lazyPage(
+  () => import("@/pages/gestao/customers"),
+  "CustomersPage",
+);
+export const CustomerDetailPage = lazyPage(
+  () => import("@/pages/gestao/customer-detail"),
+  "CustomerDetailPage",
+);

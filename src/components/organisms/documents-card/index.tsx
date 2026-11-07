@@ -11,7 +11,8 @@ import { DocumentItem } from "@/components/molecules/document-item";
 import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
 import type { DocumentFile } from "@/types/document";
 
-export function VehicleDocuments({ documents }: { documents: DocumentFile[] }) {
+/** Documents of any owner (vehicle, customer…), with view/download. */
+export function DocumentsCard({ documents }: { documents: DocumentFile[] }) {
   const { view, download } = useFileActions();
 
   return (
@@ -45,7 +46,7 @@ export function VehicleDocuments({ documents }: { documents: DocumentFile[] }) {
 
 const DOCUMENT_ROWS = 2;
 
-export function VehicleDocumentsSkeleton() {
+export function DocumentsCardSkeleton() {
   return (
     <Card>
       <CardHeader>
