@@ -129,3 +129,11 @@ export const DocumentsPage = lazyPage(
   () => import("@/pages/gestao/documents"),
   "DocumentsPage",
 );
+export const CustomerNewPage = lazyPage(
+  () => import("@/pages/gestao/customer-new"),
+  "CustomerNewPage",
+);
+export const CustomerEditPage = lazyPage(
+  () => import("@/pages/gestao/customer-edit"),
+  "CustomerEditPage",
+);

@@ -49,3 +49,22 @@ export function isDayString(value: string) {
     !Number.isNaN(fromDayString(value).getTime())
   );
 }
+
+/** "dd/mm/aaaa" → "yyyy-mm-dd", or null when it is not a real date. */
+export function brDateToDay(value: string) {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
+  if (!match) return null;
+  const [, dd, mm, yyyy] = match;
+  const day = `${yyyy}-${mm}-${dd}`;
+  const date = new Date(`${day}T00:00:00Z`);
+  return date.getUTCDate() === Number(dd) &&
+    date.getUTCMonth() + 1 === Number(mm)
+    ? day
+    : null;
+}
+
+/** Calendar date (midnight UTC ISO or yyyy-mm-dd) → "dd/mm/aaaa". */
+export function dayToBrDate(value: string) {
+  const [yyyy, mm, dd] = value.slice(0, 10).split("-");
+  return `${dd}/${mm}/${yyyy}`;
+}

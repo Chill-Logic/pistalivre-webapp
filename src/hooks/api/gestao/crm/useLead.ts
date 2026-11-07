@@ -6,5 +6,6 @@ export function useLead(id: string) {
   return useQuery({
     queryKey: queryKeys.crm.lead(id),
     queryFn: () => crmService.lead(id),
+    enabled: Boolean(id),
   });
 }

@@ -1,6 +1,7 @@
-import { Users } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { Pencil, Users } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
@@ -24,9 +25,10 @@ import {
   DocumentsCard,
   DocumentsCardSkeleton,
 } from "@/components/organisms/documents-card";
+import { CustomerDeleteButton } from "@/components/organisms/customer-delete-button";
 import { QueryError } from "@/components/organisms/query-error";
 import { CustomerDetailLayout } from "@/components/templates/customer-detail-layout";
-import { ROUTES } from "@/constants/routes";
+import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { useCustomer } from "@/hooks/api/gestao/customers/useCustomer";
 import { useBackToList } from "@/hooks/ui/useBackToList";
@@ -38,7 +40,24 @@ export function CustomerDetailPage() {
 
   return (
     <Box className="space-y-4">
-      <BackLink to={backTo} label="Clientes" />
+      <Box className="flex items-center justify-between gap-2">
+        <BackLink to={backTo} label="Clientes" />
+        {customer.data && (
+          <Box className="flex gap-2">
+            <Button asChild variant="ghost" size="sm">
+              <Link to={routeTo.editCustomer(customer.data.id)}>
+                <Pencil />
+                Editar
+              </Link>
+            </Button>
+            <CustomerDeleteButton
+              customerId={customer.data.id}
+              name={customer.data.name}
+              hasRentals={customer.data.rentals.length > 0}
+            />
+          </Box>
+        )}
+      </Box>
       {customer.isPending && (
         <SkeletonRegion label="Carregando cliente…">
           <CustomerDetailLayout

@@ -1,6 +1,7 @@
-import { Target } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { Target, UserPlus } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
@@ -18,7 +19,7 @@ import {
   ListRowSkeleton,
 } from "@/components/organisms/list-card";
 import { LeadDetailLayout } from "@/components/templates/lead-detail-layout";
-import { ROUTES } from "@/constants/routes";
+import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { useLead } from "@/hooks/api/gestao/crm/useLead";
 import { useBackToList } from "@/hooks/ui/useBackToList";
@@ -30,7 +31,17 @@ export function LeadDetailPage() {
 
   return (
     <Box className="space-y-4">
-      <BackLink to={backTo} label="CRM" />
+      <Box className="flex items-center justify-between gap-2">
+        <BackLink to={backTo} label="CRM" />
+        {lead.data && !lead.data.customerId && lead.data.status !== "LOST" && (
+          <Button asChild size="sm">
+            <Link to={routeTo.newCustomerFromLead(lead.data.id)}>
+              <UserPlus />
+              Converter em cliente
+            </Link>
+          </Button>
+        )}
+      </Box>
       {lead.isPending && (
         <SkeletonRegion label="Carregando lead…">
           <LeadDetailLayout
