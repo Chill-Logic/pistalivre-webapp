@@ -30,3 +30,22 @@ export function monthRange(day: string, offset = 0) {
     end: last.toISOString().slice(0, 10),
   };
 }
+
+/** yyyy-mm-dd → local Date at midnight (what calendar widgets expect). */
+export function fromDayString(day: string) {
+  const [year, month, date] = day.split("-").map(Number);
+  return new Date(year, month - 1, date);
+}
+
+/** Local Date → yyyy-mm-dd (the calendar day the user picked). */
+export function toDayString(date: Date) {
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+export function isDayString(value: string) {
+  return (
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    !Number.isNaN(fromDayString(value).getTime())
+  );
+}

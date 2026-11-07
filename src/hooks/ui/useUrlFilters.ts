@@ -44,10 +44,32 @@ export function useUrlFilters<Key extends string>(keys: readonly Key[]) {
     [setParam],
   );
 
+  /** Several filters in one URL update (e.g. a date range). */
+  const setFilters = useCallback(
+    (next: Partial<Record<Key, string>>) => {
+      setParams(
+        (current) => {
+          const params = new URLSearchParams(current);
+          for (const [key, value] of Object.entries(next) as [
+            string,
+            string,
+          ][]) {
+            if (value) params.set(key, value);
+            else params.delete(key);
+          }
+          params.delete(PAGE_PARAM);
+          return params;
+        },
+        { replace: true },
+      );
+    },
+    [setParams],
+  );
+
   const setPage = useCallback(
     (next: number) => setParam(PAGE_PARAM, next > 1 ? String(next) : ""),
     [setParam],
   );
 
-  return { values, page, setFilter, setPage };
+  return { values, page, setFilter, setFilters, setPage };
 }

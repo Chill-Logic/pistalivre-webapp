@@ -20,7 +20,7 @@ import { useStatementFilters } from "@/hooks/ui/useStatementFilters";
 
 /** Consolidated statement, read-only (notes/internal flags are writes). */
 export function FinanceStatementPage() {
-  const { filters, period, setPeriod, setSource, setPage } =
+  const { filters, period, setPeriod, setRange, setSource, setPage } =
     useStatementFilters();
   const statement = useStatement(filters);
   const data = statement.data;
@@ -32,7 +32,10 @@ export function FinanceStatementPage() {
       <StatementFilters
         period={period}
         source={filters.source}
+        start={filters.start}
+        end={filters.end}
         onPeriodChange={setPeriod}
+        onRangeChange={setRange}
         onSourceChange={setSource}
       />
       {statement.isPending && (

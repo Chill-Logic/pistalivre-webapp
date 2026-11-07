@@ -1,6 +1,11 @@
 import type { SelectOption } from "@/helpers/select";
 import type { StatementSourceSummary } from "@/types/statement";
-import { addDays, monthRange, todayInBrasilia } from "@/utils/date";
+import {
+  addDays,
+  isDayString,
+  monthRange,
+  todayInBrasilia,
+} from "@/utils/date";
 
 type PeriodPreset = SelectOption & { start: string; end: string };
 
@@ -14,6 +19,8 @@ const MONTH_LABEL = new Intl.DateTimeFormat("pt-BR", {
 const PAST_MONTHS = 6;
 
 export const DEFAULT_PERIOD = "30d";
+/** Free range picked in the calendar (dates in `de`/`ate`). */
+export const CUSTOM_PERIOD = "personalizado";
 
 /**
  * Period presets, computed from "today" in Brasília. A preset select instead
@@ -54,9 +61,36 @@ export function periodPresets(today = todayInBrasilia()): PeriodPreset[] {
   return presets;
 }
 
-export function resolvePeriod(value: string, today = todayInBrasilia()) {
+/** Options of the period select: the presets plus "Personalizado…". */
+export function periodOptions(today = todayInBrasilia()): SelectOption[] {
+  return [
+    ...periodPresets(today).map(({ value, label }) => ({ value, label })),
+    { value: CUSTOM_PERIOD, label: "Personalizado…" },
+  ];
+}
+
+/**
+ * The period to query. A custom range is used only when valid (both days,
+ * in order, not in the future); otherwise it falls back to the default
+ * preset, still marked as custom so the calendar shows up.
+ */
+export function resolvePeriod(
+  value: string,
+  custom: { start: string; end: string },
+  today = todayInBrasilia(),
+) {
   const presets = periodPresets(today);
-  return presets.find((preset) => preset.value === value) ?? presets[0];
+  if (value === CUSTOM_PERIOD) {
+    const valid =
+      isDayString(custom.start) &&
+      isDayString(custom.end) &&
+      custom.start <= custom.end &&
+      custom.end <= today;
+    const range = valid ? custom : presets[0];
+    return { value: CUSTOM_PERIOD, start: range.start, end: range.end };
+  }
+  const preset = presets.find((item) => item.value === value) ?? presets[0];
+  return { value: preset.value, start: preset.start, end: preset.end };
 }
 
 /** Sources that failed, for the per-source warning. */
