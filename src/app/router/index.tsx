@@ -6,6 +6,7 @@ import {
   CustomerLoginPage,
   CustomersPage,
   DashboardPage,
+  FinancePage,
   InspectionDetailPage,
   InspectionsPage,
   MaintenanceDetailPage,
@@ -20,7 +21,6 @@ import {
   VehiclesPage,
 } from "./pages";
 import { ROUTES } from "@/constants/routes";
-import { ComingSoonPage } from "@/pages/comum/coming-soon";
 import { LoginPage } from "@/pages/gestao/login";
 import { NotFoundPage } from "@/pages/comum/not-found";
 
@@ -56,7 +56,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.rentalDetail, element: <RentalDetailPage /> },
       { path: ROUTES.customers, element: <CustomersPage /> },
       { path: ROUTES.customerDetail, element: <CustomerDetailPage /> },
-      { path: ROUTES.finance, element: <ComingSoonPage title="Financeiro" /> },
+      { path: ROUTES.finance, element: <FinancePage /> },
     ],
   },
   { path: ROUTES.root, element: <Navigate to={ROUTES.dashboard} replace /> },

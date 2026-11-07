@@ -82,7 +82,7 @@ export function DashboardPage() {
           overdueByPurpose={
             <BarListCard
               title="Inadimplência por finalidade"
-              items={overdueByPurposeItems(data, label)}
+              items={overdueByPurposeItems(data.delinquency, label)}
               empty="Nenhuma cobrança vencida."
               summary={`${pluralize(data.delinquency.overdue.count, "cobrança vencida", "cobranças vencidas")} em aberto · ${pluralize(data.delinquency.paid.lateCount, "paga", "pagas")} com atraso`}
             />
@@ -90,7 +90,7 @@ export function DashboardPage() {
           topDebtors={
             <BarListCard
               title="Maiores devedores"
-              items={topDebtorItems(data)}
+              items={topDebtorItems(data.delinquency)}
               empty="Sem devedores no momento."
             />
           }

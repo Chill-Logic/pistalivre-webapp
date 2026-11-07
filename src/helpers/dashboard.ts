@@ -8,7 +8,7 @@ import { LABEL_MAPS, type LabelMapName } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
 import type { LabelMap } from "@/types/labels";
 import type { BarItem, ColumnGroup } from "@/types/chart";
-import type { Balances, Dashboard } from "@/types/dashboard";
+import type { Balances, Dashboard, Delinquency } from "@/types/dashboard";
 import type { VehicleStatus } from "@/types/vehicle";
 import { formatCurrency } from "@/utils/format";
 import { pluralize } from "@/utils/text";
@@ -86,10 +86,10 @@ export function fleetItems(dashboard: Dashboard, label: LabelFn): BarItem[] {
 }
 
 export function overdueByPurposeItems(
-  dashboard: Dashboard,
+  delinquency: Delinquency,
   label: LabelFn,
 ): BarItem[] {
-  return dashboard.delinquency.overdueByPurpose.map((item, index) => ({
+  return delinquency.overdueByPurpose.map((item, index) => ({
     key: item.purpose,
     label: label(LABEL_MAPS.paymentPurpose, item.purpose),
     value: item.amount,
@@ -98,8 +98,8 @@ export function overdueByPurposeItems(
   }));
 }
 
-export function topDebtorItems(dashboard: Dashboard): BarItem[] {
-  return dashboard.delinquency.delinquentCustomers
+export function topDebtorItems(delinquency: Delinquency): BarItem[] {
+  return delinquency.delinquentCustomers
     .slice(0, DASHBOARD_TOP_ITEMS)
     .map((customer) => ({
       key: customer.customerId,

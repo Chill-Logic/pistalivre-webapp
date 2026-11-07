@@ -63,6 +63,12 @@ export const queryKeys = {
     wallet: () => [...queryKeys.portal.all, "wallet"] as const,
     reimbursements: () => [...queryKeys.portal.all, "reimbursements"] as const,
   },
+  finance: {
+    all: ["finance"] as const,
+    balances: () => [...queryKeys.finance.all, "balances"] as const,
+    delinquency: () => [...queryKeys.finance.all, "delinquency"] as const,
+    toCollect: () => [...queryKeys.finance.all, "to-collect"] as const,
+  },
   dashboard: {
     all: ["dashboard"] as const,
   },

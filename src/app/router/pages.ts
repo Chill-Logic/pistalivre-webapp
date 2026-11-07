@@ -64,3 +64,7 @@ export const VehicleEditPage = lazyPage(
   () => import("@/pages/gestao/vehicle-edit"),
   "VehicleEditPage",
 );
+export const FinancePage = lazyPage(
+  () => import("@/pages/gestao/finance"),
+  "FinancePage",
+);

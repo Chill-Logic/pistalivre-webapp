@@ -53,6 +53,7 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
 - Ficha do veículo e da locação mostram as **manutenções e vistorias** dela (`RelatedMaintenances`/`RelatedInspections`, carregam sozinhas com `?vehicleId=`/`?rentalId=`, até 100).
 - **Criar/editar veículo** (`/gestao/veiculos/novo`, `/gestao/veiculos/:id/editar`; "Novo veículo" na lista e "Editar" no detalhe): mesmos campos do form Next, inclusive "Valor da tarifa"/"Período da tarifa", que o `PUT` ainda exige (o `GET /vehicles/:id` passou a devolver `rate`/`ratePeriod`, senão a edição sobrescreveria a tarifa). Tipo filtra categoria; marca filtra modelo; marca/modelo/ano em combobox criável (Popover + cmdk, "Usar “X”"), enviados por NOME. Erros da API nos campos via `applyApiErrors` (422 `fields`; 409 de placa/chassi/renavam também vem com `fields`). Testado sem gravar: placa repetida contra a API real (409, nada criado); sucesso de POST/PUT simulado.
 - Celular: `scroll-padding-bottom` no `html` para a barra inferior fixa não cobrir o que o navegador rola para a vista (foco, validação). Um toque no "Cadastrar" caía em "Locações".
+- **Financeiro, visão geral** (`/gestao/financeiro`): saldos (`null` = "Indisponível"), "A receber" agrupado por dia de vencimento (Hoje/Ontem/"29 de agosto" + dias de atraso + subtotal) e inadimplência (cards + por finalidade + maiores devedores). Cada bloco usa o seu `QueryBoundary`, então uma fonte fora do ar não derruba as outras. "Vencido em aberto" diz que é o **valor original**, porque "A receber" mostra o devido hoje (com multa e juros) e lado a lado pareciam divergir.
 - Clientes: lista (busca, situação, filtro de teste; padrão = só reais) + detalhe (dados, CNH com aviso de vencida, endereço e emergência, locações, documentos). O locatário na locação leva à ficha. `DocumentsCard` é genérico (veículo e cliente).
 
 ## Organização (pedido do dono)
@@ -62,7 +63,7 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
 
 ## Próximo (em ordem)
 
-1. **Financeiro, só leitura**: perguntar ao backend (pista-livre-bf) o que existe em `/api/v1` (saldo, extrato, a receber, inadimplência, débitos da empresa). Nada de emitir, dar baixa ou editar cobrança/pix (regra 5).
+1. **Financeiro, só leitura** (endpoints em `pista-livre/docs/api-v1.md`, seção "Financeiro"): visão geral **feita**. Faltam **Débitos da empresa** (`/debts`, `/debts/:id`: o selo `status` vem pronto, não derive) e o **Extrato** (`/finance/statement`: período, origem, `truncated` → "(parcial)", `sources[].error` por origem). Nota e transferência interna do extrato são escrita: ficam de fora (regra 5).
 2. Escritas do portal e de dinheiro, e criar/editar cliente: **só com o dono** (o cliente faz upsert no Asaas).
 
 ## Pendências e decisões anotadas
