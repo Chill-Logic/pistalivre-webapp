@@ -1,4 +1,4 @@
-import { Box } from "@/components/atoms/box";
+import { Col, Row } from "@/components/atoms/grid";
 import { FilterSelect } from "@/components/molecules/filter-select";
 import { SearchInput } from "@/components/molecules/search-input";
 import { VEHICLE_STATUS_LABELS } from "@/constants/labels";
@@ -25,27 +25,36 @@ export function VehicleFilters({
   onStatusChange,
 }: VehicleFiltersProps) {
   return (
-    <Box className="grid gap-2 sm:grid-cols-[1fr_11rem_11rem]">
-      <SearchInput
-        value={filters.q}
-        onSearch={onSearch}
-        placeholder="Buscar por placa, marca ou modelo"
-      />
-      <FilterSelect
-        label="Tipo"
-        value={filters.type}
-        allLabel="Todos os tipos"
-        options={types.map((type) => ({ value: type.slug, label: type.name }))}
-        isLoading={isLoadingTypes}
-        onChange={onTypeChange}
-      />
-      <FilterSelect
-        label="Situação"
-        value={filters.status}
-        allLabel="Todas as situações"
-        options={STATUS_OPTIONS}
-        onChange={onStatusChange}
-      />
-    </Box>
+    <Row className="gap-y-2">
+      <Col md={6}>
+        <SearchInput
+          value={filters.q}
+          onSearch={onSearch}
+          placeholder="Buscar por placa, marca ou modelo"
+        />
+      </Col>
+      <Col sm={6} md={3}>
+        <FilterSelect
+          label="Tipo"
+          value={filters.type}
+          allLabel="Todos os tipos"
+          options={types.map((type) => ({
+            value: type.slug,
+            label: type.name,
+          }))}
+          isLoading={isLoadingTypes}
+          onChange={onTypeChange}
+        />
+      </Col>
+      <Col sm={6} md={3}>
+        <FilterSelect
+          label="Situação"
+          value={filters.status}
+          allLabel="Todas as situações"
+          options={STATUS_OPTIONS}
+          onChange={onStatusChange}
+        />
+      </Col>
+    </Row>
   );
 }

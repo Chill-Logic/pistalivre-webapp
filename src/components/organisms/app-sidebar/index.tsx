@@ -1,21 +1,61 @@
 import { Box } from "@/components/atoms/box";
-import { Aside, Nav } from "@/components/atoms/landmarks";
+import { Aside } from "@/components/atoms/landmarks";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from "@/components/atoms/sheet";
 import { Logo } from "@/components/molecules/logo";
-import { NavLink } from "@/components/molecules/nav-link";
+import { SidebarCollapseToggle } from "@/components/molecules/sidebar-collapse-toggle";
+import { SidebarNav } from "@/components/molecules/sidebar-nav";
+import { SIDEBAR_WIDTH } from "@/constants/layout";
 import { MAIN_NAV } from "@/constants/navigation";
+import { useSidebar } from "@/hooks/ui/useSidebar";
 
-/** Desktop navigation. Follows the theme (card surface), per brand tokens. */
+/**
+ * Same content, two shapes: a column that collapses to icons on desktop, a
+ * drawer on mobile. Follows the theme (card surface), per brand tokens.
+ */
 export function AppSidebar() {
+  const { isDesktop, isCollapsed, isDrawerOpen, setDrawerOpen, closeDrawer } =
+    useSidebar();
+
+  if (!isDesktop) {
+    return (
+      <Sheet open={isDrawerOpen} onOpenChange={setDrawerOpen}>
+        <SheetContent side="left" className="pb-safe-b pt-safe-t">
+          <SheetTitle className="sr-only">Menu</SheetTitle>
+          <SheetDescription className="sr-only">
+            Navegação do Pista Livre
+          </SheetDescription>
+          <Box className="flex h-14 shrink-0 items-center px-4">
+            <Logo />
+          </Box>
+          <Box className="flex-1 overflow-y-auto p-3">
+            <SidebarNav items={MAIN_NAV} onNavigate={closeDrawer} />
+          </Box>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
   return (
-    <Aside className="hidden w-60 shrink-0 flex-col border-r bg-card md:flex">
-      <Box className="flex h-14 items-center border-b px-4">
-        <Logo />
+    <Aside
+      className="sticky top-0 flex h-dvh shrink-0 flex-col border-r bg-card transition-[width] duration-300 ease-in-out motion-reduce:transition-none"
+      style={{
+        width: isCollapsed ? SIDEBAR_WIDTH.collapsed : SIDEBAR_WIDTH.expanded,
+      }}
+    >
+      <Box className="flex h-14 shrink-0 items-center justify-center px-3">
+        <Logo withName={!isCollapsed} />
       </Box>
-      <Nav aria-label="Navegação principal" className="flex flex-col gap-1 p-3">
-        {MAIN_NAV.map((item) => (
-          <NavLink key={item.to} item={item} layout="side" />
-        ))}
-      </Nav>
+      <Box className="flex-1 overflow-y-auto overflow-x-hidden p-3">
+        <SidebarNav items={MAIN_NAV} collapsed={isCollapsed} />
+      </Box>
+      <Box className="shrink-0 border-t p-3">
+        <SidebarCollapseToggle />
+      </Box>
     </Aside>
   );
 }

@@ -1,25 +1,31 @@
 import type { ReactNode } from "react";
-import { Box } from "@/components/atoms/box";
 import {
   DescriptionDetails,
   DescriptionTerm,
 } from "@/components/atoms/description-list";
+import { Col } from "@/components/atoms/grid";
+import type { ColSpans } from "@/helpers/grid";
 import { cn } from "@/utils/cn";
 
-type InfoItemProps = {
+type InfoItemProps = ColSpans & {
   label: string;
   children: ReactNode;
   mono?: boolean;
 };
 
-/** Label/value pair; use inside a DescriptionList. */
-export function InfoItem({ label, children, mono = false }: InfoItemProps) {
+/** Label/value pair as a grid column; use inside `<Row as="dl">`. */
+export function InfoItem({
+  label,
+  children,
+  mono = false,
+  ...spans
+}: InfoItemProps) {
   return (
-    <Box className="min-w-0 space-y-1">
+    <Col {...spans} className="space-y-1">
       <DescriptionTerm>{label}</DescriptionTerm>
       <DescriptionDetails className={cn(mono && "font-mono")}>
         {children ?? "—"}
       </DescriptionDetails>
-    </Box>
+    </Col>
   );
 }

@@ -1,6 +1,6 @@
 import { Box } from "@/components/atoms/box";
 import { Card, CardContent, CardHeader } from "@/components/atoms/card";
-import { DescriptionList } from "@/components/atoms/description-list";
+import { Col, Row } from "@/components/atoms/grid";
 import { Heading } from "@/components/atoms/heading";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
@@ -26,22 +26,28 @@ export function VehicleSummary({ vehicle }: { vehicle: Vehicle }) {
         </Text>
       </CardHeader>
       <CardContent>
-        <DescriptionList className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          <InfoItem label="Tipo">{vehicle.type.name}</InfoItem>
-          <InfoItem label="Categoria">{vehicle.category.name}</InfoItem>
-          <InfoItem label="Km atual">
+        <Row as="dl" className="gap-y-4">
+          <InfoItem span={6} md={4} label="Tipo">
+            {vehicle.type.name}
+          </InfoItem>
+          <InfoItem span={6} md={4} label="Categoria">
+            {vehicle.category.name}
+          </InfoItem>
+          <InfoItem span={6} md={4} label="Km atual">
             {vehicle.currentMileage !== null
               ? formatMileage(vehicle.currentMileage)
               : "Sem leitura"}
           </InfoItem>
-          <InfoItem label="Cor">{vehicle.color}</InfoItem>
-          <InfoItem label="Chassi" mono>
+          <InfoItem span={6} md={4} label="Cor">
+            {vehicle.color}
+          </InfoItem>
+          <InfoItem span={6} md={4} label="Chassi" mono>
             {vehicle.chassis}
           </InfoItem>
-          <InfoItem label="Renavam" mono>
+          <InfoItem span={6} md={4} label="Renavam" mono>
             {vehicle.renavam}
           </InfoItem>
-        </DescriptionList>
+        </Row>
       </CardContent>
     </Card>
   );
@@ -60,14 +66,14 @@ export function VehicleSummarySkeleton() {
         <Skeleton shape="text" className="w-2/3 text-sm" />
       </CardHeader>
       <CardContent>
-        <Box className="grid grid-cols-2 gap-4 md:grid-cols-3">
+        <Row className="gap-y-4">
           {Array.from({ length: SUMMARY_FIELDS }, (_, index) => (
-            <Box key={index} className="space-y-2">
+            <Col key={index} span={6} md={4} className="space-y-2">
               <Skeleton shape="text" className="w-16 text-xs" />
               <Skeleton shape="text" className="w-28 text-sm" />
-            </Box>
+            </Col>
           ))}
-        </Box>
+        </Row>
       </CardContent>
     </Card>
   );

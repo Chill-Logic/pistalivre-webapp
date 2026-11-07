@@ -17,7 +17,7 @@ export function QueryDevtools() {
     // Desktop only: on phones the floating button covers the bottom nav.
     <Box className="hidden md:block">
       <Suspense fallback={null}>
-        <ReactQueryDevtools buttonPosition="bottom-left" />
+        <ReactQueryDevtools buttonPosition="bottom-right" />
       </Suspense>
     </Box>
   );

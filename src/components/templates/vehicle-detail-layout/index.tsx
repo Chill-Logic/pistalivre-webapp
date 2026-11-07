@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Box } from "@/components/atoms/box";
+import { Col, Row } from "@/components/atoms/grid";
 
 type VehicleDetailLayoutProps = {
   summary: ReactNode;
@@ -14,10 +14,10 @@ export function VehicleDetailLayout({
   documents,
 }: VehicleDetailLayoutProps) {
   return (
-    <Box className="grid gap-4 lg:grid-cols-[2fr_1fr] lg:items-start">
-      {summary}
-      {rental}
-      <Box className="lg:col-span-2">{documents}</Box>
-    </Box>
+    <Row className="items-start gap-y-6">
+      <Col lg={8}>{summary}</Col>
+      <Col lg={4}>{rental}</Col>
+      <Col>{documents}</Col>
+    </Row>
   );
 }

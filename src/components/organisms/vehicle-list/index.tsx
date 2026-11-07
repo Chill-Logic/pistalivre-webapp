@@ -1,5 +1,5 @@
 import { CarFront } from "lucide-react";
-import { List, ListItem } from "@/components/atoms/list";
+import { Col, Row } from "@/components/atoms/grid";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import {
@@ -9,8 +9,6 @@ import {
 import type { Vehicle } from "@/types/vehicle";
 import { cn } from "@/utils/cn";
 
-const GRID = "grid gap-3 sm:grid-cols-2 xl:grid-cols-3";
-
 type VehicleListProps = {
   vehicles: Vehicle[] | undefined;
   isLoading: boolean;
@@ -19,7 +17,7 @@ type VehicleListProps = {
   skeletonCount?: number;
 };
 
-/** Cards stacked on mobile, grid from `sm` up. */
+/** Cards stacked on mobile, 2 columns from `sm`, 3 from `xl`. */
 export function VehicleList({
   vehicles,
   isLoading,
@@ -29,13 +27,13 @@ export function VehicleList({
   if (isLoading) {
     return (
       <SkeletonRegion label="Carregando veículos…">
-        <List className={GRID}>
+        <Row as="ul" className="gap-y-6">
           {Array.from({ length: skeletonCount }, (_, index) => (
-            <ListItem key={index} className="min-w-0">
+            <Col as="li" key={index} sm={6} xl={4}>
               <VehicleCardSkeleton />
-            </ListItem>
+            </Col>
           ))}
-        </List>
+        </Row>
       </SkeletonRegion>
     );
   }
@@ -51,19 +49,20 @@ export function VehicleList({
   }
 
   return (
-    <List
+    <Row
+      as="ul"
       aria-busy={isRefreshing}
       className={cn(
-        GRID,
+        "gap-y-6",
         "transition-opacity duration-200",
         isRefreshing && "pointer-events-none opacity-60",
       )}
     >
       {vehicles.map((vehicle) => (
-        <ListItem key={vehicle.id} className="min-w-0">
+        <Col as="li" key={vehicle.id} sm={6} xl={4}>
           <VehicleCard vehicle={vehicle} />
-        </ListItem>
+        </Col>
       ))}
-    </List>
+    </Row>
   );
 }

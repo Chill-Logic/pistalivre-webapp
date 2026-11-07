@@ -57,6 +57,8 @@ export default defineConfig({
             "@radix-ui/react-slot",
             "@radix-ui/react-label",
             "@radix-ui/react-select",
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-tooltip",
             "lucide-react",
             "sonner",
           ],

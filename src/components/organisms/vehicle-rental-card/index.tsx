@@ -4,8 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/card";
-import { Box } from "@/components/atoms/box";
-import { DescriptionList } from "@/components/atoms/description-list";
+import { Col, Row } from "@/components/atoms/grid";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { InfoItem } from "@/components/molecules/info-item";
@@ -19,12 +18,14 @@ export function VehicleRentalCard({ rental }: { rental: ActiveRental | null }) {
       </CardHeader>
       <CardContent>
         {rental ? (
-          <DescriptionList className="grid grid-cols-2 gap-4">
-            <InfoItem label="Locatário">{rental.customer.name}</InfoItem>
-            <InfoItem label="Código" mono>
+          <Row as="dl" className="gap-y-4">
+            <InfoItem span={6} label="Locatário">
+              {rental.customer.name}
+            </InfoItem>
+            <InfoItem span={6} label="Código" mono>
               {rental.code}
             </InfoItem>
-          </DescriptionList>
+          </Row>
         ) : (
           <Text tone="muted">Nenhuma locação ativa neste veículo.</Text>
         )}
@@ -40,14 +41,14 @@ export function VehicleRentalCardSkeleton() {
         <Skeleton shape="text" className="w-20 text-base" />
       </CardHeader>
       <CardContent>
-        <Box className="grid grid-cols-2 gap-4">
+        <Row className="gap-y-4">
           {["w-32", "w-24"].map((width) => (
-            <Box key={width} className="space-y-2">
+            <Col key={width} span={6} className="space-y-2">
               <Skeleton shape="text" className="w-16 text-xs" />
               <Skeleton shape="text" className={`${width} text-sm`} />
-            </Box>
+            </Col>
           ))}
-        </Box>
+        </Row>
       </CardContent>
     </Card>
   );

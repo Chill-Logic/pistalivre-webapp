@@ -2,13 +2,22 @@ import { Box } from "@/components/atoms/box";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { PageSkeleton } from "@/components/templates/page-skeleton";
+import { SIDEBAR_WIDTH } from "@/constants/layout";
+import { useSidebar } from "@/hooks/ui/useSidebar";
 
 /** Same frame as AppShell while the session is being validated. */
 export function AppShellSkeleton() {
+  const { isCollapsed } = useSidebar();
+
   return (
     <SkeletonRegion label="Abrindo o Pista Livre…" className="flex min-h-dvh">
-      <Box className="hidden w-60 shrink-0 flex-col gap-2 border-r bg-card p-3 md:flex">
-        <Skeleton className="mb-3 h-8 w-36" />
+      <Box
+        className="hidden shrink-0 flex-col gap-2 border-r bg-card p-3 md:flex"
+        style={{
+          width: isCollapsed ? SIDEBAR_WIDTH.collapsed : SIDEBAR_WIDTH.expanded,
+        }}
+      >
+        <Skeleton className={isCollapsed ? "mb-3 size-8" : "mb-3 h-8 w-36"} />
         {Array.from({ length: 5 }, (_, index) => (
           <Skeleton key={index} className="h-9" />
         ))}

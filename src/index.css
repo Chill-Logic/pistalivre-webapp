@@ -2,6 +2,93 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Grid row/col estilo Bootstrap (12 colunas) — padrão de layout dos projetos da
+   Conecta. `.row` é um flex-wrap com margens negativas que compensam o padding
+   (`px-3`) das colunas, encaixando o conteúdo nas bordas. Gutter de 24px
+   (12px por lado). Uso: <div class="row"><div class="col-6">…</div>…</div>.
+   Fica FORA de @layer de propósito: dentro do @layer base o Tailwind reemitia o
+   bloco base das colunas depois das media queries, e aí `.col-12` (w-full, sem
+   media) vencia `.col-md-6`/`.col-lg-3` em qualquer largura. Como CSS plano a
+   ordem base→media é preservada (as responsivas ganham no breakpoint) e as
+   classes nunca são purgadas. */
+.row {
+  @apply flex flex-wrap -mx-3;
+}
+  .col-1 { @apply w-1/12 px-3; }
+  .col-2 { @apply w-1/6 px-3; }
+  .col-3 { @apply w-1/4 px-3; }
+  .col-4 { @apply w-1/3 px-3; }
+  .col-5 { @apply w-5/12 px-3; }
+  .col-6 { @apply w-1/2 px-3; }
+  .col-7 { @apply w-7/12 px-3; }
+  .col-8 { @apply w-2/3 px-3; }
+  .col-9 { @apply w-3/4 px-3; }
+  .col-10 { @apply w-5/6 px-3; }
+  .col-11 { @apply w-11/12 px-3; }
+  .col-12 { @apply w-full px-3; }
+
+  /* Variantes responsivas (Bootstrap-style): a coluna assume a largura a partir
+     do breakpoint. Combine com uma col base para o comportamento mobile-first —
+     ex.: `col-12 col-md-6` (empilha no mobile, 50% a partir de md). Breakpoints
+     do Tailwind: sm 640 · md 768 · lg 1024 · xl 1280. */
+  @screen sm {
+    .col-sm-1 { @apply w-1/12 px-3; }
+    .col-sm-2 { @apply w-1/6 px-3; }
+    .col-sm-3 { @apply w-1/4 px-3; }
+    .col-sm-4 { @apply w-1/3 px-3; }
+    .col-sm-5 { @apply w-5/12 px-3; }
+    .col-sm-6 { @apply w-1/2 px-3; }
+    .col-sm-7 { @apply w-7/12 px-3; }
+    .col-sm-8 { @apply w-2/3 px-3; }
+    .col-sm-9 { @apply w-3/4 px-3; }
+    .col-sm-10 { @apply w-5/6 px-3; }
+    .col-sm-11 { @apply w-11/12 px-3; }
+    .col-sm-12 { @apply w-full px-3; }
+  }
+  @screen md {
+    .col-md-1 { @apply w-1/12 px-3; }
+    .col-md-2 { @apply w-1/6 px-3; }
+    .col-md-3 { @apply w-1/4 px-3; }
+    .col-md-4 { @apply w-1/3 px-3; }
+    .col-md-5 { @apply w-5/12 px-3; }
+    .col-md-6 { @apply w-1/2 px-3; }
+    .col-md-7 { @apply w-7/12 px-3; }
+    .col-md-8 { @apply w-2/3 px-3; }
+    .col-md-9 { @apply w-3/4 px-3; }
+    .col-md-10 { @apply w-5/6 px-3; }
+    .col-md-11 { @apply w-11/12 px-3; }
+    .col-md-12 { @apply w-full px-3; }
+  }
+  @screen lg {
+    .col-lg-1 { @apply w-1/12 px-3; }
+    .col-lg-2 { @apply w-1/6 px-3; }
+    .col-lg-3 { @apply w-1/4 px-3; }
+    .col-lg-4 { @apply w-1/3 px-3; }
+    .col-lg-5 { @apply w-5/12 px-3; }
+    .col-lg-6 { @apply w-1/2 px-3; }
+    .col-lg-7 { @apply w-7/12 px-3; }
+    .col-lg-8 { @apply w-2/3 px-3; }
+    .col-lg-9 { @apply w-3/4 px-3; }
+    .col-lg-10 { @apply w-5/6 px-3; }
+    .col-lg-11 { @apply w-11/12 px-3; }
+    .col-lg-12 { @apply w-full px-3; }
+  }
+  @screen xl {
+    .col-xl-1 { @apply w-1/12 px-3; }
+    .col-xl-2 { @apply w-1/6 px-3; }
+    .col-xl-3 { @apply w-1/4 px-3; }
+    .col-xl-4 { @apply w-1/3 px-3; }
+    .col-xl-5 { @apply w-5/12 px-3; }
+    .col-xl-6 { @apply w-1/2 px-3; }
+    .col-xl-7 { @apply w-7/12 px-3; }
+    .col-xl-8 { @apply w-2/3 px-3; }
+    .col-xl-9 { @apply w-3/4 px-3; }
+    .col-xl-10 { @apply w-5/6 px-3; }
+    .col-xl-11 { @apply w-11/12 px-3; }
+    .col-xl-12 { @apply w-full px-3; }
+  }
+
+
 /*
  * Pista Livre brand tokens (see docs/brand-tokens.md) mapped to shadcn
  * semantic variables. Rule 60/30/10: neutral surfaces, neutral text, red only
