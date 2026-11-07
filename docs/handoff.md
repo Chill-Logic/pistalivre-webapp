@@ -45,6 +45,7 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
 - **Portal do cliente** (`/area-cliente`, login em `/area-cliente/entrar` por e-mail ou CPF): guards por **realm** (`RequireAuth realm`/`RedirectIfAuthenticated realm`, `helpers/safe-redirect`): sem sessão → login do realm com `callbackUrl`; sessão do outro realm → home dele (staff em /area-cliente cai em /gestao e vice-versa); `callbackUrl` de outra área é ignorado. Shell próprio (`PortalShell`: coluna única max-w-3xl, sem sidebar). Home = hub (locações, cobranças com copiar pix/QR sob demanda/fatura, NFs autorizadas, reembolsos com recusado em destaque — 5 no máximo —, carteira). Locação = resumo + caução + seções do `/sections` (a divulgação progressiva é do servidor). Cada seção carrega e falha sozinha (`QueryBoundary`). **Só leitura**: sem pedir reembolso, cadastrar chave pix, registrar manutenção/vistoria nem trocar senha (escritas do portal ficam para o dono decidir).
   - ⚠️ **Não há cliente de teste com senha no dev** (o backend não cria por ser credencial/dado de cliente). O portal foi validado com **respostas simuladas** (`/me/*` e `/auth/me` interceptados no Puppeteer, nos formatos reais que o backend viu no dev) + o login real com senha errada. Pendência para o dono: indicar/criar um cliente de teste.
   - Tema claro/escuro mantido no portal, igual ao Next (o CLAUDE.md anota a dúvida de travar o portal no claro; decisão do dono).
+- Veículo — **trocar situação e excluir**: card "Situação" com só as transições legais (`constants/vehicle.ts`, espelho da regra do domínio), cada uma confirmada em Dialog (para "Alugado" o texto avisa que normalmente isso vem de ativar uma locação); avisa quando há locação ativa mas a situação gravada é outra. "Excluir" no topo do detalhe, Dialog destrutivo, volta para a lista. `Dialog` (atom, bottom sheet no celular) + `ConfirmDialog` (molecule) prontos para reuso. Testado: AVAILABLE→MAINTENANCE→AVAILABLE no PLA-1001 (dado voltou ao original); exclusão testada com o DELETE simulado (nenhum veículo apagado).
 - Clientes: lista (busca, situação, filtro de teste; padrão = só reais) + detalhe (dados, CNH com aviso de vencida, endereço e emergência, locações, documentos). O locatário na locação leva à ficha. `DocumentsCard` é genérico (veículo e cliente).
 
 ## Organização (pedido do dono)
@@ -54,7 +55,7 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
 
 ## Próximo (em ordem)
 
-1. **Escritas sem dinheiro** (o backend já tem as de veículo): `GET /vehicles/form-options`, `POST`/`PUT /vehicles`, `PATCH /vehicles/:id/status` (transições: AVAILABLE→RENTED/MAINTENANCE/INACTIVE; RENTED→AVAILABLE/MAINTENANCE; MAINTENANCE→AVAILABLE/INACTIVE; INACTIVE→AVAILABLE) e `DELETE /vehicles/:id` (confirmar com Dialog). Marca e modelo vão por NOME (combobox criável). Criar/editar cliente está **fora**: faz upsert no Asaas (regra 5).
+1. **Criar/editar veículo** (situação e exclusão já feitas): `GET /vehicles/form-options`, `POST`/`PUT /vehicles`. Marca e modelo vão por NOME (combobox criável). Criar/editar cliente está **fora**: faz upsert no Asaas (regra 5).
    - Formulários: `react-hook-form` + zod; o 422 da API traz `fields` em PT (aplicar com `setError`). Combobox, Dialog e Checkbox via Radix (nada nativo).
 
 ## Pendências e decisões anotadas

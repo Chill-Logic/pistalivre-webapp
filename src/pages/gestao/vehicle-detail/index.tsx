@@ -17,6 +17,11 @@ import {
   VehicleSummary,
   VehicleSummarySkeleton,
 } from "@/components/organisms/vehicle-summary";
+import {
+  VehicleStatusCard,
+  VehicleStatusCardSkeleton,
+} from "@/components/organisms/vehicle-status-card";
+import { VehicleDeleteButton } from "@/components/organisms/vehicle-delete-button";
 import { VehicleDetailLayout } from "@/components/templates/vehicle-detail-layout";
 import { ROUTES } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
@@ -30,11 +35,20 @@ export function VehicleDetailPage() {
 
   return (
     <Box className="space-y-4">
-      <BackLink to={backTo} label="Veículos" />
+      <Box className="flex items-center justify-between gap-2">
+        <BackLink to={backTo} label="Veículos" />
+        {vehicle.data && (
+          <VehicleDeleteButton
+            vehicleId={vehicle.data.id}
+            plate={vehicle.data.plate}
+          />
+        )}
+      </Box>
       {vehicle.isPending && (
         <SkeletonRegion label="Carregando veículo…">
           <VehicleDetailLayout
             summary={<VehicleSummarySkeleton />}
+            status={<VehicleStatusCardSkeleton />}
             rental={<VehicleRentalCardSkeleton />}
             documents={<DocumentsCardSkeleton />}
           />
@@ -53,6 +67,13 @@ export function VehicleDetailPage() {
       {vehicle.data && (
         <VehicleDetailLayout
           summary={<VehicleSummary vehicle={vehicle.data} />}
+          status={
+            <VehicleStatusCard
+              vehicleId={vehicle.data.id}
+              status={vehicle.data.status}
+              hasActiveRental={vehicle.data.activeRental !== null}
+            />
+          }
           rental={<VehicleRentalCard rental={vehicle.data.activeRental} />}
           documents={<DocumentsCard documents={vehicle.data.documents} />}
         />
