@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Pista Livre brand tokens (see docs/brand-tokens.md) mapped to shadcn
+ * semantic variables. Rule 60/30/10: neutral surfaces, neutral text, red only
+ * as the 10% accent. Brand red #E4141B is the action colour; errors use a
+ * darker, closed red (feedback-error) — never the brand red as a fill.
+ */
+@layer base {
+  :root {
+    --background: 60 9% 98%; /* surface-page  #FAFAF9 */
+    --foreground: 240 6% 10%; /* text-primary  #18181B */
+    --card: 0 0% 100%; /* surface-card  #FFFFFF */
+    --card-foreground: 240 6% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 6% 10%;
+    --primary: 358 84% 49%; /* red-500  #E4141B */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%; /* surface-muted #F4F4F5 */
+    --secondary-foreground: 240 6% 10%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%; /* text-muted */
+    --accent: 240 5% 96%;
+    --accent-foreground: 240 6% 10%;
+    --destructive: 4 76% 40%; /* feedback-error text #B42318 */
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 90%; /* border-default #E4E4E7 */
+    --input: 240 6% 90%;
+    --ring: 358 84% 49%; /* border-focus */
+
+    --inverse: 240 5% 12%; /* surface-inverse #1C1C1F */
+    --inverse-foreground: 60 9% 98%;
+
+    --success-bg: 141 84% 93%;
+    --success-fg: 143 64% 24%;
+    --warning-bg: 48 96% 89%;
+    --warning-fg: 23 83% 31%;
+    --error-bg: 4 93% 94%;
+    --error-fg: 4 76% 40%;
+
+    --radius: 0.6rem;
+  }
+
+  .dark {
+    --background: 240 5% 12%; /* #1C1C1F */
+    --foreground: 60 9% 98%;
+    --card: 240 4% 16%; /* #27272A */
+    --card-foreground: 60 9% 98%;
+    --popover: 240 4% 16%;
+    --popover-foreground: 60 9% 98%;
+    --primary: 358 86% 57%; /* red brightened for dark #F0353B */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 16%;
+    --secondary-foreground: 60 9% 98%;
+    --muted: 240 4% 16%;
+    --muted-foreground: 240 4% 60%;
+    --accent: 240 4% 20%;
+    --accent-foreground: 60 9% 98%;
+    --destructive: 4 76% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 5% 26%; /* gray-700 #3F3F46 */
+    --input: 240 5% 26%;
+    --ring: 358 86% 57%;
+
+    --inverse: 240 6% 7%; /* #111113 */
+    --inverse-foreground: 60 9% 98%;
+
+    --success-bg: 143 40% 18%;
+    --success-fg: 141 65% 78%;
+    --warning-bg: 30 45% 20%;
+    --warning-fg: 45 90% 76%;
+    --error-bg: 4 45% 22%;
+    --error-fg: 4 85% 80%;
+  }
+}
+
+/* System-preference dark, when no explicit theme class is set. */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --background: 240 5% 12%;
+    --foreground: 60 9% 98%;
+    --card: 240 4% 16%;
+    --card-foreground: 60 9% 98%;
+    --popover: 240 4% 16%;
+    --popover-foreground: 60 9% 98%;
+    --primary: 358 86% 57%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 16%;
+    --secondary-foreground: 60 9% 98%;
+    --muted: 240 4% 16%;
+    --muted-foreground: 240 4% 60%;
+    --accent: 240 4% 20%;
+    --accent-foreground: 60 9% 98%;
+    --destructive: 4 76% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 5% 26%;
+    --input: 240 5% 26%;
+    --ring: 358 86% 57%;
+    --inverse: 240 6% 7%;
+    --inverse-foreground: 60 9% 98%;
+    --success-bg: 143 40% 18%;
+    --success-fg: 141 65% 78%;
+    --warning-bg: 30 45% 20%;
+    --warning-fg: 45 90% 76%;
+    --error-bg: 4 45% 22%;
+    --error-fg: 4 85% 80%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    overscroll-behavior-y: none;
+  }
+}
