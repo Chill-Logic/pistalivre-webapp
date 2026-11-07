@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
 import { Check } from "lucide-react";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/atoms/card";
@@ -18,7 +20,14 @@ import { formatCurrency } from "@/utils/format";
 import { cn } from "@/utils/cn";
 
 /** A plan as the public questionnaire shows it — price is real data. */
-export function PlanCard({ plan }: { plan: Plan }) {
+export function PlanCard({
+  plan,
+  actions,
+}: {
+  plan: Plan;
+  /** Edit/remove buttons (the gestão list). */
+  actions?: ReactNode;
+}) {
   const { label } = useLabels();
   return (
     <Card className={cn("flex h-full flex-col", !plan.active && "opacity-70")}>
@@ -65,6 +74,11 @@ export function PlanCard({ plan }: { plan: Plan }) {
           </List>
         )}
       </CardContent>
+      {actions && (
+        <CardFooter className="justify-end gap-2 border-t pt-4 md:pt-4">
+          {actions}
+        </CardFooter>
+      )}
     </Card>
   );
 }

@@ -125,6 +125,14 @@ export const PlansPage = lazyPage(
   () => import("@/pages/gestao/plans"),
   "PlansPage",
 );
+export const PlanNewPage = lazyPage(
+  () => import("@/pages/gestao/plan-new"),
+  "PlanNewPage",
+);
+export const PlanEditPage = lazyPage(
+  () => import("@/pages/gestao/plan-edit"),
+  "PlanEditPage",
+);
 export const ModelsContractsPage = lazyPage(
   () => import("@/pages/gestao/models-contracts"),
   "ModelsContractsPage",

@@ -107,6 +107,7 @@ export const queryKeys = {
   },
   plans: {
     all: ["plans"] as const,
+    detail: (id: string) => [...queryKeys.plans.all, "detail", id] as const,
   },
   templates: {
     all: ["templates"] as const,

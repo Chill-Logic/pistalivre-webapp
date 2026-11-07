@@ -20,3 +20,18 @@ export type Plan = {
   createdAt: string;
   updatedAt: string;
 };
+
+/** POST/PUT /plans body. PUT replaces the plan: send every field. */
+export type PlanInput = {
+  name: string;
+  description: string | null;
+  rate: number;
+  ratePeriod: RatePeriod;
+  durationMonths: number | null;
+  renewable: boolean;
+  noFidelity: boolean;
+  ownershipAtEnd: boolean;
+  highlights: string[];
+  active: boolean;
+  sortOrder: number;
+};
