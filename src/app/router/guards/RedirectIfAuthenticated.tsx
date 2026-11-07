@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useSearchParams } from "react-router-dom";
-import { FullPageLoader } from "@/components/molecules/full-page-loader";
+import { AppShellSkeleton } from "@/components/templates/app-shell-skeleton";
 import { safeRedirect } from "@/helpers/safe-redirect";
 import { useSession } from "@/hooks/auth/useSession";
 
@@ -8,7 +8,7 @@ export function RedirectIfAuthenticated() {
   const session = useSession();
   const [params] = useSearchParams();
 
-  if (session.status === "loading") return <FullPageLoader />;
+  if (session.status === "loading") return <AppShellSkeleton />;
   if (session.status === "authenticated") {
     return <Navigate to={safeRedirect(params.get("callbackUrl"))} replace />;
   }

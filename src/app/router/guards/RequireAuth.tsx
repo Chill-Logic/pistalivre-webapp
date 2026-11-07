@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { FullPageLoader } from "@/components/molecules/full-page-loader";
+import { AppShellSkeleton } from "@/components/templates/app-shell-skeleton";
 import { AppShell } from "@/components/templates/app-shell";
 import { loginUrlFor } from "@/helpers/safe-redirect";
 import { useSession } from "@/hooks/auth/useSession";
@@ -9,7 +9,7 @@ export function RequireAuth() {
   const session = useSession();
   const location = useLocation();
 
-  if (session.status === "loading") return <FullPageLoader />;
+  if (session.status === "loading") return <AppShellSkeleton />;
   if (session.status === "anonymous") {
     return (
       <Navigate to={loginUrlFor(location.pathname + location.search)} replace />

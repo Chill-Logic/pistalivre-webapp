@@ -10,6 +10,7 @@ const STATUS_OPTIONS = optionsFromLabels(VEHICLE_STATUS_LABELS);
 type VehicleFiltersProps = {
   filters: Filters;
   types: VehicleType[];
+  isLoadingTypes?: boolean;
   onSearch: (value: string) => void;
   onTypeChange: (value: string) => void;
   onStatusChange: (value: string) => void;
@@ -18,6 +19,7 @@ type VehicleFiltersProps = {
 export function VehicleFilters({
   filters,
   types,
+  isLoadingTypes = false,
   onSearch,
   onTypeChange,
   onStatusChange,
@@ -34,6 +36,7 @@ export function VehicleFilters({
         value={filters.type}
         allLabel="Todos os tipos"
         options={types.map((type) => ({ value: type.slug, label: type.name }))}
+        isLoading={isLoadingTypes}
         onChange={onTypeChange}
       />
       <FilterSelect

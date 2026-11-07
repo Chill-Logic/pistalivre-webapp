@@ -2,6 +2,7 @@ import { ChevronRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Card } from "@/components/atoms/card";
+import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { VehicleStatusBadge } from "@/components/molecules/vehicle-status-badge";
 import { routeTo } from "@/constants/routes";
@@ -53,5 +54,22 @@ export function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         />
       </Card>
     </Link>
+  );
+}
+
+/** Same box model as VehicleCard: plate + badge, name, details line. */
+export function VehicleCardSkeleton() {
+  return (
+    <Card className="flex h-full items-center gap-3 p-4">
+      <Box className="min-w-0 flex-1 space-y-2">
+        <Box className="flex items-start justify-between gap-2">
+          <Skeleton shape="text" className="w-28 text-lg" />
+          <Skeleton shape="pill" className="h-5 w-20" />
+        </Box>
+        <Skeleton shape="text" className="w-3/4 text-sm" />
+        <Skeleton shape="text" className="w-1/2 text-xs" />
+      </Box>
+      <Skeleton className="size-4 shrink-0" />
+    </Card>
   );
 }

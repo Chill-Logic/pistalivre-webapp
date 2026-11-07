@@ -62,6 +62,15 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      keyframes: {
+        progress: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(300%)" },
+        },
+      },
+      animation: {
+        progress: "progress 1.1s ease-in-out infinite",
+      },
       spacing: {
         "safe-b": "env(safe-area-inset-bottom)",
         "safe-t": "env(safe-area-inset-top)",

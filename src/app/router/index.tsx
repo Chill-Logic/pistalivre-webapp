@@ -1,13 +1,11 @@
 import { createBrowserRouter } from "react-router-dom";
 import { RedirectIfAuthenticated } from "./guards/RedirectIfAuthenticated";
 import { RequireAuth } from "./guards/RequireAuth";
+import { DashboardPage, VehicleDetailPage, VehiclesPage } from "./pages";
 import { ROUTES } from "@/constants/routes";
 import { ComingSoonPage } from "@/pages/coming-soon";
-import { DashboardPage } from "@/pages/dashboard";
 import { LoginPage } from "@/pages/login";
 import { NotFoundPage } from "@/pages/not-found";
-import { VehicleDetailPage } from "@/pages/vehicle-detail";
-import { VehiclesPage } from "@/pages/vehicles";
 
 export const router = createBrowserRouter([
   {

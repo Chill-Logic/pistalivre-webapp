@@ -1,13 +1,23 @@
 import { CarFront } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
-import { Skeleton } from "@/components/atoms/skeleton";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
+import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { QueryError } from "@/components/organisms/query-error";
-import { VehicleDocuments } from "@/components/organisms/vehicle-documents";
-import { VehicleRentalCard } from "@/components/organisms/vehicle-rental-card";
-import { VehicleSummary } from "@/components/organisms/vehicle-summary";
+import {
+  VehicleDocuments,
+  VehicleDocumentsSkeleton,
+} from "@/components/organisms/vehicle-documents";
+import {
+  VehicleRentalCard,
+  VehicleRentalCardSkeleton,
+} from "@/components/organisms/vehicle-rental-card";
+import {
+  VehicleSummary,
+  VehicleSummarySkeleton,
+} from "@/components/organisms/vehicle-summary";
+import { VehicleDetailLayout } from "@/components/templates/vehicle-detail-layout";
 import { ROUTES } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { useVehicle } from "@/hooks/api/vehicles/useVehicle";
@@ -21,6 +31,15 @@ export function VehicleDetailPage() {
   return (
     <Box className="space-y-4">
       <BackLink to={backTo} label="Veículos" />
+      {vehicle.isPending && (
+        <SkeletonRegion label="Carregando veículo…">
+          <VehicleDetailLayout
+            summary={<VehicleSummarySkeleton />}
+            rental={<VehicleRentalCardSkeleton />}
+            documents={<VehicleDocumentsSkeleton />}
+          />
+        </SkeletonRegion>
+      )}
       {vehicle.isError &&
         (isNotFound(vehicle.error) ? (
           <EmptyState
@@ -31,20 +50,12 @@ export function VehicleDetailPage() {
         ) : (
           <QueryError error={vehicle.error} onRetry={() => vehicle.refetch()} />
         ))}
-      {vehicle.isPending && (
-        <Box className="space-y-4">
-          <Skeleton className="h-56" />
-          <Skeleton className="h-28" />
-        </Box>
-      )}
       {vehicle.data && (
-        <Box className="grid gap-4 lg:grid-cols-[2fr_1fr] lg:items-start">
-          <VehicleSummary vehicle={vehicle.data} />
-          <VehicleRentalCard rental={vehicle.data.activeRental} />
-          <Box className="lg:col-span-2">
-            <VehicleDocuments documents={vehicle.data.documents} />
-          </Box>
-        </Box>
+        <VehicleDetailLayout
+          summary={<VehicleSummary vehicle={vehicle.data} />}
+          rental={<VehicleRentalCard rental={vehicle.data.activeRental} />}
+          documents={<VehicleDocuments documents={vehicle.data.documents} />}
+        />
       )}
     </Box>
   );

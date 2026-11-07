@@ -50,10 +50,16 @@ export default defineConfig({
         // Vendor chunks change less than app code: the service worker only
         // re-downloads what actually changed between deploys.
         manualChunks: {
-          react: ["react", "react-dom", "react-router-dom"],
+          react: ["react", "react-dom", "react-dom/client", "react-router-dom"],
           query: ["@tanstack/react-query"],
           forms: ["react-hook-form", "@hookform/resolvers", "zod"],
-          ui: ["@radix-ui/react-slot", "@radix-ui/react-label", "lucide-react", "sonner"],
+          ui: [
+            "@radix-ui/react-slot",
+            "@radix-ui/react-label",
+            "@radix-ui/react-select",
+            "lucide-react",
+            "sonner",
+          ],
         },
       },
     },

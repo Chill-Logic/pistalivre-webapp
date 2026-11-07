@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/card";
+import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { DocumentItem } from "@/components/molecules/document-item";
 import { useFileActions } from "@/hooks/api/files/useFileActions";
@@ -37,6 +38,33 @@ export function VehicleDocuments({ documents }: { documents: DocumentFile[] }) {
             ))}
           </Box>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+const DOCUMENT_ROWS = 2;
+
+export function VehicleDocumentsSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <Skeleton shape="text" className="w-28 text-base" />
+      </CardHeader>
+      <CardContent>
+        <Box className="divide-y">
+          {Array.from({ length: DOCUMENT_ROWS }, (_, index) => (
+            <Box key={index} className="flex items-center gap-3 py-3">
+              <Skeleton className="size-5 shrink-0" />
+              <Box className="min-w-0 flex-1 space-y-2">
+                <Skeleton shape="text" className="w-1/2 text-sm" />
+                <Skeleton shape="text" className="w-1/3 text-xs" />
+              </Box>
+              <Skeleton className="size-9 shrink-0" />
+              <Skeleton className="size-9 shrink-0" />
+            </Box>
+          ))}
+        </Box>
       </CardContent>
     </Card>
   );

@@ -1,10 +1,17 @@
 import type { ComponentProps } from "react";
+import { skeletonVariants, type SkeletonVariantProps } from "./variants";
 import { cn } from "@/utils/cn";
 
-export function Skeleton({ className, ...props }: ComponentProps<"div">) {
+/** Placeholder shape. Decorative: the surrounding SkeletonRegion announces loading. */
+export function Skeleton({
+  className,
+  shape,
+  ...props
+}: ComponentProps<"div"> & SkeletonVariantProps) {
   return (
     <div
-      className={cn("animate-pulse rounded-md bg-muted", className)}
+      aria-hidden
+      className={cn(skeletonVariants({ shape }), className)}
       {...props}
     />
   );

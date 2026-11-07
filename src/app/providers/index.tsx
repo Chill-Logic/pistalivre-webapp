@@ -1,10 +1,9 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 import { queryClient } from "./query-client";
-import { Box } from "@/components/atoms/box";
 import { PwaUpdatePrompt } from "@/components/organisms/pwa-update-prompt";
+import { QueryDevtools } from "@/components/organisms/query-devtools";
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
@@ -12,12 +11,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
       {children}
       <PwaUpdatePrompt />
       <Toaster position="top-center" richColors closeButton />
-      {import.meta.env.DEV && (
-        // Desktop only: on phones the floating button covers the bottom nav.
-        <Box className="hidden md:block">
-          <ReactQueryDevtools buttonPosition="bottom-left" />
-        </Box>
-      )}
+      <QueryDevtools />
     </QueryClientProvider>
   );
 }

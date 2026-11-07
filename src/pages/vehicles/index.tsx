@@ -20,6 +20,7 @@ export function VehiclesPage() {
       <VehicleFilters
         filters={filters}
         types={types.data ?? []}
+        isLoadingTypes={types.isPending}
         onSearch={setSearch}
         onTypeChange={setType}
         onStatusChange={setStatus}
@@ -30,6 +31,7 @@ export function VehiclesPage() {
         <VehicleList
           vehicles={vehicles.data?.items}
           isLoading={vehicles.isPending}
+          isRefreshing={vehicles.isPlaceholderData}
         />
       )}
       {vehicles.data && vehicles.data.total > 0 && (
