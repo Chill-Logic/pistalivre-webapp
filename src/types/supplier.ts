@@ -35,3 +35,11 @@ export type SupplierFilters = {
   /** "" = all. */
   active: "" | "true" | "false";
 };
+
+/** Body of POST/PUT /suppliers. */
+export type SupplierInput = {
+  name: string;
+  scope: SupplierScope;
+  monthlyAmount: number;
+  active: boolean;
+};
