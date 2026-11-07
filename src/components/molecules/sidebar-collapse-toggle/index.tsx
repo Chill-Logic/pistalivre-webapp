@@ -1,36 +1,34 @@
-import { ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/atoms/button";
-import { Text } from "@/components/atoms/text";
 import { TooltipWhenCollapsed } from "@/components/molecules/tooltip-when-collapsed";
 import { useSidebar } from "@/hooks/ui/useSidebar";
 import { cn } from "@/utils/cn";
 
-/** Desktop only: collapse/expand row at the foot of the sidebar. */
+/**
+ * Desktop only: round button straddling the sidebar's right edge (MyFinance
+ * pattern). The chevron turns instead of swapping icons.
+ */
 export function SidebarCollapseToggle() {
   const { isDesktop, isCollapsed, toggleCollapsed } = useSidebar();
   if (!isDesktop) return null;
 
   const label = isCollapsed ? "Expandir menu" : "Recolher menu";
-  const Icon = isCollapsed ? ChevronsRight : ChevronsLeft;
 
   return (
-    <TooltipWhenCollapsed collapsed={isCollapsed} label={label}>
+    <TooltipWhenCollapsed collapsed label={label}>
       <Button
-        variant="ghost"
+        size="icon"
         onClick={toggleCollapsed}
         aria-label={label}
         aria-expanded={!isCollapsed}
-        className={cn(
-          "w-full text-muted-foreground",
-          isCollapsed ? "justify-center px-0" : "justify-start gap-3 px-3",
-        )}
+        className="absolute right-0 top-[60px] z-10 size-8 translate-x-1/2 rounded-full shadow-lg hover:scale-105 md:size-8"
       >
-        <Icon />
-        {!isCollapsed && (
-          <Text inline size={null}>
-            Recolher
-          </Text>
-        )}
+        <ChevronLeft
+          className={cn(
+            "transition-transform duration-300 ease-out",
+            isCollapsed && "rotate-180",
+          )}
+        />
       </Button>
     </TooltipWhenCollapsed>
   );

@@ -49,14 +49,11 @@ const FINANCE: NavItem = {
   icon: Wallet,
 };
 
-/** Mobile bottom bar: only the five daily destinations fit. */
-export const MAIN_NAV: NavItem[] = [
-  DASHBOARD,
-  VEHICLES,
-  RENTALS,
-  CUSTOMERS,
-  FINANCE,
-];
+/**
+ * Mobile bottom bar: four daily destinations; the fifth slot is "Menu", which
+ * opens every destination (Financeiro included) in a bottom sheet.
+ */
+export const MAIN_NAV: NavItem[] = [DASHBOARD, VEHICLES, RENTALS, CUSTOMERS];
 
 /** Sidebar and drawer: the same items, order and icons as the management app. */
 export const SIDEBAR_NAV: NavItem[] = [
