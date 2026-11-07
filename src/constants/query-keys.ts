@@ -96,6 +96,7 @@ export const queryKeys = {
     leads: (filters: LeadFilters) =>
       [...queryKeys.crm.all, "leads", filters] as const,
     lead: (id: string) => [...queryKeys.crm.all, "lead", id] as const,
+    options: () => [...queryKeys.crm.all, "options"] as const,
   },
   users: {
     all: ["users"] as const,

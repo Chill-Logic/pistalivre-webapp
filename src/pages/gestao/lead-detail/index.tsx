@@ -1,4 +1,4 @@
-import { Target, UserPlus } from "lucide-react";
+import { Plus, Target, UserPlus } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -6,9 +6,16 @@ import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { LeadActivities } from "@/components/organisms/lead-activities";
+import { LeadActivityDialog } from "@/components/organisms/lead-activity-dialog";
 import { LeadChain } from "@/components/organisms/lead-chain";
+import { LeadDeleteButton } from "@/components/organisms/lead-delete-button";
 import { LeadJourneyCard } from "@/components/organisms/lead-journey-card";
 import { LeadLostCard } from "@/components/organisms/lead-lost-card";
+import { LeadNotesCard } from "@/components/organisms/lead-notes-card";
+import {
+  LeadStageCard,
+  LeadStageCardSkeleton,
+} from "@/components/organisms/lead-stage-card";
 import {
   LeadSummary,
   LeadSummarySkeleton,
@@ -21,25 +28,32 @@ import {
 import { LeadDetailLayout } from "@/components/templates/lead-detail-layout";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
+import { useCrmOptions } from "@/hooks/api/gestao/crm/useCrmOptions";
 import { useLead } from "@/hooks/api/gestao/crm/useLead";
 import { useBackToList } from "@/hooks/ui/useBackToList";
 
 export function LeadDetailPage() {
   const { id = "" } = useParams();
   const lead = useLead(id);
+  const options = useCrmOptions();
   const backTo = useBackToList(ROUTES.crm);
 
   return (
     <Box className="space-y-4">
-      <Box className="flex items-center justify-between gap-2">
+      <Box className="flex flex-wrap items-center justify-between gap-2">
         <BackLink to={backTo} label="CRM" />
-        {lead.data && !lead.data.customerId && lead.data.status !== "LOST" && (
-          <Button asChild size="sm">
-            <Link to={routeTo.newCustomerFromLead(lead.data.id)}>
-              <UserPlus />
-              Converter em cliente
-            </Link>
-          </Button>
+        {lead.data && (
+          <Box className="flex flex-wrap items-center gap-2">
+            <LeadDeleteButton leadId={lead.data.id} name={lead.data.name} />
+            {!lead.data.customerId && lead.data.status !== "LOST" && (
+              <Button asChild size="sm">
+                <Link to={routeTo.newCustomerFromLead(lead.data.id)}>
+                  <UserPlus />
+                  Converter em cliente
+                </Link>
+              </Button>
+            )}
+          </Box>
         )}
       </Box>
       {lead.isPending && (
@@ -47,7 +61,12 @@ export function LeadDetailPage() {
           <LeadDetailLayout
             summary={<LeadSummarySkeleton />}
             activities={<ListCardSkeleton rows={3} row={<ListRowSkeleton />} />}
-            side={<ListCardSkeleton rows={3} row={<ListRowSkeleton />} />}
+            side={
+              <Box className="space-y-6">
+                <LeadStageCardSkeleton />
+                <ListCardSkeleton rows={3} row={<ListRowSkeleton />} />
+              </Box>
+            }
           />
         </SkeletonRegion>
       )}
@@ -64,9 +83,43 @@ export function LeadDetailPage() {
       {lead.data && (
         <LeadDetailLayout
           summary={<LeadSummary lead={lead.data} />}
-          activities={<LeadActivities activities={lead.data.activities} />}
+          activities={
+            <LeadActivities
+              activities={lead.data.activities}
+              action={
+                options.data && (
+                  <LeadActivityDialog
+                    leadId={lead.data.id}
+                    types={options.data.activityTypes}
+                    trigger={
+                      <Button variant="outline" size="sm">
+                        <Plus />
+                        Registrar atividade
+                      </Button>
+                    }
+                  />
+                )
+              }
+            />
+          }
           side={
             <Box className="space-y-6">
+              {options.data ? (
+                // Keyed: reopening navigates to the copy, whose stage differs.
+                <LeadStageCard
+                  key={`${lead.data.id}-${lead.data.status}`}
+                  lead={lead.data}
+                  options={options.data}
+                />
+              ) : options.isError ? (
+                <QueryError
+                  error={options.error}
+                  onRetry={() => options.refetch()}
+                />
+              ) : (
+                <LeadStageCardSkeleton />
+              )}
+              <LeadNotesCard leadId={lead.data.id} notes={lead.data.notes} />
               <LeadLostCard lead={lead.data} />
               <LeadJourneyCard lead={lead.data} />
               <LeadChain chain={lead.data.chain} />

@@ -121,3 +121,29 @@ export type LeadFilters = {
   /** "" = real leads only (API default) | "test" | "all". */
   test: "" | "test" | "all";
 };
+
+/** Vocabularies of the CRM forms (GET /crm/options). */
+export type CrmOptions = {
+  /** Where a staff-created lead came from (becomes its attribution). */
+  origins: { key: string; label: string }[];
+  /** Stages a lead can be moved to — never LOST (that's /lost, with reasons). */
+  statuses: LeadStatus[];
+  /** SDR activity types (STATUS_CHANGE is automatic). */
+  activityTypes: string[];
+  lostReasons: LostReason[];
+  workApps: string[];
+  appsExperience: { code: string; label: string }[];
+  incomeTypes: { code: string; label: string }[];
+};
+
+/** POST /crm/leads — an OUTBOUND lead registered by the staff. */
+export type LeadInput = {
+  name: string;
+  phone: string;
+  email: string | null;
+  desiredVehicle: string | null;
+  origin: string;
+  note: string | null;
+};
+
+export type LeadActivityInput = { type: string; note: string | null };

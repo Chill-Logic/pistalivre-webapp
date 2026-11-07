@@ -55,7 +55,6 @@ export function LeadSummary({ lead }: { lead: LeadDetail }) {
               </TextLink>
             </InfoItem>
           )}
-          {lead.notes && <InfoItem label="Observações">{lead.notes}</InfoItem>}
         </Row>
       </CardContent>
     </Card>

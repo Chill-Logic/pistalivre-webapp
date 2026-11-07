@@ -27,6 +27,7 @@ export const ROUTES = {
   inspections: `${GESTAO}/vistorias`,
   inspectionDetail: `${GESTAO}/vistorias/:id`,
   crm: `${GESTAO}/crm`,
+  leadNew: `${GESTAO}/crm/novo`,
   leadDetail: `${GESTAO}/crm/:id`,
   reimbursements: `${GESTAO}/reembolsos`,
   suppliers: `${GESTAO}/fornecedores`,

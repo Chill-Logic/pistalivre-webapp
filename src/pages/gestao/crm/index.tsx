@@ -1,4 +1,7 @@
+import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
 import { Text } from "@/components/atoms/text";
 import {
   FunnelStages,
@@ -16,9 +19,10 @@ import { QueryBoundary } from "@/components/organisms/query-boundary";
 import { QueryError } from "@/components/organisms/query-error";
 import { useLeadFunnel } from "@/hooks/api/gestao/crm/useLeadFunnel";
 import { useLeads } from "@/hooks/api/gestao/crm/useLeads";
+import { ROUTES } from "@/constants/routes";
 import { useLeadFilters } from "@/hooks/ui/useLeadFilters";
 
-/** CRM, read-only: the funnel, where leads come from, and the list. */
+/** CRM: the funnel, where leads come from, and the list. */
 export function CrmPage() {
   const { filters, setSearch, setStatus, setTest, setPage } = useLeadFilters();
   const funnel = useLeadFunnel();
@@ -26,7 +30,17 @@ export function CrmPage() {
 
   return (
     <Box className="space-y-4 md:space-y-6">
-      <PageHeader title="CRM" />
+      <PageHeader
+        title="CRM"
+        actions={
+          <Button asChild size="sm">
+            <Link to={ROUTES.leadNew}>
+              <Plus />
+              Novo lead
+            </Link>
+          </Button>
+        }
+      />
       <QueryBoundary
         query={funnel}
         label="Carregando funil…"

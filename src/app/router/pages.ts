@@ -101,6 +101,10 @@ export const SupplierEditPage = lazyPage(
   "SupplierEditPage",
 );
 export const CrmPage = lazyPage(() => import("@/pages/gestao/crm"), "CrmPage");
+export const LeadNewPage = lazyPage(
+  () => import("@/pages/gestao/lead-new"),
+  "LeadNewPage",
+);
 export const LeadDetailPage = lazyPage(
   () => import("@/pages/gestao/lead-detail"),
   "LeadDetailPage",
@@ -152,4 +156,12 @@ export const RentalNewPage = lazyPage(
 export const RentalEditPage = lazyPage(
   () => import("@/pages/gestao/rental-edit"),
   "RentalEditPage",
+);
+export const ModelsSectionPage = lazyPage(
+  () => import("@/pages/gestao/models-section"),
+  "ModelsSectionPage",
+);
+export const FinanceSectionPage = lazyPage(
+  () => import("@/pages/gestao/finance-section"),
+  "FinanceSectionPage",
 );
