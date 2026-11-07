@@ -7,7 +7,7 @@ import { SkeletonText } from "@/components/molecules/skeleton-text";
 export function PageSkeleton() {
   return (
     <SkeletonRegion className="space-y-6">
-      <SkeletonText lines={["w-40 text-2xl", "w-56 text-sm"]} />
+      <SkeletonText lines={["w-40 text-2xl"]} />
       <Row className="gap-y-6">
         <Col sm={6} xl={4}>
           <Skeleton className="h-32" />

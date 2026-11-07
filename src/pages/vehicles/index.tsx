@@ -16,7 +16,7 @@ export function VehiclesPage() {
 
   return (
     <Box className="space-y-4 md:space-y-6">
-      <PageHeader title="Veículos" description="A frota da locadora." />
+      <PageHeader title="Veículos" />
       <VehicleFilters
         filters={filters}
         types={types.data ?? []}

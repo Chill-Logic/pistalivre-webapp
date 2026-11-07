@@ -29,6 +29,7 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
 - **Menu colapsável** no modelo do dalila-ui (`SidebarProvider`/`useSidebar`).
 - Mobile first, PWA, interface em português, código em inglês, brand (`#E4141B`, regra 60/30/10).
 - Sem saudação duplicada: "Olá, Fulano" só no header.
+- **Sem subtítulo em página** ("acho muito feio"): o `PageHeader` só tem título e ações, sem `description`. Texto explicativo de estado vazio pode.
 
 ## Feito
 

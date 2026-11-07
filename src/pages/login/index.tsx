@@ -8,7 +8,7 @@ export function LoginPage() {
   const [params] = useSearchParams();
 
   return (
-    <AuthLayout title="Entrar" description="Acesse a gestão da locadora.">
+    <AuthLayout title="Entrar">
       <LoginForm
         onSuccess={() =>
           navigate(safeRedirect(params.get("callbackUrl")), { replace: true })
