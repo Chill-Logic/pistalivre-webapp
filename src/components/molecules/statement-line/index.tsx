@@ -19,12 +19,12 @@ type StatementLineProps = {
  * own text stays visible below — it is the proof and is never replaced.
  */
 export function StatementLine({ line, showSource }: StatementLineProps) {
-  const { label, knownLabel } = useLabels();
+  const { label } = useLabels();
   const inflow = line.amount >= 0;
   const description = line.note ?? line.suggestion ?? line.originalDescription;
   const details = [
     formatCalendarDate(line.date),
-    knownLabel(LABEL_MAPS.transactionType, line.type),
+    line.typeLabel,
     line.counterparty,
   ].filter(Boolean);
 

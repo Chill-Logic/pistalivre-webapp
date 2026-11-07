@@ -72,6 +72,11 @@ export const queryKeys = {
     statement: (filters: StatementFilters) =>
       [...queryKeys.finance.all, "statement", filters] as const,
   },
+  debts: {
+    all: ["debts"] as const,
+    list: () => [...queryKeys.debts.all, "list"] as const,
+    detail: (id: string) => [...queryKeys.debts.all, "detail", id] as const,
+  },
   dashboard: {
     all: ["dashboard"] as const,
   },

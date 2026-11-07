@@ -6,6 +6,8 @@ export type StatementLine = {
   /** yyyy-mm-dd */
   date: string;
   type: string;
+  /** Ready-made by the API (explicit label or prettified code); null = no type. */
+  typeLabel: string | null;
   originalDescription: string;
   /** Who paid / received, when the bank tells. */
   counterparty: string | null;
