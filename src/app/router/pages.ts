@@ -201,3 +201,19 @@ export const ProjectionsPage = lazyPage(
   () => import("@/pages/gestao/projections"),
   "ProjectionsPage",
 );
+export const ProposalsPage = lazyPage(
+  () => import("@/pages/gestao/proposals"),
+  "ProposalsPage",
+);
+export const ProposalDetailPage = lazyPage(
+  () => import("@/pages/gestao/proposal-detail"),
+  "ProposalDetailPage",
+);
+export const SignaturesPage = lazyPage(
+  () => import("@/pages/gestao/signatures"),
+  "SignaturesPage",
+);
+export const SignatureDetailPage = lazyPage(
+  () => import("@/pages/gestao/signature-detail"),
+  "SignatureDetailPage",
+);

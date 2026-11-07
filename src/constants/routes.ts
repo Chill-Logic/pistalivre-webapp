@@ -41,8 +41,10 @@ export const ROUTES = {
   planNew: `${GESTAO}/planos/novo`,
   planEdit: `${GESTAO}/planos/:id/editar`,
   proposals: `${GESTAO}/propostas`,
+  proposalDetail: `${GESTAO}/propostas/:id`,
   projections: `${GESTAO}/projecoes`,
   signatures: `${GESTAO}/assinaturas`,
+  signatureDetail: `${GESTAO}/assinaturas/:id`,
   models: `${GESTAO}/modelos`,
   contractTemplateNew: `${GESTAO}/modelos/contratos/novo`,
   contractTemplate: `${GESTAO}/modelos/contratos/:id`,
@@ -95,5 +97,7 @@ export const routeTo = {
       : `${ROUTES.maintenances}/nova`;
   },
   inspection: (id: string) => `${ROUTES.inspections}/${id}`,
+  proposal: (id: string) => `${ROUTES.proposals}/${id}`,
+  signature: (id: string) => `${ROUTES.signatures}/${id}`,
   portalRental: (id: string) => `${ROUTES.portal}/locacoes/${id}`,
 };

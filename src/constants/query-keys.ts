@@ -105,6 +105,15 @@ export const queryKeys = {
       [...queryKeys.users.all, "list", filters] as const,
     detail: (id: string) => [...queryKeys.users.all, "detail", id] as const,
   },
+  proposals: {
+    all: ["proposals"] as const,
+    detail: (id: string) => [...queryKeys.proposals.all, "detail", id] as const,
+  },
+  signatures: {
+    all: ["signatures"] as const,
+    detail: (id: string) =>
+      [...queryKeys.signatures.all, "detail", id] as const,
+  },
   plans: {
     all: ["plans"] as const,
     detail: (id: string) => [...queryKeys.plans.all, "detail", id] as const,

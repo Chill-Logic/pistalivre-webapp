@@ -53,9 +53,12 @@ import {
   VehicleEditPage,
   VehicleNewPage,
   VehiclesPage,
+  ProposalsPage,
+  ProposalDetailPage,
+  SignaturesPage,
+  SignatureDetailPage,
 } from "./pages";
 import { ROUTES } from "@/constants/routes";
-import { ComingSoonPage } from "@/pages/comum/coming-soon";
 import { LoginPage } from "@/pages/gestao/login";
 import { NotFoundPage } from "@/pages/comum/not-found";
 
@@ -109,12 +112,11 @@ export const router = createBrowserRouter([
       { path: ROUTES.plans, element: <PlansPage /> },
       { path: ROUTES.planNew, element: <PlanNewPage /> },
       { path: ROUTES.planEdit, element: <PlanEditPage /> },
-      { path: ROUTES.proposals, element: <ComingSoonPage title="Propostas" /> },
+      { path: ROUTES.proposals, element: <ProposalsPage /> },
+      { path: ROUTES.proposalDetail, element: <ProposalDetailPage /> },
       { path: ROUTES.projections, element: <ProjectionsPage /> },
-      {
-        path: ROUTES.signatures,
-        element: <ComingSoonPage title="Assinaturas" />,
-      },
+      { path: ROUTES.signatures, element: <SignaturesPage /> },
+      { path: ROUTES.signatureDetail, element: <SignatureDetailPage /> },
       {
         element: (
           <ModelsSectionPage

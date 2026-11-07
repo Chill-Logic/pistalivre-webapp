@@ -32,6 +32,11 @@ export const LABEL_MAPS = {
   leadActivity: "LEAD_ACTIVITY_LABELS",
   proposalStatus: "PROPOSAL_STATUS_LABELS",
   userRole: "USER_ROLE_LABELS",
+  signatureStatus: "SIGNATURE_REQUEST_STATUS_LABELS",
+  signerStatus: "SIGNATURE_SIGNER_STATUS_LABELS",
+  signerRole: "SIGNER_ROLE_LABELS",
+  signerChannel: "SIGNER_CHANNEL_LABELS",
+  documentOwner: "DOCUMENT_OWNER_LABELS",
 } as const;
 
 export type LabelMapName = (typeof LABEL_MAPS)[keyof typeof LABEL_MAPS];
