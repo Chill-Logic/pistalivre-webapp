@@ -1,5 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/constants/query-keys";
+import { usePagedList } from "@/hooks/ui/usePagedList";
 import { vehiclesService } from "@/services/api/gestao/vehicles.service";
 import type { VehicleFilters } from "@/types/vehicle";
 
@@ -9,5 +10,15 @@ export function useVehicles(filters: VehicleFilters) {
     queryFn: () => vehiclesService.list(filters),
     // Keep the current page on screen while the next one loads (no flicker).
     placeholderData: keepPreviousData,
+  });
+}
+
+/** The list page: pages on the desktop, infinite (10 by 10) on the phone. */
+export function useVehicleList(filters: VehicleFilters, isDesktop: boolean) {
+  return usePagedList({
+    baseKey: queryKeys.vehicles.all,
+    filters,
+    fetch: (current) => vehiclesService.list(current),
+    isDesktop,
   });
 }

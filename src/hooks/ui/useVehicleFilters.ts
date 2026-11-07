@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { LABEL_MAPS } from "@/constants/label-maps";
-import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
 import { isKnownCode } from "@/helpers/labels";
 import { useLabels } from "@/hooks/ui/useLabels";
 import { useUrlFilters } from "@/hooks/ui/useUrlFilters";
@@ -9,21 +8,22 @@ import type { VehicleFilters, VehicleStatus } from "@/types/vehicle";
 const KEYS = ["busca", "tipo", "situacao"] as const;
 
 export function useVehicleFilters() {
-  const { values, page, setFilter, setPage } = useUrlFilters(KEYS);
+  const { values, page, pageSize, setFilter, setPage, setPageSize } =
+    useUrlFilters(KEYS);
   const { map } = useLabels();
   const statusMap = map(LABEL_MAPS.vehicleStatus);
 
   const filters = useMemo<VehicleFilters>(
     () => ({
       page,
-      pageSize: DEFAULT_PAGE_SIZE,
+      pageSize,
       q: values.busca,
       type: values.tipo,
       status: isKnownCode(statusMap, values.situacao)
         ? (values.situacao as VehicleStatus)
         : "",
     }),
-    [page, values, statusMap],
+    [page, pageSize, values, statusMap],
   );
 
   return {
@@ -32,5 +32,6 @@ export function useVehicleFilters() {
     setType: (value: string) => setFilter("tipo", value),
     setStatus: (value: string) => setFilter("situacao", value),
     setPage,
+    setPageSize,
   };
 }

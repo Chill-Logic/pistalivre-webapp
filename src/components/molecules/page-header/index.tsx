@@ -12,7 +12,9 @@ export function PageHeader({ title, actions }: PageHeaderProps) {
   return (
     <Box className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <Heading>{title}</Heading>
-      {actions && <Box className="flex gap-2">{actions}</Box>}
+      {actions && (
+        <Box className="flex flex-wrap items-center gap-2">{actions}</Box>
+      )}
     </Box>
   );
 }

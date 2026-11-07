@@ -1,8 +1,10 @@
 import { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { parsePage } from "@/helpers/pagination";
+import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
+import { parsePage, parsePageSize } from "@/helpers/pagination";
 
 const PAGE_PARAM = "pagina";
+const PAGE_SIZE_PARAM = "por_pagina";
 
 /**
  * List filters in the URL (Portuguese param names): shareable, survive refresh
@@ -22,6 +24,10 @@ export function useUrlFilters<Key extends string>(keys: readonly Key[]) {
   );
 
   const page = parsePage(params.get(PAGE_PARAM));
+  const pageSize = parsePageSize(
+    params.get(PAGE_SIZE_PARAM),
+    DEFAULT_PAGE_SIZE,
+  );
 
   const setParam = useCallback(
     (key: string, value: string) => {
@@ -71,5 +77,20 @@ export function useUrlFilters<Key extends string>(keys: readonly Key[]) {
     [setParam],
   );
 
-  return { values, page, setFilter, setFilters, setPage };
+  /** Changing the page size goes back to page 1 (like any filter). */
+  const setPageSize = useCallback(
+    (next: number) =>
+      setParam(PAGE_SIZE_PARAM, next === DEFAULT_PAGE_SIZE ? "" : String(next)),
+    [setParam],
+  );
+
+  return {
+    values,
+    page,
+    pageSize,
+    setFilter,
+    setFilters,
+    setPage,
+    setPageSize,
+  };
 }
