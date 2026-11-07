@@ -80,3 +80,7 @@ export const DebtDetailPage = lazyPage(
   () => import("@/pages/gestao/debt-detail"),
   "DebtDetailPage",
 );
+export const ReimbursementsPage = lazyPage(
+  () => import("@/pages/gestao/reimbursements"),
+  "ReimbursementsPage",
+);

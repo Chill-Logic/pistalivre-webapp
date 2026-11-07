@@ -77,6 +77,10 @@ export const queryKeys = {
     list: () => [...queryKeys.debts.all, "list"] as const,
     detail: (id: string) => [...queryKeys.debts.all, "detail", id] as const,
   },
+  reimbursements: {
+    all: ["reimbursements"] as const,
+    staff: () => [...queryKeys.reimbursements.all, "staff"] as const,
+  },
   dashboard: {
     all: ["dashboard"] as const,
   },

@@ -28,6 +28,7 @@ export const LABEL_MAPS = {
   debtInterestMode: "DEBT_INTEREST_MODE_LABELS",
   debtInterestBase: "DEBT_INTEREST_BASE_LABELS",
   debtLenderType: "DEBT_LENDER_TYPE_LABELS",
+  supplierScope: "SUPPLIER_SCOPE_LABELS",
 } as const;
 
 export type LabelMapName = (typeof LABEL_MAPS)[keyof typeof LABEL_MAPS];

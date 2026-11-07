@@ -22,6 +22,7 @@ export const ROUTES = {
   maintenanceDetail: `${GESTAO}/manutencoes/:id`,
   inspections: `${GESTAO}/vistorias`,
   inspectionDetail: `${GESTAO}/vistorias/:id`,
+  reimbursements: `${GESTAO}/reembolsos`,
   finance: `${GESTAO}/financeiro`,
   financeDebts: `${GESTAO}/financeiro/debitos`,
   debtDetail: `${GESTAO}/financeiro/debitos/:id`,

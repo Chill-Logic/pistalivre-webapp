@@ -1,6 +1,7 @@
 import {
   CarFront,
   ClipboardCheck,
+  HandCoins,
   FileText,
   LayoutDashboard,
   Users,
@@ -60,4 +61,5 @@ export const SIDEBAR_NAV: NavItem[] = [
   RENTALS,
   CUSTOMERS,
   FINANCE,
+  { label: "Reembolsos", to: ROUTES.reimbursements, icon: HandCoins },
 ];
