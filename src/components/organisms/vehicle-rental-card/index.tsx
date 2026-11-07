@@ -8,6 +8,8 @@ import { Col, Row } from "@/components/atoms/grid";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { InfoItem } from "@/components/molecules/info-item";
+import { TextLink } from "@/components/molecules/text-link";
+import { routeTo } from "@/constants/routes";
 import type { ActiveRental } from "@/types/vehicle";
 
 export function VehicleRentalCard({ rental }: { rental: ActiveRental | null }) {
@@ -23,7 +25,7 @@ export function VehicleRentalCard({ rental }: { rental: ActiveRental | null }) {
               {rental.customer.name}
             </InfoItem>
             <InfoItem span={6} label="Código" mono>
-              {rental.code}
+              <TextLink to={routeTo.rental(rental.id)}>{rental.code}</TextLink>
             </InfoItem>
           </Row>
         ) : (

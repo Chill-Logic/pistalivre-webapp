@@ -1,11 +1,9 @@
 import { Col, Row } from "@/components/atoms/grid";
 import { FilterSelect } from "@/components/molecules/filter-select";
 import { SearchInput } from "@/components/molecules/search-input";
-import { VEHICLE_STATUS_LABELS } from "@/constants/labels";
-import { optionsFromLabels } from "@/helpers/select";
+import { LABEL_MAPS } from "@/constants/label-maps";
+import { useLabels } from "@/hooks/ui/useLabels";
 import type { VehicleFilters as Filters, VehicleType } from "@/types/vehicle";
-
-const STATUS_OPTIONS = optionsFromLabels(VEHICLE_STATUS_LABELS);
 
 type VehicleFiltersProps = {
   filters: Filters;
@@ -24,6 +22,8 @@ export function VehicleFilters({
   onTypeChange,
   onStatusChange,
 }: VehicleFiltersProps) {
+  const { options } = useLabels();
+
   return (
     <Row className="gap-y-2">
       <Col md={6}>
@@ -51,7 +51,7 @@ export function VehicleFilters({
           label="Situação"
           value={filters.status}
           allLabel="Todas as situações"
-          options={STATUS_OPTIONS}
+          options={options(LABEL_MAPS.vehicleStatus)}
           onChange={onStatusChange}
         />
       </Col>

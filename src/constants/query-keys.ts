@@ -1,3 +1,4 @@
+import type { RentalFilters } from "@/types/rental";
 import type { VehicleFilters } from "@/types/vehicle";
 
 /** Query key factory: one place to build and invalidate cache keys. */
@@ -14,5 +15,15 @@ export const queryKeys = {
   },
   vehicleTypes: {
     all: ["vehicle-types"] as const,
+  },
+  rentals: {
+    all: ["rentals"] as const,
+    list: (filters: RentalFilters) =>
+      [...queryKeys.rentals.all, "list", filters] as const,
+    detail: (id: string) => [...queryKeys.rentals.all, "detail", id] as const,
+    charges: (id: string) => [...queryKeys.rentals.all, "charges", id] as const,
+  },
+  labels: {
+    all: ["labels"] as const,
   },
 };

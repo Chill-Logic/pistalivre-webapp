@@ -5,6 +5,7 @@ export const ROUTES = {
   vehicles: "/veiculos",
   vehicleDetail: "/veiculos/:id",
   rentals: "/locacoes",
+  rentalDetail: "/locacoes/:id",
   customers: "/clientes",
   finance: "/financeiro",
 } as const;
@@ -12,4 +13,5 @@ export const ROUTES = {
 /** Concrete URLs for routes with params. */
 export const routeTo = {
   vehicle: (id: string) => `${ROUTES.vehicles}/${id}`,
+  rental: (id: string) => `${ROUTES.rentals}/${id}`,
 };

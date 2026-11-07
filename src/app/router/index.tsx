@@ -1,7 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
 import { RedirectIfAuthenticated } from "./guards/RedirectIfAuthenticated";
 import { RequireAuth } from "./guards/RequireAuth";
-import { DashboardPage, VehicleDetailPage, VehiclesPage } from "./pages";
+import {
+  DashboardPage,
+  RentalDetailPage,
+  RentalsPage,
+  VehicleDetailPage,
+  VehiclesPage,
+} from "./pages";
 import { ROUTES } from "@/constants/routes";
 import { ComingSoonPage } from "@/pages/coming-soon";
 import { LoginPage } from "@/pages/login";
@@ -18,7 +24,8 @@ export const router = createBrowserRouter([
       { path: ROUTES.dashboard, element: <DashboardPage /> },
       { path: ROUTES.vehicles, element: <VehiclesPage /> },
       { path: ROUTES.vehicleDetail, element: <VehicleDetailPage /> },
-      { path: ROUTES.rentals, element: <ComingSoonPage title="Locações" /> },
+      { path: ROUTES.rentals, element: <RentalsPage /> },
+      { path: ROUTES.rentalDetail, element: <RentalDetailPage /> },
       { path: ROUTES.customers, element: <ComingSoonPage title="Clientes" /> },
       { path: ROUTES.finance, element: <ComingSoonPage title="Financeiro" /> },
     ],

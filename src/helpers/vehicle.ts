@@ -9,6 +9,9 @@ export function effectiveVehicleStatus(vehicle: Vehicle): VehicleStatus {
 }
 
 /** "Fiat Toro Volcano" */
-export function vehicleName(vehicle: Pick<Vehicle, "brand" | "model">) {
+export function vehicleName(vehicle: {
+  brand: { name: string };
+  model: { name: string };
+}) {
   return `${vehicle.brand.name} ${vehicle.model.name}`;
 }

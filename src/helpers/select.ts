@@ -15,8 +15,3 @@ export function fromSelectValue(value: string) {
 }
 
 export const ALL_SELECT_VALUE = ALL;
-
-/** Options from a code → label map (e.g. VEHICLE_STATUS_LABELS). */
-export function optionsFromLabels(labels: Record<string, string>) {
-  return Object.entries(labels).map(([value, label]) => ({ value, label }));
-}
