@@ -6,6 +6,8 @@ import type {
   VehicleDetail,
   VehicleFilters,
   VehicleStatus,
+  VehicleFormOptions,
+  VehicleInput,
   VehicleType,
 } from "@/types/vehicle";
 
@@ -28,6 +30,20 @@ export const vehiclesService = {
   },
   async remove(id: string) {
     await http.delete(`/vehicles/${id}`);
+  },
+  async formOptions() {
+    const { data } = await http.get<VehicleFormOptions>(
+      "/vehicles/form-options",
+    );
+    return data;
+  },
+  async create(input: VehicleInput) {
+    const { data } = await http.post<VehicleDetail>("/vehicles", input);
+    return data;
+  },
+  async update(id: string, input: VehicleInput) {
+    const { data } = await http.put<VehicleDetail>(`/vehicles/${id}`, input);
+    return data;
   },
   async listTypes() {
     const { data } = await http.get<VehicleType[]>("/vehicle-types");

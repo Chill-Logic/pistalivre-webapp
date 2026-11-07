@@ -15,6 +15,8 @@ import {
   RentalDetailPage,
   RentalsPage,
   VehicleDetailPage,
+  VehicleEditPage,
+  VehicleNewPage,
   VehiclesPage,
 } from "./pages";
 import { ROUTES } from "@/constants/routes";
@@ -43,7 +45,9 @@ export const router = createBrowserRouter([
     children: [
       { path: ROUTES.dashboard, element: <DashboardPage /> },
       { path: ROUTES.vehicles, element: <VehiclesPage /> },
+      { path: ROUTES.vehicleNew, element: <VehicleNewPage /> },
       { path: ROUTES.vehicleDetail, element: <VehicleDetailPage /> },
+      { path: ROUTES.vehicleEdit, element: <VehicleEditPage /> },
       { path: ROUTES.maintenances, element: <MaintenancesPage /> },
       { path: ROUTES.maintenanceDetail, element: <MaintenanceDetailPage /> },
       { path: ROUTES.inspections, element: <InspectionsPage /> },

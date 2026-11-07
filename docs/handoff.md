@@ -51,6 +51,8 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
   - Tema claro/escuro mantido no portal, igual ao Next (o CLAUDE.md anota a dúvida de travar o portal no claro; decisão do dono).
 - Veículo — **trocar situação e excluir**: card "Situação" com só as transições legais (`constants/vehicle.ts`, espelho da regra do domínio), cada uma confirmada em Dialog (para "Alugado" o texto avisa que normalmente isso vem de ativar uma locação); avisa quando há locação ativa mas a situação gravada é outra. "Excluir" no topo do detalhe, Dialog destrutivo, volta para a lista. `Dialog` (atom, bottom sheet no celular) + `ConfirmDialog` (molecule) prontos para reuso. Testado: AVAILABLE→MAINTENANCE→AVAILABLE no PLA-1001 (dado voltou ao original); exclusão testada com o DELETE simulado (nenhum veículo apagado).
 - Ficha do veículo e da locação mostram as **manutenções e vistorias** dela (`RelatedMaintenances`/`RelatedInspections`, carregam sozinhas com `?vehicleId=`/`?rentalId=`, até 100).
+- **Criar/editar veículo** (`/gestao/veiculos/novo`, `/gestao/veiculos/:id/editar`; "Novo veículo" na lista e "Editar" no detalhe): mesmos campos do form Next, inclusive "Valor da tarifa"/"Período da tarifa", que o `PUT` ainda exige (o `GET /vehicles/:id` passou a devolver `rate`/`ratePeriod`, senão a edição sobrescreveria a tarifa). Tipo filtra categoria; marca filtra modelo; marca/modelo/ano em combobox criável (Popover + cmdk, "Usar “X”"), enviados por NOME. Erros da API nos campos via `applyApiErrors` (422 `fields`; 409 de placa/chassi/renavam também vem com `fields`). Testado sem gravar: placa repetida contra a API real (409, nada criado); sucesso de POST/PUT simulado.
+- Celular: `scroll-padding-bottom` no `html` para a barra inferior fixa não cobrir o que o navegador rola para a vista (foco, validação). Um toque no "Cadastrar" caía em "Locações".
 - Clientes: lista (busca, situação, filtro de teste; padrão = só reais) + detalhe (dados, CNH com aviso de vencida, endereço e emergência, locações, documentos). O locatário na locação leva à ficha. `DocumentsCard` é genérico (veículo e cliente).
 
 ## Organização (pedido do dono)
@@ -60,19 +62,8 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
 
 ## Próximo (em ordem)
 
-1. **Criar/editar veículo** (situação e exclusão já feitas): `GET /vehicles/form-options`, `POST`/`PUT /vehicles`. Marca e modelo vão por NOME (combobox criável). Criar/editar cliente está **fora**: faz upsert no Asaas (regra 5).
-   - Formulários: `react-hook-form` + zod; o 422 da API traz `fields` em PT (aplicar com `setError`). Combobox, Dialog e Checkbox via Radix (nada nativo).
-   - O combobox criável ainda não existe: precisa de Popover (`@radix-ui/react-popover`, não instalado) + lista filtrável (shadcn usa `cmdk`). Ele vira atom/molecule reutilizável (marca, modelo, e depois oficina). `Dialog`/`ConfirmDialog` já existem.
-   - Leia o corpo exato em `pista-livre/docs/api-v1.md` (POST /vehicles) antes; o form do Next (`src/app/gestao/veiculos/novo` e `[id]/editar`) é a referência de campos e validação.
-   - Rotas sugeridas: `/gestao/veiculos/novo` e `/gestao/veiculos/:id/editar`; botão "Novo veículo" no `PageHeader` da lista e "Editar" no topo do detalhe (ao lado de "Excluir").
-2. **Financeiro** (`/gestao/financeiro` hoje é "em migração"): pedir ao backend o que existe de leitura (saldo, extrato, a receber, inadimplência). Tudo **só leitura** (regra 5).
-3. Escritas do portal e de dinheiro: **não** começar sem o dono.
-
-## Ferramentas de validação (scratchpad da sessão anterior, recrie se sumir)
-
-- Login da equipe no Puppeteer: digitar em `input[type=email]`/`input[type=password]` e Enter; numa segunda aba o login já está salvo (o `localStorage` é compartilhado), então pule o form se não houver `input[type=password]`.
-- **Respostas simuladas**: `page.setRequestInterception(true)` e responder `GET` com JSON + `access-control-allow-origin: *` (e `OPTIONS` 204). Para o portal: `localStorage.setItem("pl:auth-token", "x")` e simular `/api/v1/auth/me` com `kind: "customer"` + os `/api/v1/me/*`. Foi assim que o portal e o detalhe de vistoria foram validados.
-- Escrita real no dev: só o reversível (ex.: trocar situação e voltar). Exclusão: simular o `DELETE` com 204.
+1. **Financeiro, só leitura**: perguntar ao backend (pista-livre-bf) o que existe em `/api/v1` (saldo, extrato, a receber, inadimplência, débitos da empresa). Nada de emitir, dar baixa ou editar cobrança/pix (regra 5).
+2. Escritas do portal e de dinheiro, e criar/editar cliente: **só com o dono** (o cliente faz upsert no Asaas).
 
 ## Pendências e decisões anotadas
 

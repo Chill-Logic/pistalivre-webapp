@@ -1,6 +1,7 @@
-import { CarFront } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { CarFront, Pencil } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
@@ -31,7 +32,7 @@ import {
 } from "@/components/organisms/vehicle-status-card";
 import { VehicleDeleteButton } from "@/components/organisms/vehicle-delete-button";
 import { VehicleDetailLayout } from "@/components/templates/vehicle-detail-layout";
-import { ROUTES } from "@/constants/routes";
+import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { useVehicle } from "@/hooks/api/gestao/vehicles/useVehicle";
 import { useBackToList } from "@/hooks/ui/useBackToList";
@@ -46,10 +47,18 @@ export function VehicleDetailPage() {
       <Box className="flex items-center justify-between gap-2">
         <BackLink to={backTo} label="Veículos" />
         {vehicle.data && (
-          <VehicleDeleteButton
-            vehicleId={vehicle.data.id}
-            plate={vehicle.data.plate}
-          />
+          <Box className="flex gap-2">
+            <Button asChild variant="ghost" size="sm">
+              <Link to={routeTo.editVehicle(vehicle.data.id)}>
+                <Pencil />
+                Editar
+              </Link>
+            </Button>
+            <VehicleDeleteButton
+              vehicleId={vehicle.data.id}
+              plate={vehicle.data.plate}
+            />
+          </Box>
         )}
       </Box>
       {vehicle.isPending && (

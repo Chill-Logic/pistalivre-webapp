@@ -202,6 +202,14 @@
   }
   html {
     -webkit-tap-highlight-color: transparent;
+    /* Mobile: the fixed bottom nav (h-14 + safe area) must not cover what
+       the browser scrolls into view (focus, validation, anchors). */
+    scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  }
+  @screen md {
+    html {
+      scroll-padding-bottom: 0;
+    }
   }
   body {
     @apply bg-background text-foreground antialiased;

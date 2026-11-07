@@ -1,3 +1,4 @@
+import type { RatePeriod } from "@/types/rental";
 import type { DocumentFile } from "@/types/document";
 
 export type VehicleStatus = "AVAILABLE" | "RENTED" | "MAINTENANCE" | "INACTIVE";
@@ -34,6 +35,31 @@ export type Vehicle = {
 
 export type VehicleDetail = Vehicle & {
   documents: DocumentFile[];
+  /** Legacy tariff, still required by the vehicle form (price lives on Rental). */
+  rate: number;
+  ratePeriod: RatePeriod;
+};
+
+export type VehicleFormOptions = {
+  types: VehicleType[];
+  categories: (SluggedRef & { typeId: string })[];
+  brands: Ref[];
+  models: (Ref & { brandId: string })[];
+  years: number[];
+};
+
+/** Body of POST/PUT /vehicles. Brand and model go by NAME (find-or-create). */
+export type VehicleInput = {
+  plate: string;
+  brand: string;
+  model: string;
+  year: number;
+  categoryId: string;
+  color: string | null;
+  chassis: string;
+  renavam: string;
+  rate: number;
+  ratePeriod: RatePeriod;
 };
 
 export type VehicleFilters = {

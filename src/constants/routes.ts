@@ -11,7 +11,9 @@ export const ROUTES = {
   login: `${GESTAO}/entrar`,
   dashboard: GESTAO,
   vehicles: `${GESTAO}/veiculos`,
+  vehicleNew: `${GESTAO}/veiculos/novo`,
   vehicleDetail: `${GESTAO}/veiculos/:id`,
+  vehicleEdit: `${GESTAO}/veiculos/:id/editar`,
   rentals: `${GESTAO}/locacoes`,
   rentalDetail: `${GESTAO}/locacoes/:id`,
   customers: `${GESTAO}/clientes`,
@@ -29,6 +31,7 @@ export const ROUTES = {
 /** Concrete URLs for routes with params. */
 export const routeTo = {
   vehicle: (id: string) => `${ROUTES.vehicles}/${id}`,
+  editVehicle: (id: string) => `${ROUTES.vehicles}/${id}/editar`,
   rental: (id: string) => `${ROUTES.rentals}/${id}`,
   customer: (id: string) => `${ROUTES.customers}/${id}`,
   maintenance: (id: string) => `${ROUTES.maintenances}/${id}`,
