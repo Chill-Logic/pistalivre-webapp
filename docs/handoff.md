@@ -41,6 +41,7 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
 - Locações: lista + detalhe, com cobranças **somente leitura** (`amounts.amount` da API; vencido por status ou por data em Brasília; copiar pix; abrir fatura).
 - Rótulos vêm de `GET /labels` (o shell espera o catálogo carregar).
 - Painel (`/dashboard`): KPIs (saldo `null` = "Indisponível"; saldo parcial diz qual fonte faltou), inadimplência por finalidade, maiores devedores, funil e origem dos leads, frota, manutenções por tipo/serviço/veículo, séries mensais e o ranking de manutenção por veículo (só os que têm atividade, com nota de quantos ficaram fora). Gráficos são **CSS puro** (atom `Meter`, molecules `BarList`/`ColumnChart`), sem biblioteca: nada de HTML fora dos atoms e bundle leve. No gráfico mensal o mês se escolhe **tocando** (tooltip de hover não funciona no celular).
+- Manutenções e vistorias: listas (busca, tipo; vistoria também por quem fez) + detalhes (manutenção: serviços com especificação, "paga pelo locatário", anexos; vistoria: itens verificados OK/problema/sem resposta e fotos por requisito, "Não enviada" quando faltou). Ficam só na sidebar/gaveta: a barra inferior mantém os 5 destinos do dia a dia (`MAIN_NAV` × `SIDEBAR_NAV`). O dev **não tem vistoria**: o detalhe foi validado com resposta simulada no Puppeteer (interceptação de request).
 - Clientes: lista (busca, situação, filtro de teste; padrão = só reais) + detalhe (dados, CNH com aviso de vencida, endereço e emergência, locações, documentos). O locatário na locação leva à ficha. `DocumentsCard` é genérico (veículo e cliente).
 
 ## Organização (pedido do dono)
@@ -51,10 +52,9 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
 
 ## Próximo (em ordem)
 
-1. Manutenções e vistorias (listas; os detalhes vêm do backend em seguida).
-2. **Portal do cliente** (ver Organização acima). Os endpoints já existem: `/me/rentals`, `/me/rentals/:id/sections` (a página inteira numa chamada, com a divulgação progressiva feita no servidor), `/me/charges`, `/me/invoices`, `/me/wallet` e `/me/reimbursements`. Só leitura.
+1. **Portal do cliente** (ver Organização acima). Os endpoints já existem: `/me/rentals`, `/me/rentals/:id/sections` (a página inteira numa chamada, com a divulgação progressiva feita no servidor), `/me/charges`, `/me/invoices`, `/me/wallet` e `/me/reimbursements`. Só leitura.
 
-3. **Escritas sem dinheiro** (o backend já tem as de veículo): `GET /vehicles/form-options`, `POST`/`PUT /vehicles`, `PATCH /vehicles/:id/status` (transições: AVAILABLE→RENTED/MAINTENANCE/INACTIVE; RENTED→AVAILABLE/MAINTENANCE; MAINTENANCE→AVAILABLE/INACTIVE; INACTIVE→AVAILABLE) e `DELETE /vehicles/:id` (confirmar com Dialog). Marca e modelo vão por NOME (combobox criável). Criar/editar cliente está **fora**: faz upsert no Asaas (regra 5).
+2. **Escritas sem dinheiro** (o backend já tem as de veículo): `GET /vehicles/form-options`, `POST`/`PUT /vehicles`, `PATCH /vehicles/:id/status` (transições: AVAILABLE→RENTED/MAINTENANCE/INACTIVE; RENTED→AVAILABLE/MAINTENANCE; MAINTENANCE→AVAILABLE/INACTIVE; INACTIVE→AVAILABLE) e `DELETE /vehicles/:id` (confirmar com Dialog). Marca e modelo vão por NOME (combobox criável). Criar/editar cliente está **fora**: faz upsert no Asaas (regra 5).
    - Formulários: `react-hook-form` + zod; o 422 da API traz `fields` em PT (aplicar com `setError`). Combobox, Dialog e Checkbox via Radix (nada nativo).
 
 ## Pendências e decisões anotadas

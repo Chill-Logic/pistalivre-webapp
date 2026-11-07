@@ -8,6 +8,8 @@ import { formatDate, formatFileSize } from "@/utils/format";
 
 type DocumentItemProps = {
   document: DocumentFile;
+  /** Shown instead of the file name (e.g. the inspection photo's label). */
+  title?: string;
   onView: () => void;
   onDownload: () => void;
   isViewing: boolean;
@@ -16,6 +18,7 @@ type DocumentItemProps = {
 
 export function DocumentItem({
   document,
+  title,
   onView,
   onDownload,
   isViewing,
@@ -33,7 +36,7 @@ export function DocumentItem({
       <Icon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
       <Box className="min-w-0 flex-1">
         <Text weight="medium" truncate>
-          {document.fileName}
+          {title ?? document.fileName}
         </Text>
         <Text size="xs" tone="muted" truncate>
           {meta.join(" · ")}

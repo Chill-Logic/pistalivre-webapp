@@ -1,8 +1,10 @@
 import {
   CarFront,
+  ClipboardCheck,
   FileText,
   LayoutDashboard,
   Users,
+  Wrench,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -14,11 +16,48 @@ export type NavItem = {
   icon: LucideIcon;
 };
 
-/** Main navigation, shared by the mobile bottom bar and the desktop sidebar. */
+const DASHBOARD: NavItem = {
+  label: "Painel",
+  to: ROUTES.dashboard,
+  icon: LayoutDashboard,
+};
+const VEHICLES: NavItem = {
+  label: "Veículos",
+  to: ROUTES.vehicles,
+  icon: CarFront,
+};
+const RENTALS: NavItem = {
+  label: "Locações",
+  to: ROUTES.rentals,
+  icon: FileText,
+};
+const CUSTOMERS: NavItem = {
+  label: "Clientes",
+  to: ROUTES.customers,
+  icon: Users,
+};
+const FINANCE: NavItem = {
+  label: "Financeiro",
+  to: ROUTES.finance,
+  icon: Wallet,
+};
+
+/** Mobile bottom bar: only the five daily destinations fit. */
 export const MAIN_NAV: NavItem[] = [
-  { label: "Painel", to: ROUTES.dashboard, icon: LayoutDashboard },
-  { label: "Veículos", to: ROUTES.vehicles, icon: CarFront },
-  { label: "Locações", to: ROUTES.rentals, icon: FileText },
-  { label: "Clientes", to: ROUTES.customers, icon: Users },
-  { label: "Financeiro", to: ROUTES.finance, icon: Wallet },
+  DASHBOARD,
+  VEHICLES,
+  RENTALS,
+  CUSTOMERS,
+  FINANCE,
+];
+
+/** Sidebar and drawer: everything, the fleet operation next to vehicles. */
+export const SIDEBAR_NAV: NavItem[] = [
+  DASHBOARD,
+  VEHICLES,
+  { label: "Manutenções", to: ROUTES.maintenances, icon: Wrench },
+  { label: "Vistorias", to: ROUTES.inspections, icon: ClipboardCheck },
+  RENTALS,
+  CUSTOMERS,
+  FINANCE,
 ];

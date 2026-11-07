@@ -1,4 +1,6 @@
 import type { CustomerFilters } from "@/types/customer";
+import type { InspectionFilters } from "@/types/inspection";
+import type { MaintenanceFilters } from "@/types/maintenance";
 import type { RentalFilters } from "@/types/rental";
 import type { VehicleFilters } from "@/types/vehicle";
 
@@ -32,6 +34,20 @@ export const queryKeys = {
   },
   labels: {
     all: ["labels"] as const,
+  },
+  maintenances: {
+    all: ["maintenances"] as const,
+    list: (filters: MaintenanceFilters) =>
+      [...queryKeys.maintenances.all, "list", filters] as const,
+    detail: (id: string) =>
+      [...queryKeys.maintenances.all, "detail", id] as const,
+  },
+  inspections: {
+    all: ["inspections"] as const,
+    list: (filters: InspectionFilters) =>
+      [...queryKeys.inspections.all, "list", filters] as const,
+    detail: (id: string) =>
+      [...queryKeys.inspections.all, "detail", id] as const,
   },
   dashboard: {
     all: ["dashboard"] as const,

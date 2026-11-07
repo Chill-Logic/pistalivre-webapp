@@ -10,7 +10,7 @@ import { Logo } from "@/components/molecules/logo";
 import { SidebarCollapseToggle } from "@/components/molecules/sidebar-collapse-toggle";
 import { SidebarNav } from "@/components/molecules/sidebar-nav";
 import { SIDEBAR_WIDTH } from "@/constants/layout";
-import { MAIN_NAV } from "@/constants/navigation";
+import { SIDEBAR_NAV } from "@/constants/navigation";
 import { useSidebar } from "@/hooks/ui/useSidebar";
 
 /**
@@ -33,7 +33,7 @@ export function AppSidebar() {
             <Logo />
           </Box>
           <Box className="flex-1 overflow-y-auto p-3">
-            <SidebarNav items={MAIN_NAV} onNavigate={closeDrawer} />
+            <SidebarNav items={SIDEBAR_NAV} onNavigate={closeDrawer} />
           </Box>
         </SheetContent>
       </Sheet>
@@ -51,7 +51,7 @@ export function AppSidebar() {
         <Logo withName={!isCollapsed} />
       </Box>
       <Box className="flex-1 overflow-y-auto overflow-x-hidden p-3">
-        <SidebarNav items={MAIN_NAV} collapsed={isCollapsed} />
+        <SidebarNav items={SIDEBAR_NAV} collapsed={isCollapsed} />
       </Box>
       <Box className="shrink-0 border-t p-3">
         <SidebarCollapseToggle />

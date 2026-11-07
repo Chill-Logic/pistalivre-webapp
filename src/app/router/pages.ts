@@ -28,3 +28,19 @@ export const CustomerDetailPage = lazyPage(
   () => import("@/pages/gestao/customer-detail"),
   "CustomerDetailPage",
 );
+export const MaintenancesPage = lazyPage(
+  () => import("@/pages/gestao/maintenances"),
+  "MaintenancesPage",
+);
+export const MaintenanceDetailPage = lazyPage(
+  () => import("@/pages/gestao/maintenance-detail"),
+  "MaintenanceDetailPage",
+);
+export const InspectionsPage = lazyPage(
+  () => import("@/pages/gestao/inspections"),
+  "InspectionsPage",
+);
+export const InspectionDetailPage = lazyPage(
+  () => import("@/pages/gestao/inspection-detail"),
+  "InspectionDetailPage",
+);
