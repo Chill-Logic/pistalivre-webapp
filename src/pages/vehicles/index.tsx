@@ -1,32 +1,30 @@
 import { PageHeader } from "@/components/molecules/page-header";
 import { Pagination } from "@/components/molecules/pagination";
+import { QueryError } from "@/components/organisms/query-error";
 import { VehicleFilters } from "@/components/organisms/vehicle-filters";
 import { VehicleList } from "@/components/organisms/vehicle-list";
-import { errorMessage } from "@/helpers/api-error";
 import { useVehicles } from "@/hooks/api/vehicles/useVehicles";
+import { useVehicleTypes } from "@/hooks/api/vehicles/useVehicleTypes";
 import { useVehicleFilters } from "@/hooks/ui/useVehicleFilters";
 
 export function VehiclesPage() {
   const { filters, setSearch, setType, setStatus, setPage } =
     useVehicleFilters();
   const vehicles = useVehicles(filters);
+  const types = useVehicleTypes();
 
   return (
     <div className="space-y-4 md:space-y-6">
       <PageHeader title="Veículos" description="A frota da locadora." />
       <VehicleFilters
         filters={filters}
+        types={types.data ?? []}
         onSearch={setSearch}
         onTypeChange={setType}
         onStatusChange={setStatus}
       />
       {vehicles.isError ? (
-        <p
-          role="alert"
-          className="rounded-md bg-error px-3 py-2 text-sm text-error-foreground"
-        >
-          {errorMessage(vehicles.error)}
-        </p>
+        <QueryError error={vehicles.error} onRetry={() => vehicles.refetch()} />
       ) : (
         <VehicleList
           vehicles={vehicles.data?.items}

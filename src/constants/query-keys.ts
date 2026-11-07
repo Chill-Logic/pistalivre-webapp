@@ -10,5 +10,9 @@ export const queryKeys = {
     all: ["vehicles"] as const,
     list: (filters: VehicleFilters) =>
       [...queryKeys.vehicles.all, "list", filters] as const,
+    detail: (id: string) => [...queryKeys.vehicles.all, "detail", id] as const,
+  },
+  vehicleTypes: {
+    all: ["vehicle-types"] as const,
   },
 };

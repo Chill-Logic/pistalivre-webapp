@@ -1,13 +1,11 @@
 import { Select } from "@/components/atoms/select";
 import { SearchInput } from "@/components/molecules/search-input";
-import {
-  VEHICLE_STATUS_LABELS,
-  VEHICLE_TYPE_OPTIONS,
-} from "@/constants/labels";
-import type { VehicleFilters as Filters } from "@/types/vehicle";
+import { VEHICLE_STATUS_LABELS } from "@/constants/labels";
+import type { VehicleFilters as Filters, VehicleType } from "@/types/vehicle";
 
 type VehicleFiltersProps = {
   filters: Filters;
+  types: VehicleType[];
   onSearch: (value: string) => void;
   onTypeChange: (value: string) => void;
   onStatusChange: (value: string) => void;
@@ -15,6 +13,7 @@ type VehicleFiltersProps = {
 
 export function VehicleFilters({
   filters,
+  types,
   onSearch,
   onTypeChange,
   onStatusChange,
@@ -32,9 +31,9 @@ export function VehicleFilters({
         aria-label="Tipo"
       >
         <option value="">Todos os tipos</option>
-        {VEHICLE_TYPE_OPTIONS.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
+        {types.map((type) => (
+          <option key={type.id} value={type.slug}>
+            {type.name}
           </option>
         ))}
       </Select>

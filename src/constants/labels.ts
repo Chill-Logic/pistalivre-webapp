@@ -7,10 +7,3 @@ export const VEHICLE_STATUS_LABELS: Record<VehicleStatus, string> = {
   MAINTENANCE: "Manutenção",
   INACTIVE: "Inativo",
 };
-
-// TODO: replace with GET /api/v1/vehicle-types once published.
-export const VEHICLE_TYPE_OPTIONS = [
-  { value: "moto", label: "Moto" },
-  { value: "carro", label: "Carro" },
-  { value: "van", label: "Van" },
-];

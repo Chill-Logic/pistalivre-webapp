@@ -64,3 +64,7 @@ export function toApiError(error: unknown): ApiError {
 export function errorMessage(error: unknown) {
   return toApiError(error).message;
 }
+
+export function isNotFound(error: unknown) {
+  return toApiError(error).status === 404;
+}
