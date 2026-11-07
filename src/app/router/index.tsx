@@ -44,6 +44,8 @@ import {
   SupplierNewPage,
   SuppliersPage,
   UserDetailPage,
+  UserEditPage,
+  UserNewPage,
   UsersPage,
   RentalsPage,
   VehicleDetailPage,
@@ -142,7 +144,9 @@ export const router = createBrowserRouter([
         element: <ContractTemplateEditPage />,
       },
       { path: ROUTES.users, element: <UsersPage /> },
+      { path: ROUTES.userNew, element: <UserNewPage /> },
       { path: ROUTES.userDetail, element: <UserDetailPage /> },
+      { path: ROUTES.userEdit, element: <UserEditPage /> },
       { path: ROUTES.company, element: <CompanyPage /> },
       {
         element: (

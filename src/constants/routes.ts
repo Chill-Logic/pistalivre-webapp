@@ -49,7 +49,9 @@ export const ROUTES = {
   contractTemplateEdit: `${GESTAO}/modelos/contratos/:id/editar`,
   modelsInspection: `${GESTAO}/modelos/vistoria`,
   users: `${GESTAO}/usuarios`,
+  userNew: `${GESTAO}/usuarios/novo`,
   userDetail: `${GESTAO}/usuarios/:id`,
+  userEdit: `${GESTAO}/usuarios/:id/editar`,
   company: `${GESTAO}/empresa`,
   finance: `${GESTAO}/financeiro`,
   financeDebts: `${GESTAO}/financeiro/debitos`,
@@ -76,6 +78,7 @@ export const routeTo = {
   lead: (id: string) => `${ROUTES.crm}/${id}`,
   editPlan: (id: string) => `${ROUTES.plans}/${id}/editar`,
   user: (id: string) => `${ROUTES.users}/${id}`,
+  editUser: (id: string) => `${ROUTES.users}/${id}/editar`,
   contractTemplate: (id: string) => `${ROUTES.models}/contratos/${id}`,
   editContractTemplate: (id: string) =>
     `${ROUTES.models}/contratos/${id}/editar`,

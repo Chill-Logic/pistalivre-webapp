@@ -23,3 +23,22 @@ export type UserFilters = {
   q: string;
   role: UserRole | "";
 };
+
+/** Body of POST/PUT /users (the password only on create). */
+export type UserInput = {
+  name: string;
+  email: string;
+  /** Digits only. */
+  cpf: string;
+  /** yyyy-mm-dd or null. */
+  birthDate: string | null;
+  /** Ignored by the API when an agent edits themselves. */
+  role: UserRole;
+  password?: string;
+};
+
+export type UserPasswordInput = {
+  /** Own password: the current one. Admin on someone else: the admin's. */
+  currentPassword: string;
+  newPassword: string;
+};

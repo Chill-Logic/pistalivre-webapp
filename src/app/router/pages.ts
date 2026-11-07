@@ -189,3 +189,11 @@ export const ContractTemplateEditPage = lazyPage(
   () => import("@/pages/gestao/contract-template-edit"),
   "ContractTemplateEditPage",
 );
+export const UserNewPage = lazyPage(
+  () => import("@/pages/gestao/user-new"),
+  "UserNewPage",
+);
+export const UserEditPage = lazyPage(
+  () => import("@/pages/gestao/user-edit"),
+  "UserEditPage",
+);

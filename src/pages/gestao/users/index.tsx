@@ -1,4 +1,8 @@
+import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
+import { ROUTES } from "@/constants/routes";
 import { PageHeader } from "@/components/molecules/page-header";
 import { ViewToggle } from "@/components/molecules/view-toggle";
 import { ListFooter } from "@/components/organisms/list-footer";
@@ -8,9 +12,11 @@ import { UserList } from "@/components/organisms/user-list";
 import { UserTable } from "@/components/organisms/user-table";
 import { useUserList } from "@/hooks/api/gestao/users/useUsers";
 import { useListView } from "@/hooks/ui/useListView";
+import { useUserPermissions } from "@/hooks/ui/useUserPermissions";
 import { useUserFilters } from "@/hooks/ui/useUserFilters";
 
 export function UsersPage() {
+  const { canCreate } = useUserPermissions();
   const { filters, setSearch, setRole, setPage, setPageSize } =
     useUserFilters();
   const { view, setView, isDesktop } = useListView();
@@ -20,7 +26,19 @@ export function UsersPage() {
     <Box className="space-y-4 md:space-y-6">
       <PageHeader
         title="Usuários"
-        actions={<ViewToggle view={view} onChange={setView} />}
+        actions={
+          <>
+            <ViewToggle view={view} onChange={setView} />
+            {canCreate && (
+              <Button asChild>
+                <Link to={ROUTES.userNew}>
+                  <Plus />
+                  Novo usuário
+                </Link>
+              </Button>
+            )}
+          </>
+        }
       />
       <UserFilters
         filters={filters}
