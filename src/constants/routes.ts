@@ -27,6 +27,7 @@ export const ROUTES = {
   reimbursements: `${GESTAO}/reembolsos`,
   suppliers: `${GESTAO}/fornecedores`,
   supplierDetail: `${GESTAO}/fornecedores/:id`,
+  documents: `${GESTAO}/documentos`,
   plans: `${GESTAO}/planos`,
   models: `${GESTAO}/modelos`,
   contractTemplate: `${GESTAO}/modelos/contratos/:id`,

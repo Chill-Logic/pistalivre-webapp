@@ -113,6 +113,11 @@ export const queryKeys = {
       [...queryKeys.templates.all, "contract", id] as const,
     inspection: () => [...queryKeys.templates.all, "inspection"] as const,
   },
+  documents: {
+    all: ["documents"] as const,
+    tree: (path: string) => [...queryKeys.documents.all, "tree", path] as const,
+    search: (q: string) => [...queryKeys.documents.all, "search", q] as const,
+  },
   company: {
     all: ["company"] as const,
   },

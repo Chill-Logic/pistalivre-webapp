@@ -125,3 +125,7 @@ export const ContractTemplateDetailPage = lazyPage(
   () => import("@/pages/gestao/contract-template-detail"),
   "ContractTemplateDetailPage",
 );
+export const DocumentsPage = lazyPage(
+  () => import("@/pages/gestao/documents"),
+  "DocumentsPage",
+);
