@@ -84,3 +84,11 @@ export const ReimbursementsPage = lazyPage(
   () => import("@/pages/gestao/reimbursements"),
   "ReimbursementsPage",
 );
+export const SuppliersPage = lazyPage(
+  () => import("@/pages/gestao/suppliers"),
+  "SuppliersPage",
+);
+export const SupplierDetailPage = lazyPage(
+  () => import("@/pages/gestao/supplier-detail"),
+  "SupplierDetailPage",
+);

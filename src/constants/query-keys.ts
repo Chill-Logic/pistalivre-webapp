@@ -3,6 +3,7 @@ import type { InspectionFilters } from "@/types/inspection";
 import type { MaintenanceFilters } from "@/types/maintenance";
 import type { RentalFilters } from "@/types/rental";
 import type { StatementFilters } from "@/types/statement";
+import type { SupplierFilters } from "@/types/supplier";
 import type { VehicleFilters } from "@/types/vehicle";
 
 /** Query key factory: one place to build and invalidate cache keys. */
@@ -80,6 +81,12 @@ export const queryKeys = {
   reimbursements: {
     all: ["reimbursements"] as const,
     staff: () => [...queryKeys.reimbursements.all, "staff"] as const,
+  },
+  suppliers: {
+    all: ["suppliers"] as const,
+    list: (filters: SupplierFilters) =>
+      [...queryKeys.suppliers.all, "list", filters] as const,
+    detail: (id: string) => [...queryKeys.suppliers.all, "detail", id] as const,
   },
   dashboard: {
     all: ["dashboard"] as const,
