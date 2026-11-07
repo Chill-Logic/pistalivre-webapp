@@ -1,19 +1,22 @@
 import {
-  CarFront,
-  ClipboardCheck,
-  HandCoins,
-  FolderOpen,
-  FileCog,
-  Tags,
   Building2,
-  UserCog,
-  Target,
-  Store,
+  Car,
+  ClipboardCheck,
+  FileSignature,
   FileText,
+  HandCoins,
+  Handshake,
   LayoutDashboard,
+  Megaphone,
+  PenLine,
+  Receipt,
+  ScrollText,
+  Tags,
+  TrendingUp,
+  UserRound,
   Users,
-  Wrench,
   Wallet,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
@@ -29,20 +32,16 @@ const DASHBOARD: NavItem = {
   to: ROUTES.dashboard,
   icon: LayoutDashboard,
 };
-const VEHICLES: NavItem = {
-  label: "Veículos",
-  to: ROUTES.vehicles,
-  icon: CarFront,
+const VEHICLES: NavItem = { label: "Veículos", to: ROUTES.vehicles, icon: Car };
+const CUSTOMERS: NavItem = {
+  label: "Clientes",
+  to: ROUTES.customers,
+  icon: UserRound,
 };
 const RENTALS: NavItem = {
   label: "Locações",
   to: ROUTES.rentals,
-  icon: FileText,
-};
-const CUSTOMERS: NavItem = {
-  label: "Clientes",
-  to: ROUTES.customers,
-  icon: Users,
+  icon: FileSignature,
 };
 const FINANCE: NavItem = {
   label: "Financeiro",
@@ -59,21 +58,24 @@ export const MAIN_NAV: NavItem[] = [
   FINANCE,
 ];
 
-/** Sidebar and drawer: everything, the fleet operation next to vehicles. */
+/** Sidebar and drawer: the same items, order and icons as the management app. */
 export const SIDEBAR_NAV: NavItem[] = [
   DASHBOARD,
   VEHICLES,
-  { label: "Manutenções", to: ROUTES.maintenances, icon: Wrench },
-  { label: "Vistorias", to: ROUTES.inspections, icon: ClipboardCheck },
-  RENTALS,
   CUSTOMERS,
-  { label: "CRM", to: ROUTES.crm, icon: Target },
+  { label: "CRM", to: ROUTES.crm, icon: Megaphone },
   { label: "Planos", to: ROUTES.plans, icon: Tags },
-  { label: "Fornecedores", to: ROUTES.suppliers, icon: Store },
+  { label: "Propostas", to: ROUTES.proposals, icon: Handshake },
+  RENTALS,
+  { label: "Modelos", to: ROUTES.models, icon: ScrollText },
+  { label: "Vistorias", to: ROUTES.inspections, icon: ClipboardCheck },
+  { label: "Manutenções", to: ROUTES.maintenances, icon: Wrench },
+  { label: "Fornecedores", to: ROUTES.suppliers, icon: Receipt },
   FINANCE,
+  { label: "Projeções", to: ROUTES.projections, icon: TrendingUp },
   { label: "Reembolsos", to: ROUTES.reimbursements, icon: HandCoins },
-  { label: "Documentos", to: ROUTES.documents, icon: FolderOpen },
-  { label: "Modelos", to: ROUTES.models, icon: FileCog },
-  { label: "Usuários", to: ROUTES.users, icon: UserCog },
+  { label: "Assinaturas", to: ROUTES.signatures, icon: PenLine },
+  { label: "Documentos", to: ROUTES.documents, icon: FileText },
   { label: "Empresa", to: ROUTES.company, icon: Building2 },
+  { label: "Usuários", to: ROUTES.users, icon: Users },
 ];

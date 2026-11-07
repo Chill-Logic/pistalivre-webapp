@@ -37,6 +37,7 @@ import {
   VehiclesPage,
 } from "./pages";
 import { ROUTES } from "@/constants/routes";
+import { ComingSoonPage } from "@/pages/comum/coming-soon";
 import { LoginPage } from "@/pages/gestao/login";
 import { NotFoundPage } from "@/pages/comum/not-found";
 
@@ -79,6 +80,15 @@ export const router = createBrowserRouter([
       { path: ROUTES.supplierDetail, element: <SupplierDetailPage /> },
       { path: ROUTES.documents, element: <DocumentsPage /> },
       { path: ROUTES.plans, element: <PlansPage /> },
+      { path: ROUTES.proposals, element: <ComingSoonPage title="Propostas" /> },
+      {
+        path: ROUTES.projections,
+        element: <ComingSoonPage title="Projeções" />,
+      },
+      {
+        path: ROUTES.signatures,
+        element: <ComingSoonPage title="Assinaturas" />,
+      },
       { path: ROUTES.models, element: <ModelsContractsPage /> },
       { path: ROUTES.modelsInspection, element: <ModelsInspectionPage /> },
       {
