@@ -57,6 +57,18 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
 
 1. **Criar/editar veículo** (situação e exclusão já feitas): `GET /vehicles/form-options`, `POST`/`PUT /vehicles`. Marca e modelo vão por NOME (combobox criável). Criar/editar cliente está **fora**: faz upsert no Asaas (regra 5).
    - Formulários: `react-hook-form` + zod; o 422 da API traz `fields` em PT (aplicar com `setError`). Combobox, Dialog e Checkbox via Radix (nada nativo).
+   - O combobox criável ainda não existe: precisa de Popover (`@radix-ui/react-popover`, não instalado) + lista filtrável (shadcn usa `cmdk`). Ele vira atom/molecule reutilizável (marca, modelo, e depois oficina). `Dialog`/`ConfirmDialog` já existem.
+   - Leia o corpo exato em `pista-livre/docs/api-v1.md` (POST /vehicles) antes; o form do Next (`src/app/gestao/veiculos/novo` e `[id]/editar`) é a referência de campos e validação.
+   - Rotas sugeridas: `/gestao/veiculos/novo` e `/gestao/veiculos/:id/editar`; botão "Novo veículo" no `PageHeader` da lista e "Editar" no topo do detalhe (ao lado de "Excluir").
+2. **Seções na ficha do veículo e na locação**: manutenções e vistorias daquele veículo/locação (`GET /maintenances?vehicleId=` / `?rentalId=`, idem `/inspections`), reaproveitando `MaintenanceCard`/`InspectionCard`.
+3. **Financeiro** (`/gestao/financeiro` hoje é "em migração"): pedir ao backend o que existe de leitura (saldo, extrato, a receber, inadimplência). Tudo **só leitura** (regra 5).
+4. Escritas do portal e de dinheiro: **não** começar sem o dono.
+
+## Ferramentas de validação (scratchpad da sessão anterior, recrie se sumir)
+
+- Login da equipe no Puppeteer: digitar em `input[type=email]`/`input[type=password]` e Enter; numa segunda aba o login já está salvo (o `localStorage` é compartilhado), então pule o form se não houver `input[type=password]`.
+- **Respostas simuladas**: `page.setRequestInterception(true)` e responder `GET` com JSON + `access-control-allow-origin: *` (e `OPTIONS` 204). Para o portal: `localStorage.setItem("pl:auth-token", "x")` e simular `/api/v1/auth/me` com `kind: "customer"` + os `/api/v1/me/*`. Foi assim que o portal e o detalhe de vistoria foram validados.
+- Escrita real no dev: só o reversível (ex.: trocar situação e voltar). Exclusão: simular o `DELETE` com 204.
 
 ## Pendências e decisões anotadas
 
