@@ -4,6 +4,8 @@ import { RequireAuth } from "./guards/RequireAuth";
 import {
   CompanyPage,
   ContractTemplateDetailPage,
+  ContractTemplateEditPage,
+  ContractTemplateNewPage,
   CrmPage,
   CustomerDetailPage,
   CustomerEditPage,
@@ -128,8 +130,16 @@ export const router = createBrowserRouter([
         ],
       },
       {
+        path: ROUTES.contractTemplateNew,
+        element: <ContractTemplateNewPage />,
+      },
+      {
         path: ROUTES.contractTemplate,
         element: <ContractTemplateDetailPage />,
+      },
+      {
+        path: ROUTES.contractTemplateEdit,
+        element: <ContractTemplateEditPage />,
       },
       { path: ROUTES.users, element: <UsersPage /> },
       { path: ROUTES.userDetail, element: <UserDetailPage /> },

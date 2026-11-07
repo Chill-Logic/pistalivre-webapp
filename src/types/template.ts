@@ -17,6 +17,40 @@ export type ContractTemplateDetail = ContractTemplate & {
   caucaoClauses: Partial<Record<Caution["type"], string>>;
 };
 
+export type ContractTemplateInput = {
+  name: string;
+  bodyHtml: string;
+  caucaoClauses: Record<Caution["type"], string>;
+  active: boolean;
+};
+
+/** One `{{variable}}` the editor can insert (catalog from the API). */
+export type TemplateVariable = {
+  /** Full Handlebars path, e.g. "customer.name". */
+  key: string;
+  label: string;
+  description?: string;
+  example?: string;
+  kind: string;
+};
+
+export type TemplateVariableGroup = {
+  key: string;
+  label: string;
+  /** Curated (the good path). */
+  variables: TemplateVariable[];
+  /** Straight from the schema: every column with no curated counterpart. */
+  rawVariables: TemplateVariable[];
+};
+
+/** A whole-HTML block (`{{{caucaoClause}}}`), only in the body, once. */
+export type TemplateSlot = { key: string; label: string; description?: string };
+
+export type TemplateVariableCatalog = {
+  groups: TemplateVariableGroup[];
+  slots: TemplateSlot[];
+};
+
 export type InspectionRequirement = {
   id: string;
   key: string;

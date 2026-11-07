@@ -181,3 +181,11 @@ export const MaintenanceEditPage = lazyPage(
   () => import("@/pages/gestao/maintenance-edit"),
   "MaintenanceEditPage",
 );
+export const ContractTemplateNewPage = lazyPage(
+  () => import("@/pages/gestao/contract-template-new"),
+  "ContractTemplateNewPage",
+);
+export const ContractTemplateEditPage = lazyPage(
+  () => import("@/pages/gestao/contract-template-edit"),
+  "ContractTemplateEditPage",
+);
