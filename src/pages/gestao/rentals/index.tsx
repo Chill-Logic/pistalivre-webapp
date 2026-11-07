@@ -1,9 +1,13 @@
+import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
 import { PageHeader } from "@/components/molecules/page-header";
 import { Pagination } from "@/components/molecules/pagination";
 import { QueryError } from "@/components/organisms/query-error";
 import { RentalFilters } from "@/components/organisms/rental-filters";
 import { RentalList } from "@/components/organisms/rental-list";
+import { ROUTES } from "@/constants/routes";
 import { useRentals } from "@/hooks/api/gestao/rentals/useRentals";
 import { useRentalFilters } from "@/hooks/ui/useRentalFilters";
 
@@ -13,7 +17,17 @@ export function RentalsPage() {
 
   return (
     <Box className="space-y-4 md:space-y-6">
-      <PageHeader title="Locações" />
+      <PageHeader
+        title="Locações"
+        actions={
+          <Button asChild>
+            <Link to={ROUTES.rentalNew}>
+              <Plus />
+              Nova locação
+            </Link>
+          </Button>
+        }
+      />
       <RentalFilters
         filters={filters}
         onSearch={setSearch}

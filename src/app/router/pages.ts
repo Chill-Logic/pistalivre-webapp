@@ -145,3 +145,11 @@ export const CustomerEditPage = lazyPage(
   () => import("@/pages/gestao/customer-edit"),
   "CustomerEditPage",
 );
+export const RentalNewPage = lazyPage(
+  () => import("@/pages/gestao/rental-new"),
+  "RentalNewPage",
+);
+export const RentalEditPage = lazyPage(
+  () => import("@/pages/gestao/rental-edit"),
+  "RentalEditPage",
+);

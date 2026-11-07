@@ -15,7 +15,9 @@ export const ROUTES = {
   vehicleDetail: `${GESTAO}/veiculos/:id`,
   vehicleEdit: `${GESTAO}/veiculos/:id/editar`,
   rentals: `${GESTAO}/locacoes`,
+  rentalNew: `${GESTAO}/locacoes/nova`,
   rentalDetail: `${GESTAO}/locacoes/:id`,
+  rentalEdit: `${GESTAO}/locacoes/:id/editar`,
   customers: `${GESTAO}/clientes`,
   customerNew: `${GESTAO}/clientes/novo`,
   customerDetail: `${GESTAO}/clientes/:id`,
@@ -56,6 +58,7 @@ export const routeTo = {
   vehicle: (id: string) => `${ROUTES.vehicles}/${id}`,
   editVehicle: (id: string) => `${ROUTES.vehicles}/${id}/editar`,
   rental: (id: string) => `${ROUTES.rentals}/${id}`,
+  editRental: (id: string) => `${ROUTES.rentals}/${id}/editar`,
   customer: (id: string) => `${ROUTES.customers}/${id}`,
   editCustomer: (id: string) => `${ROUTES.customers}/${id}/editar`,
   newCustomerFromLead: (leadId: string) =>
