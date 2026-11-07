@@ -1,3 +1,4 @@
+import type { Paginated } from "@/types/api";
 import type { DocumentFile } from "@/types/document";
 
 export type DebtLender = {
@@ -102,4 +103,7 @@ export type DebtDetail = DebtListItem & {
   documents: DocumentFile[];
 };
 
-export type Debts = { summary: DebtsSummary; items: DebtListItem[] };
+/** A page of debts; the summary always covers ALL of them. */
+export type Debts = Paginated<DebtListItem> & { summary: DebtsSummary };
+
+export type DebtFilters = { page: number; pageSize: number };

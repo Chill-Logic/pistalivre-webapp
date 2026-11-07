@@ -20,6 +20,8 @@ export type DataTableColumn<Item> = {
   /** Badge-shaped skeleton instead of a text bar. */
   skeletonShape?: "text" | "pill";
   className?: string;
+  /** Money/number columns: header and cells aligned right. */
+  align?: "right";
 };
 
 type DataTableProps<Item> = {
@@ -60,7 +62,12 @@ export function DataTable<Item>({
     <TableHeader>
       <TableRow className="hover:bg-transparent">
         {columns.map((column) => (
-          <TableHead key={column.header}>{column.header}</TableHead>
+          <TableHead
+            key={column.header}
+            className={cn(column.align === "right" && "text-right")}
+          >
+            {column.header}
+          </TableHead>
         ))}
       </TableRow>
     </TableHeader>
@@ -118,7 +125,13 @@ export function DataTable<Item>({
               onClick={() => navigate(href, { state: from })}
             >
               {columns.map((column, index) => (
-                <TableCell key={column.header} className={column.className}>
+                <TableCell
+                  key={column.header}
+                  className={cn(
+                    column.align === "right" && "text-right tabular-nums",
+                    column.className,
+                  )}
+                >
                   {index === 0 ? (
                     <Link
                       to={href}

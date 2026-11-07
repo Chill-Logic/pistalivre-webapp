@@ -8,17 +8,22 @@ import type { Paginated } from "@/types/api";
 
 type PagedFilters = { page: number; pageSize: number };
 
-type UsePagedListOptions<Filters extends PagedFilters, Item> = {
+type UsePagedListOptions<
+  Filters extends PagedFilters,
+  Page extends Paginated<unknown>,
+> = {
   /** The resource's root key (e.g. queryKeys.vehicles.all), so one
    *  invalidation refreshes both modes. */
   baseKey: readonly unknown[];
   filters: Filters;
-  fetch: (filters: Filters) => Promise<Paginated<Item>>;
+  fetch: (filters: Filters) => Promise<Page>;
   isDesktop: boolean;
 };
 
-export type PagedListResult<Item> = {
+export type PagedListResult<Item, Page = Paginated<Item>> = {
   mode: "pages" | "infinite";
+  /** The (first) page as the API sent it — for extras like a summary. */
+  firstPage: Page | undefined;
   items: Item[] | undefined;
   total: number;
   page: number;
@@ -39,12 +44,18 @@ export type PagedListResult<Item> = {
  * desktop, 10 at a time appended on scroll (infinite query) on the phone.
  * Only the active mode fetches.
  */
-export function usePagedList<Filters extends PagedFilters, Item>({
+export function usePagedList<
+  Filters extends PagedFilters,
+  Page extends Paginated<unknown>,
+>({
   baseKey,
   filters,
   fetch,
   isDesktop,
-}: UsePagedListOptions<Filters, Item>): PagedListResult<Item> {
+}: UsePagedListOptions<Filters, Page>): PagedListResult<
+  Page["items"][number],
+  Page
+> {
   const pages = useQuery({
     queryKey: [...baseKey, "list", filters],
     queryFn: () => fetch(filters),
@@ -67,6 +78,7 @@ export function usePagedList<Filters extends PagedFilters, Item>({
   if (isDesktop) {
     return {
       mode: "pages",
+      firstPage: pages.data,
       items: pages.data?.items,
       total: pages.data?.total ?? 0,
       page: pages.data?.page ?? filters.page,
@@ -85,7 +97,8 @@ export function usePagedList<Filters extends PagedFilters, Item>({
   const loaded = infinite.data?.pages;
   return {
     mode: "infinite",
-    items: loaded?.flatMap((chunk) => chunk.items),
+    firstPage: loaded?.[0],
+    items: loaded?.flatMap((chunk) => chunk.items as Page["items"]),
     total: loaded?.[0]?.total ?? 0,
     page: 1,
     pageSize: MOBILE_PAGE_SIZE,

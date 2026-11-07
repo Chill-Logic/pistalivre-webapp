@@ -4,8 +4,8 @@ import { PageSizeSelect } from "@/components/molecules/page-size-select";
 import { Pagination } from "@/components/molecules/pagination";
 import type { PagedListResult } from "@/hooks/ui/usePagedList";
 
-type ListFooterProps<Item> = {
-  result: PagedListResult<Item>;
+type ListFooterProps<Item, Page> = {
+  result: PagedListResult<Item, Page>;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
 };
@@ -14,11 +14,11 @@ type ListFooterProps<Item> = {
  * Below a resource list: numbered pages + page size on the desktop, "load
  * more on scroll" on the phone. Same for the card and the table view.
  */
-export function ListFooter<Item>({
+export function ListFooter<Item, Page>({
   result,
   onPageChange,
   onPageSizeChange,
-}: ListFooterProps<Item>) {
+}: ListFooterProps<Item, Page>) {
   if (result.isPending || result.isError || result.total === 0) return null;
 
   if (result.mode === "infinite") {
