@@ -23,7 +23,9 @@ export const ROUTES = {
   customerDetail: `${GESTAO}/clientes/:id`,
   customerEdit: `${GESTAO}/clientes/:id/editar`,
   maintenances: `${GESTAO}/manutencoes`,
+  maintenanceNew: `${GESTAO}/manutencoes/nova`,
   maintenanceDetail: `${GESTAO}/manutencoes/:id`,
+  maintenanceEdit: `${GESTAO}/manutencoes/:id/editar`,
   inspections: `${GESTAO}/vistorias`,
   inspectionDetail: `${GESTAO}/vistorias/:id`,
   crm: `${GESTAO}/crm`,
@@ -71,6 +73,17 @@ export const routeTo = {
   user: (id: string) => `${ROUTES.users}/${id}`,
   contractTemplate: (id: string) => `${ROUTES.models}/contratos/${id}`,
   maintenance: (id: string) => `${ROUTES.maintenances}/${id}`,
+  editMaintenance: (id: string) => `${ROUTES.maintenances}/${id}/editar`,
+  /** From a vehicle or a rental (the vehicle comes fixed). */
+  newMaintenance: (from: { vehicleId?: string; rentalId?: string } = {}) => {
+    const params = new URLSearchParams();
+    if (from.vehicleId) params.set("veiculo", from.vehicleId);
+    if (from.rentalId) params.set("locacao", from.rentalId);
+    const query = params.toString();
+    return query
+      ? `${ROUTES.maintenances}/nova?${query}`
+      : `${ROUTES.maintenances}/nova`;
+  },
   inspection: (id: string) => `${ROUTES.inspections}/${id}`,
   portalRental: (id: string) => `${ROUTES.portal}/locacoes/${id}`,
 };

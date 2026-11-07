@@ -44,6 +44,7 @@ export const queryKeys = {
   },
   maintenances: {
     all: ["maintenances"] as const,
+    providers: () => [...queryKeys.maintenances.all, "providers"] as const,
     list: (filters: MaintenanceFilters) =>
       [...queryKeys.maintenances.all, "list", filters] as const,
     detail: (id: string) =>

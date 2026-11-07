@@ -47,3 +47,18 @@ export type MaintenanceFilters = {
   vehicleId?: string;
   rentalId?: string;
 };
+
+/** Body of POST/PUT /maintenances (PUT ignores vehicle/rental). */
+export type MaintenanceInput = {
+  vehicleId?: string;
+  rentalId?: string | null;
+  type: MaintenanceType;
+  /** yyyy-mm-dd; retroactive is fine. */
+  performedAt: string;
+  services: string[];
+  serviceDetails: Record<string, string>;
+  mileage: number | null;
+  cost: number | null;
+  provider: string | null;
+  description: string | null;
+};

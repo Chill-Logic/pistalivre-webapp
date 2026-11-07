@@ -165,3 +165,11 @@ export const FinanceSectionPage = lazyPage(
   () => import("@/pages/gestao/finance-section"),
   "FinanceSectionPage",
 );
+export const MaintenanceNewPage = lazyPage(
+  () => import("@/pages/gestao/maintenance-new"),
+  "MaintenanceNewPage",
+);
+export const MaintenanceEditPage = lazyPage(
+  () => import("@/pages/gestao/maintenance-edit"),
+  "MaintenanceEditPage",
+);

@@ -6,5 +6,6 @@ export function useVehicle(id: string) {
   return useQuery({
     queryKey: queryKeys.vehicles.detail(id),
     queryFn: () => vehiclesService.get(id),
+    enabled: Boolean(id),
   });
 }

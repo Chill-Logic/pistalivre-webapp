@@ -1,4 +1,8 @@
+import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
+import { ROUTES } from "@/constants/routes";
 import { PageHeader } from "@/components/molecules/page-header";
 import { ViewToggle } from "@/components/molecules/view-toggle";
 import { MaintenanceFilters } from "@/components/organisms/maintenance-filters";
@@ -20,7 +24,17 @@ export function MaintenancesPage() {
     <Box className="space-y-4 md:space-y-6">
       <PageHeader
         title="Manutenções"
-        actions={<ViewToggle view={view} onChange={setView} />}
+        actions={
+          <>
+            <ViewToggle view={view} onChange={setView} />
+            <Button asChild>
+              <Link to={ROUTES.maintenanceNew}>
+                <Plus />
+                Nova manutenção
+              </Link>
+            </Button>
+          </>
+        }
       />
       <MaintenanceFilters
         filters={filters}

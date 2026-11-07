@@ -1,3 +1,6 @@
+import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/atoms/button";
 import {
   Card,
   CardContent,
@@ -13,6 +16,7 @@ import {
 } from "@/components/molecules/maintenance-card";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { QueryError } from "@/components/organisms/query-error";
+import { routeTo } from "@/constants/routes";
 import { MAX_PAGE_SIZE } from "@/constants/pagination";
 import { useMaintenances } from "@/hooks/api/gestao/maintenances/useMaintenances";
 import { pluralize } from "@/utils/text";
@@ -36,8 +40,14 @@ export function RelatedMaintenances({
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
         <CardTitle className="text-base">Manutenções</CardTitle>
+        <Button asChild variant="outline" size="sm">
+          <Link to={routeTo.newMaintenance({ vehicleId, rentalId })}>
+            <Plus />
+            Registrar
+          </Link>
+        </Button>
       </CardHeader>
       <CardContent className="space-y-3">
         {query.isPending && (
