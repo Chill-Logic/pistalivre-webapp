@@ -21,6 +21,14 @@ import {
   RentalSummary,
   RentalSummarySkeleton,
 } from "@/components/organisms/rental-summary";
+import {
+  RelatedInspections,
+  RelatedInspectionsSkeleton,
+} from "@/components/organisms/related-inspections";
+import {
+  RelatedMaintenances,
+  RelatedMaintenancesSkeleton,
+} from "@/components/organisms/related-maintenances";
 import { RentalDetailLayout } from "@/components/templates/rental-detail-layout";
 import { ROUTES } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
@@ -42,6 +50,8 @@ export function RentalDetailPage() {
             billing={<RentalBillingCardSkeleton />}
             charges={<RentalChargesSkeleton />}
             caution={<RentalCautionCardSkeleton />}
+            maintenances={<RelatedMaintenancesSkeleton />}
+            inspections={<RelatedInspectionsSkeleton />}
           />
         </SkeletonRegion>
       )}
@@ -61,6 +71,8 @@ export function RentalDetailPage() {
           billing={<RentalBillingCard rental={rental.data} />}
           charges={<RentalCharges rentalId={rental.data.id} />}
           caution={<RentalCautionCard caution={rental.data.caution} />}
+          maintenances={<RelatedMaintenances rentalId={rental.data.id} />}
+          inspections={<RelatedInspections rentalId={rental.data.id} />}
         />
       )}
     </Box>

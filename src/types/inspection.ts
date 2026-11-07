@@ -34,6 +34,9 @@ export type InspectionFilters = {
   q: string;
   type: InspectionType | "";
   performedBy: InspectionActor | "";
+  /** Scope to one vehicle or rental (detail-page sections). */
+  vehicleId?: string;
+  rentalId?: string;
 };
 
 export type InspectionDetail = {

@@ -14,6 +14,10 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
   5. Decisão ambígua: escolher o mais conservador, anotar aqui e seguir. Exceção: o que mexe em **dinheiro** (emitir, dar baixa ou editar cobrança, pix) ou em **dado de cliente** fica **somente leitura** até o dono decidir.
   6. Escopo: reproduzir no SPA as telas da gestão e depois as do portal. Apagar as páginas Next antigas só com o aval dele.
 
+## Trabalho em paralelo
+
+- A `pista-livre-5d` voltou a trabalhar no webapp **em paralelo** (2026-11-07), na **mesma pasta**: ela ficou com o item 1 (criar/editar veículo; já instalou `@radix-ui/react-popover` e `cmdk`). Commits só com os seus arquivos (`git add <caminhos>`, nunca `-A`), `git pull --rebase` antes do push, mudanças aditivas nos arquivos compartilhados (router, pages.ts, query-keys, routes, label-maps).
+
 ## Rodando
 
 - API: `docker compose up dev` no `pista-livre` (já está de pé; **não reinicie**). Login `admin@pistalivre.dev` / `admin123`.
@@ -46,6 +50,7 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
   - ⚠️ **Não há cliente de teste com senha no dev** (o backend não cria por ser credencial/dado de cliente). O portal foi validado com **respostas simuladas** (`/me/*` e `/auth/me` interceptados no Puppeteer, nos formatos reais que o backend viu no dev) + o login real com senha errada. Pendência para o dono: indicar/criar um cliente de teste.
   - Tema claro/escuro mantido no portal, igual ao Next (o CLAUDE.md anota a dúvida de travar o portal no claro; decisão do dono).
 - Veículo — **trocar situação e excluir**: card "Situação" com só as transições legais (`constants/vehicle.ts`, espelho da regra do domínio), cada uma confirmada em Dialog (para "Alugado" o texto avisa que normalmente isso vem de ativar uma locação); avisa quando há locação ativa mas a situação gravada é outra. "Excluir" no topo do detalhe, Dialog destrutivo, volta para a lista. `Dialog` (atom, bottom sheet no celular) + `ConfirmDialog` (molecule) prontos para reuso. Testado: AVAILABLE→MAINTENANCE→AVAILABLE no PLA-1001 (dado voltou ao original); exclusão testada com o DELETE simulado (nenhum veículo apagado).
+- Ficha do veículo e da locação mostram as **manutenções e vistorias** dela (`RelatedMaintenances`/`RelatedInspections`, carregam sozinhas com `?vehicleId=`/`?rentalId=`, até 100).
 - Clientes: lista (busca, situação, filtro de teste; padrão = só reais) + detalhe (dados, CNH com aviso de vencida, endereço e emergência, locações, documentos). O locatário na locação leva à ficha. `DocumentsCard` é genérico (veículo e cliente).
 
 ## Organização (pedido do dono)
@@ -60,9 +65,8 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
    - O combobox criável ainda não existe: precisa de Popover (`@radix-ui/react-popover`, não instalado) + lista filtrável (shadcn usa `cmdk`). Ele vira atom/molecule reutilizável (marca, modelo, e depois oficina). `Dialog`/`ConfirmDialog` já existem.
    - Leia o corpo exato em `pista-livre/docs/api-v1.md` (POST /vehicles) antes; o form do Next (`src/app/gestao/veiculos/novo` e `[id]/editar`) é a referência de campos e validação.
    - Rotas sugeridas: `/gestao/veiculos/novo` e `/gestao/veiculos/:id/editar`; botão "Novo veículo" no `PageHeader` da lista e "Editar" no topo do detalhe (ao lado de "Excluir").
-2. **Seções na ficha do veículo e na locação**: manutenções e vistorias daquele veículo/locação (`GET /maintenances?vehicleId=` / `?rentalId=`, idem `/inspections`), reaproveitando `MaintenanceCard`/`InspectionCard`.
-3. **Financeiro** (`/gestao/financeiro` hoje é "em migração"): pedir ao backend o que existe de leitura (saldo, extrato, a receber, inadimplência). Tudo **só leitura** (regra 5).
-4. Escritas do portal e de dinheiro: **não** começar sem o dono.
+2. **Financeiro** (`/gestao/financeiro` hoje é "em migração"): pedir ao backend o que existe de leitura (saldo, extrato, a receber, inadimplência). Tudo **só leitura** (regra 5).
+3. Escritas do portal e de dinheiro: **não** começar sem o dono.
 
 ## Ferramentas de validação (scratchpad da sessão anterior, recrie se sumir)
 

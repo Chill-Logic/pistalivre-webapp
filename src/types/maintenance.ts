@@ -43,4 +43,7 @@ export type MaintenanceFilters = {
   pageSize: number;
   q: string;
   type: MaintenanceType | "";
+  /** Scope to one vehicle or rental (detail-page sections). */
+  vehicleId?: string;
+  rentalId?: string;
 };
