@@ -9,7 +9,10 @@ import {
 } from "@/components/organisms/reimbursement-queue";
 import { useStaffReimbursements } from "@/hooks/api/gestao/reimbursements/useStaffReimbursements";
 
-/** Review queue, read-only for now: approving sends a pix (owner's call). */
+/**
+ * Review queue: rejecting is available (a record the customer sees). There
+ * is no "approve/pay" — money never leaves through the system.
+ */
 export function ReimbursementsPage() {
   const reimbursements = useStaffReimbursements();
 
@@ -35,6 +38,7 @@ export function ReimbursementsPage() {
             reimbursements={reimbursements.data.pending}
             emptyIcon={Inbox}
             emptyTitle="Nenhum pedido aguardando análise"
+            missingItems={reimbursements.data.missingItems}
           />
           <ReimbursementQueue
             title="Histórico"

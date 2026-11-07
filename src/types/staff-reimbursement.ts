@@ -33,7 +33,16 @@ export type StaffReimbursement = {
   createdAt: string;
 };
 
+/** One item of the "what was missing" checklist of a rejection. */
+export type ReimbursementMissingItem = { code: string; label: string };
+
 export type StaffReimbursements = {
   pending: StaffReimbursement[];
   history: StaffReimbursement[];
+  missingItems: ReimbursementMissingItem[];
+};
+
+export type RejectReimbursementInput = {
+  missing: string[];
+  note: string | null;
 };

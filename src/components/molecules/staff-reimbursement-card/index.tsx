@@ -1,4 +1,5 @@
 import { BadgeCheck } from "lucide-react";
+import type { ReactNode } from "react";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Card, CardContent } from "@/components/atoms/card";
@@ -24,8 +25,11 @@ import {
  */
 export function StaffReimbursementCard({
   reimbursement,
+  actions,
 }: {
   reimbursement: StaffReimbursement;
+  /** Review buttons (only on pending requests). */
+  actions?: ReactNode;
 }) {
   const { label } = useLabels();
   const { view, download } = useFileActions();
@@ -129,6 +133,12 @@ export function StaffReimbursementCard({
                 }
               />
             ))}
+          </Box>
+        )}
+
+        {actions && (
+          <Box className="flex flex-wrap justify-end gap-2 border-t pt-3">
+            {actions}
           </Box>
         )}
       </CardContent>

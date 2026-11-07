@@ -9,13 +9,19 @@ import {
   StaffReimbursementCard,
   StaffReimbursementCardSkeleton,
 } from "@/components/molecules/staff-reimbursement-card";
-import type { StaffReimbursement } from "@/types/staff-reimbursement";
+import { ReimbursementRejectDialog } from "@/components/organisms/reimbursement-reject-dialog";
+import type {
+  ReimbursementMissingItem,
+  StaffReimbursement,
+} from "@/types/staff-reimbursement";
 
 type ReimbursementQueueProps = {
   title: string;
   reimbursements: StaffReimbursement[];
   emptyIcon: LucideIcon;
   emptyTitle: string;
+  /** Checklist for rejecting; present = pending requests can be rejected. */
+  missingItems?: ReimbursementMissingItem[];
 };
 
 export function ReimbursementQueue({
@@ -23,6 +29,7 @@ export function ReimbursementQueue({
   reimbursements,
   emptyIcon,
   emptyTitle,
+  missingItems,
 }: ReimbursementQueueProps) {
   return (
     <Box className="space-y-3">
@@ -40,7 +47,19 @@ export function ReimbursementQueue({
         <Row as="ul" className="gap-y-6">
           {reimbursements.map((reimbursement) => (
             <Col as="li" key={reimbursement.id} lg={6}>
-              <StaffReimbursementCard reimbursement={reimbursement} />
+              <StaffReimbursementCard
+                reimbursement={reimbursement}
+                actions={
+                  missingItems && reimbursement.status === "PENDING" ? (
+                    <ReimbursementRejectDialog
+                      reimbursementId={reimbursement.id}
+                      customerName={reimbursement.customer.name}
+                      amount={reimbursement.amount}
+                      missingItems={missingItems}
+                    />
+                  ) : undefined
+                }
+              />
             </Col>
           ))}
         </Row>
