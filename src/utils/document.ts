@@ -22,3 +22,13 @@ export function formatPhone(value: string) {
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
   return value;
 }
+
+/**
+ * CNPJ (numeric or the new alphanumeric, IN RFB 2.229/2024):
+ * AB12CD34000156 → AB.12C.D34/0001-56; anything else as is.
+ */
+export function formatCnpj(value: string) {
+  const clean = value.replace(/[^0-9A-Za-z]/g, "").toUpperCase();
+  if (clean.length !== 14) return value;
+  return `${clean.slice(0, 2)}.${clean.slice(2, 5)}.${clean.slice(5, 8)}/${clean.slice(8, 12)}-${clean.slice(12)}`;
+}

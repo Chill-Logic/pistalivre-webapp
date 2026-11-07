@@ -97,3 +97,15 @@ export const LeadDetailPage = lazyPage(
   () => import("@/pages/gestao/lead-detail"),
   "LeadDetailPage",
 );
+export const UsersPage = lazyPage(
+  () => import("@/pages/gestao/users"),
+  "UsersPage",
+);
+export const UserDetailPage = lazyPage(
+  () => import("@/pages/gestao/user-detail"),
+  "UserDetailPage",
+);
+export const CompanyPage = lazyPage(
+  () => import("@/pages/gestao/company"),
+  "CompanyPage",
+);

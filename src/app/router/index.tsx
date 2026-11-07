@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { RedirectIfAuthenticated } from "./guards/RedirectIfAuthenticated";
 import { RequireAuth } from "./guards/RequireAuth";
 import {
+  CompanyPage,
   CrmPage,
   CustomerDetailPage,
   CustomerLoginPage,
@@ -22,6 +23,8 @@ import {
   RentalDetailPage,
   SupplierDetailPage,
   SuppliersPage,
+  UserDetailPage,
+  UsersPage,
   RentalsPage,
   VehicleDetailPage,
   VehicleEditPage,
@@ -69,6 +72,9 @@ export const router = createBrowserRouter([
       { path: ROUTES.reimbursements, element: <ReimbursementsPage /> },
       { path: ROUTES.suppliers, element: <SuppliersPage /> },
       { path: ROUTES.supplierDetail, element: <SupplierDetailPage /> },
+      { path: ROUTES.users, element: <UsersPage /> },
+      { path: ROUTES.userDetail, element: <UserDetailPage /> },
+      { path: ROUTES.company, element: <CompanyPage /> },
       { path: ROUTES.finance, element: <FinancePage /> },
       { path: ROUTES.financeStatement, element: <FinanceStatementPage /> },
       { path: ROUTES.financeDebts, element: <FinanceDebtsPage /> },

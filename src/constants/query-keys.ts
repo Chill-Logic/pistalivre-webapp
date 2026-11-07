@@ -5,6 +5,7 @@ import type { MaintenanceFilters } from "@/types/maintenance";
 import type { RentalFilters } from "@/types/rental";
 import type { StatementFilters } from "@/types/statement";
 import type { SupplierFilters } from "@/types/supplier";
+import type { UserFilters } from "@/types/user";
 import type { VehicleFilters } from "@/types/vehicle";
 
 /** Query key factory: one place to build and invalidate cache keys. */
@@ -95,6 +96,15 @@ export const queryKeys = {
     leads: (filters: LeadFilters) =>
       [...queryKeys.crm.all, "leads", filters] as const,
     lead: (id: string) => [...queryKeys.crm.all, "lead", id] as const,
+  },
+  users: {
+    all: ["users"] as const,
+    list: (filters: UserFilters) =>
+      [...queryKeys.users.all, "list", filters] as const,
+    detail: (id: string) => [...queryKeys.users.all, "detail", id] as const,
+  },
+  company: {
+    all: ["company"] as const,
   },
   dashboard: {
     all: ["dashboard"] as const,
