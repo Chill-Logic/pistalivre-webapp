@@ -1,19 +1,27 @@
 import { Box } from "@/components/atoms/box";
 import { PageHeader } from "@/components/molecules/page-header";
-import { Pagination } from "@/components/molecules/pagination";
+import { ViewToggle } from "@/components/molecules/view-toggle";
 import { MaintenanceFilters } from "@/components/organisms/maintenance-filters";
 import { MaintenanceList } from "@/components/organisms/maintenance-list";
+import { MaintenanceTable } from "@/components/organisms/maintenance-table";
+import { ListFooter } from "@/components/organisms/list-footer";
 import { QueryError } from "@/components/organisms/query-error";
-import { useMaintenances } from "@/hooks/api/gestao/maintenances/useMaintenances";
+import { useMaintenanceList } from "@/hooks/api/gestao/maintenances/useMaintenances";
+import { useListView } from "@/hooks/ui/useListView";
 import { useMaintenanceFilters } from "@/hooks/ui/useMaintenanceFilters";
 
 export function MaintenancesPage() {
-  const { filters, setSearch, setType, setPage } = useMaintenanceFilters();
-  const maintenances = useMaintenances(filters);
+  const { filters, setSearch, setType, setPage, setPageSize } =
+    useMaintenanceFilters();
+  const { view, setView, isDesktop } = useListView();
+  const maintenances = useMaintenanceList(filters, isDesktop);
 
   return (
     <Box className="space-y-4 md:space-y-6">
-      <PageHeader title="Manutenções" />
+      <PageHeader
+        title="Manutenções"
+        actions={<ViewToggle view={view} onChange={setView} />}
+      />
       <MaintenanceFilters
         filters={filters}
         onSearch={setSearch}
@@ -24,21 +32,24 @@ export function MaintenancesPage() {
           error={maintenances.error}
           onRetry={() => maintenances.refetch()}
         />
+      ) : view === "tabela" ? (
+        <MaintenanceTable
+          maintenances={maintenances.items}
+          isLoading={maintenances.isPending}
+          isRefreshing={maintenances.isRefreshing}
+        />
       ) : (
         <MaintenanceList
-          maintenances={maintenances.data?.items}
+          maintenances={maintenances.items}
           isLoading={maintenances.isPending}
-          isRefreshing={maintenances.isPlaceholderData}
+          isRefreshing={maintenances.isRefreshing}
         />
       )}
-      {maintenances.data && maintenances.data.total > 0 && (
-        <Pagination
-          page={maintenances.data.page}
-          pageSize={maintenances.data.pageSize}
-          total={maintenances.data.total}
-          onPageChange={setPage}
-        />
-      )}
+      <ListFooter
+        result={maintenances}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+      />
     </Box>
   );
 }

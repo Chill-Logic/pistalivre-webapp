@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { LABEL_MAPS } from "@/constants/label-maps";
-import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
 import { isKnownCode } from "@/helpers/labels";
 import { useLabels } from "@/hooks/ui/useLabels";
 import { useUrlFilters } from "@/hooks/ui/useUrlFilters";
@@ -13,7 +12,8 @@ import type {
 const KEYS = ["busca", "tipo", "feita_por"] as const;
 
 export function useInspectionFilters() {
-  const { values, page, setFilter, setPage } = useUrlFilters(KEYS);
+  const { values, page, pageSize, setFilter, setPage, setPageSize } =
+    useUrlFilters(KEYS);
   const { map } = useLabels();
   const typeMap = map(LABEL_MAPS.inspectionType);
   const actorMap = map(LABEL_MAPS.inspectionActor);
@@ -21,7 +21,7 @@ export function useInspectionFilters() {
   const filters = useMemo<InspectionFilters>(
     () => ({
       page,
-      pageSize: DEFAULT_PAGE_SIZE,
+      pageSize,
       q: values.busca,
       type: isKnownCode(typeMap, values.tipo)
         ? (values.tipo as InspectionType)
@@ -30,7 +30,7 @@ export function useInspectionFilters() {
         ? (values.feita_por as InspectionActor)
         : "",
     }),
-    [page, values, typeMap, actorMap],
+    [page, pageSize, values, typeMap, actorMap],
   );
 
   return {
@@ -39,5 +39,6 @@ export function useInspectionFilters() {
     setType: (value: string) => setFilter("tipo", value),
     setPerformedBy: (value: string) => setFilter("feita_por", value),
     setPage,
+    setPageSize,
   };
 }
