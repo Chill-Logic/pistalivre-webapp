@@ -1,7 +1,5 @@
 import { Box } from "@/components/atoms/box";
-import { PageHeader } from "@/components/molecules/page-header";
 import { Pagination } from "@/components/molecules/pagination";
-import { SectionTabs } from "@/components/molecules/section-tabs";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { QueryError } from "@/components/organisms/query-error";
 import { StatementFilters } from "@/components/organisms/statement-filters";
@@ -13,7 +11,6 @@ import {
   StatementTotals,
   StatementTotalsSkeleton,
 } from "@/components/organisms/statement-totals";
-import { FINANCE_TABS } from "@/constants/finance";
 import { showsSourcePerLine } from "@/helpers/statement";
 import { useStatement } from "@/hooks/api/gestao/finance/useStatement";
 import { useStatementFilters } from "@/hooks/ui/useStatementFilters";
@@ -27,8 +24,6 @@ export function FinanceStatementPage() {
 
   return (
     <Box className="space-y-4 md:space-y-6">
-      <PageHeader title="Financeiro" />
-      <SectionTabs tabs={FINANCE_TABS} label="Seções do financeiro" />
       <StatementFilters
         period={period}
         source={filters.source}

@@ -19,7 +19,7 @@ export function AppSidebar() {
 
   return (
     <Aside
-      className="sticky top-0 z-20 flex h-dvh shrink-0 flex-col border-r bg-card transition-[width] duration-300 ease-in-out motion-reduce:transition-none"
+      className="sticky top-0 z-40 flex h-dvh shrink-0 flex-col border-r bg-card transition-[width] duration-300 ease-in-out motion-reduce:transition-none"
       style={{
         width: isCollapsed ? SIDEBAR_WIDTH.collapsed : SIDEBAR_WIDTH.expanded,
       }}

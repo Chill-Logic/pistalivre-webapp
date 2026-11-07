@@ -6,7 +6,8 @@ import { cn } from "@/utils/cn";
 
 /**
  * Desktop only: round button straddling the sidebar's right edge (MyFinance
- * pattern). The chevron turns instead of swapping icons.
+ * pattern), centered on the header's bottom line (h-14 − half the button).
+ * The chevron turns instead of swapping icons.
  */
 export function SidebarCollapseToggle() {
   const { isDesktop, isCollapsed, toggleCollapsed } = useSidebar();
@@ -21,7 +22,7 @@ export function SidebarCollapseToggle() {
         onClick={toggleCollapsed}
         aria-label={label}
         aria-expanded={!isCollapsed}
-        className="absolute right-0 top-[60px] z-10 size-8 translate-x-1/2 rounded-full shadow-lg hover:scale-105 md:size-8"
+        className="absolute right-0 top-10 z-10 size-8 translate-x-1/2 rounded-full shadow-lg hover:scale-105 md:size-8"
       >
         <ChevronLeft
           className={cn(

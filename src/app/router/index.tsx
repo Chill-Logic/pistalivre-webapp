@@ -106,7 +106,14 @@ export const router = createBrowserRouter([
         element: <ComingSoonPage title="Assinaturas" />,
       },
       {
-        element: <ModelsSectionPage />,
+        element: (
+          <ModelsSectionPage
+            preload={[
+              ModelsContractsPage.preload,
+              ModelsInspectionPage.preload,
+            ]}
+          />
+        ),
         children: [
           { path: ROUTES.models, element: <ModelsContractsPage /> },
           { path: ROUTES.modelsInspection, element: <ModelsInspectionPage /> },
@@ -120,7 +127,15 @@ export const router = createBrowserRouter([
       { path: ROUTES.userDetail, element: <UserDetailPage /> },
       { path: ROUTES.company, element: <CompanyPage /> },
       {
-        element: <FinanceSectionPage />,
+        element: (
+          <FinanceSectionPage
+            preload={[
+              FinancePage.preload,
+              FinanceDebtsPage.preload,
+              FinanceStatementPage.preload,
+            ]}
+          />
+        ),
         children: [
           { path: ROUTES.finance, element: <FinancePage /> },
           { path: ROUTES.financeStatement, element: <FinanceStatementPage /> },

@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Main } from "@/components/atoms/landmarks";
 import { OfflineBanner } from "@/components/molecules/offline-banner";
@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/organisms/app-sidebar";
 import { BottomNav } from "@/components/organisms/bottom-nav";
 import { TopProgressBar } from "@/components/organisms/top-progress-bar";
 import { PageSkeleton } from "@/components/templates/page-skeleton";
+import { usePageTransitionKey } from "@/hooks/ui/usePageTransitionKey";
 import type { AuthUser } from "@/types/auth";
 
 type AppShellProps = {
@@ -19,9 +20,9 @@ type AppShellProps = {
  * `md` up the bottom bar gives way to the collapsible sidebar.
  */
 export function AppShell({ user }: AppShellProps) {
-  // Keyed by path: each page enters with a short fade-up (filters in the
-  // query string don't replay it).
-  const { pathname } = useLocation();
+  // Each page enters with a short fade-up (filters in the query string and
+  // tabs of the same section don't replay it).
+  const transitionKey = usePageTransitionKey();
 
   return (
     <Box className="flex min-h-dvh">
@@ -32,7 +33,7 @@ export function AppShell({ user }: AppShellProps) {
         <OfflineBanner />
         <Main className="flex-1 px-4 pb-24 pt-4 md:px-8 md:pb-8 md:pt-6">
           <Box
-            key={pathname}
+            key={transitionKey}
             className="duration-300 ease-out animate-in fade-in-0 slide-in-from-bottom-2 motion-reduce:animate-none"
           >
             <Suspense fallback={<PageSkeleton />}>
