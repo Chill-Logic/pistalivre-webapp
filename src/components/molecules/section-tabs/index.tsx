@@ -18,7 +18,7 @@ function SectionTabLink({ tab }: { tab: SectionTab }) {
       to={tab.to}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "-mb-px inline-flex min-h-11 shrink-0 items-center border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:min-h-10",
+        "inline-flex min-h-11 shrink-0 items-center border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:min-h-10",
         active
           ? "border-primary text-primary"
           : "border-transparent text-muted-foreground hover:text-foreground",
@@ -42,7 +42,7 @@ export function SectionTabs({
 }) {
   return (
     <Nav aria-label={label} className="border-b">
-      <Box className="-mx-1 flex overflow-x-auto px-1">
+      <Box className="-mx-1 flex overflow-x-auto overflow-y-hidden px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {tabs.map((tab) => (
           <SectionTabLink key={tab.to} tab={tab} />
         ))}
