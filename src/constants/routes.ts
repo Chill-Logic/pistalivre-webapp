@@ -4,6 +4,7 @@
  * path here.
  */
 const GESTAO = "/gestao";
+const PORTAL = "/area-cliente";
 
 export const ROUTES = {
   root: "/",
@@ -20,6 +21,9 @@ export const ROUTES = {
   inspections: `${GESTAO}/vistorias`,
   inspectionDetail: `${GESTAO}/vistorias/:id`,
   finance: `${GESTAO}/financeiro`,
+  portal: PORTAL,
+  portalLogin: `${PORTAL}/entrar`,
+  portalRental: `${PORTAL}/locacoes/:id`,
 } as const;
 
 /** Concrete URLs for routes with params. */
@@ -29,4 +33,5 @@ export const routeTo = {
   customer: (id: string) => `${ROUTES.customers}/${id}`,
   maintenance: (id: string) => `${ROUTES.maintenances}/${id}`,
   inspection: (id: string) => `${ROUTES.inspections}/${id}`,
+  portalRental: (id: string) => `${ROUTES.portal}/locacoes/${id}`,
 };

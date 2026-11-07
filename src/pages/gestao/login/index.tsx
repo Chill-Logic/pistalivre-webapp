@@ -11,7 +11,9 @@ export function LoginPage() {
     <AuthLayout title="Entrar">
       <LoginForm
         onSuccess={() =>
-          navigate(safeRedirect(params.get("callbackUrl")), { replace: true })
+          navigate(safeRedirect(params.get("callbackUrl"), "gestao"), {
+            replace: true,
+          })
         }
       />
     </AuthLayout>

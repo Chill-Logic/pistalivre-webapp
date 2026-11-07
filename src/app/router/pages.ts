@@ -44,3 +44,15 @@ export const InspectionDetailPage = lazyPage(
   () => import("@/pages/gestao/inspection-detail"),
   "InspectionDetailPage",
 );
+export const CustomerLoginPage = lazyPage(
+  () => import("@/pages/cliente/login"),
+  "CustomerLoginPage",
+);
+export const PortalHomePage = lazyPage(
+  () => import("@/pages/cliente/home"),
+  "PortalHomePage",
+);
+export const PortalRentalDetailPage = lazyPage(
+  () => import("@/pages/cliente/rental-detail"),
+  "PortalRentalDetailPage",
+);

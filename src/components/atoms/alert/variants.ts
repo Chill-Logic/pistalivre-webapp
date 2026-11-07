@@ -6,6 +6,7 @@ export const alertVariants = cva("rounded-md px-3 py-2 text-sm", {
       error: "bg-error text-error-foreground",
       warning: "bg-warning text-warning-foreground",
       success: "bg-success text-success-foreground",
+      info: "bg-muted text-muted-foreground",
     },
   },
   defaultVariants: { variant: "error" },

@@ -10,6 +10,8 @@ export const LABEL_MAPS = {
   paymentStatus: "PAYMENT_STATUS_LABELS",
   paymentPurpose: "PAYMENT_PURPOSE_LABELS",
   leadStatus: "LEAD_STATUS_LABELS",
+  reimbursementStatus: "REIMBURSEMENT_STATUS_LABELS",
+  pixKeyType: "PIX_KEY_TYPE_LABELS",
   cautionType: "CAUTION_TYPE_LABELS",
   rentBillingTiming: "RENT_BILLING_TIMING_LABELS",
   weekday: "WEEKDAY_LABELS",

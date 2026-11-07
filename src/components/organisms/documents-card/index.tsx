@@ -11,18 +11,28 @@ import { DocumentItem } from "@/components/molecules/document-item";
 import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
 import type { DocumentFile } from "@/types/document";
 
+type DocumentsCardProps = {
+  documents: DocumentFile[];
+  title?: string;
+  empty?: string;
+};
+
 /** Documents of any owner (vehicle, customer…), with view/download. */
-export function DocumentsCard({ documents }: { documents: DocumentFile[] }) {
+export function DocumentsCard({
+  documents,
+  title = "Documentos",
+  empty = "Nenhum documento anexado.",
+}: DocumentsCardProps) {
   const { view, download } = useFileActions();
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Documentos</CardTitle>
+        <CardTitle className="text-base">{title}</CardTitle>
       </CardHeader>
       <CardContent>
         {documents.length === 0 ? (
-          <Text tone="muted">Nenhum documento anexado.</Text>
+          <Text tone="muted">{empty}</Text>
         ) : (
           <Box className="divide-y">
             {documents.map((document) => (

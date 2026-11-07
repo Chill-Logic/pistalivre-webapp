@@ -3,12 +3,15 @@ import { RedirectIfAuthenticated } from "./guards/RedirectIfAuthenticated";
 import { RequireAuth } from "./guards/RequireAuth";
 import {
   CustomerDetailPage,
+  CustomerLoginPage,
   CustomersPage,
   DashboardPage,
   InspectionDetailPage,
   InspectionsPage,
   MaintenanceDetailPage,
   MaintenancesPage,
+  PortalHomePage,
+  PortalRentalDetailPage,
   RentalDetailPage,
   RentalsPage,
   VehicleDetailPage,
@@ -21,11 +24,22 @@ import { NotFoundPage } from "@/pages/comum/not-found";
 
 export const router = createBrowserRouter([
   {
-    element: <RedirectIfAuthenticated />,
+    element: <RedirectIfAuthenticated realm="gestao" />,
     children: [{ path: ROUTES.login, element: <LoginPage /> }],
   },
   {
-    element: <RequireAuth />,
+    element: <RedirectIfAuthenticated realm="cliente" />,
+    children: [{ path: ROUTES.portalLogin, element: <CustomerLoginPage /> }],
+  },
+  {
+    element: <RequireAuth realm="cliente" />,
+    children: [
+      { path: ROUTES.portal, element: <PortalHomePage /> },
+      { path: ROUTES.portalRental, element: <PortalRentalDetailPage /> },
+    ],
+  },
+  {
+    element: <RequireAuth realm="gestao" />,
     children: [
       { path: ROUTES.dashboard, element: <DashboardPage /> },
       { path: ROUTES.vehicles, element: <VehiclesPage /> },
