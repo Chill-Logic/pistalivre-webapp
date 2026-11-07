@@ -2,6 +2,7 @@ import type { CustomerFilters } from "@/types/customer";
 import type { InspectionFilters } from "@/types/inspection";
 import type { MaintenanceFilters } from "@/types/maintenance";
 import type { RentalFilters } from "@/types/rental";
+import type { StatementFilters } from "@/types/statement";
 import type { VehicleFilters } from "@/types/vehicle";
 
 /** Query key factory: one place to build and invalidate cache keys. */
@@ -68,6 +69,8 @@ export const queryKeys = {
     balances: () => [...queryKeys.finance.all, "balances"] as const,
     delinquency: () => [...queryKeys.finance.all, "delinquency"] as const,
     toCollect: () => [...queryKeys.finance.all, "to-collect"] as const,
+    statement: (filters: StatementFilters) =>
+      [...queryKeys.finance.all, "statement", filters] as const,
   },
   dashboard: {
     all: ["dashboard"] as const,

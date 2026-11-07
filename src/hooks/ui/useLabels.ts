@@ -1,7 +1,12 @@
 import { useCallback } from "react";
 import type { LabelMapName } from "@/constants/label-maps";
 import { useLabelCatalog } from "@/hooks/api/comum/labels/useLabelCatalog";
-import { labelFrom, mapOf, optionsFrom } from "@/helpers/labels";
+import {
+  knownLabelFrom,
+  labelFrom,
+  mapOf,
+  optionsFrom,
+} from "@/helpers/labels";
 
 /**
  * Portuguese labels for domain codes, from the API catalog. The shell only
@@ -16,6 +21,11 @@ export function useLabels() {
     [data],
   );
 
+  const knownLabel = useCallback(
+    (map: LabelMapName, code: string) => knownLabelFrom(mapOf(data, map), code),
+    [data],
+  );
+
   const options = useCallback(
     (map: LabelMapName) => optionsFrom(mapOf(data, map)),
     [data],
@@ -23,5 +33,5 @@ export function useLabels() {
 
   const map = useCallback((name: LabelMapName) => mapOf(data, name), [data]);
 
-  return { label, options, map };
+  return { label, knownLabel, options, map };
 }

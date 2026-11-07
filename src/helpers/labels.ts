@@ -21,3 +21,8 @@ export function isKnownCode(map: LabelMap | undefined, code: string | null) {
 export function mapOf(catalog: LabelCatalog | undefined, name: string) {
   return catalog?.[name];
 }
+
+/** Label only when the catalog knows the code — never show a raw English code. */
+export function knownLabelFrom(map: LabelMap | undefined, code: string) {
+  return isKnownCode(map, code) ? labelFrom(map, code) : null;
+}

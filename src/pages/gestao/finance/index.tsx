@@ -1,5 +1,6 @@
 import { Box } from "@/components/atoms/box";
 import { PageHeader } from "@/components/molecules/page-header";
+import { SectionTabs } from "@/components/molecules/section-tabs";
 import {
   DelinquencySummary,
   DelinquencySummarySkeleton,
@@ -14,6 +15,7 @@ import {
   ToCollectTimelineSkeleton,
 } from "@/components/organisms/to-collect-timeline";
 import { FinanceLayout } from "@/components/templates/finance-layout";
+import { FINANCE_TABS } from "@/constants/finance";
 import { useFinanceBalances } from "@/hooks/api/gestao/finance/useFinanceBalances";
 import { useFinanceDelinquency } from "@/hooks/api/gestao/finance/useFinanceDelinquency";
 import { useFinanceToCollect } from "@/hooks/api/gestao/finance/useFinanceToCollect";
@@ -30,6 +32,7 @@ export function FinancePage() {
   return (
     <Box className="space-y-4 md:space-y-6">
       <PageHeader title="Financeiro" />
+      <SectionTabs tabs={FINANCE_TABS} label="Seções do financeiro" />
       <FinanceLayout
         balances={
           <QueryBoundary
