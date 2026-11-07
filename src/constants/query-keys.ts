@@ -33,4 +33,7 @@ export const queryKeys = {
   labels: {
     all: ["labels"] as const,
   },
+  dashboard: {
+    all: ["dashboard"] as const,
+  },
 };
