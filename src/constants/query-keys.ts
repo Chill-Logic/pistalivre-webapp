@@ -106,6 +106,13 @@ export const queryKeys = {
   plans: {
     all: ["plans"] as const,
   },
+  templates: {
+    all: ["templates"] as const,
+    contracts: () => [...queryKeys.templates.all, "contracts"] as const,
+    contract: (id: string) =>
+      [...queryKeys.templates.all, "contract", id] as const,
+    inspection: () => [...queryKeys.templates.all, "inspection"] as const,
+  },
   company: {
     all: ["company"] as const,
   },

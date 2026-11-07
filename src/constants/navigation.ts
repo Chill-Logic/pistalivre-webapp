@@ -2,6 +2,7 @@ import {
   CarFront,
   ClipboardCheck,
   HandCoins,
+  FileCog,
   Tags,
   Building2,
   UserCog,
@@ -70,6 +71,7 @@ export const SIDEBAR_NAV: NavItem[] = [
   { label: "Fornecedores", to: ROUTES.suppliers, icon: Store },
   FINANCE,
   { label: "Reembolsos", to: ROUTES.reimbursements, icon: HandCoins },
+  { label: "Modelos", to: ROUTES.models, icon: FileCog },
   { label: "Usuários", to: ROUTES.users, icon: UserCog },
   { label: "Empresa", to: ROUTES.company, icon: Building2 },
 ];

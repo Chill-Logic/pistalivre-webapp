@@ -3,6 +3,7 @@ import { RedirectIfAuthenticated } from "./guards/RedirectIfAuthenticated";
 import { RequireAuth } from "./guards/RequireAuth";
 import {
   CompanyPage,
+  ContractTemplateDetailPage,
   CrmPage,
   CustomerDetailPage,
   CustomerLoginPage,
@@ -13,6 +14,8 @@ import {
   FinancePage,
   FinanceStatementPage,
   LeadDetailPage,
+  ModelsContractsPage,
+  ModelsInspectionPage,
   PlansPage,
   InspectionDetailPage,
   InspectionsPage,
@@ -74,6 +77,12 @@ export const router = createBrowserRouter([
       { path: ROUTES.suppliers, element: <SuppliersPage /> },
       { path: ROUTES.supplierDetail, element: <SupplierDetailPage /> },
       { path: ROUTES.plans, element: <PlansPage /> },
+      { path: ROUTES.models, element: <ModelsContractsPage /> },
+      { path: ROUTES.modelsInspection, element: <ModelsInspectionPage /> },
+      {
+        path: ROUTES.contractTemplate,
+        element: <ContractTemplateDetailPage />,
+      },
       { path: ROUTES.users, element: <UsersPage /> },
       { path: ROUTES.userDetail, element: <UserDetailPage /> },
       { path: ROUTES.company, element: <CompanyPage /> },
