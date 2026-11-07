@@ -18,6 +18,7 @@ import {
 import { SupplierVehiclesCard } from "@/components/organisms/supplier-vehicles-card";
 import { SupplierDetailLayout } from "@/components/templates/supplier-detail-layout";
 import { ROUTES, routeTo } from "@/constants/routes";
+import { queryKeys } from "@/constants/query-keys";
 import { isNotFound } from "@/helpers/api-error";
 import { useSupplier } from "@/hooks/api/gestao/suppliers/useSupplier";
 import { useBackToList } from "@/hooks/ui/useBackToList";
@@ -80,7 +81,15 @@ export function SupplierDetailPage() {
               />
             ) : null
           }
-          documents={<DocumentsCard documents={supplier.data.documents} />}
+          documents={
+            <DocumentsCard
+              documents={supplier.data.documents}
+              manage={{
+                owner: { type: "SUPPLIER", id: supplier.data.id },
+                invalidate: queryKeys.suppliers.detail(supplier.data.id),
+              }}
+            />
+          }
         />
       )}
     </Box>

@@ -15,6 +15,7 @@ import {
 import { QueryError } from "@/components/organisms/query-error";
 import { MaintenanceDetailLayout } from "@/components/templates/maintenance-detail-layout";
 import { ROUTES } from "@/constants/routes";
+import { queryKeys } from "@/constants/query-keys";
 import { isNotFound } from "@/helpers/api-error";
 import { useMaintenance } from "@/hooks/api/gestao/maintenances/useMaintenance";
 import { useBackToList } from "@/hooks/ui/useBackToList";
@@ -51,7 +52,15 @@ export function MaintenanceDetailPage() {
       {maintenance.data && (
         <MaintenanceDetailLayout
           summary={<MaintenanceSummary maintenance={maintenance.data} />}
-          documents={<DocumentsCard documents={maintenance.data.documents} />}
+          documents={
+            <DocumentsCard
+              documents={maintenance.data.documents}
+              manage={{
+                owner: { type: "MAINTENANCE", id: maintenance.data.id },
+                invalidate: queryKeys.maintenances.detail(maintenance.data.id),
+              }}
+            />
+          }
         />
       )}
     </Box>

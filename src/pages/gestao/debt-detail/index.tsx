@@ -24,6 +24,7 @@ import {
 import { QueryError } from "@/components/organisms/query-error";
 import { DebtDetailLayout } from "@/components/templates/debt-detail-layout";
 import { ROUTES } from "@/constants/routes";
+import { queryKeys } from "@/constants/query-keys";
 import { isNotFound } from "@/helpers/api-error";
 import { useDebt } from "@/hooks/api/gestao/debts/useDebt";
 import { useBackToList } from "@/hooks/ui/useBackToList";
@@ -63,7 +64,15 @@ export function DebtDetailPage() {
           balance={<DebtBalanceCard debt={debt.data} />}
           plan={<DebtPlanCard plan={debt.data.plan} />}
           payments={<DebtPaymentsCard payments={debt.data.payments} />}
-          documents={<DocumentsCard documents={debt.data.documents} />}
+          documents={
+            <DocumentsCard
+              documents={debt.data.documents}
+              manage={{
+                owner: { type: "DEBT", id: debt.data.id },
+                invalidate: queryKeys.debts.detail(debt.data.id),
+              }}
+            />
+          }
         />
       )}
     </Box>

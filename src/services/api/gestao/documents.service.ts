@@ -1,7 +1,17 @@
 import { http } from "@/services/http/client";
+import type {
+  DocumentCategory,
+  DocumentFile,
+  DocumentOwner,
+  DocumentOwnerType,
+  DocumentUpdateInput,
+} from "@/types/document";
 import type { DocumentSearch, DocumentTree } from "@/types/document-tree";
 
-/** Folder browser over every document owner, read-only. */
+/** Uploads take longer than the default timeout on a slow connection. */
+const UPLOAD_TIMEOUT = 120_000;
+
+/** Documents of any owner: folder browser, kinds, upload, edit, delete. */
 export const documentsService = {
   async tree(path: string) {
     const { data } = await http.get<DocumentTree>("/documents/tree", {
@@ -14,5 +24,31 @@ export const documentsService = {
       params: { q },
     });
     return data;
+  },
+  async categories(ownerType: DocumentOwnerType) {
+    const { data } = await http.get<{ items: DocumentCategory[] }>(
+      "/document-categories",
+      { params: { ownerType } },
+    );
+    return data.items;
+  },
+  /** One file per request, as the API (and the old app) do. */
+  async upload(owner: DocumentOwner, file: File, categoryId?: string) {
+    const body = new FormData();
+    body.append("ownerType", owner.type);
+    body.append("ownerId", owner.id);
+    if (categoryId) body.append("categoryId", categoryId);
+    body.append("file", file);
+    const { data } = await http.post<DocumentFile>("/documents", body, {
+      timeout: UPLOAD_TIMEOUT,
+    });
+    return data;
+  },
+  async update(id: string, input: DocumentUpdateInput) {
+    const { data } = await http.patch<DocumentFile>(`/documents/${id}`, input);
+    return data;
+  },
+  async remove(id: string) {
+    await http.delete(`/documents/${id}`);
   },
 };

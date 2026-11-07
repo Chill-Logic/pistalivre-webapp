@@ -118,6 +118,8 @@ export const queryKeys = {
     all: ["documents"] as const,
     tree: (path: string) => [...queryKeys.documents.all, "tree", path] as const,
     search: (q: string) => [...queryKeys.documents.all, "search", q] as const,
+    categories: (ownerType: string) =>
+      [...queryKeys.documents.all, "categories", ownerType] as const,
   },
   company: {
     all: ["company"] as const,

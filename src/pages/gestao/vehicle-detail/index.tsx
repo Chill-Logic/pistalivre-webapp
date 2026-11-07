@@ -33,6 +33,7 @@ import {
 import { VehicleDeleteButton } from "@/components/organisms/vehicle-delete-button";
 import { VehicleDetailLayout } from "@/components/templates/vehicle-detail-layout";
 import { ROUTES, routeTo } from "@/constants/routes";
+import { queryKeys } from "@/constants/query-keys";
 import { isNotFound } from "@/helpers/api-error";
 import { useVehicle } from "@/hooks/api/gestao/vehicles/useVehicle";
 import { useBackToList } from "@/hooks/ui/useBackToList";
@@ -96,7 +97,15 @@ export function VehicleDetailPage() {
           rental={<VehicleRentalCard rental={vehicle.data.activeRental} />}
           maintenances={<RelatedMaintenances vehicleId={vehicle.data.id} />}
           inspections={<RelatedInspections vehicleId={vehicle.data.id} />}
-          documents={<DocumentsCard documents={vehicle.data.documents} />}
+          documents={
+            <DocumentsCard
+              documents={vehicle.data.documents}
+              manage={{
+                owner: { type: "VEHICLE", id: vehicle.data.id },
+                invalidate: queryKeys.vehicles.detail(vehicle.data.id),
+              }}
+            />
+          }
         />
       )}
     </Box>

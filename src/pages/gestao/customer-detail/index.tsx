@@ -29,6 +29,7 @@ import { CustomerDeleteButton } from "@/components/organisms/customer-delete-but
 import { QueryError } from "@/components/organisms/query-error";
 import { CustomerDetailLayout } from "@/components/templates/customer-detail-layout";
 import { ROUTES, routeTo } from "@/constants/routes";
+import { queryKeys } from "@/constants/query-keys";
 import { isNotFound } from "@/helpers/api-error";
 import { useCustomer } from "@/hooks/api/gestao/customers/useCustomer";
 import { useBackToList } from "@/hooks/ui/useBackToList";
@@ -88,7 +89,15 @@ export function CustomerDetailPage() {
           license={<CustomerLicenseCard customer={customer.data} />}
           contact={<CustomerContactCard customer={customer.data} />}
           rentals={<CustomerRentals rentals={customer.data.rentals} />}
-          documents={<DocumentsCard documents={customer.data.documents} />}
+          documents={
+            <DocumentsCard
+              documents={customer.data.documents}
+              manage={{
+                owner: { type: "CUSTOMER", id: customer.data.id },
+                invalidate: queryKeys.customers.detail(customer.data.id),
+              }}
+            />
+          }
         />
       )}
     </Box>

@@ -3,6 +3,7 @@ import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
+import type { ReactNode } from "react";
 import type { DocumentFile } from "@/types/document";
 import { formatDate, formatFileSize } from "@/utils/format";
 
@@ -14,6 +15,8 @@ type DocumentItemProps = {
   onDownload: () => void;
   isViewing: boolean;
   isDownloading: boolean;
+  /** Extra buttons after view/download (edit, delete). */
+  actions?: ReactNode;
 };
 
 export function DocumentItem({
@@ -23,6 +26,7 @@ export function DocumentItem({
   onDownload,
   isViewing,
   isDownloading,
+  actions,
 }: DocumentItemProps) {
   const Icon = document.contentType.startsWith("image/") ? ImageIcon : FileText;
   const meta = [
@@ -60,6 +64,7 @@ export function DocumentItem({
       >
         {isDownloading ? <Spinner /> : <Download />}
       </Button>
+      {actions}
     </Box>
   );
 }

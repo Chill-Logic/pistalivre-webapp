@@ -14,6 +14,7 @@ import {
   ListCardSkeleton,
   ListRowSkeleton,
 } from "@/components/organisms/list-card";
+import { queryKeys } from "@/constants/query-keys";
 import { QueryError } from "@/components/organisms/query-error";
 import { CompanyLayout } from "@/components/templates/company-layout";
 import { useCompany } from "@/hooks/api/gestao/company/useCompany";
@@ -44,7 +45,15 @@ export function CompanyPage() {
           integrations={
             <CompanyIntegrations integrations={company.data.integrations} />
           }
-          documents={<DocumentsCard documents={company.data.documents} />}
+          documents={
+            <DocumentsCard
+              documents={company.data.documents}
+              manage={{
+                owner: { type: "COMPANY", id: company.data.id },
+                invalidate: queryKeys.company.all,
+              }}
+            />
+          }
         />
       )}
     </Box>
