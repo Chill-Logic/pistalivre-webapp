@@ -109,3 +109,7 @@ export const CompanyPage = lazyPage(
   () => import("@/pages/gestao/company"),
   "CompanyPage",
 );
+export const PlansPage = lazyPage(
+  () => import("@/pages/gestao/plans"),
+  "PlansPage",
+);
