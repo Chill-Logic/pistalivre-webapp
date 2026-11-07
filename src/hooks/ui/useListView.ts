@@ -7,16 +7,18 @@ import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 const VIEW_PARAM = "visao";
 
 /**
- * Cards or table, in the URL (`?visao=`). Without a choice: table on the
- * desktop, cards on the phone.
+ * Cards or table, in the URL (`?visao=`), on the desktop only (table when
+ * not chosen). The phone always shows cards, with no choice offered.
  */
 export function useListView() {
   const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);
   const [params, setParams] = useSearchParams();
   const chosen = params.get(VIEW_PARAM);
-  const fallback: ListView = isDesktop ? "tabela" : "lista";
-  const view: ListView =
-    chosen === "lista" || chosen === "tabela" ? chosen : fallback;
+  const view: ListView = !isDesktop
+    ? "lista"
+    : chosen === "lista" || chosen === "tabela"
+      ? chosen
+      : "tabela";
 
   const setView = useCallback(
     (next: ListView) =>

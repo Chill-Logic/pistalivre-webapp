@@ -1,4 +1,5 @@
-export const DEFAULT_PAGE_SIZE = 20;
+/** Desktop lists start at 10 per page (owner's call). */
+export const DEFAULT_PAGE_SIZE = 10;
 
 /** API ceiling; used by detail-page sections that show everything at once. */
 export const MAX_PAGE_SIZE = 100;

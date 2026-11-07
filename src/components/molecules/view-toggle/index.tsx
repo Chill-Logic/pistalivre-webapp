@@ -14,7 +14,10 @@ type ViewToggleProps = {
   onChange: (view: ListView) => void;
 };
 
-/** Segmented "Lista | Tabela" switch; the thumb slides to the choice. */
+/**
+ * Segmented "Lista | Tabela" switch; the thumb slides to the choice.
+ * Desktop only: the phone always shows cards.
+ */
 export function ViewToggle({ view, onChange }: ViewToggleProps) {
   const index = OPTIONS.findIndex((option) => option.value === view);
 
@@ -22,7 +25,7 @@ export function ViewToggle({ view, onChange }: ViewToggleProps) {
     <Box
       role="group"
       aria-label="Visualização"
-      className="relative inline-flex shrink-0 rounded-md border bg-muted/40 p-0.5"
+      className="relative hidden shrink-0 rounded-md md:inline-flex border bg-muted/40 p-0.5"
     >
       <Box
         aria-hidden

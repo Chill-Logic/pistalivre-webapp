@@ -10,10 +10,10 @@ type PageHeaderProps = {
 /** Page title only — no subtitle, by design (owner's call). */
 export function PageHeader({ title, actions }: PageHeaderProps) {
   return (
-    <Box className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <Heading>{title}</Heading>
+    <Box className="flex items-center justify-between gap-3">
+      <Heading className="min-w-0">{title}</Heading>
       {actions && (
-        <Box className="flex flex-wrap items-center gap-2">{actions}</Box>
+        <Box className="flex shrink-0 items-center gap-2">{actions}</Box>
       )}
     </Box>
   );
