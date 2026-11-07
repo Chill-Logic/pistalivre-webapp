@@ -101,3 +101,27 @@ export type Charge = {
   attachments: Pick<DocumentFile, "id" | "category" | "fileName" | "url">[];
   createdAt: string;
 };
+
+/** Body of POST/PUT /rentals (PUT replaces: omitted fields become empty). */
+export type RentalInput = {
+  customerId: string;
+  vehicleId: string;
+  /** yyyy-mm-dd */
+  startDate: string;
+  endDate: string | null;
+  rate: number;
+  ratePeriod: RatePeriod;
+  paymentMethod: string | null;
+  paymentWeekday: number | null;
+  rentBillingTiming: "CYCLE_START" | "CYCLE_END";
+  cautionType: Caution["type"] | null;
+  cautionTotal: number | null;
+  cautionInstallmentValue: number | null;
+  cautionWeekday: number | null;
+  cautionInstallments: CautionInstallment[] | null;
+  notes: string | null;
+  /** Create only. */
+  status?: RentalStatus;
+  /** Create only: MANUAL = retroactive (no contract, no billing, no vehicle move). */
+  source?: "SYSTEM" | "MANUAL";
+};

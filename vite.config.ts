@@ -59,6 +59,8 @@ export default defineConfig({
             "@radix-ui/react-select",
             "@radix-ui/react-dialog",
             "@radix-ui/react-tooltip",
+            "@radix-ui/react-checkbox",
+            "@radix-ui/react-popover",
             "lucide-react",
             "sonner",
           ],
