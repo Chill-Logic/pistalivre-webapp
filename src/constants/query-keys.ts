@@ -1,3 +1,4 @@
+import type { LeadFilters } from "@/types/crm";
 import type { CustomerFilters } from "@/types/customer";
 import type { InspectionFilters } from "@/types/inspection";
 import type { MaintenanceFilters } from "@/types/maintenance";
@@ -87,6 +88,13 @@ export const queryKeys = {
     list: (filters: SupplierFilters) =>
       [...queryKeys.suppliers.all, "list", filters] as const,
     detail: (id: string) => [...queryKeys.suppliers.all, "detail", id] as const,
+  },
+  crm: {
+    all: ["crm"] as const,
+    funnel: () => [...queryKeys.crm.all, "funnel"] as const,
+    leads: (filters: LeadFilters) =>
+      [...queryKeys.crm.all, "leads", filters] as const,
+    lead: (id: string) => [...queryKeys.crm.all, "lead", id] as const,
   },
   dashboard: {
     all: ["dashboard"] as const,

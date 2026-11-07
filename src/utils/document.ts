@@ -12,3 +12,13 @@ export function formatZip(value: string) {
     ? `${digits.slice(0, 5)}-${digits.slice(5)}`
     : value;
 }
+
+/** 21999990000 → (21) 99999-0000; anything else as is. */
+export function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length === 11)
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  if (digits.length === 10)
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return value;
+}

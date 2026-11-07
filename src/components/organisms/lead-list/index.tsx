@@ -1,0 +1,60 @@
+import { Target } from "lucide-react";
+import { Col, Row } from "@/components/atoms/grid";
+import { EmptyState } from "@/components/molecules/empty-state";
+import { LeadCard, LeadCardSkeleton } from "@/components/molecules/lead-card";
+import { SkeletonRegion } from "@/components/molecules/skeleton-region";
+import type { LeadListItem } from "@/types/crm";
+import { cn } from "@/utils/cn";
+
+type LeadListProps = {
+  leads: LeadListItem[] | undefined;
+  isLoading: boolean;
+  isRefreshing?: boolean;
+};
+
+export function LeadList({
+  leads,
+  isLoading,
+  isRefreshing = false,
+}: LeadListProps) {
+  if (isLoading) {
+    return (
+      <SkeletonRegion label="Carregando leads…">
+        <Row as="ul" className="gap-y-6">
+          {Array.from({ length: 6 }, (_, index) => (
+            <Col as="li" key={index} sm={6} xl={4}>
+              <LeadCardSkeleton />
+            </Col>
+          ))}
+        </Row>
+      </SkeletonRegion>
+    );
+  }
+
+  if (!leads?.length) {
+    return (
+      <EmptyState
+        icon={Target}
+        title="Nenhum lead encontrado"
+        description="Ajuste a busca, o estágio ou mostre os leads de teste."
+      />
+    );
+  }
+
+  return (
+    <Row
+      as="ul"
+      aria-busy={isRefreshing}
+      className={cn(
+        "gap-y-6 transition-opacity duration-200",
+        isRefreshing && "pointer-events-none opacity-60",
+      )}
+    >
+      {leads.map((lead) => (
+        <Col as="li" key={lead.id} sm={6} xl={4}>
+          <LeadCard lead={lead} />
+        </Col>
+      ))}
+    </Row>
+  );
+}

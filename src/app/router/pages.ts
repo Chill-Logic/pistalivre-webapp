@@ -92,3 +92,8 @@ export const SupplierDetailPage = lazyPage(
   () => import("@/pages/gestao/supplier-detail"),
   "SupplierDetailPage",
 );
+export const CrmPage = lazyPage(() => import("@/pages/gestao/crm"), "CrmPage");
+export const LeadDetailPage = lazyPage(
+  () => import("@/pages/gestao/lead-detail"),
+  "LeadDetailPage",
+);
