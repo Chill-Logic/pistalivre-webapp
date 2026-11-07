@@ -8,37 +8,45 @@ import {
   FunnelStagesSkeleton,
 } from "@/components/molecules/funnel-stages";
 import { PageHeader } from "@/components/molecules/page-header";
-import { Pagination } from "@/components/molecules/pagination";
+import { ViewToggle } from "@/components/molecules/view-toggle";
 import {
   CrmOverview,
   CrmOverviewSkeleton,
 } from "@/components/organisms/crm-overview";
 import { LeadFilters } from "@/components/organisms/lead-filters";
 import { LeadList } from "@/components/organisms/lead-list";
+import { LeadTable } from "@/components/organisms/lead-table";
+import { ListFooter } from "@/components/organisms/list-footer";
 import { QueryBoundary } from "@/components/organisms/query-boundary";
 import { QueryError } from "@/components/organisms/query-error";
 import { useLeadFunnel } from "@/hooks/api/gestao/crm/useLeadFunnel";
-import { useLeads } from "@/hooks/api/gestao/crm/useLeads";
+import { useLeadList } from "@/hooks/api/gestao/crm/useLeads";
 import { ROUTES } from "@/constants/routes";
 import { useLeadFilters } from "@/hooks/ui/useLeadFilters";
+import { useListView } from "@/hooks/ui/useListView";
 
 /** CRM: the funnel, where leads come from, and the list. */
 export function CrmPage() {
-  const { filters, setSearch, setStatus, setTest, setPage } = useLeadFilters();
+  const { filters, setSearch, setStatus, setTest, setPage, setPageSize } =
+    useLeadFilters();
+  const { view, setView, isDesktop } = useListView();
   const funnel = useLeadFunnel();
-  const leads = useLeads(filters);
+  const leads = useLeadList(filters, isDesktop);
 
   return (
     <Box className="space-y-4 md:space-y-6">
       <PageHeader
         title="CRM"
         actions={
-          <Button asChild size="sm">
-            <Link to={ROUTES.leadNew}>
-              <Plus />
-              Novo lead
-            </Link>
-          </Button>
+          <>
+            <ViewToggle view={view} onChange={setView} />
+            <Button asChild size="sm">
+              <Link to={ROUTES.leadNew}>
+                <Plus />
+                Novo lead
+              </Link>
+            </Button>
+          </>
         }
       />
       <QueryBoundary
@@ -69,21 +77,24 @@ export function CrmPage() {
       />
       {leads.isError ? (
         <QueryError error={leads.error} onRetry={() => leads.refetch()} />
+      ) : view === "tabela" ? (
+        <LeadTable
+          leads={leads.items}
+          isLoading={leads.isPending}
+          isRefreshing={leads.isRefreshing}
+        />
       ) : (
         <LeadList
-          leads={leads.data?.items}
+          leads={leads.items}
           isLoading={leads.isPending}
-          isRefreshing={leads.isPlaceholderData}
+          isRefreshing={leads.isRefreshing}
         />
       )}
-      {leads.data && leads.data.total > 0 && (
-        <Pagination
-          page={leads.data.page}
-          pageSize={leads.data.pageSize}
-          total={leads.data.total}
-          onPageChange={setPage}
-        />
-      )}
+      <ListFooter
+        result={leads}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+      />
       <QueryBoundary
         query={funnel}
         label="Carregando origens…"

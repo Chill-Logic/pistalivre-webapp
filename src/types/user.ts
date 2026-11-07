@@ -17,4 +17,9 @@ export type StaffUserDetail = StaffUser & {
   updatedAt: string;
 };
 
-export type UserFilters = { q: string; role: UserRole | "" };
+export type UserFilters = {
+  page: number;
+  pageSize: number;
+  q: string;
+  role: UserRole | "";
+};

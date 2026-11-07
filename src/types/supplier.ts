@@ -30,6 +30,8 @@ export type SupplierDetail = SupplierListItem & {
 };
 
 export type SupplierFilters = {
+  page: number;
+  pageSize: number;
   q: string;
   scope: SupplierScope | "";
   /** "" = all. */

@@ -1,5 +1,6 @@
 import { toQueryParams } from "@/helpers/query-params";
 import { http } from "@/services/http/client";
+import type { Paginated } from "@/types/api";
 import type {
   SupplierDetail,
   SupplierFilters,
@@ -9,11 +10,11 @@ import type {
 
 export const suppliersService = {
   async list(filters: SupplierFilters) {
-    const { data } = await http.get<{ items: SupplierListItem[] }>(
+    const { data } = await http.get<Paginated<SupplierListItem>>(
       "/suppliers",
       { params: toQueryParams(filters) },
     );
-    return data.items;
+    return data;
   },
   async get(id: string) {
     const { data } = await http.get<SupplierDetail>(`/suppliers/${id}`);

@@ -1,14 +1,15 @@
 import { toQueryParams } from "@/helpers/query-params";
 import { http } from "@/services/http/client";
+import type { Paginated } from "@/types/api";
 import type { StaffUser, StaffUserDetail, UserFilters } from "@/types/user";
 
 /** Staff accounts, read-only (no password ever comes back). */
 export const usersService = {
   async list(filters: UserFilters) {
-    const { data } = await http.get<{ items: StaffUser[] }>("/users", {
+    const { data } = await http.get<Paginated<StaffUser>>("/users", {
       params: toQueryParams(filters),
     });
-    return data.items;
+    return data;
   },
   async get(id: string) {
     const { data } = await http.get<StaffUserDetail>(`/users/${id}`);
