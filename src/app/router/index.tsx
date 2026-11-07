@@ -27,6 +27,7 @@ import {
   ModelsInspectionPage,
   ModelsSectionPage,
   PlansPage,
+  ProjectionsPage,
   PlanEditPage,
   PlanNewPage,
   InspectionDetailPage,
@@ -109,10 +110,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.planNew, element: <PlanNewPage /> },
       { path: ROUTES.planEdit, element: <PlanEditPage /> },
       { path: ROUTES.proposals, element: <ComingSoonPage title="Propostas" /> },
-      {
-        path: ROUTES.projections,
-        element: <ComingSoonPage title="Projeções" />,
-      },
+      { path: ROUTES.projections, element: <ProjectionsPage /> },
       {
         path: ROUTES.signatures,
         element: <ComingSoonPage title="Assinaturas" />,

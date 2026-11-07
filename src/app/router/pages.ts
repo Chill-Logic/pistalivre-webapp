@@ -197,3 +197,7 @@ export const UserEditPage = lazyPage(
   () => import("@/pages/gestao/user-edit"),
   "UserEditPage",
 );
+export const ProjectionsPage = lazyPage(
+  () => import("@/pages/gestao/projections"),
+  "ProjectionsPage",
+);

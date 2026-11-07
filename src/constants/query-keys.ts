@@ -127,6 +127,10 @@ export const queryKeys = {
   company: {
     all: ["company"] as const,
   },
+  projections: {
+    all: ["projections"] as const,
+    seed: (sim: string) => [...queryKeys.projections.all, "seed", sim] as const,
+  },
   dashboard: {
     all: ["dashboard"] as const,
   },
