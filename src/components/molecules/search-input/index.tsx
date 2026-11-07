@@ -51,7 +51,7 @@ export function SearchInput({
         onChange={(event) => setDraft(event.target.value)}
         placeholder={placeholder}
         aria-label={placeholder ?? "Buscar"}
-        className="pl-9"
+        className="pl-9 [&::-webkit-search-cancel-button]:appearance-none"
       />
     </Box>
   );
