@@ -1,18 +1,23 @@
 import { Link } from "react-router-dom";
+import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
+import { Heading } from "@/components/atoms/heading";
+import { Text } from "@/components/atoms/text";
 import { ROUTES } from "@/constants/routes";
 
 export function NotFoundPage() {
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 text-center">
-      <p className="text-5xl font-bold text-primary">404</p>
-      <h1 className="text-xl font-semibold">Página não encontrada</h1>
-      <p className="text-sm text-muted-foreground">
+    <Box className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 text-center">
+      <Text size="5xl" weight="bold" tone="primary">
+        404
+      </Text>
+      <Heading variant="title">Página não encontrada</Heading>
+      <Text tone="muted">
         O endereço que você acessou não existe ou foi movido.
-      </p>
+      </Text>
       <Button asChild>
         <Link to={ROUTES.dashboard}>Voltar ao painel</Link>
       </Button>
-    </div>
+    </Box>
   );
 }

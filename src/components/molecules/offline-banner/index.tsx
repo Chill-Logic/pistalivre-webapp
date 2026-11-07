@@ -1,4 +1,5 @@
 import { WifiOff } from "lucide-react";
+import { Alert } from "@/components/atoms/alert";
 import { useOnlineStatus } from "@/hooks/ui/useOnlineStatus";
 
 export function OfflineBanner() {
@@ -6,12 +7,13 @@ export function OfflineBanner() {
   if (online) return null;
 
   return (
-    <div
+    <Alert
+      variant="warning"
       role="status"
-      className="flex items-center justify-center gap-2 bg-warning px-4 py-2 text-sm text-warning-foreground"
+      className="flex items-center justify-center gap-2 rounded-none px-4"
     >
       <WifiOff className="size-4" aria-hidden />
       Você está offline. Os dados podem estar desatualizados.
-    </div>
+    </Alert>
   );
 }

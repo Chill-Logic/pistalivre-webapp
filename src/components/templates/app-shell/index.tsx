@@ -1,4 +1,6 @@
 import { Outlet } from "react-router-dom";
+import { Box } from "@/components/atoms/box";
+import { Main } from "@/components/atoms/landmarks";
 import { OfflineBanner } from "@/components/molecules/offline-banner";
 import { AppHeader } from "@/components/organisms/app-header";
 import { AppSidebar } from "@/components/organisms/app-sidebar";
@@ -15,16 +17,16 @@ type AppShellProps = {
  */
 export function AppShell({ user }: AppShellProps) {
   return (
-    <div className="flex min-h-dvh">
+    <Box className="flex min-h-dvh">
       <AppSidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <Box className="flex min-w-0 flex-1 flex-col">
         <AppHeader user={user} />
         <OfflineBanner />
-        <main className="flex-1 px-4 pb-24 pt-4 md:px-8 md:pb-8 md:pt-6">
+        <Main className="flex-1 px-4 pb-24 pt-4 md:px-8 md:pb-8 md:pt-6">
           <Outlet />
-        </main>
-      </div>
+        </Main>
+      </Box>
       <BottomNav />
-    </div>
+    </Box>
   );
 }

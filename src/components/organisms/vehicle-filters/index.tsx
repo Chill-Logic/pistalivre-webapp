@@ -1,4 +1,5 @@
-import { Select } from "@/components/atoms/select";
+import { Box } from "@/components/atoms/box";
+import { Select, SelectOption } from "@/components/atoms/select";
 import { SearchInput } from "@/components/molecules/search-input";
 import { VEHICLE_STATUS_LABELS } from "@/constants/labels";
 import type { VehicleFilters as Filters, VehicleType } from "@/types/vehicle";
@@ -19,7 +20,7 @@ export function VehicleFilters({
   onStatusChange,
 }: VehicleFiltersProps) {
   return (
-    <div className="grid gap-2 sm:grid-cols-[1fr_10rem_10rem]">
+    <Box className="grid gap-2 sm:grid-cols-[1fr_10rem_10rem]">
       <SearchInput
         value={filters.q}
         onSearch={onSearch}
@@ -30,11 +31,11 @@ export function VehicleFilters({
         onChange={(event) => onTypeChange(event.target.value)}
         aria-label="Tipo"
       >
-        <option value="">Todos os tipos</option>
+        <SelectOption value="">Todos os tipos</SelectOption>
         {types.map((type) => (
-          <option key={type.id} value={type.slug}>
+          <SelectOption key={type.id} value={type.slug}>
             {type.name}
-          </option>
+          </SelectOption>
         ))}
       </Select>
       <Select
@@ -42,13 +43,13 @@ export function VehicleFilters({
         onChange={(event) => onStatusChange(event.target.value)}
         aria-label="Situação"
       >
-        <option value="">Todas as situações</option>
+        <SelectOption value="">Todas as situações</SelectOption>
         {Object.entries(VEHICLE_STATUS_LABELS).map(([value, label]) => (
-          <option key={value} value={value}>
+          <SelectOption key={value} value={value}>
             {label}
-          </option>
+          </SelectOption>
         ))}
       </Select>
-    </div>
+    </Box>
   );
 }

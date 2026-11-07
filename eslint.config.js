@@ -25,4 +25,19 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Only atoms touch the DOM. Everything else composes components.
+    files: ['src/**/*.tsx'],
+    ignores: ['src/components/atoms/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'JSXOpeningElement[name.type="JSXIdentifier"][name.name=/^[a-z]/]',
+          message:
+            'HTML nativo só dentro de components/atoms. Use (ou crie) um atom.',
+        },
+      ],
+    },
+  },
 )

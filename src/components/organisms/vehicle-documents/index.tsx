@@ -1,9 +1,11 @@
+import { Box } from "@/components/atoms/box";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/atoms/card";
+import { Text } from "@/components/atoms/text";
 import { DocumentItem } from "@/components/molecules/document-item";
 import { useFileActions } from "@/hooks/api/files/useFileActions";
 import type { DocumentFile } from "@/types/document";
@@ -18,11 +20,9 @@ export function VehicleDocuments({ documents }: { documents: DocumentFile[] }) {
       </CardHeader>
       <CardContent>
         {documents.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Nenhum documento anexado.
-          </p>
+          <Text tone="muted">Nenhum documento anexado.</Text>
         ) : (
-          <div className="divide-y">
+          <Box className="divide-y">
             {documents.map((document) => (
               <DocumentItem
                 key={document.id}
@@ -35,7 +35,7 @@ export function VehicleDocuments({ documents }: { documents: DocumentFile[] }) {
                 }
               />
             ))}
-          </div>
+          </Box>
         )}
       </CardContent>
     </Card>

@@ -39,6 +39,7 @@ src/
 
 ## Convenções
 
+- **Zero HTML nativo fora de `components/atoms`**: molecules, organisms, templates e pages só compõem componentes (`Box`, `Text`, `Heading`, `List`, `Form`, `Nav`…). Faltou um? Cria o atom. O lint barra (`no-restricted-syntax`).
 - **Nada de função solta em componente**: regra vai para `utils/` (pura), `helpers/` (depende do app) ou `hooks/` (depende de React).
 - **Mobile first**: o estilo base é o do celular; `md:` em diante é o desktop. Alvos de toque com 44px. Navegação inferior no celular e sidebar no desktop, as duas a partir de `constants/navigation.ts`.
 - **Código em inglês, interface em português**, URLs em português (`/veiculos`, `/entrar`).

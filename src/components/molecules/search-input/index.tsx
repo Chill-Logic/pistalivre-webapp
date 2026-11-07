@@ -1,5 +1,6 @@
 import { Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Box } from "@/components/atoms/box";
 import { Input } from "@/components/atoms/input";
 import { useDebouncedValue } from "@/hooks/ui/useDebouncedValue";
 
@@ -38,7 +39,7 @@ export function SearchInput({
   }, [debounced]);
 
   return (
-    <div className="relative">
+    <Box className="relative">
       <Search
         className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
         aria-hidden
@@ -52,6 +53,6 @@ export function SearchInput({
         aria-label={placeholder ?? "Buscar"}
         className="pl-9"
       />
-    </div>
+    </Box>
   );
 }

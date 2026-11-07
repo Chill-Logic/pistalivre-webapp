@@ -1,6 +1,8 @@
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/atoms/button";
-import { Logo } from "@/components/atoms/logo";
+import { Header } from "@/components/atoms/landmarks";
+import { Text } from "@/components/atoms/text";
+import { Logo } from "@/components/molecules/logo";
 import { ThemeToggle } from "@/components/molecules/theme-toggle";
 import { useLogout } from "@/hooks/auth/useLogout";
 import type { AuthUser } from "@/types/auth";
@@ -14,14 +16,14 @@ export function AppHeader({ user }: AppHeaderProps) {
   const logout = useLogout();
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-card/95 px-4 pt-safe-t backdrop-blur supports-[backdrop-filter]:bg-card/80">
+    <Header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-card/95 px-4 pt-safe-t backdrop-blur supports-[backdrop-filter]:bg-card/80">
       <Logo className="md:hidden" withName={false} />
-      <p className="flex-1 truncate text-sm text-muted-foreground">
+      <Text tone="muted" truncate className="flex-1">
         Olá,{" "}
-        <span className="font-medium text-foreground">
+        <Text inline weight="medium" tone="foreground">
           {firstName(user.name)}
-        </span>
-      </p>
+        </Text>
+      </Text>
       <ThemeToggle />
       <Button
         variant="ghost"
@@ -32,6 +34,6 @@ export function AppHeader({ user }: AppHeaderProps) {
       >
         <LogOut />
       </Button>
-    </header>
+    </Header>
   );
 }

@@ -1,5 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
+import { Text } from "@/components/atoms/text";
 import { rangeLabel, totalPages } from "@/helpers/pagination";
 
 type PaginationProps = {
@@ -18,11 +20,9 @@ export function Pagination({
   const pages = totalPages(total, pageSize);
 
   return (
-    <div className="flex items-center justify-between gap-4">
-      <p className="text-sm text-muted-foreground">
-        {rangeLabel(page, pageSize, total)}
-      </p>
-      <div className="flex gap-2">
+    <Box className="flex items-center justify-between gap-4">
+      <Text tone="muted">{rangeLabel(page, pageSize, total)}</Text>
+      <Box className="flex gap-2">
         <Button
           variant="outline"
           size="icon"
@@ -41,7 +41,7 @@ export function Pagination({
         >
           <ChevronRight />
         </Button>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

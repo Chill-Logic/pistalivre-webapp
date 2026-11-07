@@ -29,3 +29,7 @@ export function Select({
     </div>
   );
 }
+
+export function SelectOption(props: ComponentProps<"option">) {
+  return <option {...props} />;
+}

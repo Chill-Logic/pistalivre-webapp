@@ -4,6 +4,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/card";
+import { DescriptionList } from "@/components/atoms/description-list";
+import { Text } from "@/components/atoms/text";
 import { InfoItem } from "@/components/molecules/info-item";
 import type { ActiveRental } from "@/types/vehicle";
 
@@ -15,16 +17,14 @@ export function VehicleRentalCard({ rental }: { rental: ActiveRental | null }) {
       </CardHeader>
       <CardContent>
         {rental ? (
-          <dl className="grid grid-cols-2 gap-4">
+          <DescriptionList className="grid grid-cols-2 gap-4">
             <InfoItem label="Locatário">{rental.customer.name}</InfoItem>
             <InfoItem label="Código" mono>
               {rental.code}
             </InfoItem>
-          </dl>
+          </DescriptionList>
         ) : (
-          <p className="text-sm text-muted-foreground">
-            Nenhuma locação ativa neste veículo.
-          </p>
+          <Text tone="muted">Nenhuma locação ativa neste veículo.</Text>
         )}
       </CardContent>
     </Card>

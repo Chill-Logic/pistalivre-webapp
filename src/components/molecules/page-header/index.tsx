@@ -1,4 +1,7 @@
 import type { ReactNode } from "react";
+import { Box } from "@/components/atoms/box";
+import { Heading } from "@/components/atoms/heading";
+import { Text } from "@/components/atoms/text";
 
 type PageHeaderProps = {
   title: string;
@@ -8,14 +11,12 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, description, actions }: PageHeaderProps) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-        {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
-        )}
-      </div>
-      {actions && <div className="flex gap-2">{actions}</div>}
-    </div>
+    <Box className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <Box className="space-y-1">
+        <Heading>{title}</Heading>
+        {description && <Text tone="muted">{description}</Text>}
+      </Box>
+      {actions && <Box className="flex gap-2">{actions}</Box>}
+    </Box>
   );
 }

@@ -1,5 +1,6 @@
 import { CarFront } from "lucide-react";
 import { useParams } from "react-router-dom";
+import { Box } from "@/components/atoms/box";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
@@ -18,7 +19,7 @@ export function VehicleDetailPage() {
   const backTo = useBackToList(ROUTES.vehicles);
 
   return (
-    <div className="space-y-4">
+    <Box className="space-y-4">
       <BackLink to={backTo} label="Veículos" />
       {vehicle.isError &&
         (isNotFound(vehicle.error) ? (
@@ -31,20 +32,20 @@ export function VehicleDetailPage() {
           <QueryError error={vehicle.error} onRetry={() => vehicle.refetch()} />
         ))}
       {vehicle.isPending && (
-        <div className="space-y-4">
+        <Box className="space-y-4">
           <Skeleton className="h-56" />
           <Skeleton className="h-28" />
-        </div>
+        </Box>
       )}
       {vehicle.data && (
-        <div className="grid gap-4 lg:grid-cols-[2fr_1fr] lg:items-start">
+        <Box className="grid gap-4 lg:grid-cols-[2fr_1fr] lg:items-start">
           <VehicleSummary vehicle={vehicle.data} />
           <VehicleRentalCard rental={vehicle.data.activeRental} />
-          <div className="lg:col-span-2">
+          <Box className="lg:col-span-2">
             <VehicleDocuments documents={vehicle.data.documents} />
-          </div>
-        </div>
+          </Box>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 }

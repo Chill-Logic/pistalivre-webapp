@@ -1,5 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { Box } from "@/components/atoms/box";
+import { Text } from "@/components/atoms/text";
 
 type EmptyStateProps = {
   icon: LucideIcon;
@@ -15,15 +17,15 @@ export function EmptyState({
   action,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed px-6 py-16 text-center">
+    <Box className="flex flex-col items-center gap-3 rounded-lg border border-dashed px-6 py-16 text-center">
       <Icon className="size-8 text-muted-foreground" aria-hidden />
-      <div className="space-y-1">
-        <p className="font-medium">{title}</p>
-        {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
-        )}
-      </div>
+      <Box className="space-y-1">
+        <Text size="base" weight="medium">
+          {title}
+        </Text>
+        {description && <Text tone="muted">{description}</Text>}
+      </Box>
       {action}
-    </div>
+    </Box>
   );
 }

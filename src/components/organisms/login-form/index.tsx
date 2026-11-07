@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Alert } from "@/components/atoms/alert";
 import { Button } from "@/components/atoms/button";
+import { Form } from "@/components/atoms/form";
 import { Spinner } from "@/components/atoms/spinner";
 import { FormField } from "@/components/molecules/form-field";
 import { loginSchema, type LoginFormValues } from "./schema";
@@ -27,7 +29,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   );
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4" noValidate>
+    <Form onSubmit={onSubmit} className="space-y-4" noValidate>
       <FormField
         label="E-mail"
         type="email"
@@ -43,18 +45,11 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         error={errors.password?.message}
         {...register("password")}
       />
-      {login.isError && (
-        <p
-          role="alert"
-          className="rounded-md bg-error px-3 py-2 text-sm text-error-foreground"
-        >
-          {errorMessage(login.error)}
-        </p>
-      )}
+      {login.isError && <Alert>{errorMessage(login.error)}</Alert>}
       <Button type="submit" className="w-full" disabled={login.isPending}>
         {login.isPending && <Spinner className="text-primary-foreground" />}
         Entrar
       </Button>
-    </form>
+    </Form>
   );
 }

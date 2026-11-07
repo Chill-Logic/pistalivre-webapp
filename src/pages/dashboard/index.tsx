@@ -1,3 +1,4 @@
+import { Box } from "@/components/atoms/box";
 import {
   Card,
   CardContent,
@@ -13,7 +14,7 @@ export function DashboardPage() {
   const { user } = useSession();
 
   return (
-    <div className="space-y-6">
+    <Box className="space-y-6">
       <PageHeader
         title="Painel"
         description={
@@ -27,10 +28,12 @@ export function DashboardPage() {
             As telas da gestão chegam aqui conforme a API for publicada.
           </CardDescription>
         </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">
-          Enquanto isso, a operação segue pelo sistema atual.
+        <CardContent>
+          <CardDescription>
+            Enquanto isso, a operação segue pelo sistema atual.
+          </CardDescription>
         </CardContent>
       </Card>
-    </div>
+    </Box>
   );
 }

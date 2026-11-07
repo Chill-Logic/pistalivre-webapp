@@ -1,6 +1,8 @@
 import { useId, type ComponentProps } from "react";
+import { Box } from "@/components/atoms/box";
 import { Input } from "@/components/atoms/input";
 import { Label } from "@/components/atoms/label";
+import { Text } from "@/components/atoms/text";
 
 type FormFieldProps = ComponentProps<typeof Input> & {
   label: string;
@@ -14,7 +16,7 @@ export function FormField({ label, error, id, ...inputProps }: FormFieldProps) {
   const errorId = `${inputId}-error`;
 
   return (
-    <div className="space-y-2">
+    <Box className="space-y-2">
       <Label htmlFor={inputId}>{label}</Label>
       <Input
         id={inputId}
@@ -23,10 +25,10 @@ export function FormField({ label, error, id, ...inputProps }: FormFieldProps) {
         {...inputProps}
       />
       {error && (
-        <p id={errorId} className="text-sm text-destructive">
+        <Text id={errorId} tone="destructive">
           {error}
-        </p>
+        </Text>
       )}
-    </div>
+    </Box>
   );
 }

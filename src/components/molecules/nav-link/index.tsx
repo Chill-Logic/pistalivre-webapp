@@ -1,4 +1,5 @@
 import { NavLink as RouterNavLink } from "react-router-dom";
+import { Text } from "@/components/atoms/text";
 import type { NavItem } from "@/constants/navigation";
 import { ROUTES } from "@/constants/routes";
 import { cn } from "@/utils/cn";
@@ -32,7 +33,9 @@ export function NavLink({ item, layout }: NavLinkProps) {
       }
     >
       <Icon className="size-5 shrink-0" aria-hidden />
-      <span>{item.label}</span>
+      <Text inline size={null}>
+        {item.label}
+      </Text>
     </RouterNavLink>
   );
 }

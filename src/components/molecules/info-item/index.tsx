@@ -1,4 +1,9 @@
 import type { ReactNode } from "react";
+import { Box } from "@/components/atoms/box";
+import {
+  DescriptionDetails,
+  DescriptionTerm,
+} from "@/components/atoms/description-list";
 import { cn } from "@/utils/cn";
 
 type InfoItemProps = {
@@ -7,14 +12,14 @@ type InfoItemProps = {
   mono?: boolean;
 };
 
-/** Label/value pair; use inside a <dl>. */
+/** Label/value pair; use inside a DescriptionList. */
 export function InfoItem({ label, children, mono = false }: InfoItemProps) {
   return (
-    <div className="min-w-0 space-y-1">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className={cn("break-words text-sm", mono && "font-mono")}>
+    <Box className="min-w-0 space-y-1">
+      <DescriptionTerm>{label}</DescriptionTerm>
+      <DescriptionDetails className={cn(mono && "font-mono")}>
         {children ?? "—"}
-      </dd>
-    </div>
+      </DescriptionDetails>
+    </Box>
   );
 }

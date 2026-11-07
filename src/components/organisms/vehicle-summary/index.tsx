@@ -1,4 +1,8 @@
+import { Box } from "@/components/atoms/box";
 import { Card, CardContent, CardHeader } from "@/components/atoms/card";
+import { DescriptionList } from "@/components/atoms/description-list";
+import { Heading } from "@/components/atoms/heading";
+import { Text } from "@/components/atoms/text";
 import { InfoItem } from "@/components/molecules/info-item";
 import { VehicleStatusBadge } from "@/components/molecules/vehicle-status-badge";
 import { effectiveVehicleStatus, vehicleName } from "@/helpers/vehicle";
@@ -10,18 +14,18 @@ export function VehicleSummary({ vehicle }: { vehicle: Vehicle }) {
   return (
     <Card>
       <CardHeader className="gap-2">
-        <div className="flex items-start justify-between gap-2">
-          <h1 className="font-mono text-2xl font-bold tracking-wide">
+        <Box className="flex items-start justify-between gap-2">
+          <Heading className="font-mono tracking-wide">
             {formatPlate(vehicle.plate)}
-          </h1>
+          </Heading>
           <VehicleStatusBadge status={effectiveVehicleStatus(vehicle)} />
-        </div>
-        <p className="text-sm text-muted-foreground">
+        </Box>
+        <Text tone="muted">
           {vehicleName(vehicle)} · {vehicle.year}
-        </p>
+        </Text>
       </CardHeader>
       <CardContent>
-        <dl className="grid grid-cols-2 gap-4 md:grid-cols-3">
+        <DescriptionList className="grid grid-cols-2 gap-4 md:grid-cols-3">
           <InfoItem label="Tipo">{vehicle.type.name}</InfoItem>
           <InfoItem label="Categoria">{vehicle.category.name}</InfoItem>
           <InfoItem label="Km atual">
@@ -36,7 +40,7 @@ export function VehicleSummary({ vehicle }: { vehicle: Vehicle }) {
           <InfoItem label="Renavam" mono>
             {vehicle.renavam}
           </InfoItem>
-        </dl>
+        </DescriptionList>
       </CardContent>
     </Card>
   );

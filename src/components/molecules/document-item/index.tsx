@@ -1,6 +1,8 @@
-import { Download, Eye, FileText, Image } from "lucide-react";
+import { Download, Eye, FileText, Image as ImageIcon } from "lucide-react";
+import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Spinner } from "@/components/atoms/spinner";
+import { Text } from "@/components/atoms/text";
 import type { DocumentFile } from "@/types/document";
 import { formatDate, formatFileSize } from "@/utils/format";
 
@@ -19,23 +21,24 @@ export function DocumentItem({
   isViewing,
   isDownloading,
 }: DocumentItemProps) {
-  const Icon = document.contentType.startsWith("image/") ? Image : FileText;
+  const Icon = document.contentType.startsWith("image/") ? ImageIcon : FileText;
+  const meta = [
+    document.category?.name,
+    formatFileSize(document.size),
+    formatDate(document.createdAt),
+  ].filter(Boolean);
 
   return (
-    <div className="flex items-center gap-3 py-3">
+    <Box className="flex items-center gap-3 py-3">
       <Icon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{document.fileName}</p>
-        <p className="truncate text-xs text-muted-foreground">
-          {[
-            document.category?.name,
-            formatFileSize(document.size),
-            formatDate(document.createdAt),
-          ]
-            .filter(Boolean)
-            .join(" · ")}
-        </p>
-      </div>
+      <Box className="min-w-0 flex-1">
+        <Text weight="medium" truncate>
+          {document.fileName}
+        </Text>
+        <Text size="xs" tone="muted" truncate>
+          {meta.join(" · ")}
+        </Text>
+      </Box>
       <Button
         variant="ghost"
         size="icon"
@@ -54,6 +57,6 @@ export function DocumentItem({
       >
         {isDownloading ? <Spinner /> : <Download />}
       </Button>
-    </div>
+    </Box>
   );
 }

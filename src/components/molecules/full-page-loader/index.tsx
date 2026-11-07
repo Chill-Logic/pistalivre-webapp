@@ -1,11 +1,12 @@
-import { Logo } from "@/components/atoms/logo";
+import { Box } from "@/components/atoms/box";
 import { Spinner } from "@/components/atoms/spinner";
+import { Logo } from "@/components/molecules/logo";
 
 export function FullPageLoader() {
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center gap-4">
+    <Box className="flex min-h-dvh flex-col items-center justify-center gap-4">
       <Logo />
       <Spinner />
-    </div>
+    </Box>
   );
 }

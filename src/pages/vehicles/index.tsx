@@ -1,3 +1,4 @@
+import { Box } from "@/components/atoms/box";
 import { PageHeader } from "@/components/molecules/page-header";
 import { Pagination } from "@/components/molecules/pagination";
 import { QueryError } from "@/components/organisms/query-error";
@@ -14,7 +15,7 @@ export function VehiclesPage() {
   const types = useVehicleTypes();
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <Box className="space-y-4 md:space-y-6">
       <PageHeader title="Veículos" description="A frota da locadora." />
       <VehicleFilters
         filters={filters}
@@ -39,6 +40,6 @@ export function VehiclesPage() {
           onPageChange={setPage}
         />
       )}
-    </div>
+    </Box>
   );
 }

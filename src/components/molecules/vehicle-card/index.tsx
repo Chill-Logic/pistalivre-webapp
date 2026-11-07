@@ -1,6 +1,8 @@
 import { ChevronRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { Box } from "@/components/atoms/box";
 import { Card } from "@/components/atoms/card";
+import { Text } from "@/components/atoms/text";
 import { VehicleStatusBadge } from "@/components/molecules/vehicle-status-badge";
 import { routeTo } from "@/constants/routes";
 import { effectiveVehicleStatus, vehicleName } from "@/helpers/vehicle";
@@ -24,27 +26,27 @@ export function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
       className="block h-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <Card className="flex h-full items-center gap-3 p-4 transition-colors hover:bg-accent/50 active:bg-accent">
-        <div className="min-w-0 flex-1 space-y-2">
-          <div className="flex items-start justify-between gap-2">
-            <p className="font-mono text-lg font-semibold tracking-wide">
+        <Box className="min-w-0 flex-1 space-y-2">
+          <Box className="flex items-start justify-between gap-2">
+            <Text size="lg" weight="semibold" mono>
               {formatPlate(vehicle.plate)}
-            </p>
+            </Text>
             <VehicleStatusBadge status={effectiveVehicleStatus(vehicle)} />
-          </div>
-          <p className="truncate text-sm">{vehicleName(vehicle)}</p>
-          <p className="truncate text-xs text-muted-foreground">
+          </Box>
+          <Text truncate>{vehicleName(vehicle)}</Text>
+          <Text size="xs" tone="muted" truncate>
             {details.join(" · ")}
-          </p>
+          </Text>
           {vehicle.activeRental && (
-            <p className="truncate text-xs text-muted-foreground">
+            <Text size="xs" tone="muted" truncate>
               Com{" "}
-              <span className="font-medium text-foreground">
+              <Text inline size="xs" weight="medium" tone="foreground">
                 {vehicle.activeRental.customer.name}
-              </span>{" "}
+              </Text>{" "}
               · {vehicle.activeRental.code}
-            </p>
+            </Text>
           )}
-        </div>
+        </Box>
         <ChevronRight
           className="size-4 shrink-0 text-muted-foreground"
           aria-hidden
