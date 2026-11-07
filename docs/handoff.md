@@ -89,7 +89,7 @@ Na ordem:
 3. **Documentos**: `GET /document-categories?ownerType=`, `POST /documents` (multipart, 1 arquivo por request), `PATCH`/`DELETE /documents/:id` (409 se em assinatura). Upload no dev dá 500 (S3 quebrado), então valide com interceptação. Ligar nos `DocumentsCard` (veículo, cliente, locação, empresa, dívida…).
 4. ~~Fornecedores (+ vínculos)~~ (feito), CRM (bloco 5: `GET /crm/options`, criar lead, notas, mover, `/lost`, `/reopen` → cópia, atividades, link do questionário), Planos, Usuários (admin × agente; 403), Modelos de contrato (bloco 6).
 5. Telas novas do menu: Propostas, Assinaturas (listas+detalhe, só leitura; dev vazio → simular) e Projeções (`GET /projections/seed`, editar via `POST /projections/compute` com debounce — a conta é do servidor, não reimplementar; PDF em `/projections/report` com Bearer → blob).
-6. **Pedido do dono (2026-11-07)**: animações/transições no estilo do `Chill-Logic/MyFinanceApps` — a 1ª leva já entrou (ver Feito: "Shell no modelo do MyFinance"). Falta, do que o MyFinance tem: **ação central contextual** (FAB redondo no meio da barra inferior, que aparece/encolhe animado conforme a página: "Nova locação", "Novo cliente"…) e seções recolhíveis animadas (`grid-rows-[0fr]→[1fr]`).
+6. **Pedido do dono (2026-11-07)**: animações/transições no estilo do `Chill-Logic/MyFinanceApps` — a 1ª leva já entrou (ver Feito: "Shell no modelo do MyFinance"). **Não** copiar a ação central (botão redondo no meio da barra): o dono vetou, "no MF faz sentido, mas no PL não". Ainda dá para trazer: seções recolhíveis animadas (`grid-rows-[0fr]→[1fr]`).
 
 ## Pendências e decisões anotadas
 
