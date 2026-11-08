@@ -74,5 +74,5 @@ portal **segue o tema do celular**; logo = **emblema do Next** (feito).
 deploy), deploy deste SPA com domínio e `WEBAPP_ORIGIN`, e só então remover as páginas Next antigas.
 
 **Sucessos nunca testados de verdade no dev** (só com simulação): criar/editar cliente (upsert no Asaas),
-recusar reembolso (só há pedido real), upload de documento (o S3 do dev voltou em 2026-11-08: abrir/baixar
-funciona; enviar ainda não foi testado de verdade) e envio do questionário (a sessão fica órfã). Ver `../pista-livre/docs/handoff-api-v1.md`.
+recusar reembolso (só há pedido real) e envio do questionário (a sessão fica órfã). Upload de
+documento já foi testado de verdade (2026-11-08: enviar, abrir, baixar e excluir no cliente de teste). Ver `../pista-livre/docs/handoff-api-v1.md`.
