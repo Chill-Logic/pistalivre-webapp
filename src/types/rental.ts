@@ -87,6 +87,8 @@ export type ChargeAmounts = {
 
 export type Charge = {
   id: string;
+  rentalId: string | null;
+  customerId: string;
   purpose: string;
   label: string | null;
   method: string;
@@ -95,10 +97,14 @@ export type Charge = {
   amount: number;
   dueDate: string;
   referenceDate: string | null;
+  finePercent: number | null;
+  interestPercent: number | null;
   surchargeFree: boolean;
   paidValue: number | null;
   /** Calendar date (midnight UTC), like dueDate: format with formatCalendarDate. */
   paidAt: string | null;
+  /** Settled by the pix received on the rental (derived, not by hand). */
+  settledByReceipt: boolean;
   amounts: ChargeAmounts;
   invoiceUrl: string | null;
   pix: { encodedImage: string; payload: string; expirationDate: string } | null;

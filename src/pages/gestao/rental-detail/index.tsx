@@ -100,7 +100,13 @@ export function RentalDetailPage() {
           summary={<RentalSummary rental={rental.data} />}
           status={<RentalStatusCard rental={rental.data} />}
           billing={<RentalBillingCard rental={rental.data} />}
-          charges={<RentalCharges rentalId={rental.data.id} />}
+          charges={
+            <RentalCharges
+              rentalId={rental.data.id}
+              rate={rental.data.rate}
+              ratePeriod={rental.data.ratePeriod}
+            />
+          }
           caution={<RentalCautionCard caution={rental.data.caution} />}
           maintenances={<RelatedMaintenances rentalId={rental.data.id} />}
           inspections={<RelatedInspections rentalId={rental.data.id} />}

@@ -13,19 +13,37 @@ import {
 } from "@/components/molecules/charge-item";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
+import { ChargeActions } from "@/components/organisms/charge-actions";
+import { ChargeFormDialog } from "@/components/organisms/charge-form-dialog";
 import { QueryError } from "@/components/organisms/query-error";
 import { useRentalCharges } from "@/hooks/api/gestao/rentals/useRentalCharges";
+import type { RatePeriod } from "@/types/rental";
 
 const SKELETON_ROWS = 3;
 
-/** Charges of a rental, in the API order (open first). Read-only for now. */
-export function RentalCharges({ rentalId }: { rentalId: string }) {
+type RentalChargesProps = {
+  rentalId: string;
+  rate: number;
+  ratePeriod: RatePeriod;
+};
+
+/** Charges of a rental, in the API order (open first), with the actions. */
+export function RentalCharges({
+  rentalId,
+  rate,
+  ratePeriod,
+}: RentalChargesProps) {
   const charges = useRentalCharges(rentalId);
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
         <CardTitle className="text-base">Cobranças</CardTitle>
+        <ChargeFormDialog
+          rentalId={rentalId}
+          rate={rate}
+          ratePeriod={ratePeriod}
+        />
       </CardHeader>
       <CardContent>
         {charges.isPending && (
@@ -46,7 +64,11 @@ export function RentalCharges({ rentalId }: { rentalId: string }) {
         {charges.data && charges.data.length > 0 && (
           <Box className="divide-y">
             {charges.data.map((charge) => (
-              <ChargeItem key={charge.id} charge={charge} />
+              <ChargeItem
+                key={charge.id}
+                charge={charge}
+                actions={<ChargeActions charge={charge} />}
+              />
             ))}
           </Box>
         )}

@@ -1,4 +1,5 @@
 import { Copy, ExternalLink as ExternalIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -13,10 +14,17 @@ import type { Charge } from "@/types/rental";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
 /**
- * One charge, read-only. The amount shown is `amounts.amount` from the API
- * (due today with fine/interest, or what was paid) — never recomputed here.
+ * One charge. The amount shown is `amounts.amount` from the API (due today
+ * with fine/interest, or what was paid) — never recomputed here.
  */
-export function ChargeItem({ charge }: { charge: Charge }) {
+export function ChargeItem({
+  charge,
+  actions,
+}: {
+  charge: Charge;
+  /** Staff buttons (settle, edit…); none on read-only lists. */
+  actions?: ReactNode;
+}) {
   const { label } = useLabels();
   const copy = useCopy();
   const situation = chargeSituation(charge);
@@ -32,6 +40,7 @@ export function ChargeItem({ charge }: { charge: Charge }) {
     charge.referenceDate &&
       `referente a ${formatCalendarDate(charge.referenceDate)}`,
     charge.channel === "manual" && "fora do Asaas",
+    charge.settledByReceipt && "baixa pelos pix recebidos",
   ].filter(Boolean);
 
   return (
@@ -85,6 +94,7 @@ export function ChargeItem({ charge }: { charge: Charge }) {
           )}
         </Box>
       )}
+      {actions && <Box className="flex flex-wrap gap-1">{actions}</Box>}
     </Box>
   );
 }
