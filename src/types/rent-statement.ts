@@ -46,6 +46,8 @@ export type RentStatementReport = {
   vehicleLabel: string;
   plate: string;
   generatedAtLabel: string;
+  /** Rescinded rental; `reasons` comes only in the staff statement. */
+  termination?: { dateLabel: string; reasons: string | null } | null;
   debts: {
     label: string;
     description: string | null;

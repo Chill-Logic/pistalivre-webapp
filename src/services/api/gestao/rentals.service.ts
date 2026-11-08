@@ -9,6 +9,9 @@ import type {
   RentalRecord,
   RentalStatus,
   RentalListItem,
+  TerminationInput,
+  TerminationPreview,
+  TerminationResult,
 } from "@/types/rental";
 
 export const rentalsService = {
@@ -34,6 +37,23 @@ export const rentalsService = {
     const { data } = await http.patch<RentalRecord>(`/rentals/${id}/status`, {
       status,
     });
+    return data;
+  },
+  /** What terminating on `date` would do (charges to cancel, automation). */
+  async terminationPreview(id: string, date: string) {
+    const { data } = await http.get<TerminationPreview>(
+      `/rentals/${id}/termination/preview`,
+      { params: { date } },
+    );
+    return data;
+  },
+  /** Ends an ACTIVE rental early (cancels the charges due after the date). */
+  async terminate(id: string, key: string, input: TerminationInput) {
+    const { data } = await http.post<TerminationResult>(
+      `/rentals/${id}/termination`,
+      input,
+      { headers: { "Idempotency-Key": key } },
+    );
     return data;
   },
   async remove(id: string) {

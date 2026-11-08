@@ -1,4 +1,5 @@
 import { Download } from "lucide-react";
+import { Alert } from "@/components/atoms/alert";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -91,6 +92,13 @@ export function RentStatementView({
         </Button>
       </Box>
       <Text tone="muted">{active.hint}</Text>
+      {report.termination && (
+        // The reasons come only in the staff statement.
+        <Alert variant="warning">
+          Rescindida em {report.termination.dateLabel}
+          {report.termination.reasons && ` · ${report.termination.reasons}`}
+        </Alert>
+      )}
 
       <Box
         className={cn(

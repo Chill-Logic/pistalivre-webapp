@@ -39,7 +39,11 @@ export function PortalRentalSummary({ rental }: { rental: PortalRental }) {
             {formatCalendarDate(rental.startDate)}
           </InfoItem>
           <InfoItem span={6} md={4} label="Fim">
-            {rental.endDate ? formatCalendarDate(rental.endDate) : "Sem prazo"}
+            {rental.termination
+              ? `Rescindida em ${formatCalendarDate(rental.termination.date)}`
+              : rental.endDate
+                ? formatCalendarDate(rental.endDate)
+                : "Sem prazo"}
           </InfoItem>
           <InfoItem md={4} label="Valor">
             {rateLabel(

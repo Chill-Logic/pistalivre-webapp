@@ -16,6 +16,8 @@ export type PortalRental = RentalListItem & {
   caution: Caution | null;
   /** "Segunda-feira", "Todo dia 5", "Todos os dias, exceto domingo". */
   billingDayLabel: string | null;
+  /** Rescinded: only the day (the reasons are never shown to the renter). */
+  termination?: { date: string } | null;
 };
 
 /** GET /me/profile: the renter's own record (read-only). */

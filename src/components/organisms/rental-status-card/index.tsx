@@ -12,14 +12,26 @@ import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { RentalStatusBadge } from "@/components/molecules/rental-status-badge";
+import { RentalTerminationDialog } from "@/components/organisms/rental-termination-dialog";
 import { LABEL_MAPS } from "@/constants/label-maps";
-import { RENTAL_TRANSITIONS } from "@/constants/rental";
+import {
+  OTHER_TERMINATION_REASON,
+  RENTAL_TRANSITIONS,
+} from "@/constants/rental";
 import { useChangeRentalStatus } from "@/hooks/api/gestao/rentals/useChangeRentalStatus";
 import { useLabels } from "@/hooks/ui/useLabels";
-import type { RentalDetail, RentalStatus } from "@/types/rental";
+import type {
+  RentalDetail,
+  RentalStatus,
+  RentalTermination,
+} from "@/types/rental";
+import { formatCalendarDate } from "@/utils/format";
 
 type RentalStatusCardProps = {
-  rental: Pick<RentalDetail, "id" | "status" | "source">;
+  rental: Pick<
+    RentalDetail,
+    "id" | "code" | "status" | "source" | "termination"
+  >;
 };
 
 /** Current status and the legal next ones, each confirmed in a dialog. */
@@ -55,7 +67,14 @@ export function RentalStatusCard({ rental }: RentalStatusCardProps) {
           <Text tone="muted">Agora:</Text>
           <RentalStatusBadge status={rental.status} />
         </Box>
-        {nextStatuses.length === 0 ? (
+        {rental.termination && (
+          <TerminationSummary termination={rental.termination} />
+        )}
+        {rental.status === "ACTIVE" ? (
+          <Box className="flex flex-wrap gap-2">
+            <RentalTerminationDialog rental={rental} />
+          </Box>
+        ) : nextStatuses.length === 0 ? (
           <Text size="xs" tone="muted">
             Situação final: a locação não muda mais.
           </Text>
@@ -88,6 +107,39 @@ export function RentalStatusCard({ rental }: RentalStatusCardProps) {
         )}
       </CardContent>
     </Card>
+  );
+}
+
+/** "Rescindida em 07/11/2026 · Inadimplência, Veículo recolhido". */
+function TerminationSummary({
+  termination,
+}: {
+  termination: RentalTermination;
+}) {
+  const { label } = useLabels();
+  const reasons = termination.reasons
+    .map((code) =>
+      code === OTHER_TERMINATION_REASON && termination.otherReason
+        ? termination.otherReason
+        : label(LABEL_MAPS.rentalTerminationReason, code),
+    )
+    .join(", ");
+
+  return (
+    <Box className="space-y-1 rounded-md border p-3">
+      <Text size="sm" weight="medium">
+        Rescindida em {formatCalendarDate(termination.date)}
+      </Text>
+      <Text size="xs" tone="muted">
+        {reasons}
+        {termination.byName && ` · por ${termination.byName}`}
+      </Text>
+      {termination.notes && (
+        <Text size="xs" tone="muted">
+          {termination.notes}
+        </Text>
+      )}
+    </Box>
   );
 }
 

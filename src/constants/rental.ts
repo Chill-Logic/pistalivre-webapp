@@ -9,6 +9,9 @@ export const CLOSED_RENTAL_STATUSES: readonly RentalStatus[] = [
 
 const EARLY_EXITS: RentalStatus[] = ["ACTIVE", "CANCELLED", "WITHDRAWN"];
 
+/** "Outro" reason: asks for a text. */
+export const OTHER_TERMINATION_REASON = "OTHER";
+
 /**
  * Legal status transitions (same rule as the API's rental.entity; an illegal
  * one answers 422). Only these become buttons. RETURNED/CANCELLED/WITHDRAWN
@@ -39,7 +42,8 @@ export const RENTAL_TRANSITIONS: Record<RentalStatus, RentalStatus[]> = {
   SIGNED: ["AWAITING_CAUTION", "AWAITING_DELIVERY", ...EARLY_EXITS],
   AWAITING_CAUTION: ["AWAITING_DELIVERY", ...EARLY_EXITS],
   AWAITING_DELIVERY: EARLY_EXITS,
-  ACTIVE: ["RETURNED", "CANCELLED"],
+  // An active rental only ends through the termination (date + reasons).
+  ACTIVE: [],
   RETURNED: [],
   CANCELLED: [],
   WITHDRAWN: [],

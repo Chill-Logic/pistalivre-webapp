@@ -66,6 +66,8 @@ export type RentalRecord = RentalListItem & {
    * "Todos os dias, exceto domingo"). Only in GET /rentals/:id.
    */
   billingDayLabel?: string | null;
+  /** Early end with reasons (only GET /rentals/:id and the termination). */
+  termination?: RentalTermination | null;
   caution: Caution | null;
   createdAt: string;
   updatedAt: string;
@@ -140,4 +142,46 @@ export type RentalInput = {
   status?: RentalStatus;
   /** Create only: MANUAL = retroactive (no contract, no billing, no vehicle move). */
   source?: "SYSTEM" | "MANUAL";
+};
+
+/** Codes of RENTAL_TERMINATION_REASON_LABELS ("OTHER" takes a text). */
+export type TerminationReason = string;
+
+/** How an ACTIVE rental ended early (staff view: reasons included). */
+export type RentalTermination = {
+  /** Calendar date (YYYY-MM-DD at midnight UTC). */
+  date: string;
+  reasons: TerminationReason[];
+  otherReason: string | null;
+  notes: string | null;
+  byName: string | null;
+  at: string;
+};
+
+/** GET /rentals/:id/termination/preview: what terminating on `date` does. */
+export type TerminationPreview = {
+  date: string;
+  chargesToCancel: {
+    id: string;
+    dueDate: string;
+    amount: number;
+    channel: "asaas" | "manual";
+    description: string | null;
+    purpose: string;
+  }[];
+  autoBillingEnabled: boolean;
+  vehicle: { id: string; plate: string } | null;
+};
+
+export type TerminationInput = {
+  date: string;
+  reasons: TerminationReason[];
+  otherReason?: string;
+  notes?: string;
+};
+
+export type TerminationResult = {
+  rental: RentalRecord;
+  cancelledCharges: { id: string }[];
+  failures: { id: string; message: string }[];
 };

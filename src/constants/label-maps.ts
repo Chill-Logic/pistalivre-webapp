@@ -5,6 +5,7 @@
 export const LABEL_MAPS = {
   vehicleStatus: "VEHICLE_STATUS_LABELS",
   rentalStatus: "RENTAL_STATUS_LABELS",
+  rentalTerminationReason: "RENTAL_TERMINATION_REASON_LABELS",
   ratePeriod: "RATE_PERIOD_LABELS",
   paymentMethod: "PAYMENT_METHOD_LABELS",
   paymentStatus: "PAYMENT_STATUS_LABELS",
