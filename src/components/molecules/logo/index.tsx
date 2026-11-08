@@ -10,6 +10,8 @@ const SIZE = {
   xl: "h-12",
   /** Login screens. */
   lg: "h-24",
+  /** The brand panel of the login (big on the desktop). */
+  hero: "h-28 md:h-48 lg:h-56",
 } as const;
 
 type LogoProps = {

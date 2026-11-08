@@ -8,7 +8,7 @@ export function CustomerLoginPage() {
   const [params] = useSearchParams();
 
   return (
-    <AuthLayout title="Área do cliente">
+    <AuthLayout area="Área do cliente" title="Entrar">
       <CustomerLoginForm
         onSuccess={() =>
           navigate(safeRedirect(params.get("callbackUrl"), "cliente"), {
