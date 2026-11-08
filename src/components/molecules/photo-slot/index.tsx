@@ -76,7 +76,7 @@ export function PhotoSlot({
         <Button
           type="button"
           variant="ghost"
-          className="relative h-auto w-full overflow-hidden p-0"
+          className="relative h-auto w-full overflow-hidden p-0 md:h-auto"
           disabled={disabled}
           onClick={() => inputRef.current?.click()}
           aria-label={`Trocar foto: ${label}`}
@@ -92,7 +92,7 @@ export function PhotoSlot({
         <Button
           type="button"
           variant="outline"
-          className="aspect-[4/3] h-auto w-full flex-col gap-1 border-dashed text-muted-foreground"
+          className="aspect-[4/3] h-auto w-full flex-col gap-1 border-dashed text-muted-foreground md:h-auto"
           disabled={disabled}
           onClick={() => inputRef.current?.click()}
         >

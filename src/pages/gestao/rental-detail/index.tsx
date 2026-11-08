@@ -163,7 +163,12 @@ export function RentalDetailPage() {
           }
           caution={<RentalCautionCard caution={rental.data.caution} />}
           maintenances={<RelatedMaintenances rentalId={rental.data.id} />}
-          inspections={<RelatedInspections rentalId={rental.data.id} />}
+          inspections={
+            <RelatedInspections
+              rentalId={rental.data.id}
+              rentalVehicleId={rental.data.vehicle.id}
+            />
+          }
           signatures={
             <OwnerSignatures ownerType="RENTAL" ownerId={rental.data.id} />
           }

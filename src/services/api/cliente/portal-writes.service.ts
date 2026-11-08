@@ -1,3 +1,4 @@
+import { appendInspectionFields } from "@/helpers/inspection";
 import { http } from "@/services/http/client";
 import type {
   InspectionRequirements,
@@ -47,16 +48,7 @@ export const portalWritesService = {
   },
   /** One request: photos as `photo_<key>`, OK checks as `check_<key>`. */
   async sendInspection(rentalId: string, input: InspectionSubmitInput) {
-    const body = new FormData();
-    body.append("type", input.type);
-    body.append("mileage", String(input.mileage));
-    if (input.notes) body.append("notes", input.notes);
-    if (input.type === "FULL") {
-      for (const [key, file] of Object.entries(input.photos)) {
-        body.append(`photo_${key}`, file);
-      }
-      for (const key of input.checksOk) body.append(`check_${key}`, "true");
-    }
+    const body = appendInspectionFields(new FormData(), input);
     const { data } = await http.post<{ id: string }>(
       `/me/rentals/${rentalId}/inspections`,
       body,

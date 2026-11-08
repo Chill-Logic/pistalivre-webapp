@@ -14,6 +14,7 @@ export const ROUTES = {
   vehicleNew: `${GESTAO}/veiculos/novo`,
   vehicleDetail: `${GESTAO}/veiculos/:id`,
   vehicleEdit: `${GESTAO}/veiculos/:id/editar`,
+  inspectionNew: `${GESTAO}/veiculos/:id/vistorias/nova`,
   rentals: `${GESTAO}/locacoes`,
   rentalNew: `${GESTAO}/locacoes/nova`,
   rentalDetail: `${GESTAO}/locacoes/:id`,
@@ -111,6 +112,11 @@ export const routeTo = {
       : `${ROUTES.maintenances}/nova`;
   },
   inspection: (id: string) => `${ROUTES.inspections}/${id}`,
+  /** Of a vehicle; from a rental (`?locacao=`) the renter can be the author. */
+  newInspection: (vehicleId: string, rentalId?: string) => {
+    const path = `${ROUTES.vehicles}/${vehicleId}/vistorias/nova`;
+    return rentalId ? `${path}?locacao=${encodeURIComponent(rentalId)}` : path;
+  },
   proposal: (id: string) => `${ROUTES.proposals}/${id}`,
   signature: (id: string) => `${ROUTES.signatures}/${id}`,
   portalRental: (id: string) => `${ROUTES.portal}/locacoes/${id}`,

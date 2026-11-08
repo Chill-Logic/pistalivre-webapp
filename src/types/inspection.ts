@@ -1,4 +1,5 @@
 import type { DocumentFile } from "@/types/document";
+import type { InspectionSubmitInput } from "@/types/portal";
 
 export type InspectionType = "FULL" | "KM";
 export type InspectionActor = "LESSOR" | "LESSEE";
@@ -7,6 +8,8 @@ export type InspectionListItem = {
   id: string;
   type: InspectionType;
   performedBy: InspectionActor;
+  /** The agent who did it, or the renter (null on old records). */
+  performedByName: string | null;
   mileage: number | null;
   /** How many photos were attached. */
   photos: number;
@@ -55,4 +58,14 @@ export type InspectionDetail = {
   } | null;
   photos: InspectionPhoto[];
   checks: InspectionCheck[];
+};
+
+/**
+ * POST /inspections (management): the same body as the portal's, plus the
+ * vehicle, the optional rental (must be this vehicle's) and who did it.
+ */
+export type InspectionCreateInput = InspectionSubmitInput & {
+  vehicleId: string;
+  rentalId?: string;
+  performedBy: InspectionActor;
 };

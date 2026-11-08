@@ -1,3 +1,6 @@
+import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/atoms/button";
 import { Card, CardContent, CardHeader } from "@/components/atoms/card";
 import { Col, Row } from "@/components/atoms/grid";
 import { Skeleton } from "@/components/atoms/skeleton";
@@ -10,16 +13,24 @@ import { CollapsibleCard } from "@/components/molecules/collapsible-card";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { QueryError } from "@/components/organisms/query-error";
 import { MAX_PAGE_SIZE } from "@/constants/pagination";
+import { routeTo } from "@/constants/routes";
 import { useInspections } from "@/hooks/api/gestao/inspections/useInspections";
 import { pluralize } from "@/utils/text";
 
-type RelatedInspectionsProps = { vehicleId?: string; rentalId?: string };
+type RelatedInspectionsProps = {
+  vehicleId?: string;
+  rentalId?: string;
+  /** On a rental: its vehicle, for "Nova vistoria" (the list stays by rental). */
+  rentalVehicleId?: string;
+};
 
 /** Vistorias of one vehicle or rental, newest first, loading on their own. */
 export function RelatedInspections({
   vehicleId,
   rentalId,
+  rentalVehicleId,
 }: RelatedInspectionsProps) {
+  const newFor = vehicleId ?? rentalVehicleId;
   const query = useInspections({
     page: 1,
     pageSize: MAX_PAGE_SIZE,
@@ -37,6 +48,16 @@ export function RelatedInspections({
       count={query.data?.total}
       storageKey={`${rentalId ? "rental" : "vehicle"}-inspections`}
       contentClassName="space-y-3"
+      actions={
+        newFor && (
+          <Button asChild variant="outline" size="sm">
+            <Link to={routeTo.newInspection(newFor, rentalId)}>
+              <Plus />
+              Nova vistoria
+            </Link>
+          </Button>
+        )
+      }
     >
       {query.isPending && (
         <SkeletonRegion label="Carregando vistorias…">

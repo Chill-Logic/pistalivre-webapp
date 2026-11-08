@@ -16,6 +16,7 @@ import {
   InspectionSummary,
   InspectionSummarySkeleton,
 } from "@/components/organisms/inspection-summary";
+import { InspectionDeleteButton } from "@/components/organisms/inspection-delete-button";
 import { QueryError } from "@/components/organisms/query-error";
 import { InspectionDetailLayout } from "@/components/templates/inspection-detail-layout";
 import { ROUTES } from "@/constants/routes";
@@ -30,7 +31,15 @@ export function InspectionDetailPage() {
 
   return (
     <Box className="space-y-4">
-      <BackLink to={backTo} label="Vistorias" />
+      <Box className="flex items-center justify-between gap-2">
+        <BackLink to={backTo} label="Vistorias" />
+        {inspection.data && (
+          <InspectionDeleteButton
+            inspectionId={inspection.data.id}
+            backTo={backTo}
+          />
+        )}
+      </Box>
       {inspection.isPending && (
         <SkeletonRegion label="Carregando vistoria…">
           <InspectionDetailLayout

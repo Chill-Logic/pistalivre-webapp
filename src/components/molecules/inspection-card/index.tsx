@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
+import { inspectionAuthor } from "@/helpers/inspection";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { InspectionListItem } from "@/types/inspection";
 import { formatDateTime, formatMileage } from "@/utils/format";
@@ -21,7 +22,7 @@ export function InspectionCard({
   const location = useLocation();
   const { label } = useLabels();
   const details = [
-    `Feita por: ${label(LABEL_MAPS.inspectionActor, inspection.performedBy)}`,
+    inspectionAuthor(inspection, label),
     inspection.rental ? inspection.rental.code : "Avulsa",
   ];
 

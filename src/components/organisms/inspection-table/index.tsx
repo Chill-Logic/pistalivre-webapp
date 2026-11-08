@@ -8,6 +8,7 @@ import {
 } from "@/components/organisms/data-table";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
+import { inspectionAuthor } from "@/helpers/inspection";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { InspectionListItem } from "@/types/inspection";
 import { formatDate, formatMileage } from "@/utils/format";
@@ -57,9 +58,9 @@ export function InspectionTable({
       skeletonShape: "pill",
     },
     {
-      header: "Feita por",
-      cell: (item) => label(LABEL_MAPS.inspectionActor, item.performedBy),
-      skeleton: "w-20",
+      header: "Quem fez",
+      cell: (item) => inspectionAuthor(item, label),
+      skeleton: "w-32",
     },
     {
       header: "Locação",
