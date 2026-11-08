@@ -4,6 +4,7 @@ import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { ExternalLink } from "@/components/atoms/external-link";
+import { OptionsMenu } from "@/components/molecules/options-menu";
 import { PixQrDialog } from "@/components/molecules/pix-qr-dialog";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
@@ -21,13 +22,16 @@ import { formatCalendarDate, formatCurrency } from "@/utils/format";
 export function ChargeItem({
   charge,
   actions,
+  attach,
   attachments,
   meta,
 }: {
   charge: Charge;
-  /** Staff buttons (settle, edit…); none on read-only lists. */
+  /** Staff buttons (settle, edit…), in the "Opções" menu. */
   actions?: ReactNode;
-  /** Receipts of the charge (view, attach), under the amount lines. */
+  /** "Anexar comprovante", in the "Opções" menu. */
+  attach?: ReactNode;
+  /** Receipts already attached, under the amount lines. */
   attachments?: ReactNode;
   /** Extra line under the details (e.g. the rental, on the customer page). */
   meta?: ReactNode;
@@ -42,6 +46,34 @@ export function ChargeItem({
 
   const title =
     charge.label ?? label(LABEL_MAPS.paymentPurpose, charge.purpose);
+  const pixGroup =
+    pixToCopy || openPix?.encodedImage || charge.invoiceUrl ? (
+      <>
+        {pixToCopy && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => copy(pixToCopy, "Pix copiado")}
+          >
+            <Copy />
+            Copiar pix
+          </Button>
+        )}
+        {openPix?.encodedImage && (
+          <PixQrDialog
+            pix={openPix}
+            title={`${title} · ${formatCurrency(amounts.amount)}`}
+          />
+        )}
+        {charge.invoiceUrl && (
+          <ExternalLink href={charge.invoiceUrl}>
+            <ExternalIcon className="size-4" aria-hidden />
+            Abrir fatura
+          </ExternalLink>
+        )}
+      </>
+    ) : null;
+
   const details = [
     label(LABEL_MAPS.paymentMethod, charge.method),
     `vence ${formatCalendarDate(charge.dueDate)}`,
@@ -62,11 +94,16 @@ export function ChargeItem({
             {details.join(" · ")}
           </Text>
         </Box>
-        <Box className="shrink-0 space-y-1 text-right">
-          <Text size="base" weight="semibold">
-            {formatCurrency(amounts.amount)}
-          </Text>
-          <Badge variant={badge.variant}>{badge.label}</Badge>
+        <Box className="flex shrink-0 items-start gap-3">
+          <Box className="space-y-1 text-right">
+            <Text size="base" weight="semibold">
+              {formatCurrency(amounts.amount)}
+            </Text>
+            <Badge variant={badge.variant}>{badge.label}</Badge>
+          </Box>
+          {(pixGroup || attach || actions) && (
+            <OptionsMenu groups={[pixGroup, attach, actions]} />
+          )}
         </Box>
       </Box>
       {meta}
@@ -93,33 +130,6 @@ export function ChargeItem({
         </Text>
       )}
       {attachments}
-      {(charge.invoiceUrl || pixToCopy) && (
-        <Box className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          {pixToCopy && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => copy(pixToCopy, "Pix copiado")}
-            >
-              <Copy />
-              Copiar pix
-            </Button>
-          )}
-          {openPix?.encodedImage && (
-            <PixQrDialog
-              pix={openPix}
-              title={`${title} · ${formatCurrency(amounts.amount)}`}
-            />
-          )}
-          {charge.invoiceUrl && (
-            <ExternalLink href={charge.invoiceUrl}>
-              Abrir fatura
-              <ExternalIcon className="size-3.5" aria-hidden />
-            </ExternalLink>
-          )}
-        </Box>
-      )}
-      {actions && <Box className="flex flex-wrap gap-1">{actions}</Box>}
     </Box>
   );
 }

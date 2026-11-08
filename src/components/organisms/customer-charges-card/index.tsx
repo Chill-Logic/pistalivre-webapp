@@ -14,7 +14,10 @@ import { TextLink } from "@/components/molecules/text-link";
 import { ChargeSettleDialog } from "@/components/organisms/charge-settle-dialog";
 import { ChargeSettlementDialog } from "@/components/organisms/charge-settlement-dialog";
 import { QueryError } from "@/components/organisms/query-error";
-import { RecordAttachments } from "@/components/organisms/record-attachments";
+import {
+  AttachButton,
+  RecordAttachments,
+} from "@/components/organisms/record-attachments";
 import { routeTo } from "@/constants/routes";
 import {
   customerChargesKey,
@@ -86,8 +89,20 @@ export function CustomerChargesCard({
                   </Text>
                 }
                 actions={<CustomerChargeActions charge={charge} />}
+                attach={
+                  <AttachButton
+                    owner={{ type: "PAYMENT", id: charge.id }}
+                    invalidate={customerChargesKey(customerId)}
+                    label={
+                      charge.attachments.length > 0
+                        ? "Anexar mais"
+                        : "Anexar comprovante"
+                    }
+                  />
+                }
                 attachments={
                   <RecordAttachments
+                    withAttach={false}
                     owner={{ type: "PAYMENT", id: charge.id }}
                     attachments={charge.attachments}
                     invalidate={customerChargesKey(customerId)}

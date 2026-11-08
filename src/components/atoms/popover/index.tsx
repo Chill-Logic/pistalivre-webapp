@@ -10,11 +10,13 @@ export function PopoverContent({
   className,
   align = "start",
   sideOffset = 4,
+  forceMount,
   ...props
 }: ComponentProps<typeof PopoverPrimitive.Content>) {
   return (
-    <PopoverPrimitive.Portal>
+    <PopoverPrimitive.Portal forceMount={forceMount}>
       <PopoverPrimitive.Content
+        forceMount={forceMount}
         align={align}
         sideOffset={sideOffset}
         className={cn(

@@ -14,6 +14,8 @@ type RecordAttachmentsProps = {
   invalidate: QueryKey;
   /** Text of the attach button when there is nothing yet. */
   attachLabel?: string;
+  /** false: only the files (the attach button lives elsewhere, a menu). */
+  withAttach?: boolean;
 };
 
 /**
@@ -25,8 +27,10 @@ export function RecordAttachments({
   attachments,
   invalidate,
   attachLabel = "Anexar comprovante",
+  withAttach = true,
 }: RecordAttachmentsProps) {
   const { view, download } = useFileActions();
+  if (!withAttach && attachments.length === 0) return null;
 
   return (
     <Box className="flex flex-wrap items-center gap-2">
@@ -49,11 +53,32 @@ export function RecordAttachments({
           }
         />
       ))}
-      <DocumentUploadDialog
-        owner={owner}
-        invalidate={invalidate}
-        triggerLabel={attachments.length > 0 ? "Anexar mais" : attachLabel}
-      />
+      {withAttach && (
+        <AttachButton
+          owner={owner}
+          invalidate={invalidate}
+          label={attachments.length > 0 ? "Anexar mais" : attachLabel}
+        />
+      )}
     </Box>
+  );
+}
+
+/** The "Anexar comprovante" button alone (e.g. inside a charge's menu). */
+export function AttachButton({
+  owner,
+  invalidate,
+  label = "Anexar comprovante",
+}: {
+  owner: DocumentOwner;
+  invalidate: QueryKey;
+  label?: string;
+}) {
+  return (
+    <DocumentUploadDialog
+      owner={owner}
+      invalidate={invalidate}
+      triggerLabel={label}
+    />
   );
 }
