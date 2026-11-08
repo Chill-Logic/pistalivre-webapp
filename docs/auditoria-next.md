@@ -118,7 +118,7 @@ do dono. Marque `[x]` ao entregar.
 - [x] B+F — **Extrato: exportar planilha** por conta + histórico de exportações (`POST/GET/DELETE
   /finance/statement/exports`) e **PDF oficial do banco** (`GET /finance/statement/bank-pdf`), com Bearer.
 - [x] B+F — **Empresa editável**: `PUT /company`.
-- [x] B+F — **Integrações** pelo webapp (decidido): listar/salvar (segredo em branco mantém), testar conexão, webhook do Inter.
+- [x] B+F — **Integrações** pelo webapp, **só admin** (agente vê só a situação; dono confirmou em 2026-11-08) (decidido): listar/salvar (segredo em branco mantém), testar conexão, webhook do Inter.
 - [x] B+F — Histórico de **transferências emitidas**, só leitura (decidido): `GET /finance/transfers`.
 
 ## Portal do cliente
