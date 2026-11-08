@@ -84,7 +84,7 @@ export function InstallmentComposer({
             onChange={drive(setTotal)}
           />
         </Col>
-        <Col span={6} md={3}>
+        <Col span={6}>
           <FormField
             label="Parcelas"
             inputMode="numeric"
@@ -95,7 +95,7 @@ export function InstallmentComposer({
             disabled={disabled}
           />
         </Col>
-        <Col span={6} md={3}>
+        <Col span={6}>
           <SelectField
             label="A cada"
             value={periodicity}
