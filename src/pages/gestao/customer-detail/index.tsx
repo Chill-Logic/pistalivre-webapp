@@ -35,6 +35,10 @@ import {
   CustomerInvoicesCardSkeleton,
 } from "@/components/organisms/customer-invoices-card";
 import { QueryError } from "@/components/organisms/query-error";
+import {
+  CustomerDebtsCard,
+  CustomerDebtsCardSkeleton,
+} from "@/components/organisms/customer-debts-card";
 import { CustomerDetailLayout } from "@/components/templates/customer-detail-layout";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { queryKeys } from "@/constants/query-keys";
@@ -76,6 +80,7 @@ export function CustomerDetailPage() {
             rentals={<CustomerRentalsSkeleton />}
             billing={<CustomerBillingCardSkeleton />}
             invoices={<CustomerInvoicesCardSkeleton />}
+            debts={<CustomerDebtsCardSkeleton />}
             documents={<DocumentsCardSkeleton />}
           />
         </SkeletonRegion>
@@ -110,6 +115,7 @@ export function CustomerDetailPage() {
               rentals={customer.data.rentals}
             />
           }
+          debts={<CustomerDebtsCard customerId={customer.data.id} />}
           documents={
             <DocumentsCard
               documents={customer.data.documents}

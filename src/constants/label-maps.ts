@@ -28,6 +28,7 @@ export const LABEL_MAPS = {
   debtInterestMode: "DEBT_INTEREST_MODE_LABELS",
   debtInterestBase: "DEBT_INTEREST_BASE_LABELS",
   debtLenderType: "DEBT_LENDER_TYPE_LABELS",
+  customerDebtOrigin: "CUSTOMER_DEBT_ORIGIN_LABELS",
   supplierScope: "SUPPLIER_SCOPE_LABELS",
   leadActivity: "LEAD_ACTIVITY_LABELS",
   proposalStatus: "PROPOSAL_STATUS_LABELS",
