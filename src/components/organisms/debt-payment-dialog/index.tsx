@@ -35,14 +35,6 @@ type Errors = Partial<
   Record<"amount" | "paidAt" | "surcharge" | "discount" | "barcode", string>
 > & { form?: string };
 
-/** What is still open on an installment (a suggestion; always editable). */
-function openPart(installment: DebtInstallment) {
-  return Math.max(
-    0,
-    Math.round((installment.amount - installment.paid) * 100) / 100,
-  );
-}
-
 /**
  * An overdue installment was usually paid the day it was due (logging late
  * is the common case); a future one can only be paid today.
@@ -79,7 +71,7 @@ export function DebtPaymentDialog({ debt }: { debt: DebtDetail }) {
     setSelected(value);
     const installment =
       openInstallments.find((i) => String(i.number) === value) ?? null;
-    setAmount(installment ? openPart(installment) : debt.balance.outstanding);
+    setAmount(installment ? installment.due : debt.balance.outstanding);
     setPaidAt(suggestedDay(installment, todayInBrasilia()));
     setErrors({});
   };
@@ -142,7 +134,7 @@ export function DebtPaymentDialog({ debt }: { debt: DebtDetail }) {
   const options = [
     ...openInstallments.map((item) => ({
       value: String(item.number),
-      label: `Parcela ${item.number} · ${item.status === "OVERDUE" ? "venceu" : item.status === "PARTIAL" ? "parcial, vence" : "vence"} ${formatCalendarDate(item.dueDate)} · ${formatCurrency(openPart(item))}`,
+      label: `Parcela ${item.number} · ${item.status === "OVERDUE" ? "venceu" : item.status === "PARTIAL" ? "parcial, vence" : "vence"} ${formatCalendarDate(item.dueDate)} · ${formatCurrency(item.due)}`,
     })),
     { value: OTHER, label: "Outro valor" },
   ];

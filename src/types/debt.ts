@@ -78,6 +78,8 @@ export type DebtInstallment = {
   dueDate: string;
   amount: number;
   paid: number;
+  /** What is still open on it (amount − paid, never negative; server side). */
+  due: number;
   status: "PAID" | "PARTIAL" | "OVERDUE" | "OPEN";
 };
 
