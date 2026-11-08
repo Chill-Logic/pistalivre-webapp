@@ -105,8 +105,11 @@ Decisões do dono (2026-11-08): cadastro de cliente com upsert no Asaas **fica**
 é **o da gestão nos dois lados** (o portal passa a mostrar multa e juros como a gestão: ajuste no backend);
 portal **segue o tema do celular**; logo = **emblema do Next** (feito).
 
-**Só com o "pode" explícito do dono**: merge da `feat/api-v1-spa` na `main` do `pista-livre` (o Railway faz
-deploy), deploy deste SPA com domínio e `WEBAPP_ORIGIN`, e só então remover as páginas Next antigas.
+**No ar desde 2026-11-08 13:28** (autorizado pelo dono): a `feat/api-v1-spa` foi juntada na `main` do
+`pista-livre` (df0985f, o Railway publicou), com `WEBAPP_ORIGIN` = app.gestao, app.cliente e
+pistalivre-webapp.vercel.app. O SPA está na Vercel nos dois domínios. As telas Next antigas
+(`pistalivrelocacoes.com.br/gestao` e `/area-cliente`) **seguem no ar**: removê-las só com novo aval do dono,
+depois de ele aprovar o site novo.
 
 **Sucessos nunca testados de verdade no dev** (só com simulação): criar/editar cliente (upsert no Asaas),
 recusar reembolso (só há pedido real) e envio do questionário (a sessão fica órfã). Upload de
