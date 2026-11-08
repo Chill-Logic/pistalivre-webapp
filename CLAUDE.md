@@ -72,8 +72,13 @@ duas áreas, como no dev. Cada domínio guarda o seu login (localStorage por ori
   sem cache (senão o aviso de nova versão do PWA não aparece).
 - Variável de build na Vercel: `VITE_API_URL=https://pistalivrelocacoes.com.br/api` (entra no build: mudou,
   publica de novo).
-- DNS no **Cloudflare** (o Registro.br só guarda o registro): `CNAME gestao` e `CNAME cliente` para o destino
-  que a Vercel mostrar, com a nuvem **cinza** (DNS only) até a Vercel emitir o certificado.
+- Projeto criado em 2026-11-08: `csjhonathans-projects/pistalivre-webapp` (conta pessoal, plano Hobby),
+  produção em `https://pistalivre-webapp.vercel.app`; `VITE_API_URL` cadastrada em Production e Preview.
+  O GitHub **não** ficou conectado (o app da Vercel não tem acesso à organização Chill-Logic), então o deploy é
+  pela CLI: `/home/ojhon/.nvm/versions/node/v22.15.1/bin/vercel deploy --prod` (pasta já ligada em `.vercel/`).
+  Para deploy a cada push: dar acesso ao app da Vercel na org Chill-Logic e rodar `vercel git connect`.
+- DNS no **Cloudflare** (o Registro.br só guarda o registro): `CNAME gestao` e `CNAME cliente` para
+  `460e80aaac8cf57f.vercel-dns-017.com` (o destino que a Vercel deu ao projeto), com a nuvem **cinza** (DNS only) até a Vercel emitir o certificado.
 - No backend: `WEBAPP_ORIGIN=https://gestao.pistalivrelocacoes.com.br,https://cliente.pistalivrelocacoes.com.br`.
 - Testar local: `http://gestao.localhost:5173` e `http://cliente.localhost:5173` simulam os domínios (a API do
   dev só aceita `localhost:5173`, então lá só dá para ver os redirecionamentos).
