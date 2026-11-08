@@ -8,7 +8,6 @@ import {
 } from "react";
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
@@ -98,7 +97,13 @@ export function VariableSuggestionMenu({
       onValueChange={setActiveId}
     >
       <CommandList ref={listRef} className="max-h-72">
-        <CommandEmpty>Nenhuma variável com esse nome.</CommandEmpty>
+        {/* Not CommandEmpty: cmdk shows it for a frame on every remount,
+            before the items register (it flashed at each keystroke). */}
+        {options.length === 0 && (
+          <Text tone="muted" className="py-6 text-center">
+            Nenhuma variável com esse nome.
+          </Text>
+        )}
         {groups.map((group) => (
           <CommandGroup key={group.label} heading={group.label}>
             {group.items.map((option) => (

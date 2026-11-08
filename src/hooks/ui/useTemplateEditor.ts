@@ -52,10 +52,14 @@ export function useTemplateEditor(
   // Subscribed by hand: leaving the suggestion (Escape) is a transaction
   // with no steps, which `useEditorState` would not re-render for.
   const [trigger, setTrigger] = useState<VariableTriggerState | null>(null);
+  // Kept after the menu closes: it fades out showing the last list, not
+  // "nenhuma variável" for a frame (Enter or erasing the `{{`).
+  const [query, setQuery] = useState("");
   useEffect(() => {
     if (!editor) return;
     const sync = () => {
       const next = readVariableTrigger(editor.state);
+      if (next) setQuery(next.query);
       setTrigger((previous) =>
         previous?.from === next?.from &&
         previous?.to === next?.to &&
@@ -96,8 +100,8 @@ export function useTemplateEditor(
     [catalog, withSlots],
   );
   const options = useMemo(
-    () => (trigger ? filterTemplateVariables(allOptions, trigger.query) : []),
-    [allOptions, trigger],
+    () => filterTemplateVariables(allOptions, query),
+    [allOptions, query],
   );
 
   /** One text insertion = one undo step. Replaces the typed `{{…`. */
@@ -116,5 +120,5 @@ export function useTemplateEditor(
       .run();
   };
 
-  return { editor, trigger, options, anchorRef, menuRef, insert };
+  return { editor, trigger, query, options, anchorRef, menuRef, insert };
 }
