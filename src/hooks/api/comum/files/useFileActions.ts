@@ -3,18 +3,18 @@ import { toast } from "sonner";
 import { errorMessage } from "@/helpers/api-error";
 import { openBlobInNewTab, saveBlob } from "@/helpers/files";
 import { filesService } from "@/services/api/comum/files.service";
-import type { DocumentFile } from "@/types/document";
+import type { DocumentAttachment } from "@/types/document";
 
 /** View/download for authenticated files, with feedback on failure. */
 export function useFileActions() {
   const view = useMutation({
-    mutationFn: (file: DocumentFile) =>
+    mutationFn: (file: DocumentAttachment) =>
       openBlobInNewTab(() => filesService.download(file.url)),
     onError: (error) => toast.error(errorMessage(error)),
   });
 
   const download = useMutation({
-    mutationFn: async (file: DocumentFile) =>
+    mutationFn: async (file: DocumentAttachment) =>
       saveBlob(await filesService.download(file.url), file.fileName),
     onError: (error) => toast.error(errorMessage(error)),
   });

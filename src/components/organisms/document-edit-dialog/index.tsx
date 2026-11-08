@@ -19,12 +19,12 @@ import { SelectField } from "@/components/molecules/select-field";
 import { toApiError } from "@/helpers/api-error";
 import { useDocumentCategories } from "@/hooks/api/gestao/documents/useDocumentCategories";
 import { useDocumentMutations } from "@/hooks/api/gestao/documents/useDocumentMutations";
-import type { DocumentFile, DocumentOwner } from "@/types/document";
+import type { DocumentAttachment, DocumentOwner } from "@/types/document";
 
 const NO_CATEGORY = "none";
 
 type DocumentEditDialogProps = {
-  document: DocumentFile;
+  document: DocumentAttachment;
   owner: DocumentOwner;
   invalidate: QueryKey;
 };

@@ -1,4 +1,4 @@
-import { CalendarRange, FileText, Pencil } from "lucide-react";
+import { CalendarRange, FileText, Link2, Pencil } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -59,24 +59,44 @@ import {
   RentalInvoicesCard,
   RentalInvoicesCardSkeleton,
 } from "@/components/organisms/rental-invoices-card";
+import {
+  VehicleCrlvCard,
+  VehicleCrlvCardSkeleton,
+} from "@/components/organisms/vehicle-crlv-card";
 import { RentalDetailLayout } from "@/components/templates/rental-detail-layout";
 import { queryKeys } from "@/constants/query-keys";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
+import { portalRentalUrl } from "@/helpers/host-realm";
 import { useRental } from "@/hooks/api/gestao/rentals/useRental";
 import { useBackToList } from "@/hooks/ui/useBackToList";
+import { useCopy } from "@/hooks/ui/useCopy";
 
 export function RentalDetailPage() {
   const { id = "" } = useParams();
   const rental = useRental(id);
   const backTo = useBackToList(ROUTES.rentals);
+  const copy = useCopy();
 
   return (
     <Box className="space-y-4">
       <Box className="flex items-center justify-between gap-2">
         <BackLink to={backTo} label="Locações" />
         {rental.data && (
-          <Box className="flex gap-2">
+          <Box className="flex flex-wrap justify-end gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() =>
+                copy(
+                  portalRentalUrl(rental.data.id),
+                  "Link do cliente copiado",
+                )
+              }
+            >
+              <Link2 />
+              Link do cliente
+            </Button>
             <Button asChild variant="ghost" size="sm">
               <Link to={routeTo.rentalStatement(rental.data.id)}>
                 <CalendarRange />
@@ -113,6 +133,7 @@ export function RentalDetailPage() {
             rateSegments={<RateSegmentsCardSkeleton />}
             receipts={<RentReceiptsCardSkeleton />}
             invoices={<RentalInvoicesCardSkeleton />}
+            vehicleCrlv={<VehicleCrlvCardSkeleton />}
           />
         </SkeletonRegion>
       )}
@@ -155,6 +176,7 @@ export function RentalDetailPage() {
           rateSegments={<RateSegmentsCard rentalId={rental.data.id} />}
           receipts={<RentReceiptsCard rentalId={rental.data.id} />}
           invoices={<RentalInvoicesCard rentalId={rental.data.id} />}
+          vehicleCrlv={<VehicleCrlvCard vehicleId={rental.data.vehicle.id} />}
         />
       )}
     </Box>

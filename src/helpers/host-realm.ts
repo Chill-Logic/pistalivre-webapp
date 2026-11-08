@@ -1,3 +1,4 @@
+import { routeTo } from "@/constants/routes";
 import type { Realm } from "@/types/auth";
 
 /**
@@ -41,4 +42,13 @@ export function urlOnRealmHost(
     .join(".");
   const port = location.port ? `:${location.port}` : "";
   return `${location.protocol}//${host}${port}${path}`;
+}
+
+/**
+ * Link to the rental in the customer portal, on the customer area's domain
+ * (app.gestao.… → app.cliente.…); a host that serves both areas
+ * (localhost, the Vercel address) keeps its own origin.
+ */
+export function portalRentalUrl(rentalId: string, location = window.location) {
+  return urlOnRealmHost("cliente", routeTo.portalRental(rentalId), location);
 }

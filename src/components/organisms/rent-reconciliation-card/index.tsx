@@ -1,4 +1,6 @@
+import { CalendarRange } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Col, Row } from "@/components/atoms/grid";
@@ -12,6 +14,7 @@ import { ReconcileFromDialog } from "@/components/organisms/reconcile-from-dialo
 import { RentCreditsDialog } from "@/components/organisms/rent-credits-dialog";
 import { WaivedDaysDialog } from "@/components/organisms/waived-days-dialog";
 import { currentCycleName, cyclesLabel } from "@/helpers/billing";
+import { rentalStatementHref } from "@/helpers/rent-statement";
 import { useRentalBilling } from "@/hooks/api/gestao/rentals/useRentalBilling";
 import type { BillingPeriod } from "@/types/billing";
 import { calendarDay } from "@/utils/date";
@@ -104,6 +107,19 @@ export function RentReconciliationCard({ rentalId }: { rentalId: string }) {
               Período todo
             </Button>
           )}
+          <Button asChild variant="outline" size="sm">
+            <Link
+              to={rentalStatementHref(
+                rentalId,
+                r.filtered
+                  ? { from: calendarDay(r.from), through: calendarDay(r.through) }
+                  : null,
+              )}
+            >
+              <CalendarRange />
+              Extrato
+            </Link>
+          </Button>
         </Box>
         <Row className="gap-y-3">
           <Col sm={4}>

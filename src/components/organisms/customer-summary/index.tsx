@@ -7,6 +7,7 @@ import { CustomerStatusBadge } from "@/components/molecules/customer-status-badg
 import { InfoItem } from "@/components/molecules/info-item";
 import type { CustomerDetail } from "@/types/customer";
 import { formatCpf } from "@/utils/document";
+import { ageInYears, todayInBrasilia } from "@/utils/date";
 import { formatCalendarDate, formatDateTime } from "@/utils/format";
 
 export function CustomerSummary({ customer }: { customer: CustomerDetail }) {
@@ -36,7 +37,12 @@ export function CustomerSummary({ customer }: { customer: CustomerDetail }) {
             {customer.rg}
           </InfoItem>
           <InfoItem md={4} label="Nascimento">
-            {customer.birthDate ? formatCalendarDate(customer.birthDate) : null}
+            {customer.birthDate
+              ? `${formatCalendarDate(customer.birthDate)} · ${ageInYears(customer.birthDate, todayInBrasilia())} anos`
+              : null}
+          </InfoItem>
+          <InfoItem span={6} md={4} label="Nacionalidade">
+            {customer.nationality}
           </InfoItem>
           <InfoItem span={6} md={4} label="Estado civil">
             {customer.maritalStatus}
@@ -63,7 +69,7 @@ export function CustomerSummary({ customer }: { customer: CustomerDetail }) {
   );
 }
 
-const SUMMARY_FIELDS = 9;
+const SUMMARY_FIELDS = 10;
 
 export function CustomerSummarySkeleton() {
   return (

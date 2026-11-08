@@ -14,9 +14,11 @@ import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { CustomerDebtDialog } from "@/components/organisms/customer-debt-dialog";
 import { CustomerDebtPaymentDialog } from "@/components/organisms/customer-debt-payment-dialog";
 import { QueryError } from "@/components/organisms/query-error";
+import { RecordAttachments } from "@/components/organisms/record-attachments";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { moneyErrorMessage } from "@/helpers/money-errors";
 import {
+  customerDebtsKey,
   useCustomerDebts,
   useDeleteCustomerDebt,
   useDeleteCustomerDebtPayment,
@@ -110,6 +112,12 @@ function CustomerDebtRow({
               {debt.notes}
             </Text>
           )}
+          {debt.weeksToPayOff != null && debt.weeksToPayOff > 0 && (
+            <Text size="xs" tone="muted">
+              ~{debt.weeksToPayOff}{" "}
+              {debt.weeksToPayOff === 1 ? "semana" : "semanas"} para quitar
+            </Text>
+          )}
         </Box>
         <Box className="shrink-0 space-y-1 text-right">
           {debt.balance > 0 ? (
@@ -160,6 +168,13 @@ function CustomerDebtRow({
           ))}
         </List>
       )}
+
+      <RecordAttachments
+        owner={{ type: "CUSTOMER_DEBT", id: debt.id }}
+        attachments={debt.documents}
+        invalidate={customerDebtsKey(customerId)}
+        attachLabel="Anexar"
+      />
 
       <Box className="flex flex-wrap gap-1">
         {debt.balance > 0 && (

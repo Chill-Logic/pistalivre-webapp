@@ -42,6 +42,17 @@ export const standaloneChargesService = {
     );
     return data;
   },
+  /**
+   * OUR charges of the customer, both channels, with or without a rental
+   * (the manual ones outside Asaas show up only here). `id` here is the
+   * `paymentId` of the Asaas list.
+   */
+  async customerCharges(customerId: string) {
+    const { data } = await http.get<{ items: Charge[] }>(
+      `/customers/${customerId}/charges`,
+    );
+    return data.items;
+  },
   async link(chargeId: string, rentalId: string) {
     await http.post(`/charges/${chargeId}/link`, { rentalId });
   },

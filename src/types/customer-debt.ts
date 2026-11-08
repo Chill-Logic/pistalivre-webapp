@@ -26,6 +26,8 @@ export type CustomerDebt = {
     notes: string | null;
   }[];
   documents: DocumentFile[];
+  /** "~N semanas para quitar": only the first open debt of the queue. */
+  weeksToPayOff?: number | null;
 };
 
 /**

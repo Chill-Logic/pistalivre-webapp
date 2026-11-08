@@ -9,12 +9,12 @@ import type {
 } from "@/types/customer-debt";
 
 /** Lives under the customer's keys, so customer invalidation reaches it. */
-const debtsKey = (customerId: string) =>
+export const customerDebtsKey = (customerId: string) =>
   [...queryKeys.customers.all, "debts", customerId] as const;
 
 export function useCustomerDebts(customerId: string) {
   return useQuery({
-    queryKey: debtsKey(customerId),
+    queryKey: customerDebtsKey(customerId),
     queryFn: () => customerDebtsService.view(customerId),
   });
 }
@@ -29,7 +29,7 @@ function useCustomerDebtWrite<T>(
   return useMutation({
     mutationFn: write,
     onSuccess: (view) => {
-      queryClient.setQueryData(debtsKey(customerId), view);
+      queryClient.setQueryData(customerDebtsKey(customerId), view);
       toast.success(message);
     },
   });

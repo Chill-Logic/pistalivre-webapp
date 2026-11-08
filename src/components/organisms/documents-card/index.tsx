@@ -13,7 +13,11 @@ import { DocumentEditDialog } from "@/components/organisms/document-edit-dialog"
 import { DocumentUploadDialog } from "@/components/organisms/document-upload-dialog";
 import { useDocumentMutations } from "@/hooks/api/gestao/documents/useDocumentMutations";
 import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
-import type { DocumentFile, DocumentOwner } from "@/types/document";
+import type {
+  DocumentAttachment,
+  DocumentFile,
+  DocumentOwner,
+} from "@/types/document";
 
 type DocumentsCardProps = {
   documents: DocumentFile[];
@@ -82,7 +86,7 @@ export function ManageDocumentActions({
   owner,
   invalidate,
 }: {
-  document: DocumentFile;
+  document: DocumentAttachment;
   owner: DocumentOwner;
   invalidate: QueryKey;
 }) {

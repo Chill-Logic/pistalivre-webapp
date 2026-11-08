@@ -4,6 +4,7 @@ import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { ExternalLink } from "@/components/atoms/external-link";
+import { PixQrDialog } from "@/components/molecules/pix-qr-dialog";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { LABEL_MAPS } from "@/constants/label-maps";
@@ -20,17 +21,24 @@ import { formatCalendarDate, formatCurrency } from "@/utils/format";
 export function ChargeItem({
   charge,
   actions,
+  attachments,
+  meta,
 }: {
   charge: Charge;
   /** Staff buttons (settle, edit…); none on read-only lists. */
   actions?: ReactNode;
+  /** Receipts of the charge (view, attach), under the amount lines. */
+  attachments?: ReactNode;
+  /** Extra line under the details (e.g. the rental, on the customer page). */
+  meta?: ReactNode;
 }) {
   const { label } = useLabels();
   const copy = useCopy();
   const situation = chargeSituation(charge);
   const badge = chargeSituationBadge(situation);
   const { amounts } = charge;
-  const pixToCopy = !amounts.isPaid ? charge.pix?.payload : undefined;
+  const openPix = !amounts.isPaid ? charge.pix : null;
+  const pixToCopy = openPix?.payload;
 
   const title =
     charge.label ?? label(LABEL_MAPS.paymentPurpose, charge.purpose);
@@ -61,19 +69,30 @@ export function ChargeItem({
           <Badge variant={badge.variant}>{badge.label}</Badge>
         </Box>
       </Box>
-      {!amounts.isPaid && amounts.surcharge > 0 && (
+      {meta}
+      {amounts.surcharge > 0 && (
+        // Paid or not: what came on top of the principal. The daily rent has
+        // no fine/interest, so there the excess is an advance.
         <Text size="xs" tone="muted">
           {formatCurrency(amounts.principal)} +{" "}
-          {formatCurrency(amounts.surcharge)} de multa e juros
+          {formatCurrency(amounts.surcharge)}{" "}
+          {charge.surchargeFree ? "a mais (adiantamento)" : "de multa e juros"}
         </Text>
       )}
       {amounts.isPaid && charge.paidAt && (
         <Text size="xs" tone="muted">
           Pago em {formatCalendarDate(charge.paidAt)}
-          {amounts.shortfall > 0 &&
-            ` · falta ${formatCurrency(amounts.shortfall)}`}
         </Text>
       )}
+      {amounts.shortfall > 0 && (
+        // Settled for less than due: without this the staff only sees what
+        // came in, not what the customer still owes.
+        <Text size="xs" weight="medium" tone="destructive">
+          De {formatCurrency(amounts.principal)} · faltam{" "}
+          {formatCurrency(amounts.shortfall)}
+        </Text>
+      )}
+      {attachments}
       {(charge.invoiceUrl || pixToCopy) && (
         <Box className="flex flex-wrap items-center gap-x-4 gap-y-2">
           {pixToCopy && (
@@ -85,6 +104,12 @@ export function ChargeItem({
               <Copy />
               Copiar pix
             </Button>
+          )}
+          {openPix?.encodedImage && (
+            <PixQrDialog
+              pix={openPix}
+              title={`${title} · ${formatCurrency(amounts.amount)}`}
+            />
           )}
           {charge.invoiceUrl && (
             <ExternalLink href={charge.invoiceUrl}>

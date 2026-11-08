@@ -31,9 +31,10 @@ export function RentalBillingCard({ rental }: { rental: RentalDetail }) {
               : null}
           </InfoItem>
           <InfoItem span={6} label="Dia">
-            {rental.paymentWeekday !== null
-              ? label(LABEL_MAPS.weekday, rental.paymentWeekday)
-              : null}
+            {rental.billingDayLabel ??
+              (rental.paymentWeekday !== null
+                ? label(LABEL_MAPS.weekday, rental.paymentWeekday)
+                : null)}
           </InfoItem>
           <InfoItem span={6} label="Canal">
             {rental.billingChannel === "manual" ? "Fora do Asaas" : "Asaas"}

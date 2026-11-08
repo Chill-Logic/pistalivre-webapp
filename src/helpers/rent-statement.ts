@@ -1,5 +1,32 @@
 import { STATEMENT_MODES } from "@/constants/rent-statement";
+import { routeTo } from "@/constants/routes";
+import type { BillingPeriod } from "@/types/billing";
 import type { RentStatementMode, StatementDay } from "@/types/rent-statement";
+import { isDayString } from "@/utils/date";
+
+/**
+ * `?de=&ate=` (yyyy-mm-dd) → the statement window. A missing or invalid
+ * end is left open (the server uses the whole rental on that side).
+ */
+export function statementPeriodFromParams(params: URLSearchParams) {
+  const valid = (value: string | null) =>
+    value && isDayString(value) ? value : undefined;
+  return {
+    from: valid(params.get("de")),
+    through: valid(params.get("ate")),
+  };
+}
+
+/** The staff statement screen, on a period (the reconciliation's) or whole. */
+export function rentalStatementHref(
+  rentalId: string,
+  period?: BillingPeriod | null,
+) {
+  const base = routeTo.rentalStatement(rentalId);
+  if (!period) return base;
+  const query = new URLSearchParams({ de: period.from, ate: period.through });
+  return `${base}?${query}`;
+}
 
 /** `?modelo=` → mode (default: "Saldo devedor"). */
 export function statementModeFromParam(

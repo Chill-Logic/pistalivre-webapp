@@ -1,6 +1,7 @@
 export type DocumentFile = {
   id: string;
-  category: { id: string; name: string } | null;
+  /** `slug` finds a kind without its display name ("crlv"). */
+  category: { id: string; name: string; slug?: string } | null;
   fileName: string;
   contentType: string;
   size: number;
@@ -8,6 +9,15 @@ export type DocumentFile = {
   url: string;
   createdAt: string;
 };
+
+/**
+ * A file hung on something else (a charge's receipts): enough to view,
+ * download, rename and delete it.
+ */
+export type DocumentAttachment = Pick<
+  DocumentFile,
+  "id" | "category" | "fileName" | "url"
+>;
 
 /** Who a document belongs to (polymorphic owner, as in the API). */
 export type DocumentOwnerType =
@@ -20,6 +30,7 @@ export type DocumentOwnerType =
   | "DEBT"
   | "DEBT_PAYMENT"
   | "PAYMENT"
+  | "CUSTOMER_DEBT"
   | "LEAD_ACTIVITY"
   | "REIMBURSEMENT";
 

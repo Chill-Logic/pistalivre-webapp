@@ -1,4 +1,4 @@
-import type { DocumentFile } from "@/types/document";
+import type { DocumentAttachment, DocumentFile } from "@/types/document";
 
 export type RentalStatus =
   | "DRAFT"
@@ -60,6 +60,11 @@ export type RentalRecord = RentalListItem & {
   autoBillingEnabled: boolean;
   rentBillingTiming: "CYCLE_START" | "CYCLE_END";
   billingSkipWeekdays: number[];
+  /**
+   * The billing day as the server words it ("Segunda-feira", "Todo dia 5",
+   * "Todos os dias, exceto domingo"). Only in GET /rentals/:id.
+   */
+  billingDayLabel?: string | null;
   caution: Caution | null;
   createdAt: string;
   updatedAt: string;
@@ -108,7 +113,7 @@ export type Charge = {
   amounts: ChargeAmounts;
   invoiceUrl: string | null;
   pix: { encodedImage: string; payload: string; expirationDate: string } | null;
-  attachments: Pick<DocumentFile, "id" | "category" | "fileName" | "url">[];
+  attachments: DocumentAttachment[];
   createdAt: string;
 };
 

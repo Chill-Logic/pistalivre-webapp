@@ -68,3 +68,14 @@ export function dayToBrDate(value: string) {
   const [yyyy, mm, dd] = value.slice(0, 10).split("-");
   return `${dd}/${mm}/${yyyy}`;
 }
+
+/** Whole years from a birth date (calendar date) to `today` (yyyy-mm-dd). */
+export function ageInYears(birthDate: string, today: string) {
+  const [birthYear, birthMonth, birthDay] = calendarDay(birthDate)
+    .split("-")
+    .map(Number);
+  const [year, month, day] = today.split("-").map(Number);
+  const hadBirthday =
+    month > birthMonth || (month === birthMonth && day >= birthDay);
+  return year - birthYear - (hadBirthday ? 0 : 1);
+}

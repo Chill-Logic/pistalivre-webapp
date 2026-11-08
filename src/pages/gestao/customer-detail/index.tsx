@@ -37,6 +37,10 @@ import {
 import { QueryError } from "@/components/organisms/query-error";
 import { CustomerAsaasChargesCard } from "@/components/organisms/customer-asaas-charges-card";
 import {
+  CustomerChargesCard,
+  CustomerChargesCardSkeleton,
+} from "@/components/organisms/customer-charges-card";
+import {
   CustomerDebtsCard,
   CustomerDebtsCardSkeleton,
 } from "@/components/organisms/customer-debts-card";
@@ -82,6 +86,7 @@ export function CustomerDetailPage() {
             billing={<CustomerBillingCardSkeleton />}
             invoices={<CustomerInvoicesCardSkeleton />}
             debts={<CustomerDebtsCardSkeleton />}
+            charges={<CustomerChargesCardSkeleton />}
             documents={<DocumentsCardSkeleton />}
           />
         </SkeletonRegion>
@@ -117,6 +122,12 @@ export function CustomerDetailPage() {
             />
           }
           debts={<CustomerDebtsCard customerId={customer.data.id} />}
+          charges={
+            <CustomerChargesCard
+              customerId={customer.data.id}
+              rentals={customer.data.rentals}
+            />
+          }
           asaasCharges={
             <CustomerAsaasChargesCard
               customerId={customer.data.id}

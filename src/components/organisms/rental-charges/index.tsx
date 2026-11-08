@@ -18,6 +18,8 @@ import { ChargeActions } from "@/components/organisms/charge-actions";
 import { ChargeFormDialog } from "@/components/organisms/charge-form-dialog";
 import { ManualPaymentDialog } from "@/components/organisms/manual-payment-dialog";
 import { QueryError } from "@/components/organisms/query-error";
+import { RecordAttachments } from "@/components/organisms/record-attachments";
+import { queryKeys } from "@/constants/query-keys";
 import { chargeTimeline } from "@/helpers/billing";
 import { useRental } from "@/hooks/api/gestao/rentals/useRental";
 import { useRentalBilling } from "@/hooks/api/gestao/rentals/useRentalBilling";
@@ -93,6 +95,13 @@ export function RentalCharges({
                   key={entry.charge.id}
                   charge={entry.charge}
                   actions={<ChargeActions charge={entry.charge} />}
+                  attachments={
+                    <RecordAttachments
+                      owner={{ type: "PAYMENT", id: entry.charge.id }}
+                      attachments={entry.charge.attachments}
+                      invalidate={queryKeys.rentals.charges(rentalId)}
+                    />
+                  }
                 />
               ),
             )}
