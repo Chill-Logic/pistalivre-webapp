@@ -1,4 +1,5 @@
 import { Target } from "lucide-react";
+import type { ReactNode } from "react";
 import { Col, Row } from "@/components/atoms/grid";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { LeadCard, LeadCardSkeleton } from "@/components/molecules/lead-card";
@@ -10,12 +11,15 @@ type LeadListProps = {
   leads: LeadListItem[] | undefined;
   isLoading: boolean;
   isRefreshing?: boolean;
+  /** Under the empty state (e.g. "Links de campanha"). */
+  emptyAction?: ReactNode;
 };
 
 export function LeadList({
   leads,
   isLoading,
   isRefreshing = false,
+  emptyAction,
 }: LeadListProps) {
   if (isLoading) {
     return (
@@ -37,6 +41,7 @@ export function LeadList({
         icon={Target}
         title="Nenhum lead encontrado"
         description="Ajuste a busca, o estágio ou mostre os leads de teste."
+        action={emptyAction}
       />
     );
   }

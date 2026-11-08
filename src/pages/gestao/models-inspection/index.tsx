@@ -1,6 +1,9 @@
 import { Box } from "@/components/atoms/box";
 import { Col, Row } from "@/components/atoms/grid";
-import { InspectionPolicyCard } from "@/components/organisms/inspection-policy-card";
+import {
+  InspectionPolicyCard,
+  InspectionPolicyCardSkeleton,
+} from "@/components/organisms/inspection-policy-card";
 import {
   InspectionRequirementsCard,
   InspectionRequirementsCardSkeleton,
@@ -16,13 +19,16 @@ export function ModelsInspectionPage() {
         query={requirements}
         label="Carregando requisitos de vistoria…"
         skeleton={
-          <Row className="gap-y-6">
-            {[0, 1, 2].map((index) => (
-              <Col key={index} lg={4}>
-                <InspectionRequirementsCardSkeleton />
-              </Col>
-            ))}
-          </Row>
+          <Box className="space-y-6">
+            <InspectionPolicyCardSkeleton />
+            <Row className="gap-y-6">
+              {[0, 1, 2].map((index) => (
+                <Col key={index} md={6} xl={4}>
+                  <InspectionRequirementsCardSkeleton />
+                </Col>
+              ))}
+            </Row>
+          </Box>
         }
       >
         {(data) => (

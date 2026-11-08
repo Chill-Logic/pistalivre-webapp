@@ -56,6 +56,10 @@ export const ROUTES = {
   contractTemplate: `${GESTAO}/modelos/contratos/:id`,
   contractTemplateEdit: `${GESTAO}/modelos/contratos/:id/editar`,
   modelsInspection: `${GESTAO}/modelos/vistoria`,
+  modelsProposals: `${GESTAO}/modelos/propostas`,
+  proposalTemplateNew: `${GESTAO}/modelos/propostas/novo`,
+  proposalTemplateEdit: `${GESTAO}/modelos/propostas/:id/editar`,
+  crmLinks: `${GESTAO}/crm/links`,
   users: `${GESTAO}/usuarios`,
   userNew: `${GESTAO}/usuarios/novo`,
   userDetail: `${GESTAO}/usuarios/:id`,
@@ -121,6 +125,8 @@ export const routeTo = {
   contractTemplate: (id: string) => `${ROUTES.models}/contratos/${id}`,
   editContractTemplate: (id: string) =>
     `${ROUTES.models}/contratos/${id}/editar`,
+  editProposalTemplate: (id: string) =>
+    `${ROUTES.modelsProposals}/${id}/editar`,
   maintenance: (id: string) => `${ROUTES.maintenances}/${id}`,
   editMaintenance: (id: string) => `${ROUTES.maintenances}/${id}/editar`,
   /** From a vehicle or a rental (the vehicle comes fixed). */

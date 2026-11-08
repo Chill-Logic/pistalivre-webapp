@@ -2,6 +2,8 @@ import { toQueryParams } from "@/helpers/query-params";
 import { http } from "@/services/http/client";
 import type { Paginated } from "@/types/api";
 import type {
+  CampaignLink,
+  CampaignLinkInput,
   CrmOptions,
   LeadActivity,
   LeadActivityInput,
@@ -85,6 +87,43 @@ export const crmService = {
     body.append("file", file);
     // Uploads take longer than the default timeout on a slow connection.
     await http.post("/documents", body, { timeout: 120_000 });
+  },
+  async campaignLinks() {
+    const { data } = await http.get<{ items: CampaignLink[] }>(
+      "/crm/campaign-links",
+    );
+    return data.items;
+  },
+  async createCampaignLink(input: CampaignLinkInput) {
+    const { data } = await http.post<CampaignLink>(
+      "/crm/campaign-links",
+      input,
+    );
+    return data;
+  },
+  async removeCampaignLink(id: string) {
+    await http.delete(`/crm/campaign-links/${id}`);
+  },
+  /** "Simular lead": a sandbox lead through the link. */
+  async createTestLead(linkId: string) {
+    const { data } = await http.post<{ leadId: string }>(
+      `/crm/campaign-links/${linkId}/test-lead`,
+    );
+    return data;
+  },
+  /** How many sandbox leads exist (a one-item page, just for the total). */
+  async testLeadCount() {
+    const { data } = await http.get<Paginated<LeadListItem>>("/crm/leads", {
+      params: { test: "test", page: 1, pageSize: 1 },
+    });
+    return data.total;
+  },
+  /** Deletes EVERY test lead (and its attachments). */
+  async removeTestLeads() {
+    const { data } = await http.delete<{ deleted: number }>("/crm/leads", {
+      params: { test: true },
+    });
+    return data;
   },
   /** Creates the public questionnaire link, or reuses the open one. */
   async questionnaire(id: string) {

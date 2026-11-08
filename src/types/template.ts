@@ -76,3 +76,55 @@ export type InspectionRequirements = {
     checks: InspectionRequirement[];
   }[];
 };
+
+/** Kind of an inspection item (photo, extra reading or checked item). */
+export type InspectionItemKind = "PHOTO" | "READING" | "CHECK";
+
+/** POST /inspection-requirements — goes to the END of the type's list. */
+export type InspectionRequirementInput = {
+  vehicleTypeId: string;
+  label: string;
+  kind: InspectionItemKind;
+  required: boolean;
+};
+
+export type InspectionPolicy = InspectionRequirements["policy"];
+
+/** PUT /inspection-policy — every number is required (1 or more). */
+export type InspectionPolicyInput = {
+  fullEveryDays: number;
+  kmEveryDays: number;
+  kmEveryKm: number;
+  kmOnMaintenance: boolean;
+};
+
+/** A proposal template in the models list (`?active=all`). */
+export type ProposalTemplateSummary = {
+  id: string;
+  name: string;
+  version: number;
+  active: boolean;
+  clauses: { key: string; label: string }[];
+};
+
+export type ProposalTemplateDetail = {
+  id: string;
+  name: string;
+  slug: string;
+  version: number;
+  active: boolean;
+  /** Raw template: {{vars}} and the {{{clauses}}} slot. */
+  bodyHtml: string;
+  /** Optional clauses (checkboxes when issuing); the key comes from the label. */
+  clauses: { key: string; label: string; html: string }[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ProposalTemplateInput = {
+  name: string;
+  bodyHtml: string;
+  /** Blank rows are dropped by the API. */
+  clauses: { label: string; html: string }[];
+  active: boolean;
+};

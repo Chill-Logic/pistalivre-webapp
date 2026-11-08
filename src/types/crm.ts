@@ -134,6 +134,46 @@ export type CrmOptions = {
   workApps: string[];
   appsExperience: { code: string; label: string }[];
   incomeTypes: { code: string; label: string }[];
+  /** Where a campaign link is published: presets for utm source/medium. */
+  channels: CampaignChannel[];
+};
+
+/** A campaign-link channel; "outro" comes with empty source/medium. */
+export type CampaignChannel = {
+  key: string;
+  label: string;
+  utmSource: string;
+  utmMedium: string;
+};
+
+/** A trackable link; `url` is the short link to publish (`/l/<code>`). */
+export type CampaignLink = {
+  id: string;
+  code: string;
+  url: string;
+  label: string;
+  channel: string;
+  channelLabel: string;
+  utmSource: string;
+  utmMedium: string;
+  utmCampaign: string;
+  utmTerm: string | null;
+  utmContent: string | null;
+  /** Sandbox: every lead that comes through it is a test lead. */
+  isTest: boolean;
+  active: boolean;
+  createdAt: string;
+};
+
+/** POST /crm/campaign-links — the channel preset fills source/medium. */
+export type CampaignLinkInput = {
+  label: string;
+  channel: string;
+  utmCampaign: string;
+  utmSource: string;
+  utmMedium: string;
+  utmContent: string | null;
+  isTest: boolean;
 };
 
 /** POST /crm/leads — an OUTBOUND lead registered by the staff. */

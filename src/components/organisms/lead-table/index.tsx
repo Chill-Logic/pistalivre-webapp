@@ -1,4 +1,5 @@
 import { Target } from "lucide-react";
+import type { ReactNode } from "react";
 import { Text } from "@/components/atoms/text";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { LeadStatusBadge } from "@/components/molecules/lead-status-badge";
@@ -63,10 +64,17 @@ type LeadTableProps = {
   leads: LeadListItem[] | undefined;
   isLoading: boolean;
   isRefreshing?: boolean;
+  /** Under the empty state (e.g. "Links de campanha"). */
+  emptyAction?: ReactNode;
 };
 
 /** Table view of the lead list (same props as LeadList). */
-export function LeadTable({ leads, isLoading, isRefreshing }: LeadTableProps) {
+export function LeadTable({
+  leads,
+  isLoading,
+  isRefreshing,
+  emptyAction,
+}: LeadTableProps) {
   return (
     <DataTable
       columns={COLUMNS}
@@ -81,6 +89,7 @@ export function LeadTable({ leads, isLoading, isRefreshing }: LeadTableProps) {
           icon={Target}
           title="Nenhum lead encontrado"
           description="Ajuste a busca, o estágio ou mostre os leads de teste."
+          action={emptyAction}
         />
       }
     />

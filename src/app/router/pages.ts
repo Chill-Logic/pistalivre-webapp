@@ -261,3 +261,19 @@ export const RentalContractNewPage = lazyPage(
   () => import("@/pages/gestao/rental-contract-new"),
   "RentalContractNewPage",
 );
+export const ModelsProposalsPage = lazyPage(
+  () => import("@/pages/gestao/models-proposals"),
+  "ModelsProposalsPage",
+);
+export const ProposalTemplateNewPage = lazyPage(
+  () => import("@/pages/gestao/proposal-template-new"),
+  "ProposalTemplateNewPage",
+);
+export const ProposalTemplateEditPage = lazyPage(
+  () => import("@/pages/gestao/proposal-template-edit"),
+  "ProposalTemplateEditPage",
+);
+export const CrmLinksPage = lazyPage(
+  () => import("@/pages/gestao/crm-links"),
+  "CrmLinksPage",
+);

@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Link2, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -19,6 +19,7 @@ import { LeadTable } from "@/components/organisms/lead-table";
 import { ListFooter } from "@/components/organisms/list-footer";
 import { QueryBoundary } from "@/components/organisms/query-boundary";
 import { QueryError } from "@/components/organisms/query-error";
+import { TestLeadsDeleteButton } from "@/components/organisms/test-leads-delete-button";
 import { useLeadFunnel } from "@/hooks/api/gestao/crm/useLeadFunnel";
 import { useLeadList } from "@/hooks/api/gestao/crm/useLeads";
 import { ROUTES } from "@/constants/routes";
@@ -32,6 +33,15 @@ export function CrmPage() {
   const { view, setView, isDesktop } = useListView();
   const funnel = useLeadFunnel();
   const leads = useLeadList(filters, isDesktop);
+  /** Under "nenhum lead": where leads start coming in. */
+  const campaignLinksAction = (
+    <Button asChild variant="outline" size="sm">
+      <Link to={ROUTES.crmLinks}>
+        <Link2 />
+        Links de campanha
+      </Link>
+    </Button>
+  );
 
   return (
     <Box className="space-y-4 md:space-y-6">
@@ -40,6 +50,20 @@ export function CrmPage() {
         actions={
           <>
             <ViewToggle view={view} onChange={setView} />
+            <TestLeadsDeleteButton />
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              aria-label="Links de campanha"
+            >
+              <Link to={ROUTES.crmLinks}>
+                <Link2 />
+                <Text inline size={null} className="hidden sm:inline">
+                  Links de campanha
+                </Text>
+              </Link>
+            </Button>
             <Button asChild size="sm">
               <Link to={ROUTES.leadNew}>
                 <Plus />
@@ -82,12 +106,14 @@ export function CrmPage() {
           leads={leads.items}
           isLoading={leads.isPending}
           isRefreshing={leads.isRefreshing}
+          emptyAction={campaignLinksAction}
         />
       ) : (
         <LeadList
           leads={leads.items}
           isLoading={leads.isPending}
           isRefreshing={leads.isRefreshing}
+          emptyAction={campaignLinksAction}
         />
       )}
       <ListFooter

@@ -67,7 +67,14 @@ export function ProposalNewPage() {
               <EmptyState
                 icon={FileText}
                 title="Nenhum modelo de proposta ativo"
-                description="Crie um modelo de proposta na gestão antes de emitir."
+                description="Crie um modelo de proposta (ou ative um) antes de emitir."
+                action={
+                  <Button asChild size="sm">
+                    <Link to={ROUTES.modelsProposals}>
+                      Ir para modelos de proposta
+                    </Link>
+                  </Button>
+                }
               />
             ) : (
               <List className="space-y-2">

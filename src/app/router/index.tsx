@@ -28,7 +28,11 @@ import {
   LeadNewPage,
   ModelsContractsPage,
   ModelsInspectionPage,
+  ModelsProposalsPage,
   ModelsSectionPage,
+  ProposalTemplateEditPage,
+  ProposalTemplateNewPage,
+  CrmLinksPage,
   PlansPage,
   ProjectionsPage,
   PlanEditPage,
@@ -142,6 +146,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.customerEdit, element: <CustomerEditPage /> },
       { path: ROUTES.crm, element: <CrmPage /> },
       { path: ROUTES.leadNew, element: <LeadNewPage /> },
+      { path: ROUTES.crmLinks, element: <CrmLinksPage /> },
       { path: ROUTES.leadDetail, element: <LeadDetailPage /> },
       { path: ROUTES.reimbursements, element: <ReimbursementsPage /> },
       { path: ROUTES.suppliers, element: <SuppliersPage /> },
@@ -174,14 +179,24 @@ export const router = createBrowserRouter([
           <ModelsSectionPage
             preload={[
               ModelsContractsPage.preload,
+              ModelsProposalsPage.preload,
               ModelsInspectionPage.preload,
             ]}
           />
         ),
         children: [
           { path: ROUTES.models, element: <ModelsContractsPage /> },
+          { path: ROUTES.modelsProposals, element: <ModelsProposalsPage /> },
           { path: ROUTES.modelsInspection, element: <ModelsInspectionPage /> },
         ],
+      },
+      {
+        path: ROUTES.proposalTemplateNew,
+        element: <ProposalTemplateNewPage />,
+      },
+      {
+        path: ROUTES.proposalTemplateEdit,
+        element: <ProposalTemplateEditPage />,
       },
       {
         path: ROUTES.contractTemplateNew,
