@@ -12,6 +12,7 @@ import {
   DebtOverview,
   DebtOverviewSkeleton,
 } from "@/components/organisms/debt-overview";
+import { DebtPaymentDialog } from "@/components/organisms/debt-payment-dialog";
 import { DebtPaymentsCard } from "@/components/organisms/debt-payments-card";
 import {
   DebtPlanCard,
@@ -67,6 +68,7 @@ export function DebtDetailPage() {
             <DebtPaymentsCard
               payments={debt.data.payments}
               debtId={debt.data.id}
+              action={<DebtPaymentDialog debt={debt.data} />}
             />
           }
           documents={

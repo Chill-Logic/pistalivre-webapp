@@ -1,4 +1,5 @@
 import { Receipt } from "lucide-react";
+import type { ReactNode } from "react";
 import { Box } from "@/components/atoms/box";
 import {
   Card,
@@ -10,6 +11,7 @@ import { List, ListItem } from "@/components/atoms/list";
 import { Text } from "@/components/atoms/text";
 import { DocumentItem } from "@/components/molecules/document-item";
 import { EmptyState } from "@/components/molecules/empty-state";
+import { DebtPaymentDeleteButton } from "@/components/organisms/debt-payment-delete-button";
 import { DocumentUploadDialog } from "@/components/organisms/document-upload-dialog";
 import { ManageDocumentActions } from "@/components/organisms/documents-card";
 import { queryKeys } from "@/constants/query-keys";
@@ -20,22 +22,28 @@ import { formatCalendarDate, formatCurrency } from "@/utils/format";
 type DebtPaymentsCardProps = {
   payments: DebtPayment[];
   /**
-   * Present = the staff can attach receipts to a payment (and rename or
-   * delete them). The payment itself stays read-only: registering or
-   * editing one is a money write.
+   * Present = the staff manages it: delete a payment, attach receipts to it
+   * (rename or delete them). There is no edit: delete and log again.
    */
   debtId?: string;
+  /** "Registrar pagamento", in the header. */
+  action?: ReactNode;
 };
 
 /** Payment ledger with each payment's receipts. */
-export function DebtPaymentsCard({ payments, debtId }: DebtPaymentsCardProps) {
+export function DebtPaymentsCard({
+  payments,
+  debtId,
+  action,
+}: DebtPaymentsCardProps) {
   const { view, download } = useFileActions();
   const invalidate = debtId ? queryKeys.debts.detail(debtId) : null;
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
         <CardTitle className="text-base">Pagamentos</CardTitle>
+        {action}
       </CardHeader>
       <CardContent>
         {payments.length === 0 ? (
@@ -48,9 +56,14 @@ export function DebtPaymentsCard({ payments, debtId }: DebtPaymentsCardProps) {
                   <Text weight="medium">
                     {formatCalendarDate(payment.paidAt)}
                   </Text>
-                  <Text weight="semibold" className="tabular-nums">
-                    {formatCurrency(payment.amount)}
-                  </Text>
+                  <Box className="flex items-center gap-1">
+                    <Text weight="semibold" className="tabular-nums">
+                      {formatCurrency(payment.amount)}
+                    </Text>
+                    {invalidate && (
+                      <DebtPaymentDeleteButton payment={payment} />
+                    )}
+                  </Box>
                 </Box>
                 {(payment.surcharge > 0 || payment.discount > 0) && (
                   <Text size="xs" tone="muted">

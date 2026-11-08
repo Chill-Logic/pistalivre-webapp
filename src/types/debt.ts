@@ -107,3 +107,39 @@ export type DebtDetail = DebtListItem & {
 export type Debts = Paginated<DebtListItem> & { summary: DebtsSummary };
 
 export type DebtFilters = { page: number; pageSize: number };
+
+/** Body of POST /debts/:id/payments (dates yyyy-mm-dd). */
+export type DebtPaymentInput = {
+  amount: number;
+  paidAt: string;
+  surcharge?: number;
+  discount?: number;
+  barcode?: string;
+  notes?: string;
+};
+
+/** A lender as sent: one of our records (by id) or a free name. */
+export type DebtLenderInput = {
+  type: DebtLender["type"];
+  customerId?: string;
+  supplierId?: string;
+  userId?: string;
+  name?: string;
+};
+
+/** Body of POST/PUT /debts (PUT replaces the whole debt). */
+export type DebtInput = {
+  lenders: DebtLenderInput[];
+  kind: DebtListItem["kind"];
+  vehicleId: string | null;
+  countsAsCost: boolean;
+  principal: number;
+  interestPercent: number | null;
+  interestPeriod: DebtListItem["interestPeriod"];
+  interestMode: DebtListItem["interestMode"];
+  interestBase: DebtListItem["interestBase"];
+  borrowedAt: string;
+  dueDate: string | null;
+  installments: number;
+  notes: string | null;
+};
