@@ -17,6 +17,8 @@ import {
   ListRowSkeleton,
 } from "@/components/organisms/list-card";
 import { QueryBoundary } from "@/components/organisms/query-boundary";
+import { WalletAddDialog } from "@/components/organisms/wallet-add-dialog";
+import { WalletKeyActions } from "@/components/organisms/wallet-key-actions";
 import { HOME_REIMBURSEMENTS_LIMIT } from "@/constants/portal";
 import { useMyCharges } from "@/hooks/api/cliente/finance/useMyCharges";
 import { useMyInvoices } from "@/hooks/api/cliente/finance/useMyInvoices";
@@ -28,7 +30,8 @@ import { pluralize } from "@/utils/text";
 /**
  * Portal home = the renter's financial hub: rentals, every charge (with pix
  * to pay), authorized invoices, pix keys and reimbursement requests. Each
- * section loads on its own. Read-only for now.
+ * section loads on its own. The renter manages pix keys and asks for
+ * refunds here; paying is through the pix/invoice of each charge.
  */
 export function PortalHomePage() {
   const rentals = useMyRentals();
@@ -138,9 +141,14 @@ export function PortalHomePage() {
             title="Minha carteira"
             empty="Nenhuma chave pix cadastrada. É para ela que vão os seus reembolsos."
             isEmpty={items.length === 0}
+            actions={<WalletAddDialog />}
           >
             {items.map((walletKey) => (
-              <WalletKeyItem key={walletKey.id} walletKey={walletKey} />
+              <WalletKeyItem
+                key={walletKey.id}
+                walletKey={walletKey}
+                actions={<WalletKeyActions walletKey={walletKey} />}
+              />
             ))}
           </ListCard>
         )}

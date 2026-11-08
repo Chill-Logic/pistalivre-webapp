@@ -16,6 +16,8 @@ type ListCardProps = {
   isEmpty: boolean;
   /** Under the rows (e.g. "and 3 more on the rental page"). */
   footer?: ReactNode;
+  /** Buttons on the right of the title (e.g. "Adicionar chave"). */
+  actions?: ReactNode;
   children: ReactNode;
 };
 
@@ -25,12 +27,14 @@ export function ListCard({
   empty,
   isEmpty,
   footer,
+  actions,
   children,
 }: ListCardProps) {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
         <CardTitle className="text-base">{title}</CardTitle>
+        {actions && <Box className="flex shrink-0 gap-2">{actions}</Box>}
       </CardHeader>
       <CardContent className="space-y-2">
         {isEmpty ? (

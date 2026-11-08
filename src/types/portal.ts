@@ -127,3 +127,17 @@ export type PortalRentalSections = {
   maintenances: PortalMaintenance[];
   reimbursements: Reimbursement[];
 };
+
+/** Who a pix key belongs to, from the DICT, before saving it. */
+export type PixKeyPreview = {
+  ownerName: string;
+  bank: string | null;
+  /** Masked by the API. */
+  ownerDocument: string | null;
+};
+
+export type WalletKeyInput = {
+  pixKeyType: string;
+  pixKey: string;
+  label?: string;
+};

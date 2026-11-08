@@ -1,4 +1,5 @@
 import { BadgeCheck, KeyRound } from "lucide-react";
+import type { ReactNode } from "react";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Text } from "@/components/atoms/text";
@@ -7,7 +8,14 @@ import { useLabels } from "@/hooks/ui/useLabels";
 import type { WalletKey } from "@/types/portal";
 
 /** A validated pix key: the owner and bank confirmed on registration. */
-export function WalletKeyItem({ walletKey }: { walletKey: WalletKey }) {
+export function WalletKeyItem({
+  walletKey,
+  actions,
+}: {
+  walletKey: WalletKey;
+  /** Make default / remove. */
+  actions?: ReactNode;
+}) {
   const { label } = useLabels();
   const owner = [walletKey.ownerName, walletKey.bank].filter(Boolean);
 
@@ -38,6 +46,9 @@ export function WalletKeyItem({ walletKey }: { walletKey: WalletKey }) {
           </Text>
         )}
       </Box>
+      {actions && (
+        <Box className="flex shrink-0 items-center gap-1">{actions}</Box>
+      )}
     </Box>
   );
 }

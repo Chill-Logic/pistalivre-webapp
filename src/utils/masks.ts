@@ -53,3 +53,25 @@ export function maskDate(value: string) {
   if (c.length > 4) out += `/${c.slice(4, 8)}`;
   return out;
 }
+
+/** 00.000.000/0000-00 (digits only; the API also takes the alphanumeric one). */
+export function maskCnpj(value: string) {
+  const c = value
+    .replace(/[^0-9A-Za-z]/g, "")
+    .toUpperCase()
+    .slice(0, 14);
+  let out = c.slice(0, 2);
+  if (c.length > 2) out += `.${c.slice(2, 5)}`;
+  if (c.length > 5) out += `.${c.slice(5, 8)}`;
+  if (c.length > 8) out += `/${c.slice(8, 12)}`;
+  if (c.length > 12) out += `-${c.slice(12, 14)}`;
+  return out;
+}
+
+/** Pix key as the renter types it: CPF/CNPJ/phone masked, e-mail/random as is. */
+export function maskPixKey(type: string, value: string) {
+  if (type === "CPF") return maskCpf(value);
+  if (type === "CNPJ") return maskCnpj(value);
+  if (type === "PHONE") return maskPhone(value);
+  return value.trim();
+}
