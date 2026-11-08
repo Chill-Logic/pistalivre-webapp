@@ -1,7 +1,7 @@
 import axios from "axios";
 import { env } from "@/config/env";
 import { authToken } from "@/helpers/auth-token";
-import { toApiError } from "@/helpers/api-error";
+import { toApiError, withJsonErrorBody } from "@/helpers/api-error";
 
 /** Single axios instance for the API: bearer auth + normalized errors. */
 export const http = axios.create({
@@ -18,8 +18,8 @@ http.interceptors.request.use((config) => {
 
 http.interceptors.response.use(
   (response) => response,
-  (error) => {
-    const apiError = toApiError(error);
+  async (error) => {
+    const apiError = toApiError(await withJsonErrorBody(error));
     // Expired/invalid session: drop the token; the route guard sends to login.
     if (apiError.status === 401) authToken.clear();
     return Promise.reject(apiError);

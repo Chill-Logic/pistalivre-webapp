@@ -29,6 +29,23 @@ function isApiErrorBody(data: unknown): data is ApiErrorBody {
   );
 }
 
+/**
+ * A request with `responseType: "blob"` (PDF, spreadsheet) gets its error
+ * body as a Blob too: read it back as JSON so the server's message (e.g.
+ * "Integração do Inter incompleta") reaches the person.
+ */
+export async function withJsonErrorBody(error: unknown) {
+  if (!isAxiosError(error)) return error;
+  const response = error.response;
+  if (!response || !(response.data instanceof Blob)) return error;
+  try {
+    response.data = JSON.parse(await response.data.text());
+  } catch {
+    // Not JSON: keep the blob, the generic message applies.
+  }
+  return error;
+}
+
 /** Normalize anything thrown by the HTTP layer into an `ApiError` (PT-BR message). */
 export function toApiError(error: unknown): ApiError {
   if (error instanceof ApiError) return error;

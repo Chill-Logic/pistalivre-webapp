@@ -1,7 +1,10 @@
 import { Box } from "@/components/atoms/box";
 import { Pagination } from "@/components/molecules/pagination";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
+import { BankStatementPdfButton } from "@/components/organisms/bank-statement-pdf-button";
 import { QueryError } from "@/components/organisms/query-error";
+import { StatementExportDialog } from "@/components/organisms/statement-export-dialog";
+import { StatementExportsCard } from "@/components/organisms/statement-exports-card";
 import { StatementFilters } from "@/components/organisms/statement-filters";
 import {
   StatementList,
@@ -15,7 +18,10 @@ import { showsSourcePerLine } from "@/helpers/statement";
 import { useStatement } from "@/hooks/api/gestao/finance/useStatement";
 import { useStatementFilters } from "@/hooks/ui/useStatementFilters";
 
-/** Consolidated statement, read-only (notes/internal flags are writes). */
+/**
+ * Consolidated statement (notes/internal flags are the writes), the
+ * accountant's spreadsheets with their history and the bank's official PDF.
+ */
 export function FinanceStatementPage() {
   const { filters, period, setPeriod, setRange, setSource, setPage } =
     useStatementFilters();
@@ -24,6 +30,16 @@ export function FinanceStatementPage() {
 
   return (
     <Box className="space-y-4 md:space-y-6">
+      <Box className="flex flex-wrap justify-end gap-2">
+        {filters.source !== "ASAAS" && (
+          <BankStatementPdfButton start={filters.start} end={filters.end} />
+        )}
+        <StatementExportDialog
+          start={filters.start}
+          end={filters.end}
+          source={filters.source}
+        />
+      </Box>
       <StatementFilters
         period={period}
         source={filters.source}
@@ -63,6 +79,7 @@ export function FinanceStatementPage() {
           )}
         </>
       )}
+      <StatementExportsCard />
     </Box>
   );
 }

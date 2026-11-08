@@ -87,6 +87,9 @@ export const queryKeys = {
     toCollect: () => [...queryKeys.finance.all, "to-collect"] as const,
     statement: (filters: StatementFilters) =>
       [...queryKeys.finance.all, "statement", filters] as const,
+    statementExports: () =>
+      [...queryKeys.finance.all, "statement-exports"] as const,
+    transfers: () => [...queryKeys.finance.all, "transfers"] as const,
   },
   debts: {
     all: ["debts"] as const,

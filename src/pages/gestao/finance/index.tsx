@@ -13,6 +13,10 @@ import { QueryBoundary } from "@/components/organisms/query-boundary";
 import { StandaloneChargeDialog } from "@/components/organisms/standalone-charge-dialog";
 import { StandaloneInvoiceDialog } from "@/components/organisms/standalone-invoice-dialog";
 import {
+  TransfersCard,
+  TransfersCardSkeleton,
+} from "@/components/organisms/transfers-card";
+import {
   ToCollectTimeline,
   ToCollectTimelineSkeleton,
 } from "@/components/organisms/to-collect-timeline";
@@ -20,6 +24,7 @@ import { FinanceLayout } from "@/components/templates/finance-layout";
 import { useFinanceBalances } from "@/hooks/api/gestao/finance/useFinanceBalances";
 import { useFinanceDelinquency } from "@/hooks/api/gestao/finance/useFinanceDelinquency";
 import { useFinanceToCollect } from "@/hooks/api/gestao/finance/useFinanceToCollect";
+import { useTransfers } from "@/hooks/api/gestao/finance/useTransfers";
 
 /**
  * Finance overview + issuing (charge, NF, payment received outside Asaas)
@@ -30,6 +35,7 @@ export function FinancePage() {
   const balances = useFinanceBalances();
   const toCollect = useFinanceToCollect();
   const delinquency = useFinanceDelinquency();
+  const transfers = useTransfers();
 
   return (
     <Box className="space-y-4 md:space-y-6">
@@ -65,6 +71,15 @@ export function FinancePage() {
             skeleton={<DelinquencySummarySkeleton />}
           >
             {(data) => <DelinquencySummary delinquency={data} />}
+          </QueryBoundary>
+        }
+        transfers={
+          <QueryBoundary
+            query={transfers}
+            label="Carregando transferências emitidas…"
+            skeleton={<TransfersCardSkeleton />}
+          >
+            {(data) => <TransfersCard transfers={data} />}
           </QueryBoundary>
         }
       />
