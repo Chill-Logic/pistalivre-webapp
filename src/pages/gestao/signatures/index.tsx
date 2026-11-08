@@ -1,4 +1,7 @@
+import { Link2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
 import { PageHeader } from "@/components/molecules/page-header";
 import { ViewToggle } from "@/components/molecules/view-toggle";
 import { ListFooter } from "@/components/organisms/list-footer";
@@ -7,6 +10,7 @@ import { SignatureFilters } from "@/components/organisms/signature-filters";
 import { SignatureList } from "@/components/organisms/signature-list";
 import { SignatureTable } from "@/components/organisms/signature-table";
 import { QueryError } from "@/components/organisms/query-error";
+import { ROUTES } from "@/constants/routes";
 import { useSignatureList } from "@/hooks/api/gestao/signatures/useSignatureList";
 import { useListView } from "@/hooks/ui/useListView";
 import { useSignatureFilters } from "@/hooks/ui/useSignatureFilters";
@@ -24,6 +28,12 @@ export function SignaturesPage() {
         actions={
           <>
             <ViewToggle view={view} onChange={setView} />
+            <Button asChild variant="outline" size="sm">
+              <Link to={ROUTES.signatureLink}>
+                <Link2 />
+                Vincular envelope
+              </Link>
+            </Button>
             <SignatureCreateDialog />
           </>
         }

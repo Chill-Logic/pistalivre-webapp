@@ -46,6 +46,7 @@ export const ROUTES = {
   proposalDetail: `${GESTAO}/propostas/:id`,
   projections: `${GESTAO}/projecoes`,
   signatures: `${GESTAO}/assinaturas`,
+  signatureLink: `${GESTAO}/assinaturas/vincular`,
   signatureDetail: `${GESTAO}/assinaturas/:id`,
   models: `${GESTAO}/modelos`,
   contractTemplateNew: `${GESTAO}/modelos/contratos/novo`,

@@ -63,6 +63,7 @@ import {
   ProposalNewPage,
   SignaturesPage,
   SignatureDetailPage,
+  SignatureLinkPage,
 } from "./pages";
 import { ROUTES } from "@/constants/routes";
 import { LoginPage } from "@/pages/gestao/login";
@@ -132,6 +133,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.proposalDetail, element: <ProposalDetailPage /> },
       { path: ROUTES.projections, element: <ProjectionsPage /> },
       { path: ROUTES.signatures, element: <SignaturesPage /> },
+      { path: ROUTES.signatureLink, element: <SignatureLinkPage /> },
       { path: ROUTES.signatureDetail, element: <SignatureDetailPage /> },
       {
         element: (

@@ -237,6 +237,10 @@ export const SignaturesPage = lazyPage(
   () => import("@/pages/gestao/signatures"),
   "SignaturesPage",
 );
+export const SignatureLinkPage = lazyPage(
+  () => import("@/pages/gestao/signature-link"),
+  "SignatureLinkPage",
+);
 export const SignatureDetailPage = lazyPage(
   () => import("@/pages/gestao/signature-detail"),
   "SignatureDetailPage",
