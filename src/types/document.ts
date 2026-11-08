@@ -20,7 +20,8 @@ export type DocumentOwnerType =
   | "DEBT"
   | "DEBT_PAYMENT"
   | "PAYMENT"
-  | "LEAD_ACTIVITY";
+  | "LEAD_ACTIVITY"
+  | "REIMBURSEMENT";
 
 export type DocumentOwner = { type: DocumentOwnerType; id: string };
 

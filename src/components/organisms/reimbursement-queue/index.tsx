@@ -9,6 +9,7 @@ import {
   StaffReimbursementCard,
   StaffReimbursementCardSkeleton,
 } from "@/components/molecules/staff-reimbursement-card";
+import { ReimbursementPaidDialog } from "@/components/organisms/reimbursement-paid-dialog";
 import { ReimbursementRejectDialog } from "@/components/organisms/reimbursement-reject-dialog";
 import type {
   ReimbursementMissingItem,
@@ -50,13 +51,24 @@ export function ReimbursementQueue({
               <StaffReimbursementCard
                 reimbursement={reimbursement}
                 actions={
-                  missingItems && reimbursement.status === "PENDING" ? (
-                    <ReimbursementRejectDialog
-                      reimbursementId={reimbursement.id}
-                      customerName={reimbursement.customer.name}
-                      amount={reimbursement.amount}
-                      missingItems={missingItems}
-                    />
+                  reimbursement.status === "PENDING" ||
+                  reimbursement.status === "FAILED" ? (
+                    <>
+                      {missingItems && reimbursement.status === "PENDING" && (
+                        <ReimbursementRejectDialog
+                          reimbursementId={reimbursement.id}
+                          customerName={reimbursement.customer.name}
+                          amount={reimbursement.amount}
+                          missingItems={missingItems}
+                        />
+                      )}
+                      <ReimbursementPaidDialog
+                        reimbursementId={reimbursement.id}
+                        customerName={reimbursement.customer.name}
+                        amount={reimbursement.amount}
+                        pixKey={reimbursement.destination.pixKey}
+                      />
+                    </>
                   ) : undefined
                 }
               />

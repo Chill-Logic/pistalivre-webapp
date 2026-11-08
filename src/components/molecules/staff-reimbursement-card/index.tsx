@@ -28,7 +28,7 @@ export function StaffReimbursementCard({
   actions,
 }: {
   reimbursement: StaffReimbursement;
-  /** Review buttons (only on pending requests). */
+  /** Review buttons (pending: reject/paid; failed: paid). */
   actions?: ReactNode;
 }) {
   const { label } = useLabels();
@@ -104,6 +104,24 @@ export function StaffReimbursementCard({
             <Badge variant="warning">Não validado</Badge>
           )}
         </Box>
+
+        {reimbursement.paidAt && (
+          <Box className="rounded-md bg-success px-3 py-2">
+            <Text size="xs" className="text-success-foreground">
+              Pago por fora em {formatCalendarDate(reimbursement.paidAt)}
+              {reimbursement.paidAmount != null &&
+                ` · ${formatCurrency(reimbursement.paidAmount)}`}
+              {reimbursement.paidAmount != null &&
+                reimbursement.paidAmount !== reimbursement.amount &&
+                ` (pedido: ${formatCurrency(reimbursement.amount)})`}
+            </Text>
+            {reimbursement.paidNote && (
+              <Text size="xs" className="break-words text-success-foreground">
+                {reimbursement.paidNote}
+              </Text>
+            )}
+          </Box>
+        )}
 
         {reimbursement.staffNote && (
           <Text size="xs" tone="muted" className="break-words">

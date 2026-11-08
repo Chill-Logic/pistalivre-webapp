@@ -1,13 +1,14 @@
 import { http } from "@/services/http/client";
 import type {
+  MarkReimbursementPaidInput,
   RejectReimbursementInput,
   StaffReimbursements,
 } from "@/types/staff-reimbursement";
 
 /**
- * Review queue. Rejecting is a record (the customer sees why and can ask
- * again); approving/paying never happens here — money does not leave
- * through the system (owner's call).
+ * Review queue. Rejecting and "paid outside" are records: the pix is sent
+ * by hand in Asaas/the bank — money never leaves through the system
+ * (owner's call), so there is no approve/pay.
  */
 export const reimbursementsService = {
   async list() {
@@ -16,5 +17,8 @@ export const reimbursementsService = {
   },
   async reject(id: string, input: RejectReimbursementInput) {
     await http.post(`/reimbursements/${id}/reject`, input);
+  },
+  async markPaid(id: string, input: MarkReimbursementPaidInput) {
+    await http.post(`/reimbursements/${id}/paid`, input);
   },
 };

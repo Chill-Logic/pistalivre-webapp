@@ -29,6 +29,10 @@ export type StaffReimbursement = {
   } | null;
   documents: DocumentFile[];
   transferId: string | null;
+  /** Paid OUTSIDE the system (calendar date), when recorded. */
+  paidAt: string | null;
+  paidAmount: number | null;
+  paidNote: string | null;
   reviewedAt: string | null;
   createdAt: string;
 };
@@ -44,5 +48,12 @@ export type StaffReimbursements = {
 
 export type RejectReimbursementInput = {
   missing: string[];
+  note: string | null;
+};
+
+/** Body of POST /reimbursements/:id/paid (`paidAt` = yyyy-mm-dd). */
+export type MarkReimbursementPaidInput = {
+  paidAt: string;
+  paidAmount: number;
   note: string | null;
 };
