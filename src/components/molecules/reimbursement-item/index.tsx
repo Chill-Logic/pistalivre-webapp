@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Box } from "@/components/atoms/box";
 import { Text } from "@/components/atoms/text";
 import { ReimbursementStatusBadge } from "@/components/molecules/reimbursement-status-badge";
@@ -8,8 +9,11 @@ import { formatCurrency, formatDate } from "@/utils/format";
 /** A reimbursement request; a refused one stands out with the reason. */
 export function ReimbursementItem({
   reimbursement,
+  actions,
 }: {
   reimbursement: Reimbursement;
+  /** E.g. "Pedir reembolso" / "Pedir de novo". */
+  actions?: ReactNode;
 }) {
   const rejected = reimbursement.status === "REJECTED";
   const meta = [
@@ -46,6 +50,9 @@ export function ReimbursementItem({
           {rejected ? "Motivo da recusa: " : "Observação: "}
           {reimbursement.staffNote}
         </Text>
+      )}
+      {actions && (
+        <Box className="flex flex-wrap justify-end gap-2">{actions}</Box>
       )}
     </Box>
   );

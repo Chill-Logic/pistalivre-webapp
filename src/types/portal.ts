@@ -141,3 +141,15 @@ export type WalletKeyInput = {
   pixKey: string;
   label?: string;
 };
+
+/**
+ * POST /me/reimbursements. The pix destination is a key of the wallet
+ * (never typed here); with a maintenance the amount is locked to its cost.
+ */
+export type ReimbursementRequestInput = {
+  rentalId: string;
+  walletMethodId: string;
+  reason: string;
+  amount?: number;
+  maintenanceId?: string;
+};

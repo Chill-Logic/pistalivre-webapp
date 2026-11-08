@@ -17,6 +17,7 @@ import {
   ListRowSkeleton,
 } from "@/components/organisms/list-card";
 import { QueryBoundary } from "@/components/organisms/query-boundary";
+import { ReimbursementRequestDialog } from "@/components/organisms/reimbursement-request-dialog";
 import { WalletAddDialog } from "@/components/organisms/wallet-add-dialog";
 import { WalletKeyActions } from "@/components/organisms/wallet-key-actions";
 import { HOME_REIMBURSEMENTS_LIMIT } from "@/constants/portal";
@@ -39,6 +40,10 @@ export function PortalHomePage() {
   const invoices = useMyInvoices();
   const wallet = useMyWallet();
   const reimbursements = useMyReimbursements();
+  // Refund requests need an active rental (the API also blocks closed ones).
+  const activeRentals = (rentals.data ?? []).filter(
+    (rental) => rental.status === "ACTIVE",
+  );
 
   return (
     <Box className="space-y-6">
@@ -119,13 +124,35 @@ export function PortalHomePage() {
             title="Reembolsos"
             empty="Nenhum pedido de reembolso."
             isEmpty={items.length === 0}
+            actions={
+              activeRentals.length > 0 && (
+                <ReimbursementRequestDialog rentals={activeRentals} />
+              )
+            }
             footer={
               items.length > HOME_REIMBURSEMENTS_LIMIT &&
               `Mais ${pluralize(items.length - HOME_REIMBURSEMENTS_LIMIT, "pedido", "pedidos")} na página de cada locação.`
             }
           >
             {items.slice(0, HOME_REIMBURSEMENTS_LIMIT).map((item) => (
-              <ReimbursementItem key={item.id} reimbursement={item} />
+              <ReimbursementItem
+                key={item.id}
+                reimbursement={item}
+                actions={
+                  item.status === "REJECTED" &&
+                  activeRentals.some(
+                    (rental) => rental.id === item.rental?.id,
+                  ) && (
+                    <ReimbursementRequestDialog
+                      rentalId={item.rental?.id}
+                      maintenanceId={item.maintenanceId ?? undefined}
+                      fixedAmount={item.maintenanceId ? item.amount : undefined}
+                      defaultReason={item.reason}
+                      triggerLabel="Pedir de novo"
+                    />
+                  )
+                }
+              />
             ))}
           </ListCard>
         )}

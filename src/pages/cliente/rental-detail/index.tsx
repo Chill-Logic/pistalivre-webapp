@@ -65,7 +65,7 @@ export function PortalRentalDetailPage() {
               label="Carregando cobranças e documentos…"
               skeleton={<PortalRentalSectionsSkeleton />}
             >
-              {(data) => <PortalRentalSections sections={data} />}
+              {(data) => <PortalRentalSections rentalId={id} sections={data} />}
             </QueryBoundary>
           }
         />

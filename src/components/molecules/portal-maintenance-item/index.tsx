@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Box } from "@/components/atoms/box";
 import { Badge } from "@/components/atoms/badge";
 import { Text } from "@/components/atoms/text";
@@ -11,8 +12,11 @@ import { pluralize } from "@/utils/text";
 /** A maintenance on the rental; the renter's own show their reimbursement. */
 export function PortalMaintenanceItem({
   maintenance,
+  actions,
 }: {
   maintenance: PortalMaintenance;
+  /** E.g. "Pedir reembolso" / "Pedir de novo". */
+  actions?: ReactNode;
 }) {
   const { label } = useLabels();
   const services = maintenance.services.map((code) =>
@@ -67,6 +71,9 @@ export function PortalMaintenanceItem({
               </Text>
             )}
         </Box>
+      )}
+      {actions && (
+        <Box className="flex flex-wrap justify-end gap-2">{actions}</Box>
       )}
     </Box>
   );
