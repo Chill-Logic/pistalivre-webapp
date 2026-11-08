@@ -4,6 +4,7 @@ import type { InspectionFilters } from "@/types/inspection";
 import type { MaintenanceFilters } from "@/types/maintenance";
 import type { RentalFilters } from "@/types/rental";
 import type { StatementFilters } from "@/types/statement";
+import type { InstallmentPlanParams } from "@/types/charge";
 import type { SupplierFilters } from "@/types/supplier";
 import type { UserFilters } from "@/types/user";
 import type { VehicleFilters } from "@/types/vehicle";
@@ -32,6 +33,8 @@ export const queryKeys = {
       [...queryKeys.rentals.all, "list", filters] as const,
     detail: (id: string) => [...queryKeys.rentals.all, "detail", id] as const,
     charges: (id: string) => [...queryKeys.rentals.all, "charges", id] as const,
+    cautionPlan: (id: string) =>
+      [...queryKeys.rentals.all, "caution-plan", id] as const,
   },
   customers: {
     all: ["customers"] as const,
@@ -140,6 +143,8 @@ export const queryKeys = {
     all: ["projections"] as const,
     seed: (sim: string) => [...queryKeys.projections.all, "seed", sim] as const,
   },
+  installmentPlan: (params: InstallmentPlanParams) =>
+    ["installment-plan", params] as const,
   dashboard: {
     all: ["dashboard"] as const,
   },

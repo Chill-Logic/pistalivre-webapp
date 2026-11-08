@@ -1,8 +1,14 @@
 import { http } from "@/services/http/client";
 import type {
+  CautionChargesInput,
+  CautionPlanItem,
+  ChargeBatchResult,
+  ChargePlanItem,
   ChargeSettleInput,
   ChargeSettlementInput,
   ChargeUpdateInput,
+  InstallmentChargesInput,
+  InstallmentPlanParams,
   RentalChargeInput,
 } from "@/types/charge";
 import type { Charge } from "@/types/rental";
@@ -46,6 +52,45 @@ export const chargesService = {
   },
   async correctSettlement(id: string, input: ChargeSettlementInput) {
     const { data } = await http.put<Charge>(`/charges/${id}/settlement`, input);
+    return data;
+  },
+  /** The deposit the rental's settings imply (nothing is saved). */
+  async cautionPlan(rentalId: string) {
+    const { data } = await http.get<{ items: CautionPlanItem[] }>(
+      `/rentals/${rentalId}/charges/caution-plan`,
+    );
+    return data.items;
+  },
+  async createCaution(
+    rentalId: string,
+    input: CautionChargesInput,
+    key: string,
+  ) {
+    const { data } = await http.post<ChargeBatchResult>(
+      `/rentals/${rentalId}/charges/caution`,
+      input,
+      idempotent(key),
+    );
+    return data;
+  },
+  /** The management app's split (last one takes the cents); nothing saved. */
+  async installmentPlan(params: InstallmentPlanParams) {
+    const { data } = await http.get<{ items: ChargePlanItem[] }>(
+      "/charges/installment-plan",
+      { params },
+    );
+    return data.items;
+  },
+  async createInstallments(
+    rentalId: string,
+    input: InstallmentChargesInput,
+    key: string,
+  ) {
+    const { data } = await http.post<ChargeBatchResult>(
+      `/rentals/${rentalId}/charges/installments`,
+      input,
+      idempotent(key),
+    );
     return data;
   },
   async setReferenceDate(id: string, referenceDate: string | null) {

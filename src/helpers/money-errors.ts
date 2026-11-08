@@ -23,3 +23,16 @@ export function isNotRecorded(error: unknown) {
 }
 
 export type { ApiError };
+
+/**
+ * Batch 422s come per line (`items.2.dueDate`): the message of each line,
+ * by its index in the `items` that were sent.
+ */
+export function itemFieldErrors(fields: Record<string, string> = {}) {
+  const byIndex: Record<number, string> = {};
+  for (const [key, message] of Object.entries(fields)) {
+    const match = /^items\.(\d+)\./.exec(key);
+    if (match) byIndex[Number(match[1])] = message;
+  }
+  return byIndex;
+}

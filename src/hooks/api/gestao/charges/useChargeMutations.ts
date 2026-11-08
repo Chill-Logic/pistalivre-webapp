@@ -3,9 +3,12 @@ import { toast } from "sonner";
 import { queryKeys } from "@/constants/query-keys";
 import { chargesService } from "@/services/api/gestao/charges.service";
 import type {
+  CautionChargesInput,
+  ChargeBatchResult,
   ChargeSettleInput,
   ChargeSettlementInput,
   ChargeUpdateInput,
+  InstallmentChargesInput,
   RentalChargeInput,
 } from "@/types/charge";
 
@@ -94,6 +97,53 @@ export function useChargeReferenceDate(id: string, rentalId: string | null) {
     onSuccess: () => {
       refresh(rentalId);
       toast.success("Referência atualizada");
+    },
+  });
+}
+
+/** "2 cobranças emitidas · 1 já existia" (what a batch did). */
+function batchToast(result: ChargeBatchResult) {
+  const created = result.created.length;
+  const skipped = result.skipped?.length ?? 0;
+  const parts = [
+    `${created} ${created === 1 ? "cobrança emitida" : "cobranças emitidas"}`,
+    skipped > 0 &&
+      `${skipped} ${skipped === 1 ? "já existia" : "já existiam"} (pulada${skipped === 1 ? "" : "s"})`,
+  ].filter(Boolean);
+  if (result.failed?.length) toast.warning(parts.join(" · "));
+  else toast.success(parts.join(" · "));
+}
+
+/** Deposit charges from the plan (dates as edited). 207 keeps the failures. */
+export function useCreateCautionCharges(rentalId: string) {
+  const refresh = useRefreshAfterCharge();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ input, key }: { input: CautionChargesInput; key: string }) =>
+      chargesService.createCaution(rentalId, input, key),
+    onSuccess: (result) => {
+      refresh(rentalId);
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.rentals.cautionPlan(rentalId),
+      });
+      batchToast(result);
+    },
+  });
+}
+
+export function useCreateInstallmentCharges(rentalId: string) {
+  const refresh = useRefreshAfterCharge();
+  return useMutation({
+    mutationFn: ({
+      input,
+      key,
+    }: {
+      input: InstallmentChargesInput;
+      key: string;
+    }) => chargesService.createInstallments(rentalId, input, key),
+    onSuccess: (result) => {
+      refresh(rentalId);
+      batchToast(result);
     },
   });
 }
