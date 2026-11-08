@@ -6,6 +6,7 @@ import type {
   RentalDetail,
   RentalFilters,
   RentalInput,
+  RentalRecord,
   RentalStatus,
   RentalListItem,
 } from "@/types/rental";
@@ -22,15 +23,15 @@ export const rentalsService = {
     return data;
   },
   async create(input: RentalInput) {
-    const { data } = await http.post<RentalDetail>("/rentals", input);
+    const { data } = await http.post<RentalRecord>("/rentals", input);
     return data;
   },
   async update(id: string, input: RentalInput) {
-    const { data } = await http.put<RentalDetail>(`/rentals/${id}`, input);
+    const { data } = await http.put<RentalRecord>(`/rentals/${id}`, input);
     return data;
   },
   async changeStatus(id: string, status: RentalStatus) {
-    const { data } = await http.patch<RentalDetail>(`/rentals/${id}/status`, {
+    const { data } = await http.patch<RentalRecord>(`/rentals/${id}/status`, {
       status,
     });
     return data;

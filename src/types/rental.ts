@@ -48,7 +48,8 @@ export type Caution = {
   installments: CautionInstallment[] | null;
 };
 
-export type RentalDetail = RentalListItem & {
+/** What the writes (POST/PUT/PATCH) answer: the detail without documents. */
+export type RentalRecord = RentalListItem & {
   /** MANUAL = registered retroactively. */
   source: "SYSTEM" | "MANUAL";
   notes: string | null;
@@ -63,6 +64,9 @@ export type RentalDetail = RentalListItem & {
   createdAt: string;
   updatedAt: string;
 };
+
+/** GET /rentals/:id (documents come only in the read). */
+export type RentalDetail = RentalRecord & { documents: DocumentFile[] };
 
 export type RentalFilters = {
   page: number;

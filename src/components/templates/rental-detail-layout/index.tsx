@@ -10,6 +10,7 @@ type RentalDetailLayoutProps = {
   charges: ReactNode;
   maintenances: ReactNode;
   inspections: ReactNode;
+  documents: ReactNode;
 };
 
 /** Grid shared by the rental page and its skeleton. */
@@ -21,6 +22,7 @@ export function RentalDetailLayout({
   charges,
   maintenances,
   inspections,
+  documents,
 }: RentalDetailLayoutProps) {
   return (
     <Row className="items-start gap-y-6">
@@ -35,6 +37,7 @@ export function RentalDetailLayout({
       <Col lg={4}>{caution}</Col>
       <Col>{maintenances}</Col>
       <Col>{inspections}</Col>
+      <Col>{documents}</Col>
     </Row>
   );
 }

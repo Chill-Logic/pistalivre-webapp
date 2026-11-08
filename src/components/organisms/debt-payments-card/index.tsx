@@ -10,13 +10,27 @@ import { List, ListItem } from "@/components/atoms/list";
 import { Text } from "@/components/atoms/text";
 import { DocumentItem } from "@/components/molecules/document-item";
 import { EmptyState } from "@/components/molecules/empty-state";
+import { DocumentUploadDialog } from "@/components/organisms/document-upload-dialog";
+import { ManageDocumentActions } from "@/components/organisms/documents-card";
+import { queryKeys } from "@/constants/query-keys";
 import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
 import type { DebtPayment } from "@/types/debt";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
-/** Payment ledger, read-only (registering one is a money write). */
-export function DebtPaymentsCard({ payments }: { payments: DebtPayment[] }) {
+type DebtPaymentsCardProps = {
+  payments: DebtPayment[];
+  /**
+   * Present = the staff can attach receipts to a payment (and rename or
+   * delete them). The payment itself stays read-only: registering or
+   * editing one is a money write.
+   */
+  debtId?: string;
+};
+
+/** Payment ledger with each payment's receipts. */
+export function DebtPaymentsCard({ payments, debtId }: DebtPaymentsCardProps) {
   const { view, download } = useFileActions();
+  const invalidate = debtId ? queryKeys.debts.detail(debtId) : null;
 
   return (
     <Card>
@@ -70,8 +84,26 @@ export function DebtPaymentsCard({ payments }: { payments: DebtPayment[] }) {
                           download.isPending &&
                           download.variables?.id === document.id
                         }
+                        actions={
+                          invalidate && (
+                            <ManageDocumentActions
+                              document={document}
+                              owner={{ type: "DEBT_PAYMENT", id: payment.id }}
+                              invalidate={invalidate}
+                            />
+                          )
+                        }
                       />
                     ))}
+                  </Box>
+                )}
+                {invalidate && (
+                  <Box className="pt-1">
+                    <DocumentUploadDialog
+                      owner={{ type: "DEBT_PAYMENT", id: payment.id }}
+                      invalidate={invalidate}
+                      triggerLabel="Anexar comprovante"
+                    />
                   </Box>
                 )}
               </ListItem>

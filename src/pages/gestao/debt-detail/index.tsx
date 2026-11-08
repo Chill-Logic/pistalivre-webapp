@@ -63,7 +63,12 @@ export function DebtDetailPage() {
           overview={<DebtOverview debt={debt.data} />}
           balance={<DebtBalanceCard debt={debt.data} />}
           plan={<DebtPlanCard plan={debt.data.plan} />}
-          payments={<DebtPaymentsCard payments={debt.data.payments} />}
+          payments={
+            <DebtPaymentsCard
+              payments={debt.data.payments}
+              debtId={debt.data.id}
+            />
+          }
           documents={
             <DocumentsCard
               documents={debt.data.documents}

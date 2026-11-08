@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryKeys } from "@/constants/query-keys";
 import { rentalsService } from "@/services/api/gestao/rentals.service";
-import type { RentalInput } from "@/types/rental";
+import type { RentalDetail, RentalInput } from "@/types/rental";
 
 /** Create (no id) or replace (id). Nothing is charged by saving. */
 export function useSaveRental(id?: string) {
@@ -11,7 +11,11 @@ export function useSaveRental(id?: string) {
     mutationFn: (input: RentalInput) =>
       id ? rentalsService.update(id, input) : rentalsService.create(input),
     onSuccess: (rental) => {
-      queryClient.setQueryData(queryKeys.rentals.detail(rental.id), rental);
+      // The write answers without documents: keep the ones on screen.
+      queryClient.setQueryData<RentalDetail>(
+        queryKeys.rentals.detail(rental.id),
+        (previous) => ({ ...rental, documents: previous?.documents ?? [] }),
+      );
       queryClient.invalidateQueries({ queryKey: queryKeys.rentals.all });
       // Activating moves the vehicle and makes the customer ACTIVE.
       queryClient.invalidateQueries({ queryKey: queryKeys.vehicles.all });

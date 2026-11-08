@@ -38,6 +38,8 @@ type DocumentUploadDialogProps = {
   owner: DocumentOwner;
   /** The query that lists the owner's documents (refreshed after). */
   invalidate: QueryKey;
+  /** Text of the opening button. */
+  triggerLabel?: string;
 };
 
 /**
@@ -48,6 +50,7 @@ type DocumentUploadDialogProps = {
 export function DocumentUploadDialog({
   owner,
   invalidate,
+  triggerLabel = "Enviar",
 }: DocumentUploadDialogProps) {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
@@ -102,7 +105,7 @@ export function DocumentUploadDialog({
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Upload />
-          Enviar
+          {triggerLabel}
         </Button>
       </DialogTrigger>
       <DialogContent>

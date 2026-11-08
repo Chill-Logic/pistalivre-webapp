@@ -79,7 +79,8 @@ export function DocumentsCard({
   );
 }
 
-function ManageDocumentActions({
+/** Edit (name/kind) and delete buttons of one document. */
+export function ManageDocumentActions({
   document,
   owner,
   invalidate,

@@ -35,13 +35,13 @@ import {
   useCustomerOptions,
   useVehicleOptions,
 } from "@/hooks/ui/useRemoteOptions";
-import type { RentalDetail } from "@/types/rental";
+import type { RentalDetail, RentalRecord } from "@/types/rental";
 
 type RentalFormProps = {
   /** Present = edit (replaces); absent = create. */
   rental?: RentalDetail;
   cancelTo: string;
-  onSaved: (rental: RentalDetail) => void;
+  onSaved: (rental: RentalRecord) => void;
 };
 
 export function RentalForm({ rental, cancelTo, onSaved }: RentalFormProps) {

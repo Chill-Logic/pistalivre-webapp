@@ -35,7 +35,12 @@ import {
   RelatedMaintenances,
   RelatedMaintenancesSkeleton,
 } from "@/components/organisms/related-maintenances";
+import {
+  DocumentsCard,
+  DocumentsCardSkeleton,
+} from "@/components/organisms/documents-card";
 import { RentalDetailLayout } from "@/components/templates/rental-detail-layout";
+import { queryKeys } from "@/constants/query-keys";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { useRental } from "@/hooks/api/gestao/rentals/useRental";
@@ -76,6 +81,7 @@ export function RentalDetailPage() {
             caution={<RentalCautionCardSkeleton />}
             maintenances={<RelatedMaintenancesSkeleton />}
             inspections={<RelatedInspectionsSkeleton />}
+            documents={<DocumentsCardSkeleton />}
           />
         </SkeletonRegion>
       )}
@@ -98,6 +104,15 @@ export function RentalDetailPage() {
           caution={<RentalCautionCard caution={rental.data.caution} />}
           maintenances={<RelatedMaintenances rentalId={rental.data.id} />}
           inspections={<RelatedInspections rentalId={rental.data.id} />}
+          documents={
+            <DocumentsCard
+              documents={rental.data.documents}
+              manage={{
+                owner: { type: "RENTAL", id: rental.data.id },
+                invalidate: queryKeys.rentals.detail(rental.data.id),
+              }}
+            />
+          }
         />
       )}
     </Box>
