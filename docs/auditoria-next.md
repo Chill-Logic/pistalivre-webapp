@@ -11,13 +11,13 @@ do dono. Marque `[x]` ao entregar.
 
 ## Transversais
 
-- [ ] **F — Tempo real (Socket.io).** O webapp não tem socket nenhum (`socket.io-client` nem está no
+- [x] **F — Tempo real (Socket.io).** O webapp não tem socket nenhum (`socket.io-client` nem está no
   `package.json`); só `refetchOnWindowFocus`. O Next atualizava sozinho cobranças, NF, reembolsos, assinaturas,
   status do veículo e o Financeiro. Contrato: `api-v1.md:35` (`io(origem,{auth:{token}})`, salas `staff` e
   `customer:<id>`). Fazer `hooks/realtime/useRealtimeEvent` + um mapa evento → `queryKeys` a invalidar
   (`payment.*`, `invoice.updated`, `reimbursement.*`, `signature.updated`, `vehicle.status_changed`,
   `transfer.updated`, `bank.updated`).
-- [ ] **F — "Fornecedores" vira "Custos fixos"** (decisão do dono): menu, títulos, abas "Da empresa"/"Por
+- [x] **F — "Fornecedores" vira "Custos fixos"** (decisão do dono): menu, títulos, abas "Da empresa"/"Por
   veículo", Projeções; rota `/gestao/custos-fixos` com redirect da antiga. Código e API seguem `supplier`.
 - [ ] **B — Último acesso.** A v1 só grava no login (token de 30 dias). Chamar `touchLastSeen` (limite de 5 min)
   em `requireBearerStaff` e `requireBearerCustomer` (`src/lib/api-v1.ts`).
