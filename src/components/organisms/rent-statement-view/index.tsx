@@ -2,6 +2,7 @@ import { Download } from "lucide-react";
 import { Alert } from "@/components/atoms/alert";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
+import { Col, Row } from "@/components/atoms/grid";
 import { Button } from "@/components/atoms/button";
 import {
   Card,
@@ -46,6 +47,8 @@ type RentStatementViewProps = {
   isPdfPending: boolean;
   /** Another model is loading: the current one fades. */
   isRefreshing?: boolean;
+  /** Staff page (full width): summary beside the calendar, months in pairs. */
+  wide?: boolean;
 };
 
 /**
@@ -59,6 +62,7 @@ export function RentStatementView({
   onPdf,
   isPdfPending,
   isRefreshing = false,
+  wide = false,
 }: RentStatementViewProps) {
   const { statement, labels } = report;
   const owes = statement.balance > 0;
@@ -70,36 +74,8 @@ export function RentStatementView({
     STATEMENT_MODES.find((item) => item.mode === statement.mode) ??
     STATEMENT_MODES[0];
 
-  return (
-    <Box
-      aria-busy={isRefreshing}
-      className={cn(
-        "space-y-4 transition-opacity duration-200",
-        isRefreshing && "opacity-60",
-      )}
-    >
-      <Box className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <StatementModeToggle mode={statement.mode} onChange={onModeChange} />
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onPdf}
-          disabled={isPdfPending}
-          className="w-full sm:w-auto"
-        >
-          {isPdfPending ? <Spinner /> : <Download />}
-          Exportar PDF
-        </Button>
-      </Box>
-      <Text tone="muted">{active.hint}</Text>
-      {report.termination && (
-        // The reasons come only in the staff statement.
-        <Alert variant="warning">
-          Rescindida em {report.termination.dateLabel}
-          {report.termination.reasons && ` · ${report.termination.reasons}`}
-        </Alert>
-      )}
-
+  const summary = (
+    <>
       <Box
         className={cn(
           "rounded-lg p-4",
@@ -174,40 +150,92 @@ export function RentStatementView({
           </CardContent>
         </Card>
       )}
+    </>
+  );
 
-      {months.length > 0 && (
-        <Card>
-          <CardContent className="space-y-5 pt-4 md:pt-6">
+  const calendar =
+    months.length > 0 ? (
+      <Card>
+        <CardContent className="space-y-5 pt-4 md:pt-6">
+          {/* Months side by side only when two fit in the card. */}
+          <Box className="flex flex-wrap gap-x-6 gap-y-5">
             {months.map((month) => (
-              <StatementMonthCalendar key={month.key} month={month} />
+              <Box key={month.key} className="min-w-0 flex-1 basis-[26rem]">
+                <StatementMonthCalendar month={month} />
+              </Box>
             ))}
-            <Box className="flex flex-wrap gap-x-4 gap-y-2">
-              {legend.map(([state, text]) => (
-                <Box key={state} className="flex items-center gap-1.5">
-                  <Box
-                    aria-hidden
-                    className={cn(
-                      "inline-flex size-5 items-center justify-center rounded text-xs",
-                      STATEMENT_DAY_CLASS[state],
-                    )}
-                  >
-                    {STATEMENT_DAY_MARK[state]}
-                  </Box>
-                  <Text inline>{text}</Text>
+          </Box>
+          <Box className="flex flex-wrap gap-x-4 gap-y-2">
+            {legend.map(([state, text]) => (
+              <Box key={state} className="flex items-center gap-1.5">
+                <Box
+                  aria-hidden
+                  className={cn(
+                    "inline-flex size-5 items-center justify-center rounded text-xs",
+                    STATEMENT_DAY_CLASS[state],
+                  )}
+                >
+                  {STATEMENT_DAY_MARK[state]}
                 </Box>
-              ))}
-              {labels.closingLegend && (
-                <Box className="flex items-center gap-1.5">
-                  <Box
-                    aria-hidden
-                    className="inline-flex size-5 rounded ring-2 ring-inset ring-foreground/80"
-                  />
-                  <Text inline>{labels.closingLegend}</Text>
-                </Box>
-              )}
-            </Box>
-          </CardContent>
-        </Card>
+                <Text inline>{text}</Text>
+              </Box>
+            ))}
+            {labels.closingLegend && (
+              <Box className="flex items-center gap-1.5">
+                <Box
+                  aria-hidden
+                  className="inline-flex size-5 rounded ring-2 ring-inset ring-foreground/80"
+                />
+                <Text inline>{labels.closingLegend}</Text>
+              </Box>
+            )}
+          </Box>
+        </CardContent>
+      </Card>
+    ) : null;
+
+  return (
+    <Box
+      aria-busy={isRefreshing}
+      className={cn(
+        "space-y-4 transition-opacity duration-200",
+        isRefreshing && "opacity-60",
+      )}
+    >
+      <Box className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <StatementModeToggle mode={statement.mode} onChange={onModeChange} />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onPdf}
+          disabled={isPdfPending}
+          className="w-full sm:w-auto"
+        >
+          {isPdfPending ? <Spinner /> : <Download />}
+          Exportar PDF
+        </Button>
+      </Box>
+      <Text tone="muted">{active.hint}</Text>
+      {report.termination && (
+        // The reasons come only in the staff statement.
+        <Alert variant="warning">
+          Rescindida em {report.termination.dateLabel}
+          {report.termination.reasons && ` · ${report.termination.reasons}`}
+        </Alert>
+      )}
+
+      {wide ? (
+        <Row className="items-start gap-y-4">
+          <Col lg={4} className="space-y-4 lg:sticky lg:top-4">
+            {summary}
+          </Col>
+          <Col lg={8}>{calendar}</Col>
+        </Row>
+      ) : (
+        <>
+          {summary}
+          {calendar}
+        </>
       )}
 
       {statement.cycles.length > 0 && (

@@ -12,7 +12,7 @@ export function RentalStatementPage() {
   const rental = useRental(id);
 
   return (
-    <Box className="mx-auto max-w-4xl space-y-4">
+    <Box className="space-y-4">
       <BackLink
         to={routeTo.rental(id)}
         label={rental.data?.code ?? "Locação"}

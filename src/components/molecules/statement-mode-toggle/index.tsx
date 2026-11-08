@@ -35,7 +35,8 @@ export function StatementModeToggle({
           aria-pressed={item.mode === mode}
           onClick={() => onChange(item.mode)}
           className={cn(
-            "relative z-10 h-9 flex-1 px-3 hover:bg-transparent md:h-8",
+            // Equal halves (basis-0): the sliding pill is always 50% wide.
+            "relative z-10 h-9 flex-1 basis-0 px-4 hover:bg-transparent sm:min-w-32",
             item.mode === mode ? "text-foreground" : "text-muted-foreground",
           )}
         >

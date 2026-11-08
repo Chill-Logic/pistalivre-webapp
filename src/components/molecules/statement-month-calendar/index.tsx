@@ -100,7 +100,7 @@ export function StatementMonthCalendar({ month }: { month: StatementMonth }) {
                       <Text
                         size={null}
                         weight="bold"
-                        className="hidden text-[9px] leading-tight sm:block"
+                        className="hidden whitespace-normal break-words text-[9px] leading-tight sm:block"
                       >
                         {closing}
                       </Text>

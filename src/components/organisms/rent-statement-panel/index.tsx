@@ -112,6 +112,7 @@ export function RentStatementPanel({
         }
         onPdf={() => pdf.mutate(params)}
         isPdfPending={pdf.isPending}
+        wide={scope === "staff"}
       />
     </>
   );
