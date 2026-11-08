@@ -105,7 +105,21 @@ export type RentalBilling = {
   paidThrough: string | null;
   debtPart: number;
   period: { from: string | null; through: string | null };
+  /**
+   * Order of the "Cobranças" list, newest first, with the waived days in
+   * between (otherwise a waived day reads as a hole).
+   */
+  timeline?: BillingTimelineEntry[];
 };
+
+export type BillingTimelineEntry =
+  | { kind: "charge"; date: string; chargeId: string }
+  | {
+      kind: "waived";
+      date: string;
+      reason: string | null;
+      showInReport: boolean;
+    };
 
 export type BillingPeriod = { from: string; through: string };
 

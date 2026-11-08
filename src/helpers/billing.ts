@@ -1,6 +1,10 @@
 import { queryKeys } from "@/constants/query-keys";
-import type { BillingPeriod, RentReconciliation } from "@/types/billing";
-import type { RatePeriod } from "@/types/rental";
+import type {
+  BillingPeriod,
+  BillingTimelineEntry,
+  RentReconciliation,
+} from "@/types/billing";
+import type { Charge, RatePeriod } from "@/types/rental";
 
 /**
  * Cache key of a rental's billing view. Lives under `rentals.all`, so the
@@ -63,4 +67,38 @@ export function cyclesLabel(reconciliation: RentReconciliation) {
 export function currentCycleName(period: RatePeriod) {
   const name = UNIT_NAMES[period]?.[0] ?? "ciclo";
   return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+export type ChargeListEntry =
+  | { kind: "charge"; charge: Charge }
+  | { kind: "waived"; date: string; reason: string | null };
+
+/**
+ * The charges in the server's timeline order with the waived days in
+ * between. Without a timeline (billing view not loaded) it is just the
+ * charges as the API lists them; a charge the timeline does not know yet
+ * (just issued) goes first.
+ */
+export function chargeTimeline(
+  charges: Charge[],
+  timeline: BillingTimelineEntry[] | undefined,
+): ChargeListEntry[] {
+  if (!timeline) return charges.map((charge) => ({ kind: "charge", charge }));
+  const byId = new Map(charges.map((charge) => [charge.id, charge]));
+  const known = new Set<string>();
+  const ordered: ChargeListEntry[] = [];
+  for (const entry of timeline) {
+    if (entry.kind === "waived") {
+      ordered.push({ kind: "waived", date: entry.date, reason: entry.reason });
+      continue;
+    }
+    const charge = byId.get(entry.chargeId);
+    if (!charge) continue;
+    known.add(charge.id);
+    ordered.push({ kind: "charge", charge });
+  }
+  const unknown: ChargeListEntry[] = charges
+    .filter((charge) => !known.has(charge.id))
+    .map((charge) => ({ kind: "charge", charge }));
+  return [...unknown, ...ordered];
 }
