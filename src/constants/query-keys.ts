@@ -149,6 +149,10 @@ export const queryKeys = {
   },
   company: {
     all: ["company"] as const,
+    integrations: ["company", "integrations"] as const,
+    /** Outside `company`: it asks the Inter live, so a document upload
+     *  invalidating the company must not refetch it. */
+    interWebhook: ["inter-webhook"] as const,
   },
   projections: {
     all: ["projections"] as const,

@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { RedirectIfAuthenticated } from "./guards/RedirectIfAuthenticated";
 import { RequireAuth } from "./guards/RequireAuth";
 import {
+  CompanyEditPage,
   CompanyPage,
   ContractTemplateDetailPage,
   ContractTemplateEditPage,
@@ -199,6 +200,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.userDetail, element: <UserDetailPage /> },
       { path: ROUTES.userEdit, element: <UserEditPage /> },
       { path: ROUTES.company, element: <CompanyPage /> },
+      { path: ROUTES.companyEdit, element: <CompanyEditPage /> },
       {
         element: (
           <FinanceSectionPage

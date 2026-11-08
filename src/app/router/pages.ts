@@ -141,6 +141,10 @@ export const CompanyPage = lazyPage(
   () => import("@/pages/gestao/company"),
   "CompanyPage",
 );
+export const CompanyEditPage = lazyPage(
+  () => import("@/pages/gestao/company-edit"),
+  "CompanyEditPage",
+);
 export const PlansPage = lazyPage(
   () => import("@/pages/gestao/plans"),
   "PlansPage",
