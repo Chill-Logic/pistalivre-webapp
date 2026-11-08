@@ -1,5 +1,7 @@
 # Handoff — pistalivre-webapp
 
+> Resumo rápido e atual em **`docs/COMECE-AQUI.md`**. Este arquivo é o histórico detalhado.
+
 Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passar o bastão.
 
 ## Contexto e autonomia

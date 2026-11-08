@@ -1,5 +1,7 @@
 # CLAUDE.md — pistalivre-webapp
 
+**Nova sessão? Leia primeiro `docs/COMECE-AQUI.md`** (estado, como rodar/publicar, pendências).
+
 SPA do **Pista Livre** (gestão de locadora, nicho motofrete). Nasceu do desacoplamento do monolito Next
 (`../pista-livre`), que passou a ser **só backend** em `/api/v1` (branch `feat/api-v1-spa`). O estado vivo,
 peça por peça, fica em **`docs/handoff.md`**. Contrato da API em **`../pista-livre/docs/api-v1.md`**. O
