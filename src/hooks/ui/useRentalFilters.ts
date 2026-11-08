@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { LABEL_MAPS } from "@/constants/label-maps";
+import { ALL_RENTAL_STATUSES, DEFAULT_RENTAL_STATUS } from "@/constants/rental";
 import { isKnownCode } from "@/helpers/labels";
 import { useLabels } from "@/hooks/ui/useLabels";
 import { useUrlFilters } from "@/hooks/ui/useUrlFilters";
@@ -18,9 +19,12 @@ export function useRentalFilters() {
       page,
       pageSize,
       q: values.busca,
-      status: isKnownCode(statusMap, values.situacao)
-        ? (values.situacao as RentalStatus)
-        : "",
+      // No status in the URL = the default (Ativas); "todas" = every status.
+      status: !values.situacao
+        ? DEFAULT_RENTAL_STATUS
+        : isKnownCode(statusMap, values.situacao)
+          ? (values.situacao as RentalStatus)
+          : "",
     }),
     [page, pageSize, values, statusMap],
   );
@@ -28,7 +32,15 @@ export function useRentalFilters() {
   return {
     filters,
     setSearch: (value: string) => setFilter("busca", value),
-    setStatus: (value: string) => setFilter("situacao", value),
+    setStatus: (value: string) =>
+      setFilter(
+        "situacao",
+        !value
+          ? ALL_RENTAL_STATUSES
+          : value === DEFAULT_RENTAL_STATUS
+            ? ""
+            : value,
+      ),
     setPage,
     setPageSize,
   };

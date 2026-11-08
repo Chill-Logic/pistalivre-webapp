@@ -14,6 +14,8 @@ type FilePickerProps = {
   /** Same list the API accepts (PDF, images, office). */
   accept?: string;
   disabled?: boolean;
+  /** One file only (e.g. replacing a document): a new pick replaces it. */
+  multiple?: boolean;
 };
 
 const DEFAULT_ACCEPT =
@@ -26,6 +28,7 @@ export function FilePicker({
   label = "Anexar arquivos",
   accept = DEFAULT_ACCEPT,
   disabled = false,
+  multiple = true,
 }: FilePickerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -33,11 +36,11 @@ export function FilePicker({
     <Box className="space-y-2">
       <FileInput
         ref={inputRef}
-        multiple
+        multiple={multiple}
         accept={accept}
         onChange={(event) => {
           const picked = Array.from(event.target.files ?? []);
-          onChange([...files, ...picked]);
+          onChange(multiple ? [...files, ...picked] : picked.slice(0, 1));
           // Picking the same file again must fire `change` again.
           event.target.value = "";
         }}

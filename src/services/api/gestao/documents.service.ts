@@ -44,8 +44,25 @@ export const documentsService = {
     });
     return data;
   },
-  async update(id: string, input: DocumentUpdateInput) {
-    const { data } = await http.patch<DocumentFile>(`/documents/${id}`, input);
+  /** JSON to rename/re-kind; multipart when the file itself is replaced. */
+  async update(id: string, { file, ...input }: DocumentUpdateInput) {
+    if (!file) {
+      const { data } = await http.patch<DocumentFile>(
+        `/documents/${id}`,
+        input,
+      );
+      return data;
+    }
+    const body = new FormData();
+    if (input.filename !== undefined) body.append("filename", input.filename);
+    // Empty `categoryId` in multipart = "Sem tipo" (the API reads "" as null).
+    if (input.categoryId !== undefined) {
+      body.append("categoryId", input.categoryId ?? "");
+    }
+    body.append("file", file);
+    const { data } = await http.patch<DocumentFile>(`/documents/${id}`, body, {
+      timeout: UPLOAD_TIMEOUT,
+    });
     return data;
   },
   async remove(id: string) {

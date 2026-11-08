@@ -38,6 +38,16 @@ export type VehicleDetail = Vehicle & {
   /** Legacy tariff, still required by the vehicle form (price lives on Rental). */
   rate: number;
   ratePeriod: RatePeriod;
+  /** Fixed costs ("Custos fixos", VEHICLE scope) linked to this vehicle. */
+  suppliers?: VehicleSupplierLink[];
+};
+
+/** A fixed cost linked to a vehicle, with the amount PER vehicle. */
+export type VehicleSupplierLink = {
+  linkId: string;
+  supplier: Ref;
+  monthlyAmount: number;
+  active: boolean;
 };
 
 export type VehicleFormOptions = {

@@ -37,3 +37,12 @@ export const RENTAL_TRANSITIONS: Record<RentalStatus, RentalStatus[]> = {
   CANCELLED: [],
   WITHDRAWN: [],
 };
+
+/**
+ * The rental list opens on ACTIVE rentals (the day-to-day view; history only
+ * grows), as the old screen did. No `?situacao=` = this default.
+ */
+export const DEFAULT_RENTAL_STATUS: RentalStatus = "ACTIVE";
+
+/** Explicit "every status" in the URL (absence already means the default). */
+export const ALL_RENTAL_STATUSES = "todas";

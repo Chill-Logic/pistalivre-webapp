@@ -90,13 +90,19 @@ export function emptyLender(): DebtFormValues["lenders"][number] {
   return { type: "OTHER", refId: "", refLabel: "", name: "" };
 }
 
-export function debtFormDefaults(debt?: DebtDetail): DebtFormValues {
+/** A vehicle chosen before the form opens (from the vehicle's page). */
+export type DebtVehiclePreset = { id: string; label: string };
+
+export function debtFormDefaults(
+  debt?: DebtDetail,
+  presetVehicle?: DebtVehiclePreset,
+): DebtFormValues {
   if (!debt) {
     return {
       lenders: [emptyLender()],
       kind: "LOAN",
-      vehicleId: "",
-      vehicleLabel: "",
+      vehicleId: presetVehicle?.id ?? "",
+      vehicleLabel: presetVehicle?.label ?? "",
       countsAsCost: false,
       principal: 0,
       interestPercent: "",

@@ -17,6 +17,10 @@ export function useSupplierVehicles(supplierId: string) {
     queryClient.invalidateQueries({
       queryKey: [...queryKeys.suppliers.all, "list"],
     });
+    // The vehicle's page lists its fixed costs too.
+    queryClient.invalidateQueries({
+      queryKey: [...queryKeys.vehicles.all, "detail"],
+    });
   };
 
   const link = useMutation({

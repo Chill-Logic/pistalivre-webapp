@@ -87,6 +87,8 @@ export const queryKeys = {
     all: ["debts"] as const,
     list: () => [...queryKeys.debts.all, "list"] as const,
     detail: (id: string) => [...queryKeys.debts.all, "detail", id] as const,
+    byVehicle: (vehicleId: string) =>
+      [...queryKeys.debts.all, "vehicle", vehicleId] as const,
   },
   reimbursements: {
     all: ["reimbursements"] as const,

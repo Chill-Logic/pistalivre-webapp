@@ -36,6 +36,7 @@ import {
   useVehicleOptions,
 } from "@/hooks/ui/useRemoteOptions";
 import type { RentalDetail, RentalRecord } from "@/types/rental";
+import { formatPlate } from "@/utils/plate";
 
 type RentalFormProps = {
   /** Present = edit (replaces); absent = create. */
@@ -49,7 +50,15 @@ export function RentalForm({ rental, cancelTo, onSaved }: RentalFormProps) {
   const save = useSaveRental(rental?.id);
   const { options } = useLabels();
   const customers = useCustomerOptions();
-  const vehicles = useVehicleOptions();
+  // Only available vehicles; editing also keeps the rental's current one.
+  const vehicles = useVehicleOptions({
+    status: "AVAILABLE",
+    include: rental && {
+      value: rental.vehicle.id,
+      label: `${formatPlate(rental.vehicle.plate)} · ${rental.vehicle.brand.name} ${rental.vehicle.model.name}`,
+      detail: "Veículo atual da locação",
+    },
+  });
   const [formError, setFormError] = useState<string | null>(null);
 
   const {

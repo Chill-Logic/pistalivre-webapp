@@ -6,6 +6,8 @@ import { Skeleton } from "@/components/atoms/skeleton";
 import { DocumentItem } from "@/components/molecules/document-item";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { FolderCard } from "@/components/molecules/folder-card";
+import { ManagedDocumentList } from "@/components/organisms/managed-document-list";
+import { queryKeys } from "@/constants/query-keys";
 import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
 import type { DocumentTree } from "@/types/document-tree";
 import { cn } from "@/utils/cn";
@@ -51,19 +53,30 @@ export function DocumentBrowser({
       )}
       {tree.files.length > 0 && (
         <Card>
-          <CardContent className="divide-y pt-1 md:pt-1">
-            {tree.files.map((file) => (
-              <DocumentItem
-                key={file.id}
-                document={file}
-                onView={() => view.mutate(file)}
-                onDownload={() => download.mutate(file)}
-                isViewing={view.isPending && view.variables?.id === file.id}
-                isDownloading={
-                  download.isPending && download.variables?.id === file.id
-                }
+          <CardContent className="pt-1 md:pt-1">
+            {tree.owner ? (
+              // A category folder: its owner's documents, managed here too.
+              <ManagedDocumentList
+                documents={tree.files}
+                owner={tree.owner}
+                invalidate={queryKeys.documents.all}
               />
-            ))}
+            ) : (
+              <Box className="divide-y">
+                {tree.files.map((file) => (
+                  <DocumentItem
+                    key={file.id}
+                    document={file}
+                    onView={() => view.mutate(file)}
+                    onDownload={() => download.mutate(file)}
+                    isViewing={view.isPending && view.variables?.id === file.id}
+                    isDownloading={
+                      download.isPending && download.variables?.id === file.id
+                    }
+                  />
+                ))}
+              </Box>
+            )}
           </CardContent>
         </Card>
       )}

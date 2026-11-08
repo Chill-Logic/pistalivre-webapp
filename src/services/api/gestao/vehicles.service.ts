@@ -49,4 +49,11 @@ export const vehiclesService = {
     const { data } = await http.get<VehicleType[]>("/vehicle-types");
     return data;
   },
+  /** "Ficha técnica" PDF (needs the Bearer, so it comes as a blob). */
+  async datasheet(id: string) {
+    const { data } = await http.get<Blob>(`/vehicles/${id}/datasheet`, {
+      responseType: "blob",
+    });
+    return data;
+  },
 };

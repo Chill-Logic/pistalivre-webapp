@@ -4,6 +4,8 @@ import { Button } from "@/components/atoms/button";
 import { Card, CardContent } from "@/components/atoms/card";
 import { DocumentItem } from "@/components/molecules/document-item";
 import { EmptyState } from "@/components/molecules/empty-state";
+import { DocumentEditDialog } from "@/components/organisms/document-edit-dialog";
+import { queryKeys } from "@/constants/query-keys";
 import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
 import type { DocumentSearch } from "@/types/document-tree";
 
@@ -35,6 +37,14 @@ export function DocumentSearchResults({
               isViewing={view.isPending && view.variables?.id === document.id}
               isDownloading={
                 download.isPending && download.variables?.id === document.id
+              }
+              actions={
+                <DocumentEditDialog
+                  renameOnly
+                  document={document}
+                  owner={{ type: document.ownerType, id: document.ownerId }}
+                  invalidate={queryKeys.documents.all}
+                />
               }
             />
             <Button

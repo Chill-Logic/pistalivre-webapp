@@ -1,23 +1,16 @@
 import type { QueryKey } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
-import { useState } from "react";
 import { Box } from "@/components/atoms/box";
-import { Button } from "@/components/atoms/button";
 import { Card, CardContent, CardHeader } from "@/components/atoms/card";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { CollapsibleCard } from "@/components/molecules/collapsible-card";
-import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { DocumentItem } from "@/components/molecules/document-item";
-import { DocumentEditDialog } from "@/components/organisms/document-edit-dialog";
 import { DocumentUploadDialog } from "@/components/organisms/document-upload-dialog";
-import { useDocumentMutations } from "@/hooks/api/gestao/documents/useDocumentMutations";
+import { ManagedDocumentList } from "@/components/organisms/managed-document-list";
 import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
-import type {
-  DocumentAttachment,
-  DocumentFile,
-  DocumentOwner,
-} from "@/types/document";
+import type { DocumentFile, DocumentOwner } from "@/types/document";
+
+export { ManageDocumentActions } from "@/components/organisms/managed-document-list";
 
 type DocumentsCardProps = {
   documents: DocumentFile[];
@@ -25,7 +18,8 @@ type DocumentsCardProps = {
   empty?: string;
   /**
    * Who the documents belong to + the query that lists them. Present = the
-   * staff can send, edit and delete; absent = read-only (view/download).
+   * staff can send, edit, delete (one or several) and make PDFs signable;
+   * absent = read-only (view/download).
    */
   manage?: { owner: DocumentOwner; invalidate: QueryKey };
 };
@@ -37,8 +31,6 @@ export function DocumentsCard({
   empty = "Nenhum documento anexado.",
   manage,
 }: DocumentsCardProps) {
-  const { view, download } = useFileActions();
-
   return (
     <CollapsibleCard
       title={title}
@@ -55,74 +47,32 @@ export function DocumentsCard({
     >
       {documents.length === 0 ? (
         <Text tone="muted">{empty}</Text>
+      ) : manage ? (
+        <ManagedDocumentList documents={documents} {...manage} />
       ) : (
-        <Box className="divide-y">
-          {documents.map((document) => (
-            <DocumentItem
-              key={document.id}
-              document={document}
-              onView={() => view.mutate(document)}
-              onDownload={() => download.mutate(document)}
-              isViewing={view.isPending && view.variables?.id === document.id}
-              isDownloading={
-                download.isPending && download.variables?.id === document.id
-              }
-              actions={
-                manage && (
-                  <ManageDocumentActions document={document} {...manage} />
-                )
-              }
-            />
-          ))}
-        </Box>
+        <ReadOnlyDocuments documents={documents} />
       )}
     </CollapsibleCard>
   );
 }
 
-/** Edit (name/kind) and delete buttons of one document. */
-export function ManageDocumentActions({
-  document,
-  owner,
-  invalidate,
-}: {
-  document: DocumentAttachment;
-  owner: DocumentOwner;
-  invalidate: QueryKey;
-}) {
-  const { remove } = useDocumentMutations(owner, invalidate);
-  const [confirming, setConfirming] = useState(false);
-
+function ReadOnlyDocuments({ documents }: { documents: DocumentFile[] }) {
+  const { view, download } = useFileActions();
   return (
-    <>
-      <DocumentEditDialog
-        document={document}
-        owner={owner}
-        invalidate={invalidate}
-      />
-      <ConfirmDialog
-        destructive
-        open={confirming}
-        onOpenChange={setConfirming}
-        trigger={
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-destructive"
-            aria-label={`Excluir ${document.fileName}`}
-          >
-            <Trash2 />
-          </Button>
-        }
-        title="Excluir documento?"
-        description={`"${document.fileName}" é apagado de vez. Documento em assinatura não pode ser excluído.`}
-        confirmLabel="Excluir documento"
-        isPending={remove.isPending}
-        onConfirm={() =>
-          remove.mutate(document.id, { onSuccess: () => setConfirming(false) })
-        }
-      />
-    </>
+    <Box className="divide-y">
+      {documents.map((document) => (
+        <DocumentItem
+          key={document.id}
+          document={document}
+          onView={() => view.mutate(document)}
+          onDownload={() => download.mutate(document)}
+          isViewing={view.isPending && view.variables?.id === document.id}
+          isDownloading={
+            download.isPending && download.variables?.id === document.id
+          }
+        />
+      ))}
+    </Box>
   );
 }
 

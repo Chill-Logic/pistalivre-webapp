@@ -1,6 +1,7 @@
 import { CarFront } from "lucide-react";
 import { Text } from "@/components/atoms/text";
 import { EmptyState } from "@/components/molecules/empty-state";
+import { TextLink } from "@/components/molecules/text-link";
 import { VehicleStatusBadge } from "@/components/molecules/vehicle-status-badge";
 import {
   DataTable,
@@ -45,7 +46,18 @@ const COLUMNS: DataTableColumn<Vehicle>[] = [
   },
   {
     header: "Locatário",
-    cell: (vehicle) => vehicle.activeRental?.customer.name ?? "—",
+    cell: (vehicle) =>
+      vehicle.activeRental ? (
+        <TextLink
+          to={routeTo.rental(vehicle.activeRental.id)}
+          // The row opens the vehicle; this opens the rental.
+          onClick={(event) => event.stopPropagation()}
+        >
+          {vehicle.activeRental.customer.name}
+        </TextLink>
+      ) : (
+        "—"
+      ),
     className: "max-w-56 truncate",
     skeleton: "w-32",
   },

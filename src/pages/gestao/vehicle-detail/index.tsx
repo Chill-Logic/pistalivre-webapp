@@ -1,7 +1,9 @@
-import { CarFront, Pencil } from "lucide-react";
+import { CarFront, FileText, Pencil } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
+import { Spinner } from "@/components/atoms/spinner";
+import { Text } from "@/components/atoms/text";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
@@ -30,18 +32,28 @@ import {
   VehicleStatusCard,
   VehicleStatusCardSkeleton,
 } from "@/components/organisms/vehicle-status-card";
+import {
+  VehicleDebts,
+  VehicleDebtsSkeleton,
+} from "@/components/organisms/vehicle-debts";
+import {
+  VehicleSuppliersCard,
+  VehicleSuppliersCardSkeleton,
+} from "@/components/organisms/vehicle-suppliers-card";
 import { VehicleDeleteButton } from "@/components/organisms/vehicle-delete-button";
 import { VehicleDetailLayout } from "@/components/templates/vehicle-detail-layout";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { queryKeys } from "@/constants/query-keys";
 import { isNotFound } from "@/helpers/api-error";
 import { useVehicle } from "@/hooks/api/gestao/vehicles/useVehicle";
+import { useVehicleDatasheet } from "@/hooks/api/gestao/vehicles/useVehicleDatasheet";
 import { useBackToList } from "@/hooks/ui/useBackToList";
 
 export function VehicleDetailPage() {
   const { id = "" } = useParams();
   const vehicle = useVehicle(id);
   const backTo = useBackToList(ROUTES.vehicles);
+  const datasheet = useVehicleDatasheet();
 
   return (
     <Box className="space-y-4">
@@ -49,6 +61,18 @@ export function VehicleDetailPage() {
         <BackLink to={backTo} label="Veículos" />
         {vehicle.data && (
           <Box className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => datasheet.mutate(vehicle.data.id)}
+              disabled={datasheet.isPending}
+              aria-label="Ficha técnica (PDF)"
+            >
+              {datasheet.isPending ? <Spinner /> : <FileText />}
+              <Text inline size={null} className="max-sm:sr-only">
+                Ficha técnica (PDF)
+              </Text>
+            </Button>
             <Button asChild variant="ghost" size="sm">
               <Link to={routeTo.editVehicle(vehicle.data.id)}>
                 <Pencil />
@@ -70,6 +94,8 @@ export function VehicleDetailPage() {
             rental={<VehicleRentalCardSkeleton />}
             maintenances={<RelatedMaintenancesSkeleton />}
             inspections={<RelatedInspectionsSkeleton />}
+            suppliers={<VehicleSuppliersCardSkeleton />}
+            debts={<VehicleDebtsSkeleton />}
             documents={<DocumentsCardSkeleton />}
           />
         </SkeletonRegion>
@@ -97,6 +123,13 @@ export function VehicleDetailPage() {
           rental={<VehicleRentalCard rental={vehicle.data.activeRental} />}
           maintenances={<RelatedMaintenances vehicleId={vehicle.data.id} />}
           inspections={<RelatedInspections vehicleId={vehicle.data.id} />}
+          suppliers={
+            <VehicleSuppliersCard
+              vehicleId={vehicle.data.id}
+              links={vehicle.data.suppliers ?? []}
+            />
+          }
+          debts={<VehicleDebts vehicleId={vehicle.data.id} />}
           documents={
             <DocumentsCard
               documents={vehicle.data.documents}

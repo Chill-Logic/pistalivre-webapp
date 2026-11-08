@@ -7,6 +7,8 @@ type VehicleDetailLayoutProps = {
   rental: ReactNode;
   maintenances: ReactNode;
   inspections: ReactNode;
+  suppliers: ReactNode;
+  debts: ReactNode;
   documents: ReactNode;
 };
 
@@ -17,6 +19,8 @@ export function VehicleDetailLayout({
   rental,
   maintenances,
   inspections,
+  suppliers,
+  debts,
   documents,
 }: VehicleDetailLayoutProps) {
   return (
@@ -30,6 +34,8 @@ export function VehicleDetailLayout({
       </Col>
       <Col>{maintenances}</Col>
       <Col>{inspections}</Col>
+      <Col>{suppliers}</Col>
+      <Col>{debts}</Col>
       <Col>{documents}</Col>
     </Row>
   );

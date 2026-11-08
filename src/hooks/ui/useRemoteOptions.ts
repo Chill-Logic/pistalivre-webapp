@@ -10,6 +10,8 @@ import { useDebouncedValue } from "@/hooks/ui/useDebouncedValue";
 import { vehicleName } from "@/helpers/vehicle";
 import { formatCpf } from "@/utils/document";
 import { formatPlate } from "@/utils/plate";
+import type { SupplierScope } from "@/types/supplier";
+import type { VehicleStatus } from "@/types/vehicle";
 
 const PICKER_SIZE = 20;
 
@@ -36,8 +38,18 @@ export function useCustomerOptions() {
   return { search, setSearch, options, isLoading: customers.isFetching };
 }
 
+type VehicleOptionsConfig = {
+  /** Only vehicles in this situation (e.g. available for a new rental). */
+  status?: VehicleStatus;
+  /** Always offered (e.g. the rental's current vehicle, now rented). */
+  include?: RemoteOption;
+};
+
 /** Vehicle search for pickers. */
-export function useVehicleOptions() {
+export function useVehicleOptions({
+  status,
+  include,
+}: VehicleOptionsConfig = {}) {
   const [search, setSearch] = useState("");
   const q = useDebouncedValue(search);
   const vehicles = useVehicles({
@@ -45,31 +57,50 @@ export function useVehicleOptions() {
     pageSize: PICKER_SIZE,
     q,
     type: "",
-    status: "",
+    status: status ?? "",
   });
-  const options = useMemo<RemoteOption[]>(
-    () =>
-      (vehicles.data?.items ?? []).map((vehicle) => ({
-        value: vehicle.id,
-        label: `${formatPlate(vehicle.plate)} · ${vehicleName(vehicle)}`,
-        detail: vehicle.activeRental
-          ? `Com ${vehicle.activeRental.customer.name}`
-          : `${vehicle.type.name} · ${vehicle.year}`,
-      })),
-    [vehicles.data],
-  );
+  const includeValue = include?.value;
+  const includeLabel = include?.label;
+  const includeDetail = include?.detail;
+  const options = useMemo<RemoteOption[]>(() => {
+    const found = (vehicles.data?.items ?? []).map((vehicle) => ({
+      value: vehicle.id,
+      label: `${formatPlate(vehicle.plate)} · ${vehicleName(vehicle)}`,
+      detail: vehicle.activeRental
+        ? `Com ${vehicle.activeRental.customer.name}`
+        : `${vehicle.type.name} · ${vehicle.year}`,
+    }));
+    const term = q.trim().toLowerCase();
+    const showInclude =
+      includeValue !== undefined &&
+      includeLabel !== undefined &&
+      !found.some((option) => option.value === includeValue) &&
+      includeLabel.toLowerCase().includes(term);
+    return showInclude
+      ? [
+          { value: includeValue, label: includeLabel, detail: includeDetail },
+          ...found,
+        ]
+      : found;
+  }, [vehicles.data, q, includeValue, includeLabel, includeDetail]);
   return { search, setSearch, options, isLoading: vehicles.isFetching };
 }
 
-/** Supplier search for pickers (e.g. a debt's lender). */
-export function useSupplierOptions() {
+/**
+ * Supplier search for pickers (e.g. a debt's lender). `scope: "VEHICLE"`
+ * = only the fixed costs that link to vehicles; `items` keeps each one's
+ * base amount (suggested when linking).
+ */
+export function useSupplierOptions({
+  scope = "",
+}: { scope?: SupplierScope | "" } = {}) {
   const [search, setSearch] = useState("");
   const q = useDebouncedValue(search);
   const filters = {
     page: 1,
     pageSize: PICKER_SIZE,
     q,
-    scope: "",
+    scope,
     active: "",
   } as const;
   const suppliers = useQuery({
@@ -84,7 +115,13 @@ export function useSupplierOptions() {
       })),
     [suppliers.data],
   );
-  return { search, setSearch, options, isLoading: suppliers.isFetching };
+  return {
+    search,
+    setSearch,
+    options,
+    items: suppliers.data?.items ?? [],
+    isLoading: suppliers.isFetching,
+  };
 }
 
 /** Staff search for pickers (e.g. a partner who lent money). */

@@ -1,5 +1,11 @@
 import type { SignatureStatus } from "@/types/signature";
 
+/** The latest signature request of a PDF (staff reads only). */
+export type DocumentSignature = {
+  requestId: string;
+  status: SignatureStatus;
+};
+
 export type DocumentFile = {
   id: string;
   /** `slug` finds a kind without its display name ("crlv"). */
@@ -11,10 +17,10 @@ export type DocumentFile = {
   url: string;
   createdAt: string;
   /**
-   * Staff details only: the latest signature request of this PDF (null =
-   * never put in signature). Absent in the portal and in lists.
+   * Staff reads only (absent in the portal): the latest signature request of
+   * this PDF. Any request locks deleting it and replacing the file.
    */
-  signature?: { requestId: string; status: SignatureStatus } | null;
+  signature?: DocumentSignature | null;
 };
 
 /**
@@ -23,7 +29,7 @@ export type DocumentFile = {
  */
 export type DocumentAttachment = Pick<
   DocumentFile,
-  "id" | "category" | "fileName" | "url"
+  "id" | "category" | "fileName" | "url" | "signature"
 >;
 
 /** Who a document belongs to (polymorphic owner, as in the API). */
@@ -31,11 +37,15 @@ export type DocumentOwnerType =
   | "VEHICLE"
   | "CUSTOMER"
   | "RENTAL"
+  | "INSPECTION"
   | "MAINTENANCE"
   | "SUPPLIER"
   | "COMPANY"
+  | "LEAD"
+  | "PROPOSAL"
   | "DEBT"
   | "DEBT_PAYMENT"
+  | "CUSTOMER_DEBT"
   | "PAYMENT"
   | "CUSTOMER_DEBT"
   | "LEAD_ACTIVITY"
@@ -49,4 +59,6 @@ export type DocumentCategory = { id: string; name: string; slug: string };
 export type DocumentUpdateInput = {
   filename?: string;
   categoryId?: string | null;
+  /** Replaces the bytes (multipart). Refused (409) under signature. */
+  file?: File;
 };

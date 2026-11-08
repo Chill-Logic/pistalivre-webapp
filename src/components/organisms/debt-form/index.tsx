@@ -42,10 +42,13 @@ import {
   emptyLender,
   toDebtInput,
   type DebtFormValues,
+  type DebtVehiclePreset,
 } from "./schema";
 
 type DebtFormProps = {
   debt?: DebtDetail;
+  /** New debt opened from a vehicle: it comes chosen (still editable). */
+  presetVehicle?: DebtVehiclePreset;
   cancelTo: string;
   onSaved: (debt: DebtDetail) => void;
 };
@@ -55,7 +58,12 @@ type DebtFormProps = {
  * name), how much, interest and installments. The balance and the plan are
  * worked out by the server after saving (the form computes no money).
  */
-export function DebtForm({ debt, cancelTo, onSaved }: DebtFormProps) {
+export function DebtForm({
+  debt,
+  presetVehicle,
+  cancelTo,
+  onSaved,
+}: DebtFormProps) {
   const { label } = useLabels();
   const save = useSaveDebt(debt?.id);
   const vehicles = useVehicleOptions();
@@ -70,7 +78,7 @@ export function DebtForm({ debt, cancelTo, onSaved }: DebtFormProps) {
     formState: { errors },
   } = useForm<DebtFormValues>({
     resolver: zodResolver(debtFormSchema),
-    defaultValues: debtFormDefaults(debt),
+    defaultValues: debtFormDefaults(debt, presetVehicle),
   });
   const lenders = useFieldArray({ control, name: "lenders" });
   const interestPercent = watch("interestPercent");

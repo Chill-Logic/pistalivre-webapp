@@ -14,7 +14,10 @@ import { useDocumentSearch } from "@/hooks/api/gestao/documents/useDocumentSearc
 import { useDocumentTree } from "@/hooks/api/gestao/documents/useDocumentTree";
 import { useDocumentBrowser } from "@/hooks/ui/useDocumentBrowser";
 
-/** Every document, as folders (owner → … → category). Read-only. */
+/**
+ * Every document, as folders (owner → … → category). In a category the
+ * files are managed as on their owner's page; the search can rename.
+ */
 export function DocumentsPage() {
   const { path, query, openFolder, setQuery } = useDocumentBrowser();
   const tree = useDocumentTree(path);

@@ -108,7 +108,12 @@ export type DebtDetail = DebtListItem & {
 /** A page of debts; the summary always covers ALL of them. */
 export type Debts = Paginated<DebtListItem> & { summary: DebtsSummary };
 
-export type DebtFilters = { page: number; pageSize: number };
+export type DebtFilters = {
+  page: number;
+  pageSize: number;
+  /** Only the debts attributed to this vehicle. */
+  vehicleId?: string;
+};
 
 /** Body of POST /debts/:id/payments (dates yyyy-mm-dd). */
 export type DebtPaymentInput = {

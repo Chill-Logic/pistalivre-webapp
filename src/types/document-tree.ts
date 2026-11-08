@@ -1,4 +1,8 @@
-import type { DocumentFile } from "@/types/document";
+import type {
+  DocumentFile,
+  DocumentOwnerType,
+  DocumentSignature,
+} from "@/types/document";
 
 export type DocumentTree = {
   path: string;
@@ -9,15 +13,16 @@ export type DocumentTree = {
   files: (DocumentFile & {
     ownerType: string;
     ownerId: string;
-    signature: { requestId: string; status: string } | null;
+    signature: DocumentSignature | null;
   })[];
-  owner: { type: string; id: string } | null;
+  /** Whose files these are (leaf folders): lets the staff manage them. */
+  owner: { type: DocumentOwnerType; id: string } | null;
 };
 
 export type DocumentSearch = {
   query: string;
   results: {
-    document: DocumentFile;
+    document: DocumentFile & { ownerType: DocumentOwnerType; ownerId: string };
     /** "Manutenções › … · PLA1012 › Manutenção 29/08/2026 › Nota Fiscal" */
     location: string;
     /** Folder that holds it. */

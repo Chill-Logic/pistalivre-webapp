@@ -77,6 +77,7 @@ export const ROUTES = {
 /** Addresses that moved: the old path keeps working (shared links). */
 export const LEGACY_ROUTES = {
   suppliers: `${GESTAO}/fornecedores/*`,
+  vehicleInspection: `${GESTAO}/veiculos/:id/vistorias/:inspectionId`,
 } as const;
 
 export const routeTo = {
@@ -103,6 +104,9 @@ export const routeTo = {
     `${ROUTES.customers}/novo?lead=${encodeURIComponent(leadId)}`,
   debt: (id: string) => `${ROUTES.financeDebts}/${id}`,
   editDebt: (id: string) => `${ROUTES.financeDebts}/${id}/editar`,
+  /** From a vehicle: the debt opens with it chosen. */
+  newDebtForVehicle: (vehicleId: string) =>
+    `${ROUTES.debtNew}?veiculo=${encodeURIComponent(vehicleId)}`,
   supplier: (id: string) => `${ROUTES.suppliers}/${id}`,
   editSupplier: (id: string) => `${ROUTES.suppliers}/${id}/editar`,
   lead: (id: string) => `${ROUTES.crm}/${id}`,
