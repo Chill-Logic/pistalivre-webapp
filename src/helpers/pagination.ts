@@ -25,17 +25,3 @@ export function rangeLabel(page: number, pageSize: number, total: number) {
   const to = Math.min(page * pageSize, total);
   return `${from}–${to} de ${total}`;
 }
-
-/**
- * One page of a list the API returns whole (no `page`/`pageSize` on the
- * server), in the same `Paginated` shape, so `usePagedList` works unchanged.
- */
-export function pageOfItems<T>(items: T[], page: number, pageSize: number) {
-  const start = (page - 1) * pageSize;
-  return {
-    items: items.slice(start, start + pageSize),
-    total: items.length,
-    page,
-    pageSize,
-  };
-}
