@@ -23,7 +23,8 @@ export type RentalListItem = {
   endDate: string | null;
   rate: number;
   ratePeriod: RatePeriod;
-  customer: { id: string; name: string };
+  /** `document` (CPF) only comes on the detail. */
+  customer: { id: string; name: string; document?: string | null };
   vehicle: {
     id: string;
     plate: string;

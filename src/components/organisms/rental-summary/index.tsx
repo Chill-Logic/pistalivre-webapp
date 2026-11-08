@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/atoms/card";
 import { Col, Row } from "@/components/atoms/grid";
 import { Heading } from "@/components/atoms/heading";
 import { Skeleton } from "@/components/atoms/skeleton";
+import { Text } from "@/components/atoms/text";
 import { InfoItem } from "@/components/molecules/info-item";
 import { RentalStatusBadge } from "@/components/molecules/rental-status-badge";
 import { TextLink } from "@/components/molecules/text-link";
@@ -14,6 +15,7 @@ import { vehicleName } from "@/helpers/vehicle";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { ColSpans } from "@/helpers/grid";
 import type { RentalDetail } from "@/types/rental";
+import { formatCpf } from "@/utils/document";
 import { formatCalendarDate } from "@/utils/format";
 import { formatPlate } from "@/utils/plate";
 
@@ -39,6 +41,11 @@ export function RentalSummary({ rental }: { rental: RentalDetail }) {
             <TextLink to={routeTo.customer(rental.customer.id)}>
               {rental.customer.name}
             </TextLink>
+            {rental.customer.document && (
+              <Text size="xs" tone="muted">
+                CPF {formatCpf(rental.customer.document)}
+              </Text>
+            )}
           </InfoItem>
           <InfoItem md={6} label="Veículo">
             <TextLink to={routeTo.vehicle(rental.vehicle.id)}>
