@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
+import { Box } from "@/components/atoms/box";
 import { Col, Row } from "@/components/atoms/grid";
+import { WIDE_MEDIA_QUERY } from "@/constants/layout";
+import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 
 type VehicleDetailLayoutProps = {
   summary: ReactNode;
@@ -23,15 +26,36 @@ export function VehicleDetailLayout({
   debts,
   documents,
 }: VehicleDetailLayoutProps) {
+  // From `lg` up: two independent columns (no hole beside a short card).
+  const wide = useMediaQuery(WIDE_MEDIA_QUERY);
+
+  if (wide) {
+    return (
+      <Row className="items-start gap-y-6">
+        <Col lg={8}>
+          <Box className="space-y-6">
+            {summary}
+            {maintenances}
+            {inspections}
+            {documents}
+          </Box>
+        </Col>
+        <Col lg={4}>
+          <Box className="space-y-6">
+            {status}
+            {rental}
+            {suppliers}
+            {debts}
+          </Box>
+        </Col>
+      </Row>
+    );
+  }
   return (
     <Row className="items-start gap-y-6">
-      <Col lg={8}>{summary}</Col>
-      <Col lg={4}>
-        <Row className="gap-y-6">
-          <Col>{status}</Col>
-          <Col>{rental}</Col>
-        </Row>
-      </Col>
+      <Col>{summary}</Col>
+      <Col>{status}</Col>
+      <Col>{rental}</Col>
       <Col>{maintenances}</Col>
       <Col>{inspections}</Col>
       <Col>{suppliers}</Col>

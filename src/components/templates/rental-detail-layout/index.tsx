@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Box } from "@/components/atoms/box";
 import { Col, Row } from "@/components/atoms/grid";
+import { WIDE_MEDIA_QUERY } from "@/constants/layout";
+import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 
 type RentalDetailLayoutProps = {
   summary: ReactNode;
@@ -26,7 +28,12 @@ type RentalDetailLayoutProps = {
   signatures?: ReactNode;
 };
 
-/** Grid shared by the rental page and its skeleton. */
+/**
+ * Grid shared by the rental page and its skeleton. From `lg` up: content +
+ * sidebar, two independent columns (main: everything you work on; side: the
+ * short reference cards), so a short card never leaves a hole beside a tall
+ * one. On the phone it is one column in reading order.
+ */
 export function RentalDetailLayout({
   summary,
   status,
@@ -45,26 +52,50 @@ export function RentalDetailLayout({
   vehicleCrlv,
   signatures,
 }: RentalDetailLayoutProps) {
+  const wide = useMediaQuery(WIDE_MEDIA_QUERY);
+
+  if (wide) {
+    return (
+      <Row className="items-start gap-y-6">
+        <Col lg={8}>
+          <Box className="space-y-6">
+            {summary}
+            {charges}
+            {contracts}
+            {reconciliation}
+            {rateSegments}
+            {receipts}
+            {invoices}
+            {maintenances}
+            {inspections}
+            {signatures}
+            {documents}
+          </Box>
+        </Col>
+        <Col lg={4}>
+          <Box className="space-y-6">
+            {status}
+            {billing}
+            {autoBilling}
+            {caution}
+            {vehicleCrlv}
+          </Box>
+        </Col>
+      </Row>
+    );
+  }
   return (
     <Row className="items-start gap-y-6">
-      <Col lg={8}>{summary}</Col>
-      <Col lg={4}>
-        <Box className="space-y-6">
-          {status}
-          {billing}
-        </Box>
-      </Col>
-      <Col lg={8}>{charges}</Col>
-      <Col lg={4}>
-        <Box className="space-y-6">
-          {autoBilling}
-          {caution}
-        </Box>
-      </Col>
+      <Col>{summary}</Col>
+      <Col>{status}</Col>
+      <Col>{billing}</Col>
+      <Col>{charges}</Col>
+      {autoBilling && <Col>{autoBilling}</Col>}
+      <Col>{caution}</Col>
       {contracts && <Col>{contracts}</Col>}
       {reconciliation && <Col>{reconciliation}</Col>}
-      {rateSegments && <Col lg={6}>{rateSegments}</Col>}
-      {receipts && <Col lg={6}>{receipts}</Col>}
+      {rateSegments && <Col>{rateSegments}</Col>}
+      {receipts && <Col>{receipts}</Col>}
       {invoices && <Col>{invoices}</Col>}
       <Col>{maintenances}</Col>
       <Col>{inspections}</Col>

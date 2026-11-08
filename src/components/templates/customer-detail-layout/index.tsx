@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
+import { Box } from "@/components/atoms/box";
 import { Col, Row } from "@/components/atoms/grid";
+import { WIDE_MEDIA_QUERY } from "@/constants/layout";
+import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 
 type CustomerDetailLayoutProps = {
   summary: ReactNode;
@@ -43,24 +46,51 @@ export function CustomerDetailLayout({
   notifications,
   signatures,
 }: CustomerDetailLayoutProps) {
+  // From `lg` up: two independent columns (no hole beside a short card).
+  const wide = useMediaQuery(WIDE_MEDIA_QUERY);
+
+  if (wide) {
+    return (
+      <Row className="items-start gap-y-6">
+        <Col lg={8}>
+          <Box className="space-y-6">
+            {summary}
+            {rentals}
+            {invoices}
+            {debts}
+            {charges}
+            {asaasCharges}
+            {notifications}
+            {signatures}
+            {documents}
+          </Box>
+        </Col>
+        <Col lg={4}>
+          <Box className="space-y-6">
+            {license}
+            {contact}
+            {flags}
+            {billing}
+            {wallet}
+          </Box>
+        </Col>
+      </Row>
+    );
+  }
   return (
     <Row className="items-start gap-y-6">
-      <Col lg={8}>{summary}</Col>
-      <Col lg={4}>
-        <Row className="gap-y-6">
-          <Col>{license}</Col>
-          <Col>{contact}</Col>
-          {flags && <Col>{flags}</Col>}
-        </Row>
-      </Col>
+      <Col>{summary}</Col>
+      <Col>{license}</Col>
+      <Col>{contact}</Col>
+      {flags && <Col>{flags}</Col>}
       <Col>{rentals}</Col>
-      {billing && <Col lg={4}>{billing}</Col>}
-      {invoices && <Col lg={8}>{invoices}</Col>}
+      {billing && <Col>{billing}</Col>}
+      {invoices && <Col>{invoices}</Col>}
       {debts && <Col>{debts}</Col>}
       {charges && <Col>{charges}</Col>}
       {asaasCharges && <Col>{asaasCharges}</Col>}
-      {wallet && <Col lg={5}>{wallet}</Col>}
-      {notifications && <Col lg={7}>{notifications}</Col>}
+      {wallet && <Col>{wallet}</Col>}
+      {notifications && <Col>{notifications}</Col>}
       {signatures && <Col>{signatures}</Col>}
       <Col>{documents}</Col>
     </Row>
