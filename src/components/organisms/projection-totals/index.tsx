@@ -35,18 +35,19 @@ export function ProjectionTotalsCard({
       <Row className="gap-y-4">
         <Col md={4}>
           <StatCard
-            label={`Faturamento em ${totals.months} meses`}
+            label={`Faturamento em ${totals.months} meses (aluguel)`}
             value={formatCurrency(totals.revenue)}
+            tone="primary"
           />
         </Col>
         <Col span={6} md={4}>
-          <StatCard label="Despesas" value={formatCurrency(totals.costs)} />
+          <StatCard label="Despesas totais" value={formatCurrency(totals.costs)} />
         </Col>
         <Col span={6} md={4}>
           <StatCard
             label="Lucro projetado"
             value={formatCurrency(totals.profit)}
-            tone={totals.profit < 0 ? "destructive" : "default"}
+            tone={totals.profit < 0 ? "destructive" : "success"}
             hint={margin}
           />
         </Col>

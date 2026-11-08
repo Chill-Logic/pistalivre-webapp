@@ -9,7 +9,7 @@ type StatCardProps = {
   value: ReactNode;
   /** Short note under the number (counts, unavailable sources). */
   hint?: ReactNode;
-  tone?: "default" | "destructive" | "muted";
+  tone?: "default" | "destructive" | "muted" | "primary" | "success";
 };
 
 export function StatCard({

@@ -16,6 +16,7 @@ export const textVariants = cva("", {
       muted: "text-muted-foreground",
       primary: "text-primary",
       destructive: "text-destructive",
+      success: "text-success-foreground",
     },
     weight: {
       normal: "",

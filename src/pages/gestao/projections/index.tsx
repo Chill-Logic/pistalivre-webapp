@@ -7,6 +7,7 @@ import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Col, Row } from "@/components/atoms/grid";
 import { Heading } from "@/components/atoms/heading";
+import { Input } from "@/components/atoms/input";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { EmptyState } from "@/components/molecules/empty-state";
@@ -25,6 +26,7 @@ import {
   ProjectionTotalsCard,
   ProjectionTotalsSkeleton,
 } from "@/components/organisms/projection-totals";
+import { ProjectionTable } from "@/components/organisms/projection-table";
 import { QueryError } from "@/components/organisms/query-error";
 import { copyToClipboard } from "@/helpers/clipboard";
 import { useProjectionReport } from "@/hooks/api/gestao/projections/useProjectionReport";
@@ -115,12 +117,7 @@ function ProjectionScenario({ seed }: { seed: ProjectionSeed }) {
               ) : (
                 <FileText />
               )}
-              <Text inline size={null} className="hidden sm:inline">
-                Relatório para o contador
-              </Text>
-              <Text inline size={null} className="sm:hidden">
-                Relatório
-              </Text>
+              Relatório
             </Button>
           </>
         }
@@ -152,31 +149,57 @@ function ProjectionScenario({ seed }: { seed: ProjectionSeed }) {
             description="Adicione veículos abaixo para simular."
           />
         ) : (
-          <Row as="ul" className="gap-y-4">
-            {state.rows.map((row) => {
-              const vehicle = vehicles.get(row.id);
-              return (
-                <Col as="li" key={row.id} md={6} xl={4}>
-                  <ProjectionVehicleCard
-                    header={
+          <>
+            <Box className="hidden md:block">
+              <ProjectionTable
+                totals={sums}
+                rows={state.rows.map((row) => {
+                  const vehicle = vehicles.get(row.id);
+                  const plate = vehicle ? formatPlate(vehicle.plate) : "—";
+                  return {
+                    key: row.id,
+                    label: plate,
+                    name: (
                       <>
-                        <Text weight="semibold" mono>
-                          {vehicle ? formatPlate(vehicle.plate) : "—"}
-                        </Text>
-                        <Text size="xs" tone="muted" truncate>
-                          {vehicle?.label}
+                        <Text weight="medium">{vehicle?.label ?? "—"}</Text>
+                        <Text size="xs" tone="muted" mono>
+                          {plate}
                         </Text>
                       </>
-                    }
-                    values={row}
-                    onChange={(next) => scenario.patchRow(row.id, next)}
-                    line={lines.get(row.id)}
-                    totals={sums}
-                  />
-                </Col>
-              );
-            })}
-          </Row>
+                    ),
+                    values: row,
+                    onChange: (next) => scenario.patchRow(row.id, next),
+                    line: lines.get(row.id),
+                  };
+                })}
+              />
+            </Box>
+            <Row as="ul" className="gap-y-4 md:hidden">
+              {state.rows.map((row) => {
+                const vehicle = vehicles.get(row.id);
+                return (
+                  <Col as="li" key={row.id} md={6} xl={4}>
+                    <ProjectionVehicleCard
+                      header={
+                        <>
+                          <Text weight="semibold" mono>
+                            {vehicle ? formatPlate(vehicle.plate) : "—"}
+                          </Text>
+                          <Text size="xs" tone="muted" truncate>
+                            {vehicle?.label}
+                          </Text>
+                        </>
+                      }
+                      values={row}
+                      onChange={(next) => scenario.patchRow(row.id, next)}
+                      line={lines.get(row.id)}
+                      totals={sums}
+                    />
+                  </Col>
+                );
+              })}
+            </Row>
+          </>
         )}
       </Box>
 
@@ -196,68 +219,100 @@ function ProjectionScenario({ seed }: { seed: ProjectionSeed }) {
             aquisições.
           </Text>
         ) : (
-          <Row as="ul" className="gap-y-4">
-            {state.extras.map((extra, index) => (
-              <Col as="li" key={index} md={6} xl={4}>
-                <ProjectionVehicleCard
-                  header={
-                    <FormField
-                      label="Nome"
+          <>
+            <Box className="hidden md:block">
+              <ProjectionTable
+                planning
+                totals={sums}
+                rows={state.extras.map((extra, index) => ({
+                  key: String(index),
+                  label: extra.label || `veículo ${index + 1}`,
+                  name: (
+                    <Input
+                      aria-label={`Nome do veículo ${index + 1}`}
                       value={extra.label}
                       onChange={(event) =>
                         scenario.patchExtra(index, {
                           label: event.target.value,
                         })
                       }
+                      className="h-8 w-40 md:h-8"
                     />
-                  }
-                  values={extra}
-                  onChange={(next) => scenario.patchExtra(index, next)}
-                  line={totals.extra[index]}
-                  totals={sums}
-                  footer={
-                    <Box className="flex items-center justify-between gap-2">
-                      <Box className="flex items-center gap-2">
+                  ),
+                  values: extra,
+                  onChange: (next) => scenario.patchExtra(index, next),
+                  line: totals.extra[index],
+                  qty: {
+                    value: extra.qty,
+                    onChange: (qty) => scenario.patchExtra(index, { qty }),
+                  },
+                  onRemove: () => scenario.removeExtra(index),
+                }))}
+              />
+            </Box>
+            <Row as="ul" className="gap-y-4 md:hidden">
+              {state.extras.map((extra, index) => (
+                <Col as="li" key={index} md={6} xl={4}>
+                  <ProjectionVehicleCard
+                    header={
+                      <FormField
+                        label="Nome"
+                        value={extra.label}
+                        onChange={(event) =>
+                          scenario.patchExtra(index, {
+                            label: event.target.value,
+                          })
+                        }
+                      />
+                    }
+                    values={extra}
+                    onChange={(next) => scenario.patchExtra(index, next)}
+                    line={totals.extra[index]}
+                    totals={sums}
+                    footer={
+                      <Box className="flex items-center justify-between gap-2">
+                        <Box className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            aria-label="Menos"
+                            disabled={extra.qty <= 1}
+                            onClick={() =>
+                              scenario.patchExtra(index, { qty: extra.qty - 1 })
+                            }
+                          >
+                            −
+                          </Button>
+                          <Text className="w-16 text-center tabular-nums">
+                            {extra.qty} un.
+                          </Text>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            aria-label="Mais"
+                            onClick={() =>
+                              scenario.patchExtra(index, { qty: extra.qty + 1 })
+                            }
+                          >
+                            +
+                          </Button>
+                        </Box>
                         <Button
-                          variant="outline"
-                          size="icon"
-                          aria-label="Menos"
-                          disabled={extra.qty <= 1}
-                          onClick={() =>
-                            scenario.patchExtra(index, { qty: extra.qty - 1 })
-                          }
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive"
+                          onClick={() => scenario.removeExtra(index)}
                         >
-                          −
-                        </Button>
-                        <Text className="w-16 text-center tabular-nums">
-                          {extra.qty} un.
-                        </Text>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          aria-label="Mais"
-                          onClick={() =>
-                            scenario.patchExtra(index, { qty: extra.qty + 1 })
-                          }
-                        >
-                          +
+                          <Trash2 />
+                          Remover
                         </Button>
                       </Box>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive"
-                        onClick={() => scenario.removeExtra(index)}
-                      >
-                        <Trash2 />
-                        Remover
-                      </Button>
-                    </Box>
-                  }
-                />
-              </Col>
-            ))}
-          </Row>
+                    }
+                  />
+                </Col>
+              ))}
+            </Row>
+          </>
         )}
       </Box>
     </Box>
