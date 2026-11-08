@@ -16,7 +16,7 @@ export function useSaveSupplier(id?: string) {
         queryKeys.suppliers.detail(supplier.id),
         supplier,
       );
-      toast.success(id ? "Fornecedor atualizado" : "Fornecedor cadastrado");
+      toast.success(id ? "Custo fixo atualizado" : "Custo fixo cadastrado");
     },
   });
 }

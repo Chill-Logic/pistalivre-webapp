@@ -73,7 +73,7 @@ export function ProjectionVehicleCard({
           </Col>
           <Col span={6}>
             <MoneyField
-              label="Fornecedores / mês"
+              label="Custos fixos / mês"
               value={values.suppliers}
               onChange={(suppliers) =>
                 onChange({ suppliers: money(suppliers) })

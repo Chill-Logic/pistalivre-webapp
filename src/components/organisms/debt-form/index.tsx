@@ -378,7 +378,7 @@ function LenderRow({
           lender.type === "CUSTOMER"
             ? { label: "Cliente", source: customers }
             : lender.type === "SUPPLIER"
-              ? { label: "Fornecedor", source: suppliers }
+              ? { label: "Custo fixo", source: suppliers }
               : lender.type === "USER"
                 ? { label: "Quem da equipe", source: users }
                 : null;

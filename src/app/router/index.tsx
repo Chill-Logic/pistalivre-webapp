@@ -65,7 +65,8 @@ import {
   SignatureDetailPage,
   SignatureLinkPage,
 } from "./pages";
-import { ROUTES } from "@/constants/routes";
+import { LEGACY_ROUTES, ROUTES } from "@/constants/routes";
+import { LegacyRedirect } from "@/components/molecules/legacy-redirect";
 import { hostRealm } from "@/helpers/host-realm";
 import { LoginPage } from "@/pages/gestao/login";
 import { NotFoundPage } from "@/pages/comum/not-found";
@@ -125,6 +126,16 @@ export const router = createBrowserRouter([
       { path: ROUTES.supplierNew, element: <SupplierNewPage /> },
       { path: ROUTES.supplierDetail, element: <SupplierDetailPage /> },
       { path: ROUTES.supplierEdit, element: <SupplierEditPage /> },
+      {
+        path: LEGACY_ROUTES.suppliers,
+        element: (
+          <LegacyRedirect
+            to={({ "*": rest }) =>
+              rest ? `${ROUTES.suppliers}/${rest}` : ROUTES.suppliers
+            }
+          />
+        ),
+      },
       { path: ROUTES.documents, element: <DocumentsPage /> },
       { path: ROUTES.plans, element: <PlansPage /> },
       { path: ROUTES.planNew, element: <PlanNewPage /> },

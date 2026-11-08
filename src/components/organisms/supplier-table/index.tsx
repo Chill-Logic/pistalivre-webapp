@@ -88,11 +88,11 @@ export function SupplierTable({
       rowHref={(supplier) => routeTo.supplier(supplier.id)}
       isLoading={isLoading}
       isRefreshing={isRefreshing}
-      loadingLabel="Carregando fornecedores…"
+      loadingLabel="Carregando custos fixos…"
       empty={
         <EmptyState
           icon={Store}
-          title="Nenhum fornecedor encontrado"
+          title="Nenhum custo fixo encontrado"
           description="Custos fixos da empresa e dos veículos aparecem aqui."
         />
       }

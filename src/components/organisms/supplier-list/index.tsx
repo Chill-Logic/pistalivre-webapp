@@ -22,7 +22,7 @@ export function SupplierList({
 }: SupplierListProps) {
   if (isLoading) {
     return (
-      <SkeletonRegion label="Carregando fornecedores…">
+      <SkeletonRegion label="Carregando custos fixos…">
         <Row as="ul" className="gap-y-6">
           {Array.from({ length: 6 }, (_, index) => (
             <Col as="li" key={index} sm={6} xl={4}>
@@ -38,7 +38,7 @@ export function SupplierList({
     return (
       <EmptyState
         icon={Store}
-        title="Nenhum fornecedor encontrado"
+        title="Nenhum custo fixo encontrado"
         description="Custos fixos da empresa e dos veículos aparecem aqui."
       />
     );

@@ -23,14 +23,14 @@ export function SuppliersPage() {
   return (
     <Box className="space-y-4 md:space-y-6">
       <PageHeader
-        title="Fornecedores"
+        title="Custos fixos"
         actions={
           <>
             <ViewToggle view={view} onChange={setView} />
             <Button asChild>
               <Link to={ROUTES.supplierNew}>
                 <Plus />
-                Novo fornecedor
+                Novo custo fixo
               </Link>
             </Button>
           </>

@@ -6,6 +6,7 @@ import { OfflineBanner } from "@/components/molecules/offline-banner";
 import { PortalHeader } from "@/components/organisms/portal-header";
 import { TopProgressBar } from "@/components/organisms/top-progress-bar";
 import { PageSkeleton } from "@/components/templates/page-skeleton";
+import { useRealtimeSync } from "@/hooks/api/comum/realtime/useRealtimeSync";
 import type { AuthUser } from "@/types/auth";
 
 /**
@@ -13,6 +14,7 @@ import type { AuthUser } from "@/types/auth";
  * (a hub the renter opens now and then, not a back office).
  */
 export function PortalShell({ user }: { user: AuthUser }) {
+  useRealtimeSync();
   return (
     <Box className="flex min-h-dvh flex-col">
       <TopProgressBar />

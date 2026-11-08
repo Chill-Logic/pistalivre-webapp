@@ -53,7 +53,7 @@ export function ProjectionTotalsCard({
         </Col>
       </Row>
       <Text size="xs" tone="muted">
-        Despesas: manutenção {formatCurrency(totals.maintenance)} · fornecedores{" "}
+        Despesas: manutenção {formatCurrency(totals.maintenance)} · custos fixos{" "}
         {formatCurrency(totals.suppliers)} · financiamento{" "}
         {formatCurrency(totals.financing)} · empresa{" "}
         {formatCurrency(totals.company)}.

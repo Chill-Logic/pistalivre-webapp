@@ -108,7 +108,7 @@ export function ProjectionTable({
               </TableCell>
               <TableCell className="text-right">
                 <MoneyInput
-                  label={`Fornecedores por mês: ${row.label}`}
+                  label={`Custos fixos por mês: ${row.label}`}
                   value={values.suppliers}
                   onChange={(suppliers) =>
                     row.onChange({ suppliers: money(suppliers) })

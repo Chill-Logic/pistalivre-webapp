@@ -13,7 +13,7 @@ const OWNER_NAME: Record<string, string> = {
   RENTAL: "Locação",
   INSPECTION: "Vistoria",
   MAINTENANCE: "Manutenção",
-  SUPPLIER: "Fornecedor",
+  SUPPLIER: "Custo fixo",
   COMPANY: "Empresa",
   LEAD: "Lead",
   LEAD_ACTIVITY: "Atividade de lead",

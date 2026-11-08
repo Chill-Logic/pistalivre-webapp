@@ -32,7 +32,7 @@ export function SupplierDeleteButton({
       }
       title={`Excluir ${name}?`}
       description="Os vínculos com veículos e os documentos dele também são apagados. Isso não pode ser desfeito."
-      confirmLabel="Excluir fornecedor"
+      confirmLabel="Excluir custo fixo"
       isPending={remove.isPending}
       onConfirm={() =>
         remove.mutate(undefined, {

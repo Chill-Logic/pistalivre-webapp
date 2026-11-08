@@ -11,7 +11,7 @@ export function useDeleteSupplier(id: string) {
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: queryKeys.suppliers.detail(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.suppliers.all });
-      toast.success("Fornecedor excluído");
+      toast.success("Custo fixo excluído");
     },
     onError: (error) => toast.error(errorMessage(error)),
   });

@@ -119,7 +119,7 @@ export function SupplierForm({
                 render={({ field }) => (
                   <CheckboxField
                     label="Ativo"
-                    hint="Fornecedor inativo não entra na projeção."
+                    hint="Custo fixo inativo não entra na projeção."
                     checked={field.value}
                     onChange={field.onChange}
                   />
@@ -136,7 +136,7 @@ export function SupplierForm({
           )}
           {dropsLinks && (
             <Alert variant="warning" role="note">
-              Este fornecedor tem veículos vinculados. No escopo Empresa eles
+              Este custo fixo tem veículos vinculados. No escopo Empresa eles
               deixam de aparecer e de contar até ele voltar a ser de Veículo.
             </Alert>
           )}
@@ -150,7 +150,7 @@ export function SupplierForm({
               {save.isPending && (
                 <Spinner className="text-primary-foreground" />
               )}
-              {supplier ? "Salvar alterações" : "Cadastrar fornecedor"}
+              {supplier ? "Salvar alterações" : "Cadastrar custo fixo"}
             </Button>
           </Box>
         </Form>

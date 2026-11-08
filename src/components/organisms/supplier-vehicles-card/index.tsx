@@ -134,7 +134,7 @@ export function SupplierVehiclesCard({
                         </Button>
                       }
                       title={`Desvincular ${plate}?`}
-                      description="O custo deste fornecedor deixa de contar para o veículo na projeção."
+                      description="Este custo fixo deixa de contar para o veículo na projeção."
                       confirmLabel="Desvincular"
                       isPending={
                         unlink.isPending && unlink.variables === link.vehicle.id

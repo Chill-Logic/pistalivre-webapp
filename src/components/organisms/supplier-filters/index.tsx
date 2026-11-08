@@ -30,14 +30,14 @@ export function SupplierFilters({
         <SearchInput
           value={filters.q}
           onSearch={onSearch}
-          placeholder="Buscar fornecedor"
+          placeholder="Buscar custo fixo"
         />
       </Col>
       <Col sm={6} md={3}>
         <FilterSelect
-          label="Escopo"
+          label="Tipo"
           value={filters.scope}
-          allLabel="Empresa e veículo"
+          allLabel="Da empresa e por veículo"
           options={options(LABEL_MAPS.supplierScope)}
           onChange={onScopeChange}
         />

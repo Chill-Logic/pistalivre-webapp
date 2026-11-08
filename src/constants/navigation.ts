@@ -67,7 +67,7 @@ export const SIDEBAR_NAV: NavItem[] = [
   { label: "Modelos", to: ROUTES.models, icon: ScrollText },
   { label: "Vistorias", to: ROUTES.inspections, icon: ClipboardCheck },
   { label: "Manutenções", to: ROUTES.maintenances, icon: Wrench },
-  { label: "Fornecedores", to: ROUTES.suppliers, icon: Receipt },
+  { label: "Custos fixos", to: ROUTES.suppliers, icon: Receipt },
   FINANCE,
   { label: "Projeções", to: ROUTES.projections, icon: TrendingUp },
   { label: "Reembolsos", to: ROUTES.reimbursements, icon: HandCoins },

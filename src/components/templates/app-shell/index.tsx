@@ -9,6 +9,7 @@ import { BottomNav } from "@/components/organisms/bottom-nav";
 import { TopProgressBar } from "@/components/organisms/top-progress-bar";
 import { PageSkeleton } from "@/components/templates/page-skeleton";
 import { usePageTransitionKey } from "@/hooks/ui/usePageTransitionKey";
+import { useRealtimeSync } from "@/hooks/api/comum/realtime/useRealtimeSync";
 import type { AuthUser } from "@/types/auth";
 
 type AppShellProps = {
@@ -23,6 +24,7 @@ export function AppShell({ user }: AppShellProps) {
   // Each page enters with a short fade-up (filters in the query string and
   // tabs of the same section don't replay it).
   const transitionKey = usePageTransitionKey();
+  useRealtimeSync();
 
   return (
     <Box className="flex min-h-dvh">

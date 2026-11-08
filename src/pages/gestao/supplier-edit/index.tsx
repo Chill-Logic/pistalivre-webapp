@@ -22,16 +22,16 @@ export function SupplierEditPage() {
 
   return (
     <Box className="space-y-4">
-      <BackLink to={detailUrl} label={supplier.data?.name ?? "Fornecedor"} />
-      <PageHeader title="Editar fornecedor" />
+      <BackLink to={detailUrl} label={supplier.data?.name ?? "Custo fixo"} />
+      <PageHeader title="Editar custo fixo" />
       {supplier.isPending && (
-        <SkeletonRegion label="Carregando fornecedor…">
+        <SkeletonRegion label="Carregando custo fixo…">
           <SupplierFormSkeleton />
         </SkeletonRegion>
       )}
       {supplier.isError &&
         (isNotFound(supplier.error) ? (
-          <EmptyState icon={Store} title="Fornecedor não encontrado" />
+          <EmptyState icon={Store} title="Custo fixo não encontrado" />
         ) : (
           <QueryError
             error={supplier.error}

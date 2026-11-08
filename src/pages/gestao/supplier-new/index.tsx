@@ -12,8 +12,8 @@ export function SupplierNewPage() {
 
   return (
     <Box className="space-y-4">
-      <BackLink to={backTo} label="Fornecedores" />
-      <PageHeader title="Novo fornecedor" />
+      <BackLink to={backTo} label="Custos fixos" />
+      <PageHeader title="Novo custo fixo" />
       <SupplierForm
         cancelTo={backTo}
         onSaved={(supplier) =>

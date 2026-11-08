@@ -33,10 +33,10 @@ export const ROUTES = {
   leadNew: `${GESTAO}/crm/novo`,
   leadDetail: `${GESTAO}/crm/:id`,
   reimbursements: `${GESTAO}/reembolsos`,
-  suppliers: `${GESTAO}/fornecedores`,
-  supplierNew: `${GESTAO}/fornecedores/novo`,
-  supplierDetail: `${GESTAO}/fornecedores/:id`,
-  supplierEdit: `${GESTAO}/fornecedores/:id/editar`,
+  suppliers: `${GESTAO}/custos-fixos`,
+  supplierNew: `${GESTAO}/custos-fixos/novo`,
+  supplierDetail: `${GESTAO}/custos-fixos/:id`,
+  supplierEdit: `${GESTAO}/custos-fixos/:id/editar`,
   documents: `${GESTAO}/documentos`,
   plans: `${GESTAO}/planos`,
   planNew: `${GESTAO}/planos/novo`,
@@ -72,6 +72,11 @@ export const ROUTES = {
 } as const;
 
 /** Concrete URLs for routes with params. */
+/** Addresses that moved: the old path keeps working (shared links). */
+export const LEGACY_ROUTES = {
+  suppliers: `${GESTAO}/fornecedores/*`,
+} as const;
+
 export const routeTo = {
   vehicle: (id: string) => `${ROUTES.vehicles}/${id}`,
   editVehicle: (id: string) => `${ROUTES.vehicles}/${id}/editar`,

@@ -31,7 +31,7 @@ export function SupplierDetailPage() {
   return (
     <Box className="space-y-4">
       <Box className="flex items-center justify-between gap-2">
-        <BackLink to={backTo} label="Fornecedores" />
+        <BackLink to={backTo} label="Custos fixos" />
         {supplier.data && (
           <Box className="flex gap-2">
             <Button asChild variant="ghost" size="sm">
@@ -48,7 +48,7 @@ export function SupplierDetailPage() {
         )}
       </Box>
       {supplier.isPending && (
-        <SkeletonRegion label="Carregando fornecedor…">
+        <SkeletonRegion label="Carregando custo fixo…">
           <SupplierDetailLayout
             summary={<SupplierSummarySkeleton />}
             vehicles={null}
@@ -60,7 +60,7 @@ export function SupplierDetailPage() {
         (isNotFound(supplier.error) ? (
           <EmptyState
             icon={Store}
-            title="Fornecedor não encontrado"
+            title="Custo fixo não encontrado"
             description="Ele pode ter sido excluído ou o endereço está errado."
           />
         ) : (
