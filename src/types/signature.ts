@@ -1,11 +1,7 @@
 import type { DocumentFile, DocumentOwnerType } from "@/types/document";
 
 export type SignatureStatus =
-  | "DRAFT"
-  | "SENT"
-  | "SIGNED"
-  | "REFUSED"
-  | "CANCELED";
+  "DRAFT" | "SENT" | "SIGNED" | "REFUSED" | "CANCELED";
 
 export type SignerStatus = "PENDING" | "SIGNED" | "REFUSED";
 
@@ -19,8 +15,7 @@ export type SignatureListItem = {
   signedCount: number;
   /** null = the PDF is gone. */
   document:
-    | (DocumentFile & { ownerType: DocumentOwnerType; ownerId: string })
-    | null;
+    (DocumentFile & { ownerType: DocumentOwnerType; ownerId: string }) | null;
   deadlineAt: string | null;
   sentAt: string | null;
   signedAt: string | null;
@@ -61,4 +56,53 @@ export type SignatureFilters = {
   pageSize: number;
   q: string;
   status: SignatureStatus | "";
+};
+
+export type SignerRole =
+  | "LESSEE"
+  | "LESSOR"
+  | "WITNESS"
+  | "GUARANTOR"
+  | "JOINT_DEBTOR"
+  | "CONTRACTOR"
+  | "PARTY"
+  | "INTERVENING"
+  | "SIGN";
+
+export type SignerChannel = "EMAIL" | "WHATSAPP" | "SMS" | "NONE";
+
+/** Body of PUT /signatures/:id (draft only; deadline yyyy-mm-dd). */
+export type SignatureSettingsInput = {
+  name: string;
+  message: string | null;
+  deadlineAt: string | null;
+  remindInterval: number;
+  autoClose: boolean;
+};
+
+/** One line of PUT /signatures/:id/signers (the list replaces the old one). */
+export type SignerInput = {
+  name: string;
+  email: string;
+  phone?: string;
+  documentation?: string;
+  order: number;
+  role: SignerRole;
+  notify: SignerChannel;
+  customerId?: string;
+  userId?: string;
+};
+
+/** An envelope in the provider not yet linked here. */
+export type ProviderEnvelope = {
+  externalId: string;
+  name: string;
+  status: string;
+  createdAt: string | null;
+};
+
+export type ProviderEnvelopeDocument = {
+  id: string;
+  filename: string;
+  status: string;
 };

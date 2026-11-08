@@ -9,7 +9,11 @@ import {
   DocumentsCardSkeleton,
 } from "@/components/organisms/documents-card";
 import { QueryError } from "@/components/organisms/query-error";
+import { SignatureActions } from "@/components/organisms/signature-actions";
 import { SignatureBlockers } from "@/components/organisms/signature-blockers";
+import { SignatureSendDialog } from "@/components/organisms/signature-send-dialog";
+import { SignatureSettingsForm } from "@/components/organisms/signature-settings-form";
+import { SignatureSignersEditor } from "@/components/organisms/signature-signers-editor";
 import {
   SignatureSignersCard,
   SignatureSignersCardSkeleton,
@@ -32,7 +36,17 @@ export function SignatureDetailPage() {
 
   return (
     <Box className="space-y-4">
-      <BackLink to={backTo} label="Assinaturas" />
+      <Box className="flex flex-wrap items-center justify-between gap-2">
+        <BackLink to={backTo} label="Assinaturas" />
+        {data && (
+          <Box className="flex flex-wrap justify-end gap-2">
+            <SignatureActions signature={data} />
+            {data.status === "DRAFT" && (
+              <SignatureSendDialog signature={data} />
+            )}
+          </Box>
+        )}
+      </Box>
       {signature.isPending && (
         <SkeletonRegion label="Carregando pedido de assinatura…">
           <SignatureDetailLayout
@@ -63,7 +77,25 @@ export function SignatureDetailPage() {
             ) : null
           }
           summary={<SignatureSummary signature={data} />}
-          signers={<SignatureSignersCard signers={data.signers} />}
+          settings={
+            data.status === "DRAFT" ? (
+              <SignatureSettingsForm key={data.updatedAt} signature={data} />
+            ) : null
+          }
+          signers={
+            data.status === "DRAFT" ? (
+              <SignatureSignersEditor
+                key={data.updatedAt}
+                signatureId={data.id}
+                signers={data.signers}
+              />
+            ) : (
+              <SignatureSignersCard
+                signers={data.signers}
+                resendFor={data.status === "SENT" ? data.id : undefined}
+              />
+            )
+          }
           document={
             <DocumentsCard
               title="Documento a assinar"

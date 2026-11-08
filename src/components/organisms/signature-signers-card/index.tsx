@@ -1,4 +1,7 @@
+import { RotateCw } from "lucide-react";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
+import { Spinner } from "@/components/atoms/spinner";
 import {
   Card,
   CardContent,
@@ -12,13 +15,24 @@ import { SignerStatusBadge } from "@/components/molecules/signature-status-badge
 import { TextLink } from "@/components/molecules/text-link";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
+import { useNotifySigner } from "@/hooks/api/gestao/signatures/useSignatureMutations";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { Signer } from "@/types/signature";
 import { formatCpf, formatPhone } from "@/utils/document";
 import { formatDateTime } from "@/utils/format";
 
-/** Who signs, in signing order (same order = in parallel), with status. */
-export function SignatureSignersCard({ signers }: { signers: Signer[] }) {
+/**
+ * Who signs, in signing order (same order = in parallel), with status.
+ * With `resendFor` (a SENT request), a pending signer can get the
+ * invitation again.
+ */
+export function SignatureSignersCard({
+  signers,
+  resendFor,
+}: {
+  signers: Signer[];
+  resendFor?: string;
+}) {
   const { label } = useLabels();
   const ordered = [...signers].sort((a, b) => a.order - b.order);
 
@@ -54,11 +68,20 @@ export function SignatureSignersCard({ signers }: { signers: Signer[] }) {
                         signer.name
                       )}
                     </Text>
-                    <SignerStatusBadge status={signer.status} />
+                    <Box className="flex shrink-0 items-center gap-1">
+                      {resendFor && signer.status === "PENDING" && (
+                        <SignerResendButton
+                          signatureId={resendFor}
+                          signer={signer}
+                        />
+                      )}
+                      <SignerStatusBadge status={signer.status} />
+                    </Box>
                   </Box>
                   <Text size="xs" tone="muted">
-                    {signer.order}º · {label(LABEL_MAPS.signerRole, signer.role)}{" "}
-                    · aviso por {label(LABEL_MAPS.signerChannel, signer.notify)}
+                    {signer.order}º ·{" "}
+                    {label(LABEL_MAPS.signerRole, signer.role)} · aviso por{" "}
+                    {label(LABEL_MAPS.signerChannel, signer.notify)}
                   </Text>
                   <Text size="xs" tone="muted" className="break-words">
                     {contact.join(" · ")}
@@ -97,5 +120,28 @@ export function SignatureSignersCardSkeleton() {
         ))}
       </CardContent>
     </Card>
+  );
+}
+
+/** "Reenviar": the provider sends the invitation to this signer again. */
+function SignerResendButton({
+  signatureId,
+  signer,
+}: {
+  signatureId: string;
+  signer: Signer;
+}) {
+  const notify = useNotifySigner(signatureId);
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      aria-label={`Reenviar convite para ${signer.name}`}
+      disabled={notify.isPending}
+      onClick={() => notify.mutate(signer.id)}
+    >
+      {notify.isPending ? <Spinner /> : <RotateCw />}
+      Reenviar
+    </Button>
   );
 }
