@@ -18,7 +18,8 @@ import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
 /**
  * A charge in the renter's portal: what to pay and how (pix copy-and-paste,
- * QR on demand, or the invoice). Amount comes ready from the API.
+ * QR on demand, or the invoice). Amount comes ready from the API — the
+ * same one the staff sees, with fine and interest when overdue.
  */
 export function PortalChargeItem({ charge }: { charge: PortalCharge }) {
   const copy = useCopy();
@@ -55,9 +56,12 @@ export function PortalChargeItem({ charge }: { charge: PortalCharge }) {
         </Box>
       </Box>
       {!amounts.isPaid && amounts.surcharge > 0 && (
+        // Same number as the staff sees (owner's call). An old charge made
+        // in Asaas without fine/interest may cost less there, hence the note.
         <Text size="xs" tone="muted">
           {formatCurrency(amounts.principal)} +{" "}
-          {formatCurrency(amounts.surcharge)} de multa e juros
+          {formatCurrency(amounts.surcharge)} de multa e juros · o valor no
+          pagamento pode ser diferente
         </Text>
       )}
       {amounts.isPaid && charge.paidAt && (

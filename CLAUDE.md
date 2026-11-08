@@ -54,14 +54,14 @@ Gestão inteira fora o que move dinheiro: Painel; Veículos, Clientes, Locaçõe
 perda/retomada, atividades, questionário), Fornecedores (+ vínculos), Planos, Usuários (admin × agente),
 Modelos de contrato e Manutenções com CRUD; Documentos (enviar/renomear/excluir); Vistorias; Reembolsos
 (listar e **recusar**); Financeiro, Débitos e Extrato **só leitura**; Propostas e Assinaturas **só
-leitura**; Projeções (conta no servidor + PDF). Portal do cliente **só leitura**. Shell novo com animações
+leitura**; Projeções (conta no servidor + PDF). Portal do cliente com as escritas (senha, carteira pix, pedir reembolso, manutenção, vistoria). Shell novo com animações
 (bottom sheet no celular, sem ação central na barra). Locação: cobrança automática e regras do aluguel
 (acerto, valores no tempo, abonos, descontos, pix recebidos) com escrita (B5).
 
 ## O que falta (2026-11-08)
 
 **Liberado pelo dono em 2026-11-08 ("vamos fazer tudo")**, em andamento com o backend (`pista-livre-99`),
-na ordem: A) reembolso "marcar como pago" (migration aditiva), escritas do portal, nota do extrato e
+na ordem: A) reembolso "marcar como pago" (migration aditiva), escritas do portal (feitas), nota do extrato e
 "transferência interna", revogar o Bearer ao trocar a senha; B) cobranças (emitir avulsa, editar, cancelar,
 baixa/recebimento, NF, cobrança automática, trechos de valor, abonos, dias sem cobrança, descontos, pix
 recebidos) e pagamentos de dívida, com `Idempotency-Key` nas escritas que emitem; C) escritas de Propostas e
