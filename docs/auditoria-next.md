@@ -55,15 +55,15 @@ do dono. Marque `[x]` ao entregar.
 - [ ] B+F — **Carteira pix pela equipe**: `GET/POST /customers/:id/wallet`, `POST …/wallet/preview`,
   `PUT …/wallet/:methodId/default`, `DELETE …/wallet/:methodId` (cadastrar chave não é saída de dinheiro).
 - [ ] B+F — **Notificações do Asaas** por evento/canal: `GET/PUT /customers/:id/notifications`.
-- [ ] B+F — **Cobranças do cliente**, inclusive as fora do Asaas sem locação (hoje não aparecem em lugar nenhum):
+- [x] B+F — **Cobranças do cliente**, inclusive as fora do Asaas sem locação (hoje não aparecem em lugar nenhum):
   `GET /customers/:id/charges` (`billing.listChargesForCustomer`).
-- [ ] F — Nas cobranças do Asaas com `paymentId`: "Dar baixa" e anexos (`ChargeSettleDialog`, `DocumentUploadDialog`).
+- [x] F — Nas cobranças do Asaas com `paymentId`: "Dar baixa" e anexos (`ChargeSettleDialog`, `DocumentUploadDialog`).
 - [ ] B+F — **Asaas na lista**: `asaasLinked` no item de `GET /customers`; `GET /customers/asaas-directory`
   (só no Asaas + conciliáveis); `POST /customers/:id/asaas-link`; `POST /customers/import-from-asaas`.
 - [ ] B+F — **Assinaturas do cliente e da locação**: `GET /signatures?ownerType=&ownerId=`.
-- [ ] F — Anexos de cada débito do cliente (`ownerType=CUSTOMER_DEBT`).
-- [ ] B+F — Previsão "~N semanas para quitar" no débito, calculada no servidor (decidido).
-- [ ] F — Idade ao lado da data de nascimento; nacionalidade.
+- [x] F — Anexos de cada débito do cliente (`ownerType=CUSTOMER_DEBT`).
+- [x] B+F — Previsão "~N semanas para quitar" no débito, calculada no servidor (decidido).
+- [x] F — Idade ao lado da data de nascimento; nacionalidade.
 
 ## Locações
 
@@ -74,13 +74,13 @@ do dono. Marque `[x]` ao entregar.
   Separar no front os documentos de categoria "Contrato"/"Contrato assinado" já pode (api-v1.md:78).
 - [ ] B+F — **Ver como cliente**: `GET /rentals/:id/customer-view` → `{rental, sections}` no formato do portal;
   front reaproveita `PortalRentalSummary`/`PortalRentalSections` com `readOnly`.
-- [ ] F — "Copiar link do cliente" (URL do portal no domínio `app.cliente`).
-- [ ] F — Card **CRLV do veículo** (de `GET /vehicles/:id` `documents[]`).
-- [ ] F — Cobranças: anexos/comprovantes (`attachments[]` + `POST /documents ownerType=PAYMENT`), **QR do pix**
+- [x] F — "Copiar link do cliente" (URL do portal no domínio `app.cliente`).
+- [x] F — Card **CRLV do veículo** (de `GET /vehicles/:id` `documents[]`).
+- [x] F — Cobranças: anexos/comprovantes (`attachments[]` + `POST /documents ownerType=PAYMENT`), **QR do pix**
   (`pix.encodedImage`), multa/juros ou "a mais" também nas **pagas**.
-- [ ] B — **Dia de cobrança** pronto: `billingDayLabel` ("Todo dia N" / "Todos os dias, exceto …") em
+- [x] B — **Dia de cobrança** pronto: `billingDayLabel` ("Todo dia N" / "Todos os dias, exceto …") em
   `GET /rentals/:id` e `GET /me/rentals[/:id]` (o Next calcula em `lib/labels.ts:277`).
-- [ ] F — Extrato respeita o período da conciliação (`?from=&through=` na tela e no PDF; o botão leva o período).
+- [x] F — Extrato respeita o período da conciliação (`?from=&through=` na tela e no PDF; o botão leva o período).
 - [ ] F — Lista de locações abre filtrada em **Ativas** (como o Next).
 - [ ] F — Nova locação: listar só veículos **disponíveis** (+ o atual na edição), como o Next (decidido).
 
