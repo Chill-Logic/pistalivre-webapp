@@ -56,7 +56,9 @@ Modelos de contrato e Manutenções com CRUD; Documentos (enviar/renomear/exclui
 (listar e **recusar**); Financeiro, Débitos e Extrato **só leitura**; Propostas e Assinaturas **só
 leitura**; Projeções (conta no servidor + PDF). Portal do cliente com as escritas (senha, carteira pix, pedir reembolso, manutenção, vistoria). Shell novo com animações
 (bottom sheet no celular, sem ação central na barra). Locação: cobrança automática e regras do aluguel
-(acerto, valores no tempo, abonos, descontos, pix recebidos) com escrita (B5).
+(acerto, valores no tempo, abonos, descontos, pix recebidos) com escrita (B5). Cobrança avulsa (unitária e
+parcelada), registrar recebimento fora do Asaas, "Sincronizar do Asaas" e NF (locação, cliente e avulsa,
+cancelar, vincular) com escrita (B2/B4).
 
 ## O que falta (2026-11-08)
 
