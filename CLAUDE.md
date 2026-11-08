@@ -77,7 +77,6 @@ leitura**; Projeções (conta no servidor + PDF). Portal do cliente **só leitur
   `npm run pwa:assets`).
 
 **Pode ser feito sem decisão**:
-- Seções recolhíveis animadas (`grid-rows-[0fr]→[1fr]`), resto do pedido de animações.
 
 **Sucessos nunca testados de verdade no dev** (só com simulação): criar/editar cliente (upsert no Asaas),
 recusar reembolso (só há pedido real), upload de documento (o S3 do dev está com credencial quebrada: abrir

@@ -32,6 +32,8 @@ export type TemplateVariable = {
   description?: string;
   example?: string;
   kind: string;
+  /** Only on `kind: "list"`: the fields of one item (`{{this.x}}` in `#each`). */
+  itemFields?: Omit<TemplateVariable, "itemFields">[];
 };
 
 export type TemplateVariableGroup = {

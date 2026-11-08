@@ -13,7 +13,10 @@ import {
 import {
   filterTemplateVariables,
   flattenTemplateVariables,
+  pathOptions,
+  splitBlockQuery,
   variableSets,
+  type VariableOption,
 } from "@/helpers/template-variables";
 import { useRichTextEditor } from "@/hooks/ui/useRichTextEditor";
 import type { TemplateVariableCatalog } from "@/types/template";
@@ -97,13 +100,31 @@ export function useTemplateEditor(
     () => flattenTemplateVariables(catalog, withSlots),
     [catalog, withSlots],
   );
+  // `{{#if ` (typed, or left by picking "Se … então") asks for a path.
+  const pendingBlock = useMemo(() => splitBlockQuery(query), [query]);
   const options = useMemo(
-    () => filterTemplateVariables(allOptions, query),
-    [allOptions, query],
+    () =>
+      pendingBlock
+        ? filterTemplateVariables(
+            pathOptions(allOptions, pendingBlock.block.needs ?? "any"),
+            pendingBlock.rest,
+          )
+        : filterTemplateVariables(allOptions, query),
+    [allOptions, query, pendingBlock],
   );
+  const menuHeading = pendingBlock
+    ? `${pendingBlock.label}: escolha ${
+        pendingBlock.block.needs === "list"
+          ? "a lista a repetir"
+          : "o campo a testar"
+      }`
+    : undefined;
 
-  /** One text insertion = one undo step. Replaces the typed `{{…`. */
-  const insert = (text: string) => {
+  /**
+   * One text insertion = one undo step. Replaces the typed `{{…`; the caret
+   * lands at `caret` (default: the end), e.g. between `{{#if x}}` and `{{/if}}`.
+   */
+  const insert = (text: string, caret = text.length) => {
     if (!editor) return;
     const current = triggerRef.current;
     const range = current ?? {
@@ -114,9 +135,40 @@ export function useTemplateEditor(
       .chain()
       .focus()
       .insertContentAt(range, { type: "text", text })
-      .setTextSelection(range.from + text.length)
+      .setTextSelection(range.from + caret)
       .run();
   };
 
-  return { editor, trigger, query, options, anchorRef, menuRef, insert };
+  /** What picking an entry of the `{{` menu does. */
+  const pick = (option: VariableOption) => {
+    if (pendingBlock) {
+      const opener = pendingBlock.block.opener.replace("%s", option.key);
+      insert(opener + pendingBlock.block.closer, opener.length);
+      return;
+    }
+    if (option.block?.needs) {
+      // Leaves `{{#if ` open: the menu turns into the path list.
+      insert(`{{${option.key} `);
+      return;
+    }
+    if (option.block) {
+      insert(
+        option.block.opener + option.block.closer,
+        option.block.opener.length,
+      );
+      return;
+    }
+    insert(option.text);
+  };
+
+  return {
+    editor,
+    trigger,
+    query,
+    options,
+    menuHeading,
+    anchorRef,
+    menuRef,
+    pick,
+  };
 }

@@ -42,8 +42,16 @@ export function TemplateHtmlEditor({
   error,
 }: TemplateHtmlEditorProps) {
   const labelId = useId();
-  const { editor, trigger, query, options, anchorRef, menuRef, insert } =
-    useTemplateEditor(value, onChange, catalog, withSlots);
+  const {
+    editor,
+    trigger,
+    query,
+    options,
+    menuHeading,
+    anchorRef,
+    menuRef,
+    pick,
+  } = useTemplateEditor(value, onChange, catalog, withSlots);
   const closeMenu = () => {
     if (editor) exitSuggestion(editor.view, variableSuggestionKey);
   };
@@ -94,7 +102,8 @@ export function TemplateHtmlEditor({
               key={query}
               ref={menuRef}
               options={options}
-              onPick={(option) => insert(option.text)}
+              heading={menuHeading}
+              onPick={pick}
             />
           </PopoverContent>
         </Popover>

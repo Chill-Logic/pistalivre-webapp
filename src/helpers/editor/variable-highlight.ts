@@ -96,7 +96,13 @@ export const VariableHighlight = Extension.create<VariableHighlightOptions>({
   name: "variableHighlight",
 
   addOptions() {
-    return { getSets: () => ({ keys: new Set(), slots: new Set() }) };
+    return {
+      getSets: () => ({
+        keys: new Set(),
+        slots: new Set(),
+        itemKeys: new Set(),
+      }),
+    };
   },
 
   addProseMirrorPlugins() {

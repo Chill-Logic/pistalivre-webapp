@@ -8,9 +8,11 @@ import type { SuggestionMatch, Trigger } from "@tiptap/suggestion";
  * about `{{{` (the slot form).
  *
  * Anchored at the caret, so it matches the LAST opening. `#` and one space
- * are allowed so a hand-typed `{{#each ` keeps the menu open.
+ * are allowed so a hand-typed `{{#each ` keeps the menu open; accented
+ * letters too, because the search also matches labels ("Senão").
  */
-const TRIGGER_RE = /(\{\{\{?)(#\w*(?:\s+[\w.[\]]*)?|[\w.[\]]*)$/;
+const TRIGGER_RE =
+  /(\{\{\{?)(#\w*(?:\s+[\p{L}\p{N}_.[\]]*)?|[\p{L}\p{N}_.[\]]*)$/u;
 
 /** One char per inline leaf keeps string offsets aligned with positions. */
 export const LEAF_CHAR = "￼";

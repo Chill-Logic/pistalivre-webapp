@@ -23,6 +23,8 @@ export type VariableSuggestionMenuHandle = {
 type VariableSuggestionMenuProps = {
   /** Already filtered by what was typed after `{{`. */
   options: VariableOption[];
+  /** Line above the list, e.g. while a block waits for its path. */
+  heading?: string;
   onPick: (option: VariableOption) => void;
   ref?: Ref<VariableSuggestionMenuHandle>;
 };
@@ -34,6 +36,7 @@ type VariableSuggestionMenuProps = {
  */
 export function VariableSuggestionMenu({
   options,
+  heading,
   onPick,
   ref,
 }: VariableSuggestionMenuProps) {
@@ -100,12 +103,23 @@ export function VariableSuggestionMenu({
       value={options[activeIndex]?.id ?? ""}
       onValueChange={setActiveId}
     >
+      {heading && (
+        <Text
+          size="xs"
+          weight="medium"
+          className="border-b bg-muted/50 px-3 py-2"
+        >
+          {heading}
+        </Text>
+      )}
       <CommandList ref={listRef} className="max-h-72">
         {/* Not CommandEmpty: cmdk shows it for a frame on every remount,
             before the items register (it flashed at each keystroke). */}
         {options.length === 0 && (
           <Text tone="muted" className="py-6 text-center">
-            Nenhuma variável com esse nome.
+            {heading
+              ? "Nenhum campo com esse nome."
+              : "Nenhuma variável com esse nome."}
           </Text>
         )}
         {groups.map((group) => (
