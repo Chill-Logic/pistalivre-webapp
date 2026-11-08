@@ -1,4 +1,4 @@
-import { FileText, Pencil } from "lucide-react";
+import { CalendarRange, FileText, Pencil } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -77,6 +77,12 @@ export function RentalDetailPage() {
         <BackLink to={backTo} label="Locações" />
         {rental.data && (
           <Box className="flex gap-2">
+            <Button asChild variant="ghost" size="sm">
+              <Link to={routeTo.rentalStatement(rental.data.id)}>
+                <CalendarRange />
+                Extrato
+              </Link>
+            </Button>
             <Button asChild variant="ghost" size="sm">
               <Link to={routeTo.editRental(rental.data.id)}>
                 <Pencil />

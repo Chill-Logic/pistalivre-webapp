@@ -18,6 +18,7 @@ export const ROUTES = {
   rentalNew: `${GESTAO}/locacoes/nova`,
   rentalDetail: `${GESTAO}/locacoes/:id`,
   rentalEdit: `${GESTAO}/locacoes/:id/editar`,
+  rentalStatement: `${GESTAO}/locacoes/:id/extrato`,
   customers: `${GESTAO}/clientes`,
   customerNew: `${GESTAO}/clientes/novo`,
   customerDetail: `${GESTAO}/clientes/:id`,
@@ -66,6 +67,7 @@ export const ROUTES = {
   portalLogin: `${PORTAL}/entrar`,
   portalRental: `${PORTAL}/locacoes/:id`,
   portalInspectionNew: `${PORTAL}/locacoes/:id/vistorias/nova`,
+  portalRentalStatement: `${PORTAL}/locacoes/:id/extrato`,
 } as const;
 
 /** Concrete URLs for routes with params. */
@@ -73,6 +75,7 @@ export const routeTo = {
   vehicle: (id: string) => `${ROUTES.vehicles}/${id}`,
   editVehicle: (id: string) => `${ROUTES.vehicles}/${id}/editar`,
   rental: (id: string) => `${ROUTES.rentals}/${id}`,
+  rentalStatement: (id: string) => `${ROUTES.rentals}/${id}/extrato`,
   editRental: (id: string) => `${ROUTES.rentals}/${id}/editar`,
   customer: (id: string) => `${ROUTES.customers}/${id}`,
   editCustomer: (id: string) => `${ROUTES.customers}/${id}/editar`,
@@ -105,6 +108,8 @@ export const routeTo = {
   proposal: (id: string) => `${ROUTES.proposals}/${id}`,
   signature: (id: string) => `${ROUTES.signatures}/${id}`,
   portalRental: (id: string) => `${ROUTES.portal}/locacoes/${id}`,
+  portalRentalStatement: (id: string) =>
+    `${ROUTES.portal}/locacoes/${id}/extrato`,
   portalInspectionNew: (id: string) =>
     `${ROUTES.portal}/locacoes/${id}/vistorias/nova`,
 };

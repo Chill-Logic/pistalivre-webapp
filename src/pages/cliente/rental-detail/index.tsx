@@ -1,6 +1,7 @@
-import { FileText } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { CalendarRange, FileText } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
@@ -19,7 +20,7 @@ import {
   RentalCautionCardSkeleton,
 } from "@/components/organisms/rental-caution-card";
 import { PortalRentalLayout } from "@/components/templates/portal-rental-layout";
-import { ROUTES } from "@/constants/routes";
+import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { useMyRental } from "@/hooks/api/cliente/rentals/useMyRental";
 import { useMyRentalSections } from "@/hooks/api/cliente/rentals/useMyRentalSections";
@@ -31,7 +32,17 @@ export function PortalRentalDetailPage() {
 
   return (
     <Box className="space-y-4">
-      <BackLink to={ROUTES.portal} label="Minhas locações" />
+      <Box className="flex items-center justify-between gap-2">
+        <BackLink to={ROUTES.portal} label="Minhas locações" />
+        {rental.data && (
+          <Button asChild variant="ghost" size="sm">
+            <Link to={routeTo.portalRentalStatement(id)}>
+              <CalendarRange />
+              Ver extrato
+            </Link>
+          </Button>
+        )}
+      </Box>
       {rental.isPending && (
         <SkeletonRegion label="Carregando locação…">
           <PortalRentalLayout

@@ -40,6 +40,8 @@ import {
   MaintenancesPage,
   PortalHomePage,
   PortalRentalDetailPage,
+  PortalRentalStatementPage,
+  RentalStatementPage,
   PortalInspectionNewPage,
   ReimbursementsPage,
   RentalDetailPage,
@@ -81,6 +83,10 @@ export const router = createBrowserRouter([
       { path: ROUTES.portal, element: <PortalHomePage /> },
       { path: ROUTES.portalRental, element: <PortalRentalDetailPage /> },
       {
+        path: ROUTES.portalRentalStatement,
+        element: <PortalRentalStatementPage />,
+      },
+      {
         path: ROUTES.portalInspectionNew,
         element: <PortalInspectionNewPage />,
       },
@@ -104,6 +110,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.rentalNew, element: <RentalNewPage /> },
       { path: ROUTES.rentalDetail, element: <RentalDetailPage /> },
       { path: ROUTES.rentalEdit, element: <RentalEditPage /> },
+      { path: ROUTES.rentalStatement, element: <RentalStatementPage /> },
       { path: ROUTES.customers, element: <CustomersPage /> },
       { path: ROUTES.customerNew, element: <CustomerNewPage /> },
       { path: ROUTES.customerDetail, element: <CustomerDetailPage /> },

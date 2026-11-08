@@ -52,6 +52,14 @@ export const PortalHomePage = lazyPage(
   () => import("@/pages/cliente/home"),
   "PortalHomePage",
 );
+export const PortalRentalStatementPage = lazyPage(
+  () => import("@/pages/cliente/rental-statement"),
+  "PortalRentalStatementPage",
+);
+export const RentalStatementPage = lazyPage(
+  () => import("@/pages/gestao/rental-statement"),
+  "RentalStatementPage",
+);
 export const PortalRentalDetailPage = lazyPage(
   () => import("@/pages/cliente/rental-detail"),
   "PortalRentalDetailPage",
