@@ -249,3 +249,7 @@ export const SignatureDetailPage = lazyPage(
   () => import("@/pages/gestao/signature-detail"),
   "SignatureDetailPage",
 );
+export const RentalContractNewPage = lazyPage(
+  () => import("@/pages/gestao/rental-contract-new"),
+  "RentalContractNewPage",
+);

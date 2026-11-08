@@ -11,6 +11,8 @@ type DocumentItemProps = {
   document: DocumentFile;
   /** Shown instead of the file name (e.g. the inspection photo's label). */
   title?: string;
+  /** Replaces the kind · size · date line (e.g. a contract's status). */
+  subtitle?: string;
   onView: () => void;
   onDownload: () => void;
   isViewing: boolean;
@@ -22,6 +24,7 @@ type DocumentItemProps = {
 export function DocumentItem({
   document,
   title,
+  subtitle,
   onView,
   onDownload,
   isViewing,
@@ -43,7 +46,7 @@ export function DocumentItem({
           {title ?? document.fileName}
         </Text>
         <Text size="xs" tone="muted" truncate>
-          {meta.join(" · ")}
+          {subtitle ?? meta.join(" · ")}
         </Text>
       </Box>
       <Button

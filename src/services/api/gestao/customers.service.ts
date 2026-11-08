@@ -1,6 +1,7 @@
 import { toQueryParams } from "@/helpers/query-params";
 import { http } from "@/services/http/client";
 import type { Paginated } from "@/types/api";
+import type { LicenseInput, LicenseStatus } from "@/types/contract";
 import type {
   AsaasDirectory,
   CustomerDetail,
@@ -55,6 +56,14 @@ export const customersService = {
     const { data } = await http.post<CustomerDetail>(
       "/customers/import-from-asaas",
       { asaasCustomerId },
+    );
+    return data;
+  },
+  /** Only the CNH (asked when generating a contract; nothing goes to Asaas). */
+  async saveLicense(id: string, input: LicenseInput) {
+    const { data } = await http.put<LicenseStatus>(
+      `/customers/${id}/cnh`,
+      input,
     );
     return data;
   },

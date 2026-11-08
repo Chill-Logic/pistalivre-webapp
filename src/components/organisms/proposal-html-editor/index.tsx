@@ -12,8 +12,8 @@ type ProposalHtmlEditorProps = {
 };
 
 /**
- * The proposal text to review before issuing (what is here freezes in the
- * PDF). It seeds once: remount it with a `key` to load a new draft or the
+ * The proposal (or contract) text to review before issuing (what is here
+ * freezes in the PDF). It seeds once: remount it with a `key` to load a new draft or the
  * AI's version. TipTap's schema drops anything that is not text formatting.
  */
 export function ProposalHtmlEditor({

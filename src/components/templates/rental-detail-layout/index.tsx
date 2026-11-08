@@ -11,6 +11,8 @@ type RentalDetailLayoutProps = {
   maintenances: ReactNode;
   inspections: ReactNode;
   documents: ReactNode;
+  /** Generated contracts + "Contrato…" documents. */
+  contracts?: ReactNode;
   /** Rent rules (block B5): auto-billing, reconciliation, values, pix. */
   autoBilling?: ReactNode;
   reconciliation?: ReactNode;
@@ -34,6 +36,7 @@ export function RentalDetailLayout({
   maintenances,
   inspections,
   documents,
+  contracts,
   autoBilling,
   reconciliation,
   rateSegments,
@@ -58,6 +61,7 @@ export function RentalDetailLayout({
           {caution}
         </Box>
       </Col>
+      {contracts && <Col>{contracts}</Col>}
       {reconciliation && <Col>{reconciliation}</Col>}
       {rateSegments && <Col lg={6}>{rateSegments}</Col>}
       {receipts && <Col lg={6}>{receipts}</Col>}

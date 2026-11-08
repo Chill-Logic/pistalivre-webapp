@@ -1,3 +1,5 @@
+import type { SignatureStatus } from "@/types/signature";
+
 export type DocumentFile = {
   id: string;
   /** `slug` finds a kind without its display name ("crlv"). */
@@ -8,6 +10,11 @@ export type DocumentFile = {
   /** Relative to the API server root (`/api/files/<key>`), not to `/api`. */
   url: string;
   createdAt: string;
+  /**
+   * Staff details only: the latest signature request of this PDF (null =
+   * never put in signature). Absent in the portal and in lists.
+   */
+  signature?: { requestId: string; status: SignatureStatus } | null;
 };
 
 /**

@@ -10,11 +10,15 @@ import { Col, Row } from "@/components/atoms/grid";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { InfoItem } from "@/components/molecules/info-item";
+import { CustomerLicenseDialog } from "@/components/organisms/customer-license-dialog";
 import { isLicenseExpired } from "@/helpers/customer";
 import type { CustomerDetail } from "@/types/customer";
 import { formatCalendarDate } from "@/utils/format";
 
-/** CNH: captured in the contract flow; a valid one is required to generate it. */
+/**
+ * CNH: edited here or in the contract flow; a valid one is required to
+ * generate a contract.
+ */
 export function CustomerLicenseCard({
   customer,
 }: {
@@ -26,14 +30,18 @@ export function CustomerLicenseCard({
     <Card>
       <CardHeader>
         <Box className="flex items-center justify-between gap-2">
-          <CardTitle className="text-base">CNH</CardTitle>
-          {expired && <Badge variant="error">Vencida</Badge>}
+          <Box className="flex items-center gap-2">
+            <CardTitle className="text-base">CNH</CardTitle>
+            {expired && <Badge variant="error">Vencida</Badge>}
+          </Box>
+          <CustomerLicenseDialog customer={customer} />
         </Box>
       </CardHeader>
       <CardContent>
         {!customer.driverLicense ? (
           <Text tone="muted">
-            Ainda não informada. Ela é pedida ao gerar o contrato.
+            Ainda não informada. Informe aqui ou ao gerar o contrato: ela é
+            exigida para gerar.
           </Text>
         ) : (
           <Row as="dl" className="gap-y-4">
@@ -61,7 +69,10 @@ export function CustomerLicenseCardSkeleton() {
   return (
     <Card>
       <CardHeader>
-        <Skeleton shape="text" className="w-12 text-base" />
+        <Box className="flex items-center justify-between gap-2">
+          <Skeleton shape="text" className="w-12 text-base" />
+          <Skeleton className="h-8 w-20" />
+        </Box>
       </CardHeader>
       <CardContent>
         <Row className="gap-y-4">

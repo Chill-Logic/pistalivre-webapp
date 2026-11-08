@@ -1,4 +1,4 @@
-import { Eye, FileText, Sparkles } from "lucide-react";
+import { Eye, FileText } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Alert } from "@/components/atoms/alert";
@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/atoms/card";
 import { Col, Row } from "@/components/atoms/grid";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
+import { AiPersonalizeBox } from "@/components/molecules/ai-personalize-box";
 import { CheckboxField } from "@/components/molecules/checkbox-field";
 import { DateField } from "@/components/molecules/date-field";
 import { FormField } from "@/components/molecules/form-field";
@@ -20,6 +21,7 @@ import { ProposalHtmlEditor } from "@/components/organisms/proposal-html-editor"
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { toApiError } from "@/helpers/api-error";
 import { moneyErrorMessage } from "@/helpers/money-errors";
+import { useContractOptions } from "@/hooks/api/gestao/contracts/useContractOptions";
 import {
   useIssueProposal,
   usePersonalizeProposal,
@@ -66,6 +68,7 @@ export function ProposalComposer({
   const preview = useProposalPreview();
   const issue = useIssueProposal();
   const idempotency = useIdempotencyKey();
+  const { aiEnabled } = useContractOptions();
 
   const [recipientName, setRecipientName] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
@@ -307,34 +310,19 @@ export function ProposalComposer({
 
         {html && (
           <Box className="space-y-4 border-t pt-6">
-            <Box className="space-y-3 rounded-md border border-primary/30 bg-primary/5 p-4">
-              <Text weight="medium" className="flex items-center gap-2">
-                <Sparkles className="size-4 text-primary" aria-hidden />
-                Personalizar com IA
-              </Text>
-              <TextareaField
+            {aiEnabled && (
+              <AiPersonalizeBox
                 label="Ajustes e acordos desta proposta"
                 placeholder="Ex.: plano fidelidade de 30 meses; aluguel R$ 490 aos sábados; caução abatida na transferência."
-                value={instructions}
-                onChange={(event) => setInstructions(event.target.value)}
+                hint="A IA reescreve o texto abaixo; você revisa antes de emitir."
+                instructions={instructions}
+                onInstructionsChange={setInstructions}
+                onRun={runAi}
+                isPending={personalize.isPending}
+                disabled={busy}
                 error={errors.ai}
               />
-              <Text size="xs" tone="muted">
-                A IA reescreve o texto abaixo; você revisa antes de emitir.
-              </Text>
-              <Box className="flex justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={runAi}
-                  disabled={busy || !instructions.trim()}
-                >
-                  {personalize.isPending && <Spinner />}
-                  Personalizar com IA
-                </Button>
-              </Box>
-            </Box>
+            )}
 
             <ProposalHtmlEditor
               key={version}

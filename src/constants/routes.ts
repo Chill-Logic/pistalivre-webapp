@@ -20,6 +20,7 @@ export const ROUTES = {
   rentalDetail: `${GESTAO}/locacoes/:id`,
   rentalEdit: `${GESTAO}/locacoes/:id/editar`,
   rentalStatement: `${GESTAO}/locacoes/:id/extrato`,
+  rentalContractNew: `${GESTAO}/locacoes/:id/contrato/novo`,
   customers: `${GESTAO}/clientes`,
   customerNew: `${GESTAO}/clientes/novo`,
   customerDetail: `${GESTAO}/clientes/:id`,
@@ -84,6 +85,18 @@ export const routeTo = {
   rental: (id: string) => `${ROUTES.rentals}/${id}`,
   rentalStatement: (id: string) => `${ROUTES.rentals}/${id}/extrato`,
   editRental: (id: string) => `${ROUTES.rentals}/${id}/editar`,
+  /** "Gerar contrato": `?modelo=` = the chosen template, `?cnh=editar`. */
+  newRentalContract: (
+    id: string,
+    step: { templateId?: string; editLicense?: boolean } = {},
+  ) => {
+    const params = new URLSearchParams();
+    if (step.templateId) params.set("modelo", step.templateId);
+    if (step.editLicense) params.set("cnh", "editar");
+    const query = params.toString();
+    const path = `${ROUTES.rentals}/${id}/contrato/novo`;
+    return query ? `${path}?${query}` : path;
+  },
   customer: (id: string) => `${ROUTES.customers}/${id}`,
   editCustomer: (id: string) => `${ROUTES.customers}/${id}/editar`,
   newCustomerFromLead: (leadId: string) =>

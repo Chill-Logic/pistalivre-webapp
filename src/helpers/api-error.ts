@@ -60,6 +60,22 @@ export function toApiError(error: unknown): ApiError {
   });
 }
 
+/**
+ * A request made with `responseType: "blob"` (a PDF) gets its error body as a
+ * Blob too: turn it back into the JSON error, so `toApiError` reads the
+ * server's reason instead of the generic message. Rethrows the same error.
+ */
+export async function rethrowBlobError(error: unknown): Promise<never> {
+  if (isAxiosError(error) && error.response?.data instanceof Blob) {
+    try {
+      error.response.data = JSON.parse(await error.response.data.text());
+    } catch {
+      // Not JSON: keep the generic message.
+    }
+  }
+  throw error;
+}
+
 /** Message to show the user for any error. */
 export function errorMessage(error: unknown) {
   return toApiError(error).message;

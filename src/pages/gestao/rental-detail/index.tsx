@@ -67,11 +67,16 @@ import {
   OwnerSignatures,
   OwnerSignaturesSkeleton,
 } from "@/components/organisms/owner-signatures";
+import {
+  RentalContractsCard,
+  RentalContractsCardSkeleton,
+} from "@/components/organisms/rental-contracts-card";
 import { RentalDetailLayout } from "@/components/templates/rental-detail-layout";
 import { queryKeys } from "@/constants/query-keys";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { portalRentalUrl } from "@/helpers/host-realm";
+import { splitRentalDocuments } from "@/helpers/contract";
 import { useRental } from "@/hooks/api/gestao/rentals/useRental";
 import { useBackToList } from "@/hooks/ui/useBackToList";
 import { useCopy } from "@/hooks/ui/useCopy";
@@ -129,6 +134,7 @@ export function RentalDetailPage() {
             maintenances={<RelatedMaintenancesSkeleton />}
             inspections={<RelatedInspectionsSkeleton />}
             documents={<DocumentsCardSkeleton />}
+            contracts={<RentalContractsCardSkeleton />}
             autoBilling={<RentalAutoBillingCardSkeleton />}
             reconciliation={<RentReconciliationCardSkeleton />}
             rateSegments={<RateSegmentsCardSkeleton />}
@@ -174,13 +180,17 @@ export function RentalDetailPage() {
           }
           documents={
             <DocumentsCard
-              documents={rental.data.documents}
+              documents={
+                // Contracts have their own card ("Contratos").
+                splitRentalDocuments(rental.data.documents, []).otherDocuments
+              }
               manage={{
                 owner: { type: "RENTAL", id: rental.data.id },
                 invalidate: queryKeys.rentals.detail(rental.data.id),
               }}
             />
           }
+          contracts={<RentalContractsCard rental={rental.data} />}
           autoBilling={<RentalAutoBillingCard rentalId={rental.data.id} />}
           reconciliation={<RentReconciliationCard rentalId={rental.data.id} />}
           rateSegments={<RateSegmentsCard rentalId={rental.data.id} />}
