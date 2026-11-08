@@ -32,13 +32,13 @@ export function useTemplateEditor(
   // Read through refs so the extension list stays stable (a new list would
   // recreate the editor and lose the caret and the undo history).
   const setsRef = useRef(sets);
-  const keyHandlerRef = useRef<((event: KeyboardEvent) => boolean) | null>(
-    null,
-  );
   const menuRef = useRef<VariableSuggestionMenuHandle>(null);
+  // Functions, not refs, go into `configure` (it copies plain objects).
   const [extensions] = useState(() => [
     VariableHighlight.configure({ getSets: () => setsRef.current }),
-    VariableSuggestion.configure({ keyHandlerRef }),
+    VariableSuggestion.configure({
+      onKeyDown: (event) => menuRef.current?.onKeyDown(event) ?? false,
+    }),
   ]);
   const editor = useRichTextEditor(value, onChange, extensions);
 
@@ -80,8 +80,6 @@ export function useTemplateEditor(
   useLayoutEffect(() => {
     triggerRef.current = trigger;
     editorRef.current = editor;
-    // The ProseMirror plugin routes keys to whatever the menu exposes.
-    keyHandlerRef.current = (event) => menuRef.current?.onKeyDown(event) ?? false;
   });
 
   /** Virtual anchor for the menu, measured on every call (scroll, resize). */

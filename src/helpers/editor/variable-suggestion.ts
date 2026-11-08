@@ -22,8 +22,12 @@ export const variableSuggestionKey = new PluginKey<SuggestionState>(
 );
 
 export type VariableSuggestionOptions = {
-  /** Filled by React; returns true when the menu consumed the key. */
-  keyHandlerRef: { current: ((event: KeyboardEvent) => boolean) | null };
+  /**
+   * Keys typed while the menu is open; true = the menu used it. A function,
+   * not a `{ current }` ref: `configure` deep-merges plain objects, so a ref
+   * would be COPIED with whatever it held at that moment.
+   */
+  onKeyDown: (event: KeyboardEvent) => boolean;
 };
 
 /**
@@ -38,11 +42,11 @@ export const VariableSuggestion = Extension.create<VariableSuggestionOptions>({
   priority: 200,
 
   addOptions() {
-    return { keyHandlerRef: { current: null } };
+    return { onKeyDown: () => false };
   },
 
   addProseMirrorPlugins() {
-    const { keyHandlerRef } = this.options;
+    const { onKeyDown } = this.options;
     return [
       Suggestion({
         editor: this.editor,
@@ -57,7 +61,7 @@ export const VariableSuggestion = Extension.create<VariableSuggestionOptions>({
         minQueryLength: 0,
         items: () => [],
         render: () => ({
-          onKeyDown: ({ event }) => keyHandlerRef.current?.(event) ?? false,
+          onKeyDown: ({ event }) => onKeyDown(event),
         }),
       }),
     ];

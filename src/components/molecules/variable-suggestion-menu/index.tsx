@@ -74,11 +74,15 @@ export function VariableSuggestionMenu({
 
   useImperativeHandle(ref, () => ({ onKeyDown: handleKey }), [handleKey]);
 
+  // Like an IDE: the highlighted item stays in view. Found by its value,
+  // because cmdk marks `data-selected` only after this runs.
+  const activeValue = options[activeIndex]?.id;
   useLayoutEffect(() => {
+    if (!activeValue) return;
     listRef.current
-      ?.querySelector('[data-selected="true"]')
+      ?.querySelector(`[data-value="${CSS.escape(activeValue)}"]`)
       ?.scrollIntoView({ block: "nearest" });
-  }, [activeIndex]);
+  }, [activeValue]);
 
   const groups = options.reduce<{ label: string; items: VariableOption[] }[]>(
     (acc, option) => {
