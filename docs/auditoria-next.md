@@ -86,13 +86,13 @@ do dono. Marque `[x]` ao entregar.
 
 ## CRM, propostas, assinaturas e modelos
 
-- [ ] F — Card **Propostas** no detalhe do lead (status, PDF, aceitar/recusar/excluir; vem em `GET /crm/leads/:id`).
-- [ ] F — **"Copiar texto"** da proposta (WhatsApp) na lista/detalhe, no compositor e no lead (portar `htmlToText`).
-- [ ] F — Renomear o PDF da proposta e os anexos das atividades do lead.
-- [ ] F — Atribuição completa (referrer, landing, conteúdo, data, link da campanha), "Respondido em", origem com
+- [x] F — Card **Propostas** no detalhe do lead (status, PDF, aceitar/recusar/excluir; vem em `GET /crm/leads/:id`).
+- [x] F — **"Copiar texto"** da proposta (WhatsApp) na lista/detalhe, no compositor e no lead (portar `htmlToText`).
+- [x] F — Renomear o PDF da proposta e os anexos das atividades do lead.
+- [x] F — Atribuição completa (referrer, landing, conteúdo, data, link da campanha), "Respondido em", origem com
   a campanha na tabela de leads.
-- [ ] F — Mudar estágio/perdido direto na linha da lista de leads (decidido).
-- [ ] F — Gerar novo link do questionário depois de respondido ou com o lead encerrado (decidido).
+- [x] F — Mudar estágio/perdido direto na linha da lista de leads (decidido).
+- [x] F — Gerar novo link do questionário depois de respondido ou com o lead encerrado (decidido).
 - [x] B+F — **Links de campanha** (tela inteira): `GET/POST /crm/campaign-links`, `DELETE …/:id`,
   `POST …/:id/test-lead`, `channels[]` em `GET /crm/options`.
 - [x] B+F — **Apagar leads de teste**: `DELETE /crm/leads?test=true` → `{deleted}`.
@@ -101,20 +101,20 @@ do dono. Marque `[x]` ao entregar.
 - [x] B — Flag `aiEnabled` para esconder "Personalizar com IA" quando não há assistente (hoje dá 502).
 - [x] B+F — **Modelos de vistoria** com escrita: `POST /inspection-requirements`, `DELETE …/:id`;
   **cadência** editável: `PUT /inspection-policy`.
-- [ ] F — Signatário: CPF da equipe (`GET /users/:id`) e contato de emergência do cliente como candidato.
-- [ ] F — Vincular envelope: nº de documentos por envelope, ajuda com link para Integrações, só PDFs sem pedido vivo.
+- [x] F — Signatário: CPF da equipe (`GET /users/:id`) e contato de emergência do cliente como candidato.
+- [x] F — Vincular envelope: nº de documentos por envelope, ajuda com link para Integrações, só PDFs sem pedido vivo.
 
 ## Financeiro, empresa e shell
 
-- [ ] F — "Dar baixa" direto na fila **A receber** (`POST /charges/:paymentId/settle`).
-- [ ] B — `invoiceUrl` e `pix{payload, encodedImage}` nos itens de `GET /finance/to-collect` (copiar fatura/pix na fila).
-- [ ] F — **Inadimplentes** completo com nº de cobranças, e **Top 5 que mais atrasam** (`topLatePayers` já vem).
-- [ ] B+F — Taxa de inadimplência: `overdueRate` vindo do backend (decidido).
-- [ ] F — Dívidas: "Pagar" em cada parcela (diálogo com a parcela pré-selecionada); leitura do código do boleto
+- [x] F — "Dar baixa" direto na fila **A receber** (`POST /charges/:paymentId/settle`).
+- [x] B — `invoiceUrl` e `pix{payload, encodedImage}` nos itens de `GET /finance/to-collect` (copiar fatura/pix na fila).
+- [x] F — **Inadimplentes** completo com nº de cobranças, e **Top 5 que mais atrasam** (`topLatePayers` já vem).
+- [x] B+F — Taxa de inadimplência: `overdueRate` vindo do backend (decidido).
+- [x] F — Dívidas: "Pagar" em cada parcela (diálogo com a parcela pré-selecionada); leitura do código do boleto
   (portar `parseBoletoCode`, aviso de boleto já pago e de valor diferente); link para credor fornecedor/usuário;
   "Registrar pagamento" na linha; anexar ao criar.
-- [ ] B — `createdByName` em `payments[]` de `GET /debts/:id`; `paymentCount`/`documentCount` nos itens de `GET /debts`.
-- [ ] B+F — Prévia de juros no formulário de dívida e "saldo depois do pagamento" (`POST /debts/preview`) (decidido).
+- [x] B — `createdByName` em `payments[]` de `GET /debts/:id`; `paymentCount`/`documentCount` nos itens de `GET /debts`.
+- [x] B+F — Prévia de juros no formulário de dívida e "saldo depois do pagamento" (`POST /debts/preview`) (decidido).
 - [ ] B+F — **Extrato: exportar planilha** por conta + histórico de exportações (`POST/GET/DELETE
   /finance/statement/exports`) e **PDF oficial do banco** (`GET /finance/statement/bank-pdf`), com Bearer.
 - [x] B+F — **Empresa editável**: `PUT /company`.
