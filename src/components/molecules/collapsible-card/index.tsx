@@ -26,7 +26,10 @@ type CollapsibleCardProps = {
   children: ReactNode;
 };
 
-/** A card whose body opens and closes sliding, from a tap on the title. */
+/**
+ * A card whose body opens and closes sliding, from a tap on the title. On a
+ * narrow screen the actions wrap below the title instead of cutting it.
+ */
 export function CollapsibleCard({
   title,
   count,
@@ -41,14 +44,14 @@ export function CollapsibleCard({
 
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
+      <CardHeader className="flex-row flex-wrap items-center justify-between gap-2 space-y-0">
         <Button
           type="button"
           variant="ghost"
           aria-expanded={open}
           aria-controls={contentId}
           onClick={toggle}
-          className="-ml-2 h-auto min-w-0 justify-start gap-2 px-2 py-1"
+          className="-ml-2 h-auto max-w-full shrink-0 justify-start gap-2 px-2 py-1"
         >
           <CardTitle className="truncate text-base">{title}</CardTitle>
           {count !== undefined && (
@@ -64,7 +67,7 @@ export function CollapsibleCard({
             )}
           />
         </Button>
-        {actions && <Box className="flex shrink-0 gap-2">{actions}</Box>}
+        {actions && <Box className="flex flex-wrap gap-2">{actions}</Box>}
       </CardHeader>
       <Collapse open={open} id={contentId}>
         <CardContent className={contentClassName}>{children}</CardContent>
