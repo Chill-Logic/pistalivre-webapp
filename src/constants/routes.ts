@@ -62,6 +62,7 @@ export const ROUTES = {
   portal: PORTAL,
   portalLogin: `${PORTAL}/entrar`,
   portalRental: `${PORTAL}/locacoes/:id`,
+  portalInspectionNew: `${PORTAL}/locacoes/:id/vistorias/nova`,
 } as const;
 
 /** Concrete URLs for routes with params. */
@@ -100,4 +101,6 @@ export const routeTo = {
   proposal: (id: string) => `${ROUTES.proposals}/${id}`,
   signature: (id: string) => `${ROUTES.signatures}/${id}`,
   portalRental: (id: string) => `${ROUTES.portal}/locacoes/${id}`,
+  portalInspectionNew: (id: string) =>
+    `${ROUTES.portal}/locacoes/${id}/vistorias/nova`,
 };

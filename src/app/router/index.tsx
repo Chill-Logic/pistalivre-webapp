@@ -38,6 +38,7 @@ import {
   MaintenancesPage,
   PortalHomePage,
   PortalRentalDetailPage,
+  PortalInspectionNewPage,
   ReimbursementsPage,
   RentalDetailPage,
   SupplierDetailPage,
@@ -76,6 +77,10 @@ export const router = createBrowserRouter([
     children: [
       { path: ROUTES.portal, element: <PortalHomePage /> },
       { path: ROUTES.portalRental, element: <PortalRentalDetailPage /> },
+      {
+        path: ROUTES.portalInspectionNew,
+        element: <PortalInspectionNewPage />,
+      },
     ],
   },
   {

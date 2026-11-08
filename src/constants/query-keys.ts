@@ -64,6 +64,8 @@ export const queryKeys = {
     all: ["portal"] as const,
     rentals: () => [...queryKeys.portal.all, "rentals"] as const,
     rental: (id: string) => [...queryKeys.portal.all, "rental", id] as const,
+    inspectionRequirements: (rentalId: string) =>
+      [...queryKeys.portal.all, "inspection-requirements", rentalId] as const,
     rentalSections: (id: string) =>
       [...queryKeys.portal.all, "rental-sections", id] as const,
     charges: () => [...queryKeys.portal.all, "charges"] as const,

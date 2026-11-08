@@ -6,5 +6,7 @@ export function useCustomer(id: string) {
   return useQuery({
     queryKey: queryKeys.customers.detail(id),
     queryFn: () => customersService.get(id),
+    // Pickers mount before a customer is chosen.
+    enabled: Boolean(id),
   });
 }
