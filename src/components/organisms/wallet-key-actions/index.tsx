@@ -2,12 +2,18 @@ import { Star, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/atoms/button";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
-import { useWalletMutations } from "@/hooks/api/cliente/finance/useWalletMutations";
-import type { WalletKey } from "@/types/portal";
+import type { WalletKey, WalletMutations } from "@/types/portal";
 
 /** "Principal" (when it is not) and remove, with confirmation. */
-export function WalletKeyActions({ walletKey }: { walletKey: WalletKey }) {
-  const { setDefault, remove } = useWalletMutations();
+export function WalletKeyActions({
+  walletKey,
+  mutations,
+}: {
+  walletKey: WalletKey;
+  /** Portal (the renter's own) or gestão (a customer's record). */
+  mutations: Pick<WalletMutations, "setDefault" | "remove">;
+}) {
+  const { setDefault, remove } = mutations;
   const [confirming, setConfirming] = useState(false);
 
   return (
@@ -40,7 +46,7 @@ export function WalletKeyActions({ walletKey }: { walletKey: WalletKey }) {
         title="Remover chave pix?"
         description={
           walletKey.isDefault
-            ? "Ela é a sua chave principal: outra chave passa a ser a principal."
+            ? "Ela é a chave principal: outra chave passa a ser a principal."
             : "Os reembolsos deixam de poder ir para ela."
         }
         confirmLabel="Remover chave"

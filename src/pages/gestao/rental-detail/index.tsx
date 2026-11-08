@@ -63,6 +63,10 @@ import {
   VehicleCrlvCard,
   VehicleCrlvCardSkeleton,
 } from "@/components/organisms/vehicle-crlv-card";
+import {
+  OwnerSignatures,
+  OwnerSignaturesSkeleton,
+} from "@/components/organisms/owner-signatures";
 import { RentalDetailLayout } from "@/components/templates/rental-detail-layout";
 import { queryKeys } from "@/constants/query-keys";
 import { ROUTES, routeTo } from "@/constants/routes";
@@ -88,10 +92,7 @@ export function RentalDetailPage() {
               variant="ghost"
               size="sm"
               onClick={() =>
-                copy(
-                  portalRentalUrl(rental.data.id),
-                  "Link do cliente copiado",
-                )
+                copy(portalRentalUrl(rental.data.id), "Link do cliente copiado")
               }
             >
               <Link2 />
@@ -134,6 +135,7 @@ export function RentalDetailPage() {
             receipts={<RentReceiptsCardSkeleton />}
             invoices={<RentalInvoicesCardSkeleton />}
             vehicleCrlv={<VehicleCrlvCardSkeleton />}
+            signatures={<OwnerSignaturesSkeleton />}
           />
         </SkeletonRegion>
       )}
@@ -162,6 +164,9 @@ export function RentalDetailPage() {
           caution={<RentalCautionCard caution={rental.data.caution} />}
           maintenances={<RelatedMaintenances rentalId={rental.data.id} />}
           inspections={<RelatedInspections rentalId={rental.data.id} />}
+          signatures={
+            <OwnerSignatures ownerType="RENTAL" ownerId={rental.data.id} />
+          }
           documents={
             <DocumentsCard
               documents={rental.data.documents}

@@ -25,6 +25,7 @@ import { useMyCharges } from "@/hooks/api/cliente/finance/useMyCharges";
 import { useMyInvoices } from "@/hooks/api/cliente/finance/useMyInvoices";
 import { useMyReimbursements } from "@/hooks/api/cliente/finance/useMyReimbursements";
 import { useMyWallet } from "@/hooks/api/cliente/finance/useMyWallet";
+import { useWalletMutations } from "@/hooks/api/cliente/finance/useWalletMutations";
 import { useMyRentals } from "@/hooks/api/cliente/rentals/useMyRentals";
 import { pluralize } from "@/utils/text";
 
@@ -39,6 +40,7 @@ export function PortalHomePage() {
   const charges = useMyCharges();
   const invoices = useMyInvoices();
   const wallet = useMyWallet();
+  const walletMutations = useWalletMutations();
   const reimbursements = useMyReimbursements();
   // Refund requests need an active rental (the API also blocks closed ones).
   const activeRentals = (rentals.data ?? []).filter(
@@ -168,13 +170,18 @@ export function PortalHomePage() {
             title="Minha carteira"
             empty="Nenhuma chave pix cadastrada. É para ela que vão os seus reembolsos."
             isEmpty={items.length === 0}
-            actions={<WalletAddDialog />}
+            actions={<WalletAddDialog mutations={walletMutations} />}
           >
             {items.map((walletKey) => (
               <WalletKeyItem
                 key={walletKey.id}
                 walletKey={walletKey}
-                actions={<WalletKeyActions walletKey={walletKey} />}
+                actions={
+                  <WalletKeyActions
+                    walletKey={walletKey}
+                    mutations={walletMutations}
+                  />
+                }
               />
             ))}
           </ListCard>

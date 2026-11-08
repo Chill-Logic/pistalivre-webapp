@@ -16,28 +16,51 @@ import { FormField } from "@/components/molecules/form-field";
 import { SelectField } from "@/components/molecules/select-field";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { PIX_KEY_TYPES } from "@/constants/portal";
-import { toApiError } from "@/helpers/api-error";
-import { useWalletMutations } from "@/hooks/api/cliente/finance/useWalletMutations";
+import { pixKeyError } from "@/helpers/wallet";
 import { useLabels } from "@/hooks/ui/useLabels";
-import type { PixKeyPreview } from "@/types/portal";
+import type { PixKeyPreview, WalletMutations } from "@/types/portal";
 import { maskPixKey } from "@/utils/masks";
+
+type WalletAddDialogProps = {
+  /** Portal (the renter's own) or gestão (a customer's record). */
+  mutations: WalletMutations;
+  description?: string;
+  keyFieldLabel?: string;
+  /** Lets the team name the key; without it the bank's name is the label. */
+  askLabel?: boolean;
+  /** Known values of the customer by key type (CPF, EMAIL, PHONE). */
+  prefill?: Partial<Record<string, string | null>>;
+};
+
+const INITIAL_TYPE = "CPF";
 
 /**
  * Two steps, no jargon: type the key → "Verificar chave" → confirm the
  * owner the bank returned → add. The bank's name becomes the label.
  */
-export function WalletAddDialog() {
+export function WalletAddDialog({
+  mutations,
+  description = "É para ela que vão os seus reembolsos. Conferimos no banco de quem é a chave antes de salvar.",
+  keyFieldLabel = "Sua chave pix",
+  askLabel = false,
+  prefill,
+}: WalletAddDialogProps) {
   const { label } = useLabels();
-  const { preview, add } = useWalletMutations();
+  const { preview, add } = mutations;
   const [open, setOpen] = useState(false);
-  const [pixKeyType, setPixKeyType] = useState<string>("CPF");
+  const [pixKeyType, setPixKeyType] = useState<string>(INITIAL_TYPE);
   const [pixKey, setPixKey] = useState("");
+  const [nickname, setNickname] = useState("");
   const [owner, setOwner] = useState<PixKeyPreview | null>(null);
   const [error, setError] = useState<{ pixKey?: string; form?: string }>({});
+  const busy = preview.isPending || add.isPending;
+
+  const prefilled = (type: string) => maskPixKey(type, prefill?.[type] ?? "");
 
   const reset = () => {
-    setPixKeyType("CPF");
-    setPixKey("");
+    setPixKeyType(INITIAL_TYPE);
+    setPixKey(prefilled(INITIAL_TYPE));
+    setNickname("");
     setOwner(null);
     setError({});
     preview.reset();
@@ -45,19 +68,12 @@ export function WalletAddDialog() {
   };
 
   const onOpenChange = (next: boolean) => {
-    if (preview.isPending || add.isPending) return;
+    if (busy) return;
     setOpen(next);
     if (next) reset();
   };
 
-  const showError = (err: unknown) => {
-    const apiError = toApiError(err);
-    setError(
-      apiError.fields?.pixKey
-        ? { pixKey: apiError.fields.pixKey }
-        : { form: apiError.message },
-    );
-  };
+  const showError = (err: unknown) => setError(pixKeyError(err));
 
   const verify = () => {
     setError({});
@@ -75,7 +91,11 @@ export function WalletAddDialog() {
   const confirm = () => {
     if (!owner) return;
     add.mutate(
-      { pixKeyType, pixKey: pixKey.trim(), label: owner.bank ?? undefined },
+      {
+        pixKeyType,
+        pixKey: pixKey.trim(),
+        label: nickname.trim() || owner.bank || undefined,
+      },
       { onSuccess: () => setOpen(false), onError: showError },
     );
   };
@@ -90,10 +110,7 @@ export function WalletAddDialog() {
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Adicionar chave pix</DialogTitle>
-        <DialogDescription>
-          É para ela que vão os seus reembolsos. Conferimos no banco de quem é a
-          chave antes de salvar.
-        </DialogDescription>
+        <DialogDescription>{description}</DialogDescription>
         <Box className="space-y-4">
           <SelectField
             label="Tipo de chave"
@@ -104,14 +121,18 @@ export function WalletAddDialog() {
             }))}
             onChange={(value) => {
               setPixKeyType(value);
-              setPixKey((current) => maskPixKey(value, current));
+              setPixKey((current) =>
+                prefill?.[value]
+                  ? prefilled(value)
+                  : maskPixKey(value, current),
+              );
               setOwner(null);
               setError({});
             }}
-            disabled={preview.isPending || add.isPending}
+            disabled={busy}
           />
           <FormField
-            label="Sua chave pix"
+            label={keyFieldLabel}
             value={pixKey}
             inputMode={
               pixKeyType === "EMAIL"
@@ -128,7 +149,7 @@ export function WalletAddDialog() {
               setError({});
             }}
             error={error.pixKey}
-            disabled={preview.isPending || add.isPending}
+            disabled={busy}
           />
           {!owner && (
             <Button
@@ -162,6 +183,16 @@ export function WalletAddDialog() {
                     .join(" · ")}
                 </Text>
               </Box>
+              {askLabel && (
+                <FormField
+                  label="Apelido (opcional)"
+                  value={nickname}
+                  maxLength={60}
+                  placeholder={owner.bank ?? "Ex.: Conta principal"}
+                  onChange={(event) => setNickname(event.target.value)}
+                  disabled={add.isPending}
+                />
+              )}
               <Button
                 type="button"
                 className="w-full"

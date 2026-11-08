@@ -20,6 +20,8 @@ type RentalDetailLayoutProps = {
   invoices?: ReactNode;
   /** The CRLV of the rental's vehicle (lives on the vehicle). */
   vehicleCrlv?: ReactNode;
+  /** Signature requests over the rental's PDFs. */
+  signatures?: ReactNode;
 };
 
 /** Grid shared by the rental page and its skeleton. */
@@ -38,6 +40,7 @@ export function RentalDetailLayout({
   receipts,
   invoices,
   vehicleCrlv,
+  signatures,
 }: RentalDetailLayoutProps) {
   return (
     <Row className="items-start gap-y-6">
@@ -62,6 +65,7 @@ export function RentalDetailLayout({
       <Col>{maintenances}</Col>
       <Col>{inspections}</Col>
       {vehicleCrlv && <Col>{vehicleCrlv}</Col>}
+      {signatures && <Col>{signatures}</Col>}
       <Col>{documents}</Col>
     </Row>
   );

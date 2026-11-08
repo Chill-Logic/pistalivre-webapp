@@ -17,11 +17,25 @@ import type {
  * configured here first. Writes answer the detail (except the 204s).
  */
 export const signaturesService = {
-  async list({ page, pageSize, q, status }: SignatureFilters) {
+  async list({
+    page,
+    pageSize,
+    q,
+    status,
+    ownerType,
+    ownerId,
+  }: SignatureFilters) {
     const { data } = await http.get<Paginated<SignatureListItem>>(
       "/signatures",
       {
-        params: toQueryParams({ page, pageSize, q, status }),
+        params: toQueryParams({
+          page,
+          pageSize,
+          q,
+          status,
+          ownerType,
+          ownerId,
+        }),
       },
     );
     return data;

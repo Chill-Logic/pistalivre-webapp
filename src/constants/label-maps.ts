@@ -39,6 +39,7 @@ export const LABEL_MAPS = {
   signerChannel: "SIGNER_CHANNEL_LABELS",
   documentOwner: "DOCUMENT_OWNER_LABELS",
   invoiceStatus: "INVOICE_STATUS_LABELS",
+  asaasNotificationEvent: "ASAAS_NOTIFICATION_EVENT_LABELS",
 } as const;
 
 export type LabelMapName = (typeof LABEL_MAPS)[keyof typeof LABEL_MAPS];

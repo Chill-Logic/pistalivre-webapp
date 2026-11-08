@@ -18,6 +18,11 @@ export function WalletKeyItem({
 }) {
   const { label } = useLabels();
   const owner = [walletKey.ownerName, walletKey.bank].filter(Boolean);
+  // The label defaults to the bank's name: show it only when someone named it.
+  const nickname =
+    walletKey.label && walletKey.label !== walletKey.bank
+      ? walletKey.label
+      : null;
 
   return (
     <Box className="flex items-start gap-3 py-3">
@@ -30,9 +35,10 @@ export function WalletKeyItem({
           <Text weight="medium" className="break-all">
             {walletKey.pixKey}
           </Text>
-          {walletKey.isDefault && <Badge variant="neutral">Padrão</Badge>}
+          {walletKey.isDefault && <Badge variant="success">Principal</Badge>}
         </Box>
         <Text size="xs" tone="muted">
+          {nickname && `${nickname} · `}
           {label(LABEL_MAPS.pixKeyType, walletKey.pixKeyType)}
           {owner.length > 0 && ` · ${owner.join(" · ")}`}
         </Text>

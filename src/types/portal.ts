@@ -1,3 +1,4 @@
+import type { UseMutationResult } from "@tanstack/react-query";
 import type { DocumentFile } from "@/types/document";
 import type { MaintenanceType } from "@/types/maintenance";
 import type { InspectionActor, InspectionType } from "@/types/inspection";
@@ -140,6 +141,21 @@ export type WalletKeyInput = {
   pixKeyType: string;
   pixKey: string;
   label?: string;
+};
+
+/**
+ * The wallet writes, the same for the renter (portal) and for the team (a
+ * customer's record): the wallet dialogs take them, so both share the UI.
+ */
+export type WalletMutations = {
+  preview: UseMutationResult<
+    PixKeyPreview,
+    Error,
+    Pick<WalletKeyInput, "pixKeyType" | "pixKey">
+  >;
+  add: UseMutationResult<unknown, Error, WalletKeyInput>;
+  setDefault: UseMutationResult<void, Error, string>;
+  remove: UseMutationResult<void, Error, string>;
 };
 
 /**

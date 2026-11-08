@@ -56,6 +56,9 @@ export type SignatureFilters = {
   pageSize: number;
   q: string;
   status: SignatureStatus | "";
+  /** Only the requests over the PDFs of this owner (customer, rental…). */
+  ownerType?: "CUSTOMER" | "RENTAL";
+  ownerId?: string;
 };
 
 export type SignerRole =

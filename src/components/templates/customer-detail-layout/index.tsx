@@ -16,6 +16,14 @@ type CustomerDetailLayoutProps = {
   asaasCharges?: ReactNode;
   /** Our charges of the customer (settle, receipts), outside Asaas too. */
   charges?: ReactNode;
+  /** "Cliente de teste" / "Fora das métricas". */
+  flags?: ReactNode;
+  /** Pix keys (where refunds go). */
+  wallet?: ReactNode;
+  /** What Asaas warns the customer about. */
+  notifications?: ReactNode;
+  /** Signature requests over the customer's PDFs. */
+  signatures?: ReactNode;
 };
 
 /** Grid shared by the customer page and its skeleton. */
@@ -30,6 +38,10 @@ export function CustomerDetailLayout({
   debts,
   asaasCharges,
   charges,
+  flags,
+  wallet,
+  notifications,
+  signatures,
 }: CustomerDetailLayoutProps) {
   return (
     <Row className="items-start gap-y-6">
@@ -38,6 +50,7 @@ export function CustomerDetailLayout({
         <Row className="gap-y-6">
           <Col>{license}</Col>
           <Col>{contact}</Col>
+          {flags && <Col>{flags}</Col>}
         </Row>
       </Col>
       <Col>{rentals}</Col>
@@ -46,6 +59,9 @@ export function CustomerDetailLayout({
       {debts && <Col>{debts}</Col>}
       {charges && <Col>{charges}</Col>}
       {asaasCharges && <Col>{asaasCharges}</Col>}
+      {wallet && <Col lg={5}>{wallet}</Col>}
+      {notifications && <Col lg={7}>{notifications}</Col>}
+      {signatures && <Col>{signatures}</Col>}
       <Col>{documents}</Col>
     </Row>
   );

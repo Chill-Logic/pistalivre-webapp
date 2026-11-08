@@ -3,9 +3,10 @@ import { toast } from "sonner";
 import { queryKeys } from "@/constants/query-keys";
 import { errorMessage } from "@/helpers/api-error";
 import { walletService } from "@/services/api/cliente/wallet.service";
+import type { WalletMutations } from "@/types/portal";
 
 /** Check, add, make default and remove pix keys of the renter's wallet. */
-export function useWalletMutations() {
+export function useWalletMutations(): WalletMutations {
   const queryClient = useQueryClient();
   const refresh = () =>
     queryClient.invalidateQueries({ queryKey: queryKeys.portal.wallet() });

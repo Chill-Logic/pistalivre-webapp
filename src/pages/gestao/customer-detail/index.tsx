@@ -44,6 +44,22 @@ import {
   CustomerDebtsCard,
   CustomerDebtsCardSkeleton,
 } from "@/components/organisms/customer-debts-card";
+import {
+  CustomerFlagsCard,
+  CustomerFlagsCardSkeleton,
+} from "@/components/organisms/customer-flags-card";
+import {
+  CustomerNotificationsCard,
+  CustomerNotificationsCardSkeleton,
+} from "@/components/organisms/customer-notifications-card";
+import {
+  CustomerWalletCard,
+  CustomerWalletCardSkeleton,
+} from "@/components/organisms/customer-wallet-card";
+import {
+  OwnerSignatures,
+  OwnerSignaturesSkeleton,
+} from "@/components/organisms/owner-signatures";
 import { CustomerDetailLayout } from "@/components/templates/customer-detail-layout";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { queryKeys } from "@/constants/query-keys";
@@ -88,6 +104,10 @@ export function CustomerDetailPage() {
             debts={<CustomerDebtsCardSkeleton />}
             charges={<CustomerChargesCardSkeleton />}
             documents={<DocumentsCardSkeleton />}
+            flags={<CustomerFlagsCardSkeleton />}
+            wallet={<CustomerWalletCardSkeleton />}
+            notifications={<CustomerNotificationsCardSkeleton />}
+            signatures={<OwnerSignaturesSkeleton />}
           />
         </SkeletonRegion>
       )}
@@ -133,6 +153,12 @@ export function CustomerDetailPage() {
               customerId={customer.data.id}
               rentals={customer.data.rentals}
             />
+          }
+          flags={<CustomerFlagsCard customer={customer.data} />}
+          wallet={<CustomerWalletCard customer={customer.data} />}
+          notifications={<CustomerNotificationsCard customer={customer.data} />}
+          signatures={
+            <OwnerSignatures ownerType="CUSTOMER" ownerId={customer.data.id} />
           }
           documents={
             <DocumentsCard
