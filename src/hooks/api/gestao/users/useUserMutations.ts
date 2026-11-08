@@ -4,6 +4,7 @@ import { queryKeys } from "@/constants/query-keys";
 import { errorMessage } from "@/helpers/api-error";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { usersService } from "@/services/api/gestao/users.service";
+import { authToken } from "@/helpers/auth-token";
 import type { UserInput, UserPasswordInput } from "@/types/user";
 
 /** Create (no id) or update (id). */
@@ -22,11 +23,18 @@ export function useSaveUser(id?: string) {
   });
 }
 
+/**
+ * Your own password: the old token is revoked, so the new one replaces it
+ * (otherwise the next request would 401 and log you out).
+ */
 export function useChangeUserPassword(id: string) {
   return useMutation({
     mutationFn: (input: UserPasswordInput) =>
       usersService.changePassword(id, input),
-    onSuccess: () => toast.success("Senha alterada"),
+    onSuccess: (token) => {
+      if (token) authToken.set(token);
+      toast.success("Senha alterada");
+    },
   });
 }
 

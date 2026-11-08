@@ -32,8 +32,17 @@ export const usersService = {
     const { data } = await http.put<StaffUserDetail>(`/users/${id}`, input);
     return data;
   },
+  /**
+   * Changing a password revokes the tokens issued before it. On your OWN
+   * password the API answers 200 with a fresh token (to keep this session);
+   * an ADMIN changing someone else's gets 204 (no body).
+   */
   async changePassword(id: string, input: UserPasswordInput) {
-    await http.put(`/users/${id}/password`, input);
+    const { data } = await http.put<{ token: string } | "">(
+      `/users/${id}/password`,
+      input,
+    );
+    return data && typeof data === "object" ? data.token : null;
   },
   async remove(id: string) {
     await http.delete(`/users/${id}`);
