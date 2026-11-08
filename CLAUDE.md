@@ -59,29 +59,21 @@ leitura**; Projeções (conta no servidor + PDF). Portal do cliente **só leitur
 
 ## O que falta (2026-11-08)
 
-**Espera decisão do dono** (não implementar sem o "ok"):
-- **Escritas que mexem em dinheiro**: emitir/editar/excluir cobrança, dar baixa, registrar recebimento, NF,
-  pagamento de dívida, ligar/desligar cobrança automática da locação, trechos de valor, abonos, dias sem
-  cobrança, descontos, pix recebidos.
-- **Reembolso "marcar como pago"** (pago por fora): precisa de migration aditiva (`paidAt`/`paidAmount`).
-- **Financeiro**: nota do extrato e marca "transferência interna" (mudam totais do contador).
-- **Escritas do portal**: pedir reembolso, cadastrar chave pix, registrar manutenção/vistoria, trocar senha.
-- **Escritas de Propostas e Assinaturas**: emitir/aceitar/recusar/excluir proposta; configurar, enviar,
-  cancelar, reenviar assinatura (o backend ainda não tem essas rotas no v1).
-- **Cadastro de cliente** já está liberado no webapp (faz upsert no Asaas, best-effort); confirmar com o
-  dono, porque uma regra anterior deixava isso para ele.
-- Divergência de valor da mesma cobrança: gestão R$ 730,16 × portal R$ 650 (já existia no Next).
-- Token Bearer não cai ao trocar a senha (revogar exige migration).
-- Dados de demonstração no dev (`db:seed:demo`), para parar de validar com simulação.
-- Theming do portal (travar no claro?) e logo definitivo (`public/logo.svg` é provisório; depois
-  `npm run pwa:assets`).
+**Liberado pelo dono em 2026-11-08 ("vamos fazer tudo")**, em andamento com o backend (`pista-livre-99`),
+na ordem: A) reembolso "marcar como pago" (migration aditiva), escritas do portal, nota do extrato e
+"transferência interna", revogar o Bearer ao trocar a senha; B) cobranças (emitir avulsa, editar, cancelar,
+baixa/recebimento, NF, cobrança automática, trechos de valor, abonos, dias sem cobrança, descontos, pix
+recebidos) e pagamentos de dívida, com `Idempotency-Key` nas escritas que emitem; C) escritas de Propostas e
+Assinaturas; D) `db:seed:demo`. Saída de dinheiro continua proibida.
 
-**Pode ser feito sem decisão**:
+Decisões do dono (2026-11-08): cadastro de cliente com upsert no Asaas **fica**; o valor da cobrança vencida
+é **o da gestão nos dois lados** (o portal passa a mostrar multa e juros como a gestão: ajuste no backend);
+portal **segue o tema do celular**; logo = **emblema do Next** (feito).
+
+**Só com o "pode" explícito do dono**: merge da `feat/api-v1-spa` na `main` do `pista-livre` (o Railway faz
+deploy), deploy deste SPA com domínio e `WEBAPP_ORIGIN`, e só então remover as páginas Next antigas.
+A credencial do S3 do dev também é com ele.
 
 **Sucessos nunca testados de verdade no dev** (só com simulação): criar/editar cliente (upsert no Asaas),
 recusar reembolso (só há pedido real), upload de documento (o S3 do dev está com credencial quebrada: abrir
 e baixar arquivo dá 500) e envio do questionário (a sessão fica órfã). Ver `../pista-livre/docs/handoff-api-v1.md`.
-
-**Para ir ao ar** (só com o aval do dono): merge da `feat/api-v1-spa` na `main` do `pista-livre` (o
-Railway faz deploy da main), deploy deste SPA com domínio e `WEBAPP_ORIGIN` no backend, e só então remover
-as páginas Next antigas.

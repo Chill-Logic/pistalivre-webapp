@@ -1,22 +1,36 @@
-import { Box } from "@/components/atoms/box";
 import { Image } from "@/components/atoms/image";
-import { Text } from "@/components/atoms/text";
 import { cn } from "@/utils/cn";
 
+const SIZE = {
+  /** Collapsed sidebar. */
+  sm: "h-8",
+  /** Headers (h-14 bars). */
+  md: "h-10",
+  /** Open sidebar, where there is room. */
+  xl: "h-12",
+  /** Login screens. */
+  lg: "h-24",
+} as const;
+
 type LogoProps = {
+  size?: keyof typeof SIZE;
   className?: string;
-  withName?: boolean;
 };
 
-export function Logo({ className, withName = true }: LogoProps) {
+/**
+ * The Pista Livre emblem (it carries the name, so no text beside it).
+ * Source: `pista-livre/public/logo.png`, cropped; the PWA icons come from
+ * `brand/logo-icon.png` (`npm run pwa:assets`).
+ */
+export function Logo({ size = "md", className }: LogoProps) {
   return (
-    <Box className={cn("inline-flex items-center gap-2", className)}>
-      <Image src="/logo.svg" alt="" className="size-8" aria-hidden />
-      {withName && (
-        <Text inline size="lg" weight="bold" className="tracking-tight">
-          Pista Livre
-        </Text>
-      )}
-    </Box>
+    <Image
+      src="/logo.webp"
+      alt="Pista Livre"
+      width={460}
+      height={320}
+      className={cn("w-auto shrink-0 select-none", SIZE[size], className)}
+      draggable={false}
+    />
   );
 }

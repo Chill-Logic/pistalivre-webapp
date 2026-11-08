@@ -18,7 +18,7 @@ export function AppHeader({ user }: AppHeaderProps) {
 
   return (
     <Header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-card/95 px-4 pt-safe-t backdrop-blur supports-[backdrop-filter]:bg-card/80">
-      <Logo className="md:hidden" withName={false} />
+      <Logo className="md:hidden" />
       <Text tone="muted" truncate className="flex-1">
         Olá,{" "}
         <Text inline weight="medium" tone="foreground">

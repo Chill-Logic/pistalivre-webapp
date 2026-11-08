@@ -16,7 +16,7 @@ npm run dev              # http://localhost:5173
 
 A API (repo `pista-livre`) precisa liberar a origem do webapp em `WEBAPP_ORIGIN` (default `http://localhost:5173`).
 
-Scripts: `npm run build` (typecheck + build) · `npm run lint` (zero warnings) · `npm run format` · `npm run pwa:assets` (regenera os ícones a partir de `public/logo.svg`).
+Scripts: `npm run build` (typecheck + build) · `npm run lint` (zero warnings) · `npm run format` · `npm run pwa:assets` (regenera os ícones a partir de `brand/logo-icon.png`, o emblema do Next sobre fundo branco).
 
 ## Estrutura
 

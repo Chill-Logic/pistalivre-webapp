@@ -6,5 +6,5 @@ import {
 export default defineConfig({
   headLinkOptions: { preset: "2023" },
   preset: minimal2023Preset,
-  images: ["public/logo.svg"],
+  images: ["brand/logo-icon.png"],
 });

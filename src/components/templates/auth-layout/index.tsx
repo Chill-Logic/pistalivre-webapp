@@ -17,7 +17,7 @@ export function AuthLayout({ title, children }: AuthLayoutProps) {
       <OfflineBanner />
       <Main className="flex flex-1 flex-col justify-center px-4 py-10 sm:items-center">
         <Box className="w-full space-y-6 sm:max-w-sm sm:rounded-lg sm:border sm:bg-card sm:p-8 sm:shadow-sm">
-          <Logo />
+          <Logo size="lg" />
           <Heading>{title}</Heading>
           {children}
         </Box>
