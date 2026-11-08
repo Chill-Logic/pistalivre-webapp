@@ -63,8 +63,10 @@ cancelar, vincular) com escrita (B2/B4).
 
 ## Deploy (Vercel) e domínios
 
-Um projeto só na Vercel serve as duas áreas, cada uma no seu domínio: **`gestao.pistalivrelocacoes.com.br`**
-(equipe) e **`cliente.pistalivrelocacoes.com.br`** (portal). O app lê o domínio (`helpers/host-realm`): a raiz
+Um projeto só na Vercel serve as duas áreas, cada uma no seu domínio, com prefixo de ambiente:
+**`app.gestao.pistalivrelocacoes.com.br`** (equipe) e **`app.cliente.pistalivrelocacoes.com.br`** (portal); um dia,
+`dev.gestao`/`dev.cliente` funcionam igual, sem mudar código. O app procura o rótulo `gestao`/`cliente` no
+endereço (`helpers/host-realm`) e, ao trocar de área, mantém o prefixo (`app.cliente` → `app.gestao`): a raiz
 abre a área do domínio, e uma página da outra área vai para o domínio certo (`useHostRealmRedirect`, nos
 guards `RequireAuth`/`RedirectIfAuthenticated`). Qualquer outro host (localhost, previews da Vercel) serve as
 duas áreas, como no dev. Cada domínio guarda o seu login (localStorage por origem).
@@ -77,15 +79,16 @@ duas áreas, como no dev. Cada domínio guarda o seu login (localStorage por ori
   O GitHub **não** ficou conectado (o app da Vercel não tem acesso à organização Chill-Logic), então o deploy é
   pela CLI: `/home/ojhon/.nvm/versions/node/v22.15.1/bin/vercel deploy --prod` (pasta já ligada em `.vercel/`).
   Para deploy a cada push: dar acesso ao app da Vercel na org Chill-Logic e rodar `vercel git connect`.
-- DNS no **Cloudflare** (o Registro.br só guarda o registro): `CNAME gestao` e `CNAME cliente` para
+- DNS no **Cloudflare** (o Registro.br só guarda o registro): `CNAME app.gestao` e `CNAME app.cliente` para
   `460e80aaac8cf57f.vercel-dns-017.com` (o destino que a Vercel deu ao projeto), com a nuvem **cinza** (DNS only) até a Vercel emitir o certificado.
-- No backend: `WEBAPP_ORIGIN=https://gestao.pistalivrelocacoes.com.br,https://cliente.pistalivrelocacoes.com.br`.
-- Testar local: `http://gestao.localhost:5173` e `http://cliente.localhost:5173` simulam os domínios (a API do
+- No backend: `WEBAPP_ORIGIN=https://app.gestao.pistalivrelocacoes.com.br,https://app.cliente.pistalivrelocacoes.com.br,https://pistalivre-webapp.vercel.app`
+  (um ambiente `dev.` novo entra nessa lista ou na variável do backend de dev).
+- Testar local: `http://app.gestao.localhost:5173` e `http://app.cliente.localhost:5173` simulam os domínios (a API do
   dev só aceita `localhost:5173`, então lá só dá para ver os redirecionamentos).
 
 **Follow-up (pedido do dono, 2026-11-08): endereços limpos por domínio.** Hoje os caminhos mantêm o prefixo
-(`gestao.…/gestao/locacoes`, `cliente.…/area-cliente/…`). Depois de no ar, tirar o prefixo quando o domínio já
-diz a área (`gestao.…/locacoes`, `cliente.…/locacoes/123`): os prefixos `GESTAO`/`PORTAL` de
+(`app.gestao.…/gestao/locacoes`, `app.cliente.…/area-cliente/…`). Depois de no ar, tirar o prefixo quando o domínio já
+diz a área (`app.gestao.…/locacoes`, `app.cliente.…/locacoes/123`): os prefixos `GESTAO`/`PORTAL` de
 `constants/routes.ts` passam a depender do host (vazio no domínio da área, igual no localhost), redirecionar os
 caminhos antigos com prefixo para os novos (links já compartilhados) e testar as duas áreas nos dois domínios.
 
