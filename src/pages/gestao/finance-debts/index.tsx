@@ -1,3 +1,6 @@
+import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/atoms/button";
 import { Box } from "@/components/atoms/box";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { ViewToggle } from "@/components/molecules/view-toggle";
@@ -9,6 +12,7 @@ import {
 } from "@/components/organisms/debts-summary";
 import { ListFooter } from "@/components/organisms/list-footer";
 import { QueryError } from "@/components/organisms/query-error";
+import { ROUTES } from "@/constants/routes";
 import { useDebtList } from "@/hooks/api/gestao/debts/useDebts";
 import { useDebtFilters } from "@/hooks/ui/useDebtFilters";
 import { useListView } from "@/hooks/ui/useListView";
@@ -33,11 +37,15 @@ export function FinanceDebtsPage() {
       ) : (
         summary && debts.total > 0 && <DebtsSummary summary={summary} />
       )}
-      {debts.total > 0 && (
-        <Box className="flex justify-end">
-          <ViewToggle view={view} onChange={setView} />
-        </Box>
-      )}
+      <Box className="flex items-center justify-end gap-2">
+        {debts.total > 0 && <ViewToggle view={view} onChange={setView} />}
+        <Button asChild size="sm">
+          <Link to={ROUTES.debtNew}>
+            <Plus />
+            Nova dívida
+          </Link>
+        </Button>
+      </Box>
       {view === "tabela" ? (
         <DebtTable
           debts={debts.items}

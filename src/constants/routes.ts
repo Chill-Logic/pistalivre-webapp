@@ -57,7 +57,9 @@ export const ROUTES = {
   company: `${GESTAO}/empresa`,
   finance: `${GESTAO}/financeiro`,
   financeDebts: `${GESTAO}/financeiro/debitos`,
+  debtNew: `${GESTAO}/financeiro/debitos/nova`,
   debtDetail: `${GESTAO}/financeiro/debitos/:id`,
+  debtEdit: `${GESTAO}/financeiro/debitos/:id/editar`,
   financeStatement: `${GESTAO}/financeiro/extrato`,
   portal: PORTAL,
   portalLogin: `${PORTAL}/entrar`,
@@ -76,6 +78,7 @@ export const routeTo = {
   newCustomerFromLead: (leadId: string) =>
     `${ROUTES.customers}/novo?lead=${encodeURIComponent(leadId)}`,
   debt: (id: string) => `${ROUTES.financeDebts}/${id}`,
+  editDebt: (id: string) => `${ROUTES.financeDebts}/${id}/editar`,
   supplier: (id: string) => `${ROUTES.suppliers}/${id}`,
   editSupplier: (id: string) => `${ROUTES.suppliers}/${id}/editar`,
   lead: (id: string) => `${ROUTES.crm}/${id}`,

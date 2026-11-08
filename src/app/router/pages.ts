@@ -161,6 +161,14 @@ export const CustomerEditPage = lazyPage(
   () => import("@/pages/gestao/customer-edit"),
   "CustomerEditPage",
 );
+export const DebtNewPage = lazyPage(
+  () => import("@/pages/gestao/debt-new"),
+  "DebtNewPage",
+);
+export const DebtEditPage = lazyPage(
+  () => import("@/pages/gestao/debt-edit"),
+  "DebtEditPage",
+);
 export const RentalNewPage = lazyPage(
   () => import("@/pages/gestao/rental-new"),
   "RentalNewPage",

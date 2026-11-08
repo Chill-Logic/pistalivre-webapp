@@ -1,6 +1,7 @@
-import { HandCoins } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { HandCoins, Pencil } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
@@ -12,6 +13,7 @@ import {
   DebtOverview,
   DebtOverviewSkeleton,
 } from "@/components/organisms/debt-overview";
+import { DebtDeleteButton } from "@/components/organisms/debt-delete-button";
 import { DebtPaymentDialog } from "@/components/organisms/debt-payment-dialog";
 import { DebtPaymentsCard } from "@/components/organisms/debt-payments-card";
 import {
@@ -24,7 +26,7 @@ import {
 } from "@/components/organisms/documents-card";
 import { QueryError } from "@/components/organisms/query-error";
 import { DebtDetailLayout } from "@/components/templates/debt-detail-layout";
-import { ROUTES } from "@/constants/routes";
+import { ROUTES, routeTo } from "@/constants/routes";
 import { queryKeys } from "@/constants/query-keys";
 import { isNotFound } from "@/helpers/api-error";
 import { useDebt } from "@/hooks/api/gestao/debts/useDebt";
@@ -37,7 +39,20 @@ export function DebtDetailPage() {
 
   return (
     <Box className="space-y-4">
-      <BackLink to={backTo} label="Débitos" />
+      <Box className="flex items-center justify-between gap-2">
+        <BackLink to={backTo} label="Débitos" />
+        {debt.data && (
+          <Box className="flex gap-2">
+            <Button asChild variant="ghost" size="sm">
+              <Link to={routeTo.editDebt(debt.data.id)}>
+                <Pencil />
+                Editar
+              </Link>
+            </Button>
+            <DebtDeleteButton debt={debt.data} />
+          </Box>
+        )}
+      </Box>
       {debt.isPending && (
         <SkeletonRegion label="Carregando dívida…">
           <DebtDetailLayout

@@ -25,7 +25,15 @@ import {
   DocumentsCard,
   DocumentsCardSkeleton,
 } from "@/components/organisms/documents-card";
+import {
+  CustomerBillingCard,
+  CustomerBillingCardSkeleton,
+} from "@/components/organisms/customer-billing-card";
 import { CustomerDeleteButton } from "@/components/organisms/customer-delete-button";
+import {
+  CustomerInvoicesCard,
+  CustomerInvoicesCardSkeleton,
+} from "@/components/organisms/customer-invoices-card";
 import { QueryError } from "@/components/organisms/query-error";
 import { CustomerDetailLayout } from "@/components/templates/customer-detail-layout";
 import { ROUTES, routeTo } from "@/constants/routes";
@@ -66,6 +74,8 @@ export function CustomerDetailPage() {
             license={<CustomerLicenseCardSkeleton />}
             contact={<CustomerContactCardSkeleton />}
             rentals={<CustomerRentalsSkeleton />}
+            billing={<CustomerBillingCardSkeleton />}
+            invoices={<CustomerInvoicesCardSkeleton />}
             documents={<DocumentsCardSkeleton />}
           />
         </SkeletonRegion>
@@ -89,6 +99,17 @@ export function CustomerDetailPage() {
           license={<CustomerLicenseCard customer={customer.data} />}
           contact={<CustomerContactCard customer={customer.data} />}
           rentals={<CustomerRentals rentals={customer.data.rentals} />}
+          billing={
+            <CustomerBillingCard
+              customer={{ id: customer.data.id, name: customer.data.name }}
+            />
+          }
+          invoices={
+            <CustomerInvoicesCard
+              customer={customer.data}
+              rentals={customer.data.rentals}
+            />
+          }
           documents={
             <DocumentsCard
               documents={customer.data.documents}
