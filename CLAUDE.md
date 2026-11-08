@@ -53,8 +53,9 @@ Várias sessões Claude podem mexer **na mesma pasta**: `git add <caminhos>` (nu
 Gestão inteira fora o que move dinheiro: Painel; Veículos, Clientes, Locações, CRM (lead, estágio,
 perda/retomada, atividades, questionário), Fornecedores (+ vínculos), Planos, Usuários (admin × agente),
 Modelos de contrato e Manutenções com CRUD; Documentos (enviar/renomear/excluir); Vistorias; Reembolsos
-(listar e **recusar**); Financeiro, Débitos e Extrato **só leitura**; Propostas e Assinaturas **só
-leitura**; Projeções (conta no servidor + PDF). Portal do cliente com as escritas (senha, carteira pix, pedir reembolso, manutenção, vistoria). Extrato do aluguel (tela + PDF) na gestão e no portal; dias abonados intercalados nas cobranças. Shell novo com animações
+(listar e **recusar**); Financeiro, Débitos e Extrato **só leitura**; Propostas e Assinaturas com escrita (C:
+nova proposta com prévia/IA/PDF, aceitar/recusar/excluir/converter; assinatura nova, configurar, signatários,
+solicitar, cancelar, confirmar, reenviar, vincular envelope); Projeções (conta no servidor + PDF). Portal do cliente com as escritas (senha, carteira pix, pedir reembolso, manutenção, vistoria). Extrato do aluguel (tela + PDF) na gestão e no portal; dias abonados intercalados nas cobranças. Shell novo com animações
 (bottom sheet no celular, sem ação central na barra). Locação: cobrança automática e regras do aluguel
 (acerto, valores no tempo, abonos, descontos, pix recebidos) com escrita (B5). Cobrança avulsa (unitária e
 parcelada), registrar recebimento fora do Asaas, "Sincronizar do Asaas" e NF (locação, cliente e avulsa,
@@ -67,7 +68,7 @@ na ordem: A) reembolso "marcar como pago" (migration aditiva), escritas do porta
 "transferência interna", revogar o Bearer ao trocar a senha; B) cobranças (emitir avulsa, editar, cancelar,
 baixa/recebimento, NF, cobrança automática, trechos de valor, abonos, dias sem cobrança, descontos, pix
 recebidos) e pagamentos de dívida, com `Idempotency-Key` nas escritas que emitem; C) escritas de Propostas e
-Assinaturas; D) `db:seed:demo`. Saída de dinheiro continua proibida.
+Assinaturas (feitas); D) `db:seed:demo`. Saída de dinheiro continua proibida.
 
 Decisões do dono (2026-11-08): cadastro de cliente com upsert no Asaas **fica**; o valor da cobrança vencida
 é **o da gestão nos dois lados** (o portal passa a mostrar multa e juros como a gestão: ajuste no backend);
