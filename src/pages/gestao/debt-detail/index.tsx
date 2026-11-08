@@ -78,7 +78,30 @@ export function DebtDetailPage() {
         <DebtDetailLayout
           overview={<DebtOverview debt={debt.data} />}
           balance={<DebtBalanceCard debt={debt.data} />}
-          plan={<DebtPlanCard plan={debt.data.plan} />}
+          plan={
+            <DebtPlanCard
+              plan={debt.data.plan}
+              action={(installment) =>
+                installment.status !== "PAID" &&
+                debt.data && (
+                  <DebtPaymentDialog
+                    debt={debt.data}
+                    installment={installment.number}
+                    trigger={
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        aria-label={`Pagar parcela ${installment.number}`}
+                      >
+                        <HandCoins />
+                        Pagar
+                      </Button>
+                    }
+                  />
+                )
+              }
+            />
+          }
           payments={
             <DebtPaymentsCard
               payments={debt.data.payments}

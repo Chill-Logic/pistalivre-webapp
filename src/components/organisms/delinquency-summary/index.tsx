@@ -4,7 +4,8 @@ import {
   BarListCard,
   BarListCardSkeleton,
 } from "@/components/organisms/bar-list-card";
-import { overdueByPurposeItems, topDebtorItems } from "@/helpers/dashboard";
+import { overdueByPurposeItems } from "@/helpers/dashboard";
+import { delinquentItems, latePayerItems } from "@/helpers/finance";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { Delinquency } from "@/types/dashboard";
 import { formatCurrency } from "@/utils/format";
@@ -38,7 +39,17 @@ export function DelinquencySummary({
           hint={pluralize(pending.count, "cobrança", "cobranças")}
         />
       </Col>
-      <Col>
+      {delinquency.overdueRate != null && (
+        <Col span={6}>
+          <StatCard
+            label="Taxa de inadimplência"
+            value={`${delinquency.overdueRate.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`}
+            tone={delinquency.overdueRate > 0 ? "destructive" : "default"}
+            hint="vencido sobre o total em aberto"
+          />
+        </Col>
+      )}
+      <Col span={delinquency.overdueRate != null ? 6 : undefined}>
         <StatCard
           label="Pagas com atraso"
           value={paid.lateCount}
@@ -58,9 +69,16 @@ export function DelinquencySummary({
       </Col>
       <Col>
         <BarListCard
-          title="Maiores devedores"
-          items={topDebtorItems(delinquency)}
-          empty="Sem devedores no momento."
+          title="Inadimplentes agora"
+          items={delinquentItems(delinquency)}
+          empty="Ninguém em atraso."
+        />
+      </Col>
+      <Col>
+        <BarListCard
+          title="Top 5 que mais atrasam"
+          items={latePayerItems(delinquency)}
+          empty="Ninguém com histórico de atraso ainda."
         />
       </Col>
     </Row>
@@ -76,8 +94,17 @@ export function DelinquencySummarySkeleton() {
       <Col span={6}>
         <StatCardSkeleton />
       </Col>
-      <Col>
+      <Col span={6}>
         <StatCardSkeleton />
+      </Col>
+      <Col span={6}>
+        <StatCardSkeleton />
+      </Col>
+      <Col>
+        <BarListCardSkeleton />
+      </Col>
+      <Col>
+        <BarListCardSkeleton />
       </Col>
       <Col>
         <BarListCardSkeleton />

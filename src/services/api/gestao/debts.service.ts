@@ -5,6 +5,10 @@ import type {
   DebtFilters,
   DebtInput,
   DebtPaymentInput,
+  DebtPaymentPreview,
+  DebtPaymentPreviewInput,
+  DebtPreview,
+  DebtPreviewInput,
   Debts,
 } from "@/types/debt";
 
@@ -33,6 +37,19 @@ export const debtsService = {
   },
   async remove(id: string) {
     await http.delete(`/debts/${id}`);
+  },
+  /** Interest and plan "as of today" of a draft (nothing is saved). */
+  async preview(input: DebtPreviewInput) {
+    const { data } = await http.post<DebtPreview>("/debts/preview", input);
+    return data;
+  },
+  /** What a payment would leave open (nothing is saved). */
+  async previewPayment(id: string, input: DebtPaymentPreviewInput) {
+    const { data } = await http.post<DebtPaymentPreview>(
+      `/debts/${id}/payments/preview`,
+      input,
+    );
+    return data;
   },
   async addPayment(id: string, input: DebtPaymentInput, key: string) {
     const { data } = await http.post<{ paymentId: string; debt: DebtDetail }>(

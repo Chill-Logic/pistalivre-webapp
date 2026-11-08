@@ -60,7 +60,9 @@ export type DocumentOwnerType =
   | "CUSTOMER_DEBT"
   | "PAYMENT"
   | "CUSTOMER_DEBT"
+  | "LEAD"
   | "LEAD_ACTIVITY"
+  | "PROPOSAL"
   | "REIMBURSEMENT";
 
 export type DocumentOwner = { type: DocumentOwnerType; id: string };

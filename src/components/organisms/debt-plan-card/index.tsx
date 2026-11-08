@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import {
@@ -16,7 +17,14 @@ import type { DebtInstallment } from "@/types/debt";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
 /** Derived plan: payments cover installments in cascade (oldest first). */
-export function DebtPlanCard({ plan }: { plan: DebtInstallment[] }) {
+export function DebtPlanCard({
+  plan,
+  action,
+}: {
+  plan: DebtInstallment[];
+  /** E.g. "Pagar" on each open installment. */
+  action?: (installment: DebtInstallment) => ReactNode;
+}) {
   const { label } = useLabels();
   if (plan.length === 0) return null;
 
@@ -49,6 +57,7 @@ export function DebtPlanCard({ plan }: { plan: DebtInstallment[] }) {
                 <Badge variant={installmentVariant(installment.status)}>
                   {label(LABEL_MAPS.debtInstallmentStatus, installment.status)}
                 </Badge>
+                {action?.(installment)}
               </Box>
             </ListItem>
           ))}

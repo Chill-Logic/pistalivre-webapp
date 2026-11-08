@@ -35,11 +35,8 @@ export function LeadSummary({ lead }: { lead: LeadDetail }) {
           <InfoItem md={6} label="Entrou em">
             {formatDateTime(lead.createdAt)}
           </InfoItem>
-          <InfoItem md={6} label="Primeiro contato (origem)">
+          <InfoItem md={6} label="Origem">
             {touchLabel(lead.first)}
-          </InfoItem>
-          <InfoItem md={6} label="Último contato (origem)">
-            {touchLabel(lead.last)}
           </InfoItem>
           {lead.customerId && (
             <InfoItem md={6} label="Cliente">
@@ -72,7 +69,7 @@ export function LeadSummarySkeleton() {
       </CardHeader>
       <CardContent>
         <Row className="gap-y-4">
-          {Array.from({ length: 6 }, (_, index) => (
+          {Array.from({ length: 5 }, (_, index) => (
             <Col key={index} md={6} className="space-y-2">
               <Skeleton shape="text" className="w-24 text-xs" />
               <Skeleton shape="text" className="w-40 text-sm" />

@@ -6,6 +6,7 @@ import {
   ProposalCard,
   ProposalCardSkeleton,
 } from "@/components/molecules/proposal-card";
+import { CopyProposalButton } from "@/components/organisms/copy-proposal-button";
 import type { ProposalListItem } from "@/types/proposal";
 import { cn } from "@/utils/cn";
 
@@ -26,7 +27,7 @@ export function ProposalList({
         <Row as="ul" className="gap-y-6">
           {Array.from({ length: 6 }, (_, index) => (
             <Col as="li" key={index} sm={6} xl={4}>
-              <ProposalCardSkeleton />
+              <ProposalCardSkeleton withFooter />
             </Col>
           ))}
         </Row>
@@ -55,7 +56,10 @@ export function ProposalList({
     >
       {proposals.map((item) => (
         <Col as="li" key={item.id} sm={6} xl={4}>
-          <ProposalCard proposal={item} />
+          <ProposalCard
+            proposal={item}
+            footer={<CopyProposalButton source={{ proposalId: item.id }} />}
+          />
         </Col>
       ))}
     </Row>

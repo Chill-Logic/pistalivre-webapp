@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
+import { CopyProposalButton } from "@/components/organisms/copy-proposal-button";
 import { ProposalConvertDialog } from "@/components/organisms/proposal-convert-dialog";
 import { ProposalRejectDialog } from "@/components/organisms/proposal-reject-dialog";
 import { ROUTES } from "@/constants/routes";
@@ -27,6 +28,7 @@ export function ProposalActions({ proposal }: { proposal: ProposalDetail }) {
 
   return (
     <Box className="flex flex-wrap justify-end gap-2">
+      <CopyProposalButton source={{ html: proposal.renderedHtml }} />
       {!proposal.lead && <ProposalConvertDialog proposal={proposal} />}
       {proposal.status === "SENT" && (
         <>

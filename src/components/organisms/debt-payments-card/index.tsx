@@ -82,6 +82,11 @@ export function DebtPaymentsCard({
                     {payment.notes}
                   </Text>
                 )}
+                {payment.createdByName && (
+                  <Text size="xs" tone="muted">
+                    Lançado por {payment.createdByName}
+                  </Text>
+                )}
                 {payment.documents.length > 0 && (
                   <Box className="divide-y">
                     {payment.documents.map((document) => (

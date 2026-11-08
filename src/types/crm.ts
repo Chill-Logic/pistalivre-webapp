@@ -1,4 +1,5 @@
 import type { DocumentFile } from "@/types/document";
+import type { ProposalStatus } from "@/types/proposal";
 
 export type LeadStatus =
   | "NEW"
@@ -56,6 +57,17 @@ export type LeadActivity = {
   documents: DocumentFile[];
 };
 
+/** A proposal issued to the lead (its PDF belongs to the lead). */
+export type LeadProposal = {
+  id: string;
+  status: ProposalStatus;
+  rejectionReason: string | null;
+  /** Frozen snapshot, RAW: never render it without sanitizing. */
+  renderedHtml: string;
+  document: DocumentFile | null;
+  createdAt: string;
+};
+
 export type LeadChainLink = {
   id: string;
   name: string;
@@ -103,13 +115,7 @@ export type LeadDetail = LeadListItem & {
     link: string | null;
   } | null;
   activities: LeadActivity[];
-  proposals: {
-    id: string;
-    status: string;
-    rejectionReason: string | null;
-    document: DocumentFile | null;
-    createdAt: string;
-  }[];
+  proposals: LeadProposal[];
   chain: LeadChainLink[];
 };
 

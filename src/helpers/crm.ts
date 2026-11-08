@@ -1,6 +1,6 @@
 import type { BadgeVariantProps } from "@/components/atoms/badge/variants";
 import type { BarItem } from "@/types/chart";
-import type { LeadFunnel, LeadStatus, Touch } from "@/types/crm";
+import type { LeadFunnel, LeadListItem, LeadStatus, Touch } from "@/types/crm";
 
 type Variant = BadgeVariantProps["variant"];
 
@@ -62,4 +62,21 @@ export function touchLabel(touch: Touch) {
 /** The API says "direto" when there is no utm; show it as a label. */
 export function sourceLabel(source: string) {
   return source === "direto" ? "Direto" : source;
+}
+
+/** A touch with anything recorded (otherwise it was a direct visit). */
+export function hasTouchData(touch: Touch) {
+  return Boolean(
+    touch.utmSource || touch.utmCampaign || touch.referrer || touch.landing,
+  );
+}
+
+/** "google / cpc" (source / medium) of one touch. */
+export function touchChannel(touch: Touch) {
+  return [touch.utmSource, touch.utmMedium].filter(Boolean).join(" / ") || "—";
+}
+
+/** List origin, as the management table: "instagram · black-friday". */
+export function leadOriginLabel(lead: LeadListItem) {
+  return [sourceLabel(lead.source), lead.campaign].filter(Boolean).join(" · ");
 }

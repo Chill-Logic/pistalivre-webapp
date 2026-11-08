@@ -1,16 +1,27 @@
+import { Copy, Link2 } from "lucide-react";
+import type { ReactNode } from "react";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { TextLink } from "@/components/molecules/text-link";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
+import { useCopy } from "@/hooks/ui/useCopy";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { ToCollectItem as Item } from "@/types/finance";
 import { formatCurrency } from "@/utils/format";
 
-/** One charge in the collection queue (read-only: no "dar baixa" yet). */
-export function ToCollectItem({ item }: { item: Item }) {
+type ToCollectItemProps = {
+  item: Item;
+  /** E.g. "Dar baixa", under the amount. */
+  action?: ReactNode;
+};
+
+/** One charge in the collection queue. */
+export function ToCollectItem({ item, action }: ToCollectItemProps) {
   const { label } = useLabels();
+  const copy = useCopy();
   const title = item.label ?? label(LABEL_MAPS.paymentPurpose, item.purpose);
   const meta = [
     label(LABEL_MAPS.paymentMethod, item.method),
@@ -45,7 +56,7 @@ export function ToCollectItem({ item }: { item: Item }) {
           {meta.length > 0 && ` · ${meta.join(" · ")}`}
         </Text>
       </Box>
-      <Box className="shrink-0 text-right">
+      <Box className="flex shrink-0 flex-col items-end gap-1 text-right">
         <Text weight="semibold" className="tabular-nums">
           {formatCurrency(item.amounts.amount)}
         </Text>
@@ -54,6 +65,31 @@ export function ToCollectItem({ item }: { item: Item }) {
             {formatCurrency(item.amounts.principal)} + multa/juros
           </Text>
         )}
+        <Box className="flex flex-wrap justify-end gap-1">
+          {item.pix?.payload && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => copy(item.pix?.payload ?? "", "Pix copiado")}
+            >
+              <Copy />
+              Pix
+            </Button>
+          )}
+          {item.invoiceUrl && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() =>
+                copy(item.invoiceUrl ?? "", "Link da fatura copiado")
+              }
+            >
+              <Link2 />
+              Fatura
+            </Button>
+          )}
+          {action}
+        </Box>
       </Box>
     </Box>
   );
@@ -66,7 +102,10 @@ export function ToCollectItemSkeleton() {
         <Skeleton shape="text" className="w-40 text-sm" />
         <Skeleton shape="text" className="w-56 text-xs" />
       </Box>
-      <Skeleton shape="text" className="w-20 text-sm" />
+      <Box className="flex shrink-0 flex-col items-end gap-1">
+        <Skeleton shape="text" className="w-20 text-sm" />
+        <Skeleton className="h-9 w-24 md:h-8" />
+      </Box>
     </Box>
   );
 }

@@ -9,15 +9,20 @@ import { InfoItem } from "@/components/molecules/info-item";
 import { TextLink } from "@/components/molecules/text-link";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
-import { debtStatusVariant, interestDescription } from "@/helpers/debt";
+import {
+  debtStatusVariant,
+  interestDescription,
+  lenderHref,
+} from "@/helpers/debt";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { DebtDetail, DebtLender } from "@/types/debt";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
 import { formatPlate } from "@/utils/plate";
 
 function LenderName({ lender }: { lender: DebtLender }) {
-  return lender.customerId ? (
-    <TextLink to={routeTo.customer(lender.customerId)}>{lender.name}</TextLink>
+  const href = lenderHref(lender);
+  return href ? (
+    <TextLink to={href}>{lender.name}</TextLink>
   ) : (
     <>{lender.name}</>
   );

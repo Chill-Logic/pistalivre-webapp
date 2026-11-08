@@ -4,11 +4,14 @@ import { Col, Row } from "@/components/atoms/grid";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { LeadCard, LeadCardSkeleton } from "@/components/molecules/lead-card";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
-import type { LeadListItem } from "@/types/crm";
+import { LeadStageSelect } from "@/components/organisms/lead-stage-select";
+import type { CrmOptions, LeadListItem } from "@/types/crm";
 import { cn } from "@/utils/cn";
 
 type LeadListProps = {
   leads: LeadListItem[] | undefined;
+  /** With them, an open lead's stage is changed right on its card. */
+  options?: CrmOptions;
   isLoading: boolean;
   isRefreshing?: boolean;
   /** Under the empty state (e.g. "Links de campanha"). */
@@ -17,6 +20,7 @@ type LeadListProps = {
 
 export function LeadList({
   leads,
+  options,
   isLoading,
   isRefreshing = false,
   emptyAction,
@@ -27,7 +31,7 @@ export function LeadList({
         <Row as="ul" className="gap-y-6">
           {Array.from({ length: 6 }, (_, index) => (
             <Col as="li" key={index} sm={6} xl={4}>
-              <LeadCardSkeleton />
+              <LeadCardSkeleton withFooter />
             </Col>
           ))}
         </Row>
@@ -57,7 +61,20 @@ export function LeadList({
     >
       {leads.map((lead) => (
         <Col as="li" key={lead.id} sm={6} xl={4}>
-          <LeadCard lead={lead} />
+          <LeadCard
+            lead={lead}
+            footer={
+              options &&
+              lead.status !== "WON" &&
+              lead.status !== "LOST" && (
+                <LeadStageSelect
+                  lead={lead}
+                  options={options}
+                  className="w-full [&>button]:flex-1"
+                />
+              )
+            }
+          />
         </Col>
       ))}
     </Row>

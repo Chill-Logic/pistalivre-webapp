@@ -4,8 +4,21 @@ import type {
   DocumentFile,
   DocumentOwnerType,
 } from "@/types/document";
-import type { SignatureListItem, SignatureStatus } from "@/types/signature";
+import type {
+  SignatureListItem,
+  SignatureStatus,
+  SignerRole,
+} from "@/types/signature";
 import { pluralize } from "@/utils/text";
+
+/** Staff signs for the lessor; a customer's contact usually witnesses. */
+export function candidateRole(candidate?: {
+  kind: "customer" | "user" | "contact";
+}): SignerRole {
+  if (candidate?.kind === "user") return "LESSOR";
+  if (candidate?.kind === "contact") return "WITNESS";
+  return "LESSEE";
+}
 
 /**
  * "Documento de: Veículo". The API catalog (`DOCUMENT_OWNER_LABELS`) names

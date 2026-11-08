@@ -15,6 +15,7 @@ import {
   ToCollectItem,
   ToCollectItemSkeleton,
 } from "@/components/molecules/to-collect-item";
+import { ChargeSettleDialog } from "@/components/organisms/charge-settle-dialog";
 import { dueDayLabel, lateLabel } from "@/helpers/finance";
 import type { ToCollect } from "@/types/finance";
 import { formatCurrency } from "@/utils/format";
@@ -63,7 +64,15 @@ export function ToCollectTimeline({ toCollect }: { toCollect: ToCollect }) {
               </Box>
               <Box className="divide-y">
                 {day.items.map((item) => (
-                  <ToCollectItem key={item.id} item={item} />
+                  <ToCollectItem
+                    key={item.id}
+                    item={item}
+                    action={
+                      <ChargeSettleDialog
+                        charge={{ ...item, rentalId: item.rental?.id ?? null }}
+                      />
+                    }
+                  />
                 ))}
               </Box>
             </Box>

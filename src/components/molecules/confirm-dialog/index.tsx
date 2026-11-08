@@ -12,8 +12,8 @@ import {
 import { Spinner } from "@/components/atoms/spinner";
 
 type ConfirmDialogProps = {
-  /** The button that opens the dialog. */
-  trigger: ReactNode;
+  /** The button that opens the dialog (none = opened through `open`). */
+  trigger?: ReactNode;
   title: string;
   description: ReactNode;
   confirmLabel: string;
@@ -38,7 +38,7 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent>
         <DialogTitle>{title}</DialogTitle>
         <DialogDescription>{description}</DialogDescription>

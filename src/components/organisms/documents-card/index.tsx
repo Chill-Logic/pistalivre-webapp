@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { CollapsibleCard } from "@/components/molecules/collapsible-card";
 import { DocumentItem } from "@/components/molecules/document-item";
+import { DocumentEditDialog } from "@/components/organisms/document-edit-dialog";
 import { DocumentUploadDialog } from "@/components/organisms/document-upload-dialog";
 import { ManagedDocumentList } from "@/components/organisms/managed-document-list";
 import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
@@ -20,8 +21,13 @@ type DocumentsCardProps = {
    * Who the documents belong to + the query that lists them. Present = the
    * staff can send, edit, delete (one or several) and make PDFs signable;
    * absent = read-only (view/download).
+   * `renameOnly`: just the pencil (a generated file, like a proposal's PDF).
    */
-  manage?: { owner: DocumentOwner; invalidate: QueryKey };
+  manage?: {
+    owner: DocumentOwner;
+    invalidate: QueryKey;
+    renameOnly?: boolean;
+  };
 };
 
 /** Documents of any owner (vehicle, customer…), with view/download. */
@@ -37,7 +43,8 @@ export function DocumentsCard({
       count={documents.length}
       storageKey={`documents-${manage?.owner.type.toLowerCase() ?? "view"}`}
       actions={
-        manage && (
+        manage &&
+        !manage.renameOnly && (
           <DocumentUploadDialog
             owner={manage.owner}
             invalidate={manage.invalidate}
@@ -47,8 +54,14 @@ export function DocumentsCard({
     >
       {documents.length === 0 ? (
         <Text tone="muted">{empty}</Text>
+      ) : manage?.renameOnly ? (
+        <ReadOnlyDocuments documents={documents} rename={manage} />
       ) : manage ? (
-        <ManagedDocumentList documents={documents} {...manage} />
+        <ManagedDocumentList
+          documents={documents}
+          owner={manage.owner}
+          invalidate={manage.invalidate}
+        />
       ) : (
         <ReadOnlyDocuments documents={documents} />
       )}
@@ -56,7 +69,14 @@ export function DocumentsCard({
   );
 }
 
-function ReadOnlyDocuments({ documents }: { documents: DocumentFile[] }) {
+function ReadOnlyDocuments({
+  documents,
+  rename,
+}: {
+  documents: DocumentFile[];
+  /** Only the pencil (rename), for generated files. */
+  rename?: { owner: DocumentOwner; invalidate: QueryKey };
+}) {
   const { view, download } = useFileActions();
   return (
     <Box className="divide-y">
@@ -69,6 +89,16 @@ function ReadOnlyDocuments({ documents }: { documents: DocumentFile[] }) {
           isViewing={view.isPending && view.variables?.id === document.id}
           isDownloading={
             download.isPending && download.variables?.id === document.id
+          }
+          actions={
+            rename && (
+              <DocumentEditDialog
+                document={document}
+                owner={rename.owner}
+                invalidate={rename.invalidate}
+                renameOnly
+              />
+            )
           }
         />
       ))}

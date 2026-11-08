@@ -81,6 +81,15 @@ export type Delinquency = {
     amount: number;
     count: number;
   }[];
+  /** % overdue ÷ (overdue + pending), by amount (server; Financeiro only). */
+  overdueRate?: number;
+  /** Who pays late most often (history), with their average delay. */
+  topLatePayers: {
+    customerId: string;
+    name: string;
+    lateCount: number;
+    avgDaysLate: number;
+  }[];
 };
 
 export type LeadFunnel = {

@@ -59,6 +59,9 @@ export type DebtListItem = {
   remainingInstallments: number;
   balance: DebtBalance;
   createdAt: string;
+  /** In the list items (the detail carries the arrays themselves). */
+  paymentCount?: number;
+  documentCount?: number;
 };
 
 export type DebtsSummary = {
@@ -92,6 +95,8 @@ export type DebtPayment = {
   /** Calendar date. */
   paidAt: string;
   notes: string | null;
+  /** Who logged it (null = a user since deleted). */
+  createdByName: string | null;
   createdAt: string;
   documents: DocumentFile[];
 };
@@ -123,6 +128,46 @@ export type DebtPaymentInput = {
   discount?: number;
   barcode?: string;
   notes?: string;
+};
+
+/** Body of POST /debts/preview: the terms of the draft. */
+export type DebtPreviewInput = Pick<
+  DebtInput,
+  | "principal"
+  | "interestPercent"
+  | "interestPeriod"
+  | "interestMode"
+  | "interestBase"
+  | "borrowedAt"
+  | "dueDate"
+  | "installments"
+>;
+
+/** The draft "as of today", by the server (same domain functions). */
+export type DebtPreview = {
+  elapsedPeriods: number | null;
+  interest: number;
+  total: number;
+  perPeriod: number;
+  installmentAmount: number | null;
+  firstDue: string | null;
+  lastDue: string | null;
+};
+
+export type DebtPaymentPreviewInput = {
+  amount: number;
+  surcharge?: number;
+  discount?: number;
+};
+
+/** What a payment would leave open (by the server). */
+export type DebtPaymentPreview = {
+  outstanding: number;
+  amortized: number;
+  remaining: number;
+  settles: boolean;
+  /** Would abate more than what is left: the POST refuses it. */
+  exceeds: boolean;
 };
 
 /** A lender as sent: one of our records (by id) or a free name. */

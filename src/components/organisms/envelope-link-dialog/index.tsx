@@ -16,13 +16,16 @@ import {
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
+import { IntegrationsHelp } from "@/components/molecules/integrations-help";
 import { RemoteCombobox } from "@/components/molecules/remote-combobox";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { toApiError } from "@/helpers/api-error";
+import { pluralize } from "@/utils/text";
 import {
   useEnvelopeDocuments,
   useImportEnvelope,
 } from "@/hooks/api/gestao/signatures/useSignatureMutations";
+import { useLiveSignatureDocumentIds } from "@/hooks/api/gestao/signatures/useLiveSignatureDocumentIds";
 import { usePdfDocumentOptions } from "@/hooks/ui/usePdfDocumentOptions";
 import type {
   ProviderEnvelope,
@@ -61,6 +64,23 @@ export function EnvelopeLinkDialog({
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+/**
+ * "2 documentos" of an envelope, for its list row: each document becomes a
+ * request here. Same query as the dialog, so opening it doesn't refetch.
+ */
+export function EnvelopeDocumentCount({ externalId }: { externalId: string }) {
+  const documents = useEnvelopeDocuments(externalId);
+  if (documents.isPending) {
+    return <Skeleton shape="text" className="w-20 text-xs" />;
+  }
+  if (documents.isError) return null;
+  return (
+    <Text size="xs" tone="muted">
+      {pluralize(documents.data.length, "documento", "documentos")}
+    </Text>
   );
 }
 
@@ -122,7 +142,9 @@ function EnvelopeLinkBody({
           </Box>
         )}
         {documents.isError && (
-          <Alert>{toApiError(documents.error).message}</Alert>
+          <Alert>
+            {toApiError(documents.error).message} <IntegrationsHelp />
+          </Alert>
         )}
         {documents.data?.length === 0 && (
           <Text tone="muted">Este envelope não tem documentos.</Text>
@@ -183,6 +205,8 @@ function EnvelopeDocumentRow({
   onChange: (value: { id: string; label: string }) => void;
 }) {
   const pdfs = usePdfDocumentOptions();
+  // A PDF with a live request (draft or sent) can't be linked again.
+  const live = useLiveSignatureDocumentIds();
   return (
     <Box className="space-y-2 rounded-md border p-3">
       <Box className="flex items-start gap-2">
@@ -204,9 +228,10 @@ function EnvelopeDocumentRow({
         value={value?.id ?? ""}
         selectedLabel={value?.label}
         options={pdfs.options.filter(
-          (option) => !takenIds.includes(option.value),
+          (option) =>
+            !takenIds.includes(option.value) && !live.data?.has(option.value),
         )}
-        isLoading={pdfs.isLoading}
+        isLoading={pdfs.isLoading || live.isPending}
         search={pdfs.search}
         onSearchChange={pdfs.setSearch}
         onChange={(option) =>
@@ -215,6 +240,9 @@ function EnvelopeDocumentRow({
         placeholder="PDF correspondente aqui…"
         searchPlaceholder="Buscar por nome do arquivo ou dono…"
       />
+      <Text size="xs" tone="muted">
+        Só aparecem PDFs sem pedido de assinatura em andamento.
+      </Text>
     </Box>
   );
 }

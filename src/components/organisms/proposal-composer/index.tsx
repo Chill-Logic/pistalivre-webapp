@@ -17,6 +17,7 @@ import { MoneyField } from "@/components/molecules/money-field";
 import { RemoteCombobox } from "@/components/molecules/remote-combobox";
 import { SelectField } from "@/components/molecules/select-field";
 import { TextareaField } from "@/components/molecules/textarea-field";
+import { CopyProposalButton } from "@/components/organisms/copy-proposal-button";
 import { ProposalHtmlEditor } from "@/components/organisms/proposal-html-editor";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { toApiError } from "@/helpers/api-error";
@@ -336,6 +337,7 @@ export function ProposalComposer({
               <Button asChild variant="ghost">
                 <Link to={cancelTo}>Cancelar</Link>
               </Button>
+              <CopyProposalButton source={{ html }} />
               <Button
                 type="button"
                 variant="outline"

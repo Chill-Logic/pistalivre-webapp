@@ -19,6 +19,7 @@ import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { CheckboxField } from "@/components/molecules/checkbox-field";
 import { DateField } from "@/components/molecules/date-field";
+import { FilePicker } from "@/components/molecules/file-picker";
 import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { RemoteCombobox } from "@/components/molecules/remote-combobox";
@@ -34,7 +35,8 @@ import {
   useUserOptions,
   useVehicleOptions,
 } from "@/hooks/ui/useRemoteOptions";
-import type { DebtDetail } from "@/types/debt";
+import { DebtTermsPreview } from "@/components/organisms/debt-terms-preview";
+import type { DebtDetail, DebtPreviewInput } from "@/types/debt";
 import {
   DEBT_FORM_FIELDS,
   debtFormDefaults,
@@ -68,6 +70,8 @@ export function DebtForm({
   const save = useSaveDebt(debt?.id);
   const vehicles = useVehicleOptions();
   const [formError, setFormError] = useState<string | null>(null);
+  // On create only: sent right after the debt is saved.
+  const [files, setFiles] = useState<File[]>([]);
   const {
     control,
     register,
@@ -85,17 +89,41 @@ export function DebtForm({
   const interestPeriod = watch("interestPeriod");
   const installments = Number(watch("installments")) || 1;
   const hasInterest = Number(interestPercent.replace(",", ".")) > 0;
+  const principal = watch("principal");
+  const borrowedAt = watch("borrowedAt");
+  const dueDate = watch("dueDate");
+  const interestMode = watch("interestMode");
+  const interestBase = watch("interestBase");
+  // The server's preview, once the minimum (amount and date) is there.
+  const previewInput: DebtPreviewInput | null =
+    principal > 0 && borrowedAt
+      ? {
+          principal,
+          interestPercent: hasInterest
+            ? Number(interestPercent.replace(",", "."))
+            : null,
+          interestPeriod,
+          interestMode,
+          interestBase,
+          borrowedAt,
+          dueDate: dueDate || null,
+          installments,
+        }
+      : null;
 
   const options = (map: LabelMapName, keys: string[]) =>
     keys.map((key) => ({ value: key, label: label(map, key) }));
 
   const onSubmit = handleSubmit((values) => {
     setFormError(null);
-    save.mutate(toDebtInput(values), {
-      onSuccess: onSaved,
-      onError: (error) =>
-        setFormError(applyApiErrors(error, setError, DEBT_FORM_FIELDS)),
-    });
+    save.mutate(
+      { input: toDebtInput(values), files: debt ? [] : files },
+      {
+        onSuccess: ({ debt: saved }) => onSaved(saved),
+        onError: (error) =>
+          setFormError(applyApiErrors(error, setError, DEBT_FORM_FIELDS)),
+      },
+    );
   });
 
   return (
@@ -310,6 +338,9 @@ export function DebtForm({
               </Text>
             </Col>
             <Col>
+              <DebtTermsPreview input={previewInput} />
+            </Col>
+            <Col>
               <Controller
                 control={control}
                 name="countsAsCost"
@@ -331,6 +362,23 @@ export function DebtForm({
                 {...register("notes")}
               />
             </Col>
+            {!debt && (
+              <Col className="space-y-2">
+                <Text size="sm" weight="medium">
+                  Anexos
+                </Text>
+                <Text size="xs" tone="muted">
+                  Contrato, boletos, comprovante do empréstimo… Enviados ao
+                  salvar; o tipo de cada um se ajusta depois, na página da
+                  dívida.
+                </Text>
+                <FilePicker
+                  files={files}
+                  onChange={setFiles}
+                  disabled={save.isPending}
+                />
+              </Col>
+            )}
           </Row>
 
           {formError && <Alert>{formError}</Alert>}

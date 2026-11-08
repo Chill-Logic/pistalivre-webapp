@@ -11,7 +11,9 @@ import { List, ListItem } from "@/components/atoms/list";
 import { Text } from "@/components/atoms/text";
 import { DocumentItem } from "@/components/molecules/document-item";
 import { EmptyState } from "@/components/molecules/empty-state";
+import { DocumentEditDialog } from "@/components/organisms/document-edit-dialog";
 import { LABEL_MAPS } from "@/constants/label-maps";
+import { queryKeys } from "@/constants/query-keys";
 import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { LeadActivity } from "@/types/crm";
@@ -19,6 +21,8 @@ import { formatDateTime } from "@/utils/format";
 
 type LeadActivitiesProps = {
   activities: LeadActivity[];
+  /** With it, each attachment can be renamed (the lead query is refreshed). */
+  leadId?: string;
   /** "Registrar atividade" button, next to the title. */
   action?: ReactNode;
 };
@@ -27,7 +31,11 @@ type LeadActivitiesProps = {
  * SDR trail, newest first, with each activity's attachments. A stage change
  * carries the new stage code.
  */
-export function LeadActivities({ activities, action }: LeadActivitiesProps) {
+export function LeadActivities({
+  activities,
+  leadId,
+  action,
+}: LeadActivitiesProps) {
   const { label } = useLabels();
   const { view, download } = useFileActions();
 
@@ -83,6 +91,18 @@ export function LeadActivities({ activities, action }: LeadActivitiesProps) {
                             isDownloading={
                               download.isPending &&
                               download.variables?.id === document.id
+                            }
+                            actions={
+                              leadId && (
+                                <DocumentEditDialog
+                                  document={document}
+                                  owner={{
+                                    type: "LEAD_ACTIVITY",
+                                    id: activity.id,
+                                  }}
+                                  invalidate={queryKeys.crm.lead(leadId)}
+                                />
+                              )
                             }
                           />
                         ))}

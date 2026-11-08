@@ -19,6 +19,7 @@ import {
 import { ProposalActions } from "@/components/organisms/proposal-actions";
 import { QueryError } from "@/components/organisms/query-error";
 import { ProposalDetailLayout } from "@/components/templates/proposal-detail-layout";
+import { queryKeys } from "@/constants/query-keys";
 import { ROUTES } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { useProposal } from "@/hooks/api/gestao/proposals/useProposal";
@@ -65,6 +66,14 @@ export function ProposalDetailPage() {
               title="PDF da proposta"
               documents={proposal.data.document ? [proposal.data.document] : []}
               empty="O PDF desta proposta não existe mais."
+              // The PDF belongs to the lead (or to the standalone proposal).
+              manage={{
+                owner: proposal.data.lead
+                  ? { type: "LEAD", id: proposal.data.lead.id }
+                  : { type: "PROPOSAL", id: proposal.data.id },
+                invalidate: queryKeys.proposals.detail(proposal.data.id),
+                renameOnly: true,
+              }}
             />
           }
           preview={<ProposalPreview html={proposal.data.renderedHtml} />}

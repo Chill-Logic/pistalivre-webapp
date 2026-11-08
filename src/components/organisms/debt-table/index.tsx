@@ -5,9 +5,14 @@ import {
   type DataTableColumn,
 } from "@/components/organisms/data-table";
 import { DebtsEmpty } from "@/components/organisms/debt-list";
+import { DebtRowPayment } from "@/components/organisms/debt-row-payment";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
-import { debtStatusVariant, nextDueLabel } from "@/helpers/debt";
+import {
+  debtCountsLabel,
+  debtStatusVariant,
+  nextDueLabel,
+} from "@/helpers/debt";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { DebtListItem } from "@/types/debt";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
@@ -25,8 +30,22 @@ export function DebtTable({ debts, isLoading, isRefreshing }: DebtTableProps) {
   const columns: DataTableColumn<DebtListItem>[] = [
     {
       header: "Credores",
-      cell: (debt) => debt.lendersLabel,
-      className: "max-w-64 truncate",
+      cell: (debt) => {
+        const counts = debtCountsLabel(debt);
+        return (
+          <>
+            <Text inline size={null} className="block truncate">
+              {debt.lendersLabel}
+            </Text>
+            {counts && (
+              <Text inline size="xs" tone="muted" className="block truncate">
+                {counts}
+              </Text>
+            )}
+          </>
+        );
+      },
+      className: "max-w-56",
       skeleton: "w-40",
     },
     {
@@ -87,6 +106,11 @@ export function DebtTable({ debts, isLoading, isRefreshing }: DebtTableProps) {
         </Badge>
       ),
       skeletonShape: "pill",
+    },
+    {
+      header: "Pagar",
+      cell: (debt) => <DebtRowPayment debt={debt} compact />,
+      skeleton: "w-8",
     },
   ];
 

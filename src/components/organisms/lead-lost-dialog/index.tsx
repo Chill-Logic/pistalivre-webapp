@@ -23,21 +23,40 @@ import type { LostReason } from "@/types/crm";
 type LeadLostDialogProps = {
   leadId: string;
   reasons: LostReason[];
-  trigger: ReactNode;
+  /** Opens it from a button; without it, open it with `defaultOpen`. */
+  trigger?: ReactNode;
+  /**
+   * Mounted already open (e.g. "Perdido" picked in a list row's stage
+   * select); `onClose` tells the parent it closed (sent or given up).
+   */
+  defaultOpen?: boolean;
+  onClose?: () => void;
 };
 
 /**
  * Loss needs at least one mapped reason (they feed the report) plus an
  * optional note. It is never undone: reopening creates a new attempt.
  */
-export function LeadLostDialog({ leadId, reasons, trigger }: LeadLostDialogProps) {
-  const [open, setOpen] = useState(false);
+export function LeadLostDialog({
+  leadId,
+  reasons,
+  trigger,
+  defaultOpen = false,
+  onClose,
+}: LeadLostDialogProps) {
+  const [open, setOpenState] = useState(defaultOpen);
   const [picked, setPicked] = useState<string[]>([]);
   const [note, setNote] = useState("");
   const [errors, setErrors] = useState<{ reasons?: string; form?: string }>({});
   const { lost } = useLeadActions(leadId);
 
+  const setOpen = (next: boolean) => {
+    setOpenState(next);
+    if (!next) onClose?.();
+  };
+
   const onOpenChange = (next: boolean) => {
+    if (lost.isPending) return;
     setOpen(next);
     if (!next) return;
     setPicked([]);
@@ -76,7 +95,7 @@ export function LeadLostDialog({ leadId, reasons, trigger }: LeadLostDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent>
         <DialogTitle>Marcar como perdido</DialogTitle>
         <DialogDescription>
@@ -84,11 +103,7 @@ export function LeadLostDialog({ leadId, reasons, trigger }: LeadLostDialogProps
           tentativa e mantém esta no histórico.
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
-          <Box
-            role="group"
-            aria-label="Motivos da perda"
-            className="space-y-3"
-          >
+          <Box role="group" aria-label="Motivos da perda" className="space-y-3">
             {reasons.map((reason) => (
               <CheckboxField
                 key={reason.code}
@@ -98,9 +113,7 @@ export function LeadLostDialog({ leadId, reasons, trigger }: LeadLostDialogProps
                 disabled={lost.isPending}
               />
             ))}
-            {errors.reasons && (
-              <Text tone="destructive">{errors.reasons}</Text>
-            )}
+            {errors.reasons && <Text tone="destructive">{errors.reasons}</Text>}
           </Box>
           <TextareaField
             label="Observação (opcional)"
@@ -116,8 +129,14 @@ export function LeadLostDialog({ leadId, reasons, trigger }: LeadLostDialogProps
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit" variant="destructive" disabled={lost.isPending}>
-              {lost.isPending && <Spinner className="text-primary-foreground" />}
+            <Button
+              type="submit"
+              variant="destructive"
+              disabled={lost.isPending}
+            >
+              {lost.isPending && (
+                <Spinner className="text-primary-foreground" />
+              )}
               Marcar como perdido
             </Button>
           </DialogFooter>

@@ -27,12 +27,21 @@ import { formatCalendarDate, formatCurrency } from "@/utils/format";
 type Errors = { paidValue?: string; paidAt?: string; form?: string };
 
 /**
+ * What settling needs from a charge: a rental's charge or an item of the
+ * Financeiro's "A receber" queue both have it.
+ */
+export type SettleableCharge = Pick<
+  Charge,
+  "id" | "rentalId" | "channel" | "amounts" | "dueDate"
+>;
+
+/**
  * "Dar baixa": the customer paid outside the gateway (cash, pix to the
  * bank). At Asaas the charge becomes "received in cash", so it stops
  * charging. The original amount/due date stay; the difference shows as
  * shortfall or lateness.
  */
-export function ChargeSettleDialog({ charge }: { charge: Charge }) {
+export function ChargeSettleDialog({ charge }: { charge: SettleableCharge }) {
   const settle = useSettleCharge(charge.id, charge.rentalId);
   const idempotency = useIdempotencyKey();
   const atAsaas = charge.channel === "asaas";

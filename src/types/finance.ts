@@ -12,6 +12,9 @@ export type ToCollectItem = {
   amounts: ChargeAmounts;
   customer: { id: string; name: string } | null;
   rental: { id: string; code: string } | null;
+  /** Only on an open Asaas charge. */
+  invoiceUrl: string | null;
+  pix: { encodedImage: string; payload: string; expirationDate: string } | null;
 };
 
 export type ToCollectDay = {

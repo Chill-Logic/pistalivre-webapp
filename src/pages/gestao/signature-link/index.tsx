@@ -11,7 +11,11 @@ import { EmptyState } from "@/components/molecules/empty-state";
 import { PageHeader } from "@/components/molecules/page-header";
 import { SelectField } from "@/components/molecules/select-field";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
-import { EnvelopeLinkDialog } from "@/components/organisms/envelope-link-dialog";
+import { IntegrationsHelp } from "@/components/molecules/integrations-help";
+import {
+  EnvelopeDocumentCount,
+  EnvelopeLinkDialog,
+} from "@/components/organisms/envelope-link-dialog";
 import { QueryError } from "@/components/organisms/query-error";
 import { ROUTES } from "@/constants/routes";
 import { fromSelectValue, toSelectValue } from "@/helpers/select";
@@ -58,10 +62,16 @@ export function SignatureLinkPage() {
         </SkeletonRegion>
       )}
       {envelopes.isError && (
-        <QueryError
-          error={envelopes.error}
-          onRetry={() => envelopes.refetch()}
-        />
+        <Box className="space-y-2">
+          <QueryError
+            error={envelopes.error}
+            onRetry={() => envelopes.refetch()}
+          />
+          <Text tone="muted">
+            Não foi possível listar os envelopes do Clicksign.{" "}
+            <IntegrationsHelp />
+          </Text>
+        </Box>
       )}
       {envelopes.data && items.length === 0 && (
         <EmptyState
@@ -93,6 +103,7 @@ export function SignatureLinkPage() {
                       {envelope.createdAt &&
                         ` · criado em ${formatDateTime(envelope.createdAt)}`}
                     </Text>
+                    <EnvelopeDocumentCount externalId={envelope.externalId} />
                   </Box>
                   <EnvelopeLinkDialog envelope={envelope} />
                 </ListItem>
@@ -134,6 +145,7 @@ function EnvelopeListSkeleton() {
             <Box className="flex-1 space-y-2">
               <Skeleton shape="text" className="w-1/2 text-sm" />
               <Skeleton shape="text" className="w-1/3 text-xs" />
+              <Skeleton shape="text" className="w-20 text-xs" />
             </Box>
             <Skeleton className="h-9 w-24" />
           </Box>

@@ -21,6 +21,7 @@ import { QueryBoundary } from "@/components/organisms/query-boundary";
 import { QueryError } from "@/components/organisms/query-error";
 import { TestLeadsDeleteButton } from "@/components/organisms/test-leads-delete-button";
 import { useLeadFunnel } from "@/hooks/api/gestao/crm/useLeadFunnel";
+import { useCrmOptions } from "@/hooks/api/gestao/crm/useCrmOptions";
 import { useLeadList } from "@/hooks/api/gestao/crm/useLeads";
 import { ROUTES } from "@/constants/routes";
 import { useLeadFilters } from "@/hooks/ui/useLeadFilters";
@@ -42,6 +43,8 @@ export function CrmPage() {
       </Link>
     </Button>
   );
+  // The stage select of each row (until it loads, rows show the badge).
+  const options = useCrmOptions();
 
   return (
     <Box className="space-y-4 md:space-y-6">
@@ -104,6 +107,7 @@ export function CrmPage() {
       ) : view === "tabela" ? (
         <LeadTable
           leads={leads.items}
+          options={options.data}
           isLoading={leads.isPending}
           isRefreshing={leads.isRefreshing}
           emptyAction={campaignLinksAction}
@@ -111,6 +115,7 @@ export function CrmPage() {
       ) : (
         <LeadList
           leads={leads.items}
+          options={options.data}
           isLoading={leads.isPending}
           isRefreshing={leads.isRefreshing}
           emptyAction={campaignLinksAction}

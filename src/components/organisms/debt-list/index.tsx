@@ -3,6 +3,7 @@ import { Col, Row } from "@/components/atoms/grid";
 import { DebtCard, DebtCardSkeleton } from "@/components/molecules/debt-card";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
+import { DebtRowPayment } from "@/components/organisms/debt-row-payment";
 import type { DebtListItem } from "@/types/debt";
 import { cn } from "@/utils/cn";
 
@@ -40,7 +41,10 @@ export function DebtList({
     >
       {debts.map((debt) => (
         <Col as="li" key={debt.id} md={6} xl={4}>
-          <DebtCard debt={debt} />
+          <DebtCard
+            debt={debt}
+            footer={!debt.balance.settled && <DebtRowPayment debt={debt} />}
+          />
         </Col>
       ))}
     </Row>

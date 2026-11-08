@@ -78,15 +78,46 @@ export function useDeleteDebtPayment() {
   });
 }
 
-/** Create (no id) or replace (id). Errors stay with the form. */
+/**
+ * Create (no id) or replace (id), then send the chosen attachments one per
+ * request (they belong to the debt, so only after it exists). A file that
+ * fails doesn't undo the debt: it says so. Errors stay with the form.
+ */
 export function useSaveDebt(id?: string) {
   const store = useStoreDebt();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: DebtInput) =>
-      id ? debtsService.update(id, input) : debtsService.create(input),
-    onSuccess: (debt) => {
+    mutationFn: async ({
+      input,
+      files = [],
+    }: {
+      input: DebtInput;
+      files?: File[];
+    }) => {
+      let debt = id
+        ? await debtsService.update(id, input)
+        : await debtsService.create(input);
+      let failed = 0;
+      for (const file of files) {
+        try {
+          await documentsService.upload({ type: "DEBT", id: debt.id }, file);
+        } catch {
+          failed += 1;
+        }
+      }
+      // The documents only show in a fresh read of the debt.
+      if (files.length > failed) debt = await debtsService.get(debt.id);
+      return { debt, failed };
+    },
+    onSuccess: ({ debt, failed }) => {
       store(debt);
+      queryClient.invalidateQueries({ queryKey: queryKeys.documents.all });
       toast.success(id ? "Dívida atualizada" : "Dívida cadastrada");
+      if (failed > 0) {
+        toast.warning(
+          `${failed === 1 ? "1 anexo não foi enviado" : `${failed} anexos não foram enviados`}. Envie de novo pela página da dívida.`,
+        );
+      }
     },
   });
 }

@@ -15,7 +15,7 @@ import { rateLabel } from "@/helpers/rental";
 import { useCopy } from "@/hooks/ui/useCopy";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { LeadDetail } from "@/types/crm";
-import { formatDate } from "@/utils/format";
+import { formatDate, formatDateTime } from "@/utils/format";
 
 /**
  * What the lead answered on their own (public questionnaire): qualification,
@@ -55,6 +55,11 @@ export function LeadJourneyCard({ lead }: { lead: LeadDetail }) {
                     ? "Sim"
                     : "Não"}
               </InfoItem>
+              {qualification.qualifiedAt && (
+                <InfoItem label="Respondido em">
+                  {formatDateTime(qualification.qualifiedAt)}
+                </InfoItem>
+              )}
             </>
           )}
           {interestedPlan && (

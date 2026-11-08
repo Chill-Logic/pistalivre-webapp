@@ -33,11 +33,22 @@ export function LeadStageCard({ lead, options }: LeadStageCardProps) {
   const [confirming, setConfirming] = useState(false);
   const terminal = lead.status === "LOST" || lead.status === "WON";
   const stageLabel = (code: string) => label(LABEL_MAPS.leadStatus, code);
-  // A submitted or still-open questionnaire needs no new link.
-  const canSendQuestionnaire =
-    !terminal &&
-    !lead.questionnaire?.submittedAt &&
-    !lead.questionnaire?.link;
+  // Owner's call: a new link even after it was answered or with the lead
+  // closed. Only a link still open is reused (the server would hand it back).
+  const canSendQuestionnaire = !lead.questionnaire?.link;
+  const questionnaireButton = canSendQuestionnaire && (
+    <Button
+      variant="outline"
+      className="w-full"
+      disabled={questionnaire.isPending}
+      onClick={() => questionnaire.mutate()}
+    >
+      {questionnaire.isPending ? <Spinner /> : <ClipboardList />}
+      {lead.questionnaire
+        ? "Gerar novo link do questionário"
+        : "Gerar link do questionário"}
+    </Button>
+  );
 
   return (
     <Card>
@@ -61,6 +72,7 @@ export function LeadStageCard({ lead, options }: LeadStageCardProps) {
                 </Button>
               }
             />
+            {questionnaireButton}
           </>
         ) : (
           <>
@@ -104,16 +116,7 @@ export function LeadStageCard({ lead, options }: LeadStageCardProps) {
               )}
             </Box>
             <Box className="flex flex-col gap-2">
-              {canSendQuestionnaire && (
-                <Button
-                  variant="outline"
-                  disabled={questionnaire.isPending}
-                  onClick={() => questionnaire.mutate()}
-                >
-                  {questionnaire.isPending ? <Spinner /> : <ClipboardList />}
-                  Gerar link do questionário
-                </Button>
-              )}
+              {questionnaireButton}
               <LeadLostDialog
                 leadId={lead.id}
                 reasons={options.lostReasons}

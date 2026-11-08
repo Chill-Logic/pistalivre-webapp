@@ -1,7 +1,14 @@
 import type { BadgeVariantProps } from "@/components/atoms/badge/variants";
 import { LABEL_MAPS, type LabelMapName } from "@/constants/label-maps";
-import type { DebtInstallment, DebtListItem, DebtStatus } from "@/types/debt";
+import { routeTo } from "@/constants/routes";
+import type {
+  DebtInstallment,
+  DebtLender,
+  DebtListItem,
+  DebtStatus,
+} from "@/types/debt";
 import { formatCalendarDate } from "@/utils/format";
+import { pluralize } from "@/utils/text";
 
 type Variant = BadgeVariantProps["variant"];
 type LabelFn = (map: LabelMapName, code: string) => string;
@@ -12,6 +19,25 @@ const STATUS_VARIANT: Record<DebtStatus["variant"], Variant> = {
   warning: "warning",
   neutral: "neutral",
 };
+
+/** Screen of the lender's record (customer, fixed cost, staff), if any. */
+export function lenderHref(lender: DebtLender) {
+  if (lender.customerId) return routeTo.customer(lender.customerId);
+  if (lender.supplierId) return routeTo.supplier(lender.supplierId);
+  if (lender.userId) return routeTo.user(lender.userId);
+  return null;
+}
+
+/** "2 pagamentos · 1 documento" of a list item (null when it has neither). */
+export function debtCountsLabel(debt: DebtListItem) {
+  const parts = [
+    debt.paymentCount &&
+      pluralize(debt.paymentCount, "pagamento", "pagamentos"),
+    debt.documentCount &&
+      pluralize(debt.documentCount, "documento", "documentos"),
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
 
 /** API badge variant → our Badge variant. */
 export function debtStatusVariant(status: DebtStatus): Variant {

@@ -1,5 +1,5 @@
-import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { ArrowDown, ArrowUp, Plus, Trash2, UserPlus } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -18,9 +18,13 @@ import { RemoteCombobox } from "@/components/molecules/remote-combobox";
 import { SelectField } from "@/components/molecules/select-field";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { toApiError } from "@/helpers/api-error";
+import { candidateRole } from "@/helpers/signature";
 import { useSetSigners } from "@/hooks/api/gestao/signatures/useSignatureMutations";
 import { useLabels } from "@/hooks/ui/useLabels";
-import { useSignerCandidates } from "@/hooks/ui/useSignerCandidates";
+import {
+  useSignerCandidates,
+  type SignerCandidate,
+} from "@/hooks/ui/useSignerCandidates";
 import type { Signer, SignerChannel, SignerRole } from "@/types/signature";
 import { maskCpf, maskPhone, onlyDigits } from "@/utils/masks";
 
@@ -77,6 +81,16 @@ export function SignatureSignersEditor({
   const [errors, setErrors] = useState<Record<number, RowErrors>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [seq, setSeq] = useState(0);
+  const { offerContact } = candidates;
+
+  // A draft that already has a customer offers their emergency contact too.
+  useEffect(() => {
+    for (const signer of signers) {
+      if (signer.customerId) {
+        offerContact(signer.customerId).catch(() => undefined);
+      }
+    }
+  }, [signers, offerContact]);
 
   const update = (key: string, patch: Partial<SignerRow>) =>
     setRows((current) =>
@@ -92,8 +106,7 @@ export function SignatureSignersEditor({
       return next;
     });
 
-  const add = (value?: string) => {
-    const candidate = value ? candidates.find(value) : undefined;
+  const addRow = (candidate?: SignerCandidate) => {
     setSeq((n) => n + 1);
     setRows((current) => [
       ...current,
@@ -103,13 +116,27 @@ export function SignatureSignersEditor({
         email: candidate?.email ?? "",
         phone: maskPhone(candidate?.phone ?? ""),
         documentation: maskCpf(candidate?.documentation ?? ""),
-        role: candidate?.kind === "user" ? "LESSOR" : "LESSEE",
+        role: candidateRole(candidate),
         notify: "EMAIL",
+        // A contact is another person: no link to the customer's record.
         customerId: candidate?.kind === "customer" ? candidate.id : "",
         userId: candidate?.kind === "user" ? candidate.id : "",
       },
     ]);
   };
+
+  const add = async (value: string) => {
+    const candidate = await candidates.pick(value);
+    if (candidate) addRow(candidate);
+  };
+
+  // Emergency contacts not on the list yet (offered once their customer is).
+  const suggestedContacts = candidates.contacts.filter(
+    (contact) =>
+      !rows.some(
+        (row) => row.email.trim().toLowerCase() === contact.email.toLowerCase(),
+      ),
+  );
 
   const onSave = () => {
     const next: Record<number, RowErrors> = {};
@@ -308,7 +335,7 @@ export function SignatureSignersEditor({
               label="Adicionar quem já está cadastrado"
               value=""
               options={candidates.options}
-              isLoading={candidates.isLoading}
+              isLoading={candidates.isLoading || candidates.isResolving}
               search={candidates.search}
               onSearchChange={candidates.setSearch}
               onChange={(option) => add(option.value)}
@@ -321,13 +348,29 @@ export function SignatureSignersEditor({
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => add()}
+              onClick={() => addRow()}
             >
               <Plus />
               Adicionar em branco
             </Button>
           </Col>
         </Row>
+        {suggestedContacts.length > 0 && (
+          <Box className="flex flex-wrap gap-2">
+            {suggestedContacts.map((contact) => (
+              <Button
+                key={contact.id}
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => addRow(contact)}
+              >
+                <UserPlus />
+                {contact.name} (contato de emergência de {contact.of})
+              </Button>
+            ))}
+          </Box>
+        )}
 
         {formError && <Alert>{formError}</Alert>}
         <Box className="flex justify-end">
