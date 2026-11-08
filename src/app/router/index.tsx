@@ -44,6 +44,7 @@ import {
   PortalRentalStatementPage,
   RentalStatementPage,
   RentalContractNewPage,
+  RentalCustomerViewPage,
   PortalInspectionNewPage,
   ReimbursementsPage,
   RentalDetailPage,
@@ -95,6 +96,10 @@ export const router = createBrowserRouter([
         path: ROUTES.portalInspectionNew,
         element: <PortalInspectionNewPage />,
       },
+      {
+        path: LEGACY_ROUTES.portalPassword,
+        element: <LegacyRedirect to={() => ROUTES.portal} />,
+      },
     ],
   },
   {
@@ -126,6 +131,10 @@ export const router = createBrowserRouter([
       { path: ROUTES.rentalEdit, element: <RentalEditPage /> },
       { path: ROUTES.rentalStatement, element: <RentalStatementPage /> },
       { path: ROUTES.rentalContractNew, element: <RentalContractNewPage /> },
+      {
+        path: ROUTES.rentalCustomerView,
+        element: <RentalCustomerViewPage />,
+      },
       { path: ROUTES.customers, element: <CustomersPage /> },
       { path: ROUTES.customerNew, element: <CustomerNewPage /> },
       { path: ROUTES.customerDetail, element: <CustomerDetailPage /> },

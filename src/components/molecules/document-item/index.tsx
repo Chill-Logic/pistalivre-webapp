@@ -8,12 +8,12 @@ import { SignatureStatusBadge } from "@/components/molecules/signature-status-ba
 import { TextLink } from "@/components/molecules/text-link";
 import { routeTo } from "@/constants/routes";
 import type { ReactNode } from "react";
-import type { DocumentFile } from "@/types/document";
+import type { FileLink } from "@/types/document";
 import { cn } from "@/utils/cn";
 import { formatDate, formatFileSize } from "@/utils/format";
 
 type DocumentItemProps = {
-  document: DocumentFile;
+  document: FileLink;
   /** Shown instead of the file name (e.g. the inspection photo's label). */
   title?: string;
   /** Replaces the kind · size · date line (e.g. a contract's status). */
@@ -43,11 +43,13 @@ export function DocumentItem({
   actions,
   selection,
 }: DocumentItemProps) {
-  const Icon = document.contentType.startsWith("image/") ? ImageIcon : FileText;
+  const Icon = document.contentType?.startsWith("image/")
+    ? ImageIcon
+    : FileText;
   const meta = [
     document.category?.name,
-    formatFileSize(document.size),
-    formatDate(document.createdAt),
+    document.size !== undefined && formatFileSize(document.size),
+    document.createdAt && formatDate(document.createdAt),
   ].filter(Boolean);
 
   return (

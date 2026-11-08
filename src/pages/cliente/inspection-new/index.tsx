@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { BackLink } from "@/components/molecules/back-link";
 import { PageHeader } from "@/components/molecules/page-header";
@@ -8,6 +8,7 @@ import {
 } from "@/components/organisms/portal-inspection-form";
 import { QueryBoundary } from "@/components/organisms/query-boundary";
 import { routeTo } from "@/constants/routes";
+import { isRentalClosed } from "@/helpers/rental";
 import { useMyRental } from "@/hooks/api/cliente/rentals/useMyRental";
 import { useInspectionRequirements } from "@/hooks/api/cliente/rentals/useInspectionRequirements";
 
@@ -17,6 +18,11 @@ export function PortalInspectionNewPage() {
   const rental = useMyRental(id);
   const requirements = useInspectionRequirements(id);
   const back = routeTo.portalRental(id);
+
+  // A closed rental takes no inspection (the API answers 409): back to it.
+  if (rental.data && isRentalClosed(rental.data.status)) {
+    return <Navigate to={back} replace />;
+  }
 
   return (
     <Box className="space-y-4">

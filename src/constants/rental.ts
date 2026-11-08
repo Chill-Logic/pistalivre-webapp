@@ -1,5 +1,12 @@
 import type { RentalStatus } from "@/types/rental";
 
+/** Final statuses: the rental is history (read-only for the renter). */
+export const CLOSED_RENTAL_STATUSES: readonly RentalStatus[] = [
+  "RETURNED",
+  "CANCELLED",
+  "WITHDRAWN",
+];
+
 const EARLY_EXITS: RentalStatus[] = ["ACTIVE", "CANCELLED", "WITHDRAWN"];
 
 /**

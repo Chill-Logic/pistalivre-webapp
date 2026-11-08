@@ -32,6 +32,18 @@ export type DocumentAttachment = Pick<
   "id" | "category" | "fileName" | "url" | "signature"
 >;
 
+/**
+ * Enough of a file to open/download it. Some lists (a charge's attachments)
+ * send only id, name, kind and url.
+ */
+export type FileLink = Pick<DocumentFile, "id" | "fileName" | "url"> &
+  Partial<
+    Pick<
+      DocumentFile,
+      "category" | "contentType" | "size" | "createdAt" | "signature"
+    >
+  >;
+
 /** Who a document belongs to (polymorphic owner, as in the API). */
 export type DocumentOwnerType =
   | "VEHICLE"

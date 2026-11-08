@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Box } from "@/components/atoms/box";
 import { Text } from "@/components/atoms/text";
+import { AttachmentList } from "@/components/molecules/attachment-list";
 import { ReimbursementStatusBadge } from "@/components/molecules/reimbursement-status-badge";
 import type { Reimbursement } from "@/types/portal";
 import { cn } from "@/utils/cn";
@@ -51,6 +52,7 @@ export function ReimbursementItem({
           {reimbursement.staffNote}
         </Text>
       )}
+      <AttachmentList files={reimbursement.documents} />
       {actions && (
         <Box className="flex flex-wrap justify-end gap-2">{actions}</Box>
       )}

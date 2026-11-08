@@ -1,7 +1,10 @@
 import { http } from "@/services/http/client";
+import type { DocumentCategory } from "@/types/document";
 import type {
+  PortalAttachOwner,
   PortalCharge,
   PortalInvoice,
+  PortalProfile,
   PortalRental,
   PortalRentalSections,
   Reimbursement,
@@ -26,6 +29,10 @@ export const portalService = {
     );
     return data;
   },
+  async profile() {
+    const { data } = await http.get<PortalProfile>("/me/profile");
+    return data;
+  },
   async charges() {
     const { data } = await http.get<Items<PortalCharge>>("/me/charges");
     return data.items;
@@ -36,6 +43,14 @@ export const portalService = {
   },
   async wallet() {
     const { data } = await http.get<Items<WalletKey>>("/me/wallet");
+    return data.items;
+  },
+  /** Kinds the renter can pick when attaching (maintenance, refund). */
+  async documentCategories(ownerType: PortalAttachOwner) {
+    const { data } = await http.get<Items<DocumentCategory>>(
+      "/me/document-categories",
+      { params: { ownerType } },
+    );
     return data.items;
   },
   async reimbursements() {

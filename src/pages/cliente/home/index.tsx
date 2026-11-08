@@ -1,14 +1,12 @@
 import { FileText } from "lucide-react";
 import { Box } from "@/components/atoms/box";
 import { Col, Row } from "@/components/atoms/grid";
+import { Skeleton } from "@/components/atoms/skeleton";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { InvoiceItem } from "@/components/molecules/invoice-item";
 import { PageHeader } from "@/components/molecules/page-header";
 import { PortalChargeItem } from "@/components/molecules/portal-charge-item";
-import {
-  PortalRentalCard,
-  PortalRentalCardSkeleton,
-} from "@/components/molecules/portal-rental-card";
+import { PortalRentalCardSkeleton } from "@/components/molecules/portal-rental-card";
 import { ReimbursementItem } from "@/components/molecules/reimbursement-item";
 import { WalletKeyItem } from "@/components/molecules/wallet-key-item";
 import {
@@ -16,17 +14,26 @@ import {
   ListCardSkeleton,
   ListRowSkeleton,
 } from "@/components/organisms/list-card";
+import { PortalRentalGroup } from "@/components/organisms/portal-rental-group";
 import { QueryBoundary } from "@/components/organisms/query-boundary";
 import { ReimbursementRequestDialog } from "@/components/organisms/reimbursement-request-dialog";
 import { WalletAddDialog } from "@/components/organisms/wallet-add-dialog";
 import { WalletKeyActions } from "@/components/organisms/wallet-key-actions";
 import { HOME_REIMBURSEMENTS_LIMIT } from "@/constants/portal";
+import {
+  openChargesTitle,
+  reimbursementsTitle,
+  walletPrefill,
+} from "@/helpers/portal";
+import { isRentalClosed } from "@/helpers/rental";
 import { useMyCharges } from "@/hooks/api/cliente/finance/useMyCharges";
 import { useMyInvoices } from "@/hooks/api/cliente/finance/useMyInvoices";
 import { useMyReimbursements } from "@/hooks/api/cliente/finance/useMyReimbursements";
 import { useMyWallet } from "@/hooks/api/cliente/finance/useMyWallet";
 import { useWalletMutations } from "@/hooks/api/cliente/finance/useWalletMutations";
 import { useMyRentals } from "@/hooks/api/cliente/rentals/useMyRentals";
+import { useMyProfile } from "@/hooks/api/cliente/account/useMyProfile";
+import { useSession } from "@/hooks/auth/useSession";
 import { pluralize } from "@/utils/text";
 
 /**
@@ -41,10 +48,15 @@ export function PortalHomePage() {
   const invoices = useMyInvoices();
   const wallet = useMyWallet();
   const walletMutations = useWalletMutations();
+  const profile = useMyProfile();
+  const sessionEmail = useSession().user?.email;
   const reimbursements = useMyReimbursements();
   // Refund requests need an active rental (the API also blocks closed ones).
   const activeRentals = (rentals.data ?? []).filter(
     (rental) => rental.status === "ACTIVE",
+  );
+  const pastRentals = (rentals.data ?? []).filter((rental) =>
+    isRentalClosed(rental.status),
   );
 
   return (
@@ -54,11 +66,14 @@ export function PortalHomePage() {
         query={rentals}
         label="Carregando locações…"
         skeleton={
-          <Row className="gap-y-4">
-            <Col>
-              <PortalRentalCardSkeleton />
-            </Col>
-          </Row>
+          <Box className="space-y-3">
+            <Skeleton shape="text" className="w-28 text-base" />
+            <Row className="gap-y-4">
+              <Col md={6}>
+                <PortalRentalCardSkeleton />
+              </Col>
+            </Row>
+          </Box>
         }
       >
         {(items) =>
@@ -69,13 +84,11 @@ export function PortalHomePage() {
               description="Quando a locadora registrar a sua locação, ela aparece aqui."
             />
           ) : (
-            <Row as="ul" className="gap-y-4">
-              {items.map((rental) => (
-                <Col as="li" key={rental.id}>
-                  <PortalRentalCard rental={rental} />
-                </Col>
-              ))}
-            </Row>
+            <PortalRentalGroup
+              title="Locação atual"
+              rentals={items.filter((rental) => !isRentalClosed(rental.status))}
+              empty="Você não tem locações em andamento."
+            />
           )
         }
       </QueryBoundary>
@@ -87,7 +100,9 @@ export function PortalHomePage() {
       >
         {(items) => (
           <ListCard
-            title="Cobranças"
+            title={openChargesTitle(
+              items.filter((charge) => charge.open).length,
+            )}
             empty="Nenhuma cobrança por enquanto."
             isEmpty={items.length === 0}
           >
@@ -123,7 +138,9 @@ export function PortalHomePage() {
       >
         {(items) => (
           <ListCard
-            title="Reembolsos"
+            title={reimbursementsTitle(
+              items.filter((item) => item.status === "REJECTED").length,
+            )}
             empty="Nenhum pedido de reembolso."
             isEmpty={items.length === 0}
             actions={
@@ -170,7 +187,12 @@ export function PortalHomePage() {
             title="Minha carteira"
             empty="Nenhuma chave pix cadastrada. É para ela que vão os seus reembolsos."
             isEmpty={items.length === 0}
-            actions={<WalletAddDialog mutations={walletMutations} />}
+            actions={
+              <WalletAddDialog
+                mutations={walletMutations}
+                prefill={walletPrefill(profile.data, sessionEmail)}
+              />
+            }
           >
             {items.map((walletKey) => (
               <WalletKeyItem
@@ -187,6 +209,13 @@ export function PortalHomePage() {
           </ListCard>
         )}
       </QueryBoundary>
+
+      {pastRentals.length > 0 && (
+        <PortalRentalGroup
+          title="Histórico (somente leitura)"
+          rentals={pastRentals}
+        />
+      )}
     </Box>
   );
 }

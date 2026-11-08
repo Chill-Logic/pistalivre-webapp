@@ -17,10 +17,12 @@ import {
   ListCardSkeleton,
   ListRowSkeleton,
 } from "@/components/organisms/list-card";
+import { MaintenanceAttachDialog } from "@/components/organisms/maintenance-attach-dialog";
 import { MaintenanceReportDialog } from "@/components/organisms/maintenance-report-dialog";
 import { PortalInspectionDelete } from "@/components/organisms/portal-inspection-delete";
 import { ReimbursementRequestDialog } from "@/components/organisms/reimbursement-request-dialog";
 import { routeTo } from "@/constants/routes";
+import { rentalStageNotice } from "@/helpers/portal";
 import type { PortalRentalSections as Sections } from "@/types/portal";
 
 /**
@@ -31,26 +33,30 @@ import type { PortalRentalSections as Sections } from "@/types/portal";
 export function PortalRentalSections({
   rentalId,
   sections,
+  readOnly = false,
 }: {
   rentalId: string;
   sections: Sections;
+  /** Staff's "ver como cliente": same page, no writes nor payment links. */
+  readOnly?: boolean;
 }) {
-  const canWrite = sections.operationalVisible && !sections.closed;
+  const canWrite = !readOnly && sections.operationalVisible && !sections.closed;
+  const notice = rentalStageNotice(sections);
 
   return (
     <Box className="space-y-6">
-      {sections.closed && (
-        <Alert variant="info">
-          Locação encerrada: aqui fica só para consulta.
-        </Alert>
-      )}
+      {notice && <Alert variant="info">{notice}</Alert>}
       <ListCard
         title="Cobranças"
         empty="Nenhuma cobrança nesta locação."
         isEmpty={sections.charges.length === 0}
       >
         {sections.charges.map((charge) => (
-          <PortalChargeItem key={charge.id} charge={charge} />
+          <PortalChargeItem
+            key={charge.id}
+            charge={charge}
+            readOnly={readOnly}
+          />
         ))}
       </ListCard>
       <DocumentsCard
@@ -58,10 +64,12 @@ export function PortalRentalSections({
         documents={sections.contracts}
         empty="O contrato aparece aqui quando for gerado."
       />
-      {sections.crlv.length > 0 && (
+      {(sections.status === "ACTIVE" || sections.crlv.length > 0) && (
+        // The renter has the vehicle only while active (the API sends it then).
         <DocumentsCard
           title="Documento do veículo (CRLV)"
           documents={sections.crlv}
+          empty="CRLV ainda não disponível."
         />
       )}
       {sections.financialVisible && (
@@ -160,28 +168,33 @@ export function PortalRentalSections({
               const live =
                 maintenance.reimbursement &&
                 maintenance.reimbursement.status !== "REJECTED";
-              const canAsk =
-                canWrite &&
-                maintenance.mine &&
-                (maintenance.cost ?? 0) > 0 &&
-                !live;
+              const canAsk = (maintenance.cost ?? 0) > 0 && !live;
               return (
                 <PortalMaintenanceItem
                   key={maintenance.id}
                   maintenance={maintenance}
                   actions={
-                    canAsk && (
-                      <ReimbursementRequestDialog
-                        rentalId={rentalId}
-                        maintenanceId={maintenance.id}
-                        fixedAmount={maintenance.cost ?? undefined}
-                        defaultReason={`Reembolso da manutenção: ${maintenance.description ?? ""}`.trim()}
-                        triggerLabel={
-                          maintenance.reimbursement
-                            ? "Pedir de novo"
-                            : "Pedir reembolso"
-                        }
-                      />
+                    canWrite &&
+                    maintenance.mine && (
+                      <>
+                        <MaintenanceAttachDialog
+                          rentalId={rentalId}
+                          maintenanceId={maintenance.id}
+                        />
+                        {canAsk && (
+                          <ReimbursementRequestDialog
+                            rentalId={rentalId}
+                            maintenanceId={maintenance.id}
+                            fixedAmount={maintenance.cost ?? undefined}
+                            defaultReason={`Reembolso da manutenção: ${maintenance.description ?? ""}`.trim()}
+                            triggerLabel={
+                              maintenance.reimbursement
+                                ? "Pedir de novo"
+                                : "Pedir reembolso"
+                            }
+                          />
+                        )}
+                      </>
                     )
                   }
                 />
@@ -190,13 +203,12 @@ export function PortalRentalSections({
           </ListCard>
           <DocumentsCard documents={sections.documents} />
         </>
-      ) : (
-        !sections.closed && (
-          <Alert variant="info">
-            Vistorias, manutenções e reembolsos aparecem aqui quando a locação
-            estiver ativa.
-          </Alert>
-        )
+      ) : null}
+      {sections.personalDocuments.length > 0 && (
+        <DocumentsCard
+          title="Meus documentos"
+          documents={sections.personalDocuments}
+        />
       )}
     </Box>
   );

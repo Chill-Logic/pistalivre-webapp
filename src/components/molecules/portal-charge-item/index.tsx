@@ -1,36 +1,56 @@
-import { Copy, ExternalLink as ExternalIcon, QrCode } from "lucide-react";
+import {
+  Copy,
+  ExternalLink as ExternalIcon,
+  QrCode,
+  RefreshCw,
+} from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { ExternalLink } from "@/components/atoms/external-link";
 import { Image } from "@/components/atoms/image";
+import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
+import { AttachmentList } from "@/components/molecules/attachment-list";
 import {
   chargeSituation,
   chargeSituationBadge,
-  isPixExpired,
   pixImageSrc,
 } from "@/helpers/charge";
+import { useRegeneratePix } from "@/hooks/api/cliente/finance/useRegeneratePix";
 import { useCopy } from "@/hooks/ui/useCopy";
+import { usePixExpired } from "@/hooks/ui/usePixExpired";
 import type { PortalCharge } from "@/types/portal";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
 /**
  * A charge in the renter's portal: what to pay and how (pix copy-and-paste,
  * QR on demand, or the invoice). Amount comes ready from the API — the
- * same one the staff sees, with fine and interest when overdue.
+ * same one the staff sees, with fine and interest when overdue. A pix that
+ * lapses with the screen open turns into "Regerar" (a fresh read from Asaas).
  */
-export function PortalChargeItem({ charge }: { charge: PortalCharge }) {
+export function PortalChargeItem({
+  charge,
+  readOnly = false,
+}: {
+  charge: PortalCharge;
+  /**
+   * Staff seeing it as the renter: no pix nor invoice (opening the invoice
+   * makes Asaas tell the renter it was viewed).
+   */
+  readOnly?: boolean;
+}) {
   const copy = useCopy();
+  const regenerate = useRegeneratePix();
   const [showQr, setShowQr] = useState(false);
   const situation = chargeSituation(charge);
   const badge = chargeSituationBadge(situation);
   const { amounts } = charge;
+  const pixExpired = usePixExpired(charge.pix?.expirationDate);
   const pix =
-    charge.open && charge.pix && !isPixExpired(charge.pix.expirationDate)
-      ? charge.pix
-      : null;
+    !readOnly && charge.open && charge.pix && !pixExpired ? charge.pix : null;
+  const invoiceUrl = readOnly ? null : charge.invoiceUrl;
   const details = [
     charge.methodLabel,
     charge.dueDate && `vence ${formatCalendarDate(charge.dueDate)}`,
@@ -55,23 +75,29 @@ export function PortalChargeItem({ charge }: { charge: PortalCharge }) {
           <Badge variant={badge.variant}>{badge.label}</Badge>
         </Box>
       </Box>
-      {!amounts.isPaid && amounts.surcharge > 0 && (
+      {amounts.surcharge > 0 && (
         // Same number as the staff sees (owner's call). An old charge made
         // in Asaas without fine/interest may cost less there, hence the note.
         <Text size="xs" tone="muted">
           {formatCurrency(amounts.principal)} +{" "}
-          {formatCurrency(amounts.surcharge)} de multa e juros · o valor no
-          pagamento pode ser diferente
+          {formatCurrency(amounts.surcharge)} de multa e juros
+          {!amounts.isPaid && " · o valor no pagamento pode ser diferente"}
+        </Text>
+      )}
+      {amounts.shortfall > 0 && (
+        // Settled for less than due: without this the renter sees only what
+        // was received and not what is still owed.
+        <Text size="xs" weight="medium" tone="destructive">
+          De {formatCurrency(amounts.principal)} · faltam{" "}
+          {formatCurrency(amounts.shortfall)}
         </Text>
       )}
       {amounts.isPaid && charge.paidAt && (
         <Text size="xs" tone="muted">
           Pago em {formatCalendarDate(charge.paidAt)}
-          {amounts.shortfall > 0 &&
-            ` · falta ${formatCurrency(amounts.shortfall)}`}
         </Text>
       )}
-      {(pix || charge.invoiceUrl) && (
+      {(pix || invoiceUrl) && (
         <Box className="flex flex-wrap items-center gap-x-4 gap-y-2">
           {pix && (
             <Button
@@ -94,8 +120,8 @@ export function PortalChargeItem({ charge }: { charge: PortalCharge }) {
               {showQr ? "Esconder QR code" : "Ver QR code"}
             </Button>
           )}
-          {charge.invoiceUrl && (
-            <ExternalLink href={charge.invoiceUrl}>
+          {invoiceUrl && (
+            <ExternalLink href={invoiceUrl}>
               Abrir fatura
               <ExternalIcon className="size-3.5" aria-hidden />
             </ExternalLink>
@@ -111,11 +137,24 @@ export function PortalChargeItem({ charge }: { charge: PortalCharge }) {
           />
         </Box>
       )}
-      {charge.open && charge.pix && !pix && (
-        <Text size="xs" tone="muted">
-          O pix desta cobrança expirou. Pague pela fatura.
-        </Text>
+      {!readOnly && charge.open && charge.pix && !pix && (
+        <Box className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-muted px-3 py-2">
+          <Text size="xs" tone="muted">
+            O pix desta cobrança expirou.
+            {invoiceUrl && " Gere outro ou pague pela fatura."}
+          </Text>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={regenerate.isPending}
+            onClick={() => regenerate.mutate()}
+          >
+            {regenerate.isPending ? <Spinner /> : <RefreshCw />}
+            Regerar
+          </Button>
+        </Box>
       )}
+      <AttachmentList files={charge.attachments} />
     </Box>
   );
 }

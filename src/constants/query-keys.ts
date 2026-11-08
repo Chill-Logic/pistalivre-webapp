@@ -70,6 +70,11 @@ export const queryKeys = {
       [...queryKeys.portal.all, "inspection-requirements", rentalId] as const,
     rentalSections: (id: string) =>
       [...queryKeys.portal.all, "rental-sections", id] as const,
+    profile: () => [...queryKeys.portal.all, "profile"] as const,
+    allRentalSections: () =>
+      [...queryKeys.portal.all, "rental-sections"] as const,
+    documentCategories: (ownerType: string) =>
+      [...queryKeys.portal.all, "document-categories", ownerType] as const,
     charges: () => [...queryKeys.portal.all, "charges"] as const,
     invoices: () => [...queryKeys.portal.all, "invoices"] as const,
     wallet: () => [...queryKeys.portal.all, "wallet"] as const,

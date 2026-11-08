@@ -64,6 +64,10 @@ export const RentalStatementPage = lazyPage(
   () => import("@/pages/gestao/rental-statement"),
   "RentalStatementPage",
 );
+export const RentalCustomerViewPage = lazyPage(
+  () => import("@/pages/gestao/rental-customer-view"),
+  "RentalCustomerViewPage",
+);
 export const PortalRentalDetailPage = lazyPage(
   () => import("@/pages/cliente/rental-detail"),
   "PortalRentalDetailPage",

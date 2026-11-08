@@ -1,4 +1,5 @@
 import type { BadgeVariantProps } from "@/components/atoms/badge/variants";
+import { CLOSED_RENTAL_STATUSES } from "@/constants/rental";
 import type { RentalStatus } from "@/types/rental";
 import { formatCurrency } from "@/utils/format";
 
@@ -19,6 +20,11 @@ const RENTAL_STATUS_VARIANT: Record<RentalStatus, Variant> = {
 
 export function rentalStatusVariant(status: RentalStatus): Variant {
   return RENTAL_STATUS_VARIANT[status] ?? "neutral";
+}
+
+/** Returned, cancelled or withdrawn: nothing else happens on it. */
+export function isRentalClosed(status: RentalStatus) {
+  return CLOSED_RENTAL_STATUSES.includes(status);
 }
 
 /** "R$ 650,00 · Semanal" */

@@ -14,6 +14,17 @@ export type PortalRental = RentalListItem & {
   paymentMethod: string | null;
   paymentWeekday: number | null;
   caution: Caution | null;
+  /** "Segunda-feira", "Todo dia 5", "Todos os dias, exceto domingo". */
+  billingDayLabel: string | null;
+};
+
+/** GET /me/profile: the renter's own record (read-only). */
+export type PortalProfile = {
+  name: string;
+  email: string | null;
+  /** CPF. */
+  document: string | null;
+  phone: string | null;
 };
 
 export type PixQrCode = {
@@ -124,9 +135,17 @@ export type PortalRentalSections = {
   charges: PortalCharge[];
   invoices: PortalInvoice[];
   documents: DocumentFile[];
+  /** The renter's own documents ("Meus documentos"), always sent. */
+  personalDocuments: DocumentFile[];
   inspections: PortalInspection[];
   maintenances: PortalMaintenance[];
   reimbursements: Reimbursement[];
+};
+
+/** GET /rentals/:id/customer-view: exactly what the renter sees (staff). */
+export type RentalCustomerView = {
+  rental: PortalRental;
+  sections: PortalRentalSections;
 };
 
 /** Who a pix key belongs to, from the DICT, before saving it. */
@@ -169,6 +188,9 @@ export type ReimbursementRequestInput = {
   amount?: number;
   maintenanceId?: string;
 };
+
+/** What the renter can attach files to (GET /me/document-categories). */
+export type PortalAttachOwner = "MAINTENANCE" | "REIMBURSEMENT";
 
 /** POST /me/rentals/:id/maintenances (multipart; a receipt is required). */
 export type MaintenanceReportInput = {

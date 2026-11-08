@@ -21,6 +21,7 @@ export const ROUTES = {
   rentalEdit: `${GESTAO}/locacoes/:id/editar`,
   rentalStatement: `${GESTAO}/locacoes/:id/extrato`,
   rentalContractNew: `${GESTAO}/locacoes/:id/contrato/novo`,
+  rentalCustomerView: `${GESTAO}/locacoes/:id/como-cliente`,
   customers: `${GESTAO}/clientes`,
   customerNew: `${GESTAO}/clientes/novo`,
   customerDetail: `${GESTAO}/clientes/:id`,
@@ -78,6 +79,8 @@ export const ROUTES = {
 export const LEGACY_ROUTES = {
   suppliers: `${GESTAO}/fornecedores/*`,
   vehicleInspection: `${GESTAO}/veiculos/:id/vistorias/:inspectionId`,
+  /** The Next had a password page; the SPA changes it from the header. */
+  portalPassword: `${PORTAL}/senha`,
 } as const;
 
 export const routeTo = {
@@ -85,6 +88,7 @@ export const routeTo = {
   editVehicle: (id: string) => `${ROUTES.vehicles}/${id}/editar`,
   rental: (id: string) => `${ROUTES.rentals}/${id}`,
   rentalStatement: (id: string) => `${ROUTES.rentals}/${id}/extrato`,
+  rentalCustomerView: (id: string) => `${ROUTES.rentals}/${id}/como-cliente`,
   editRental: (id: string) => `${ROUTES.rentals}/${id}/editar`,
   /** "Gerar contrato": `?modelo=` = the chosen template, `?cnh=editar`. */
   newRentalContract: (

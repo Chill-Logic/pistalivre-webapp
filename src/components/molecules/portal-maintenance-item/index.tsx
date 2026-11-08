@@ -2,12 +2,12 @@ import type { ReactNode } from "react";
 import { Box } from "@/components/atoms/box";
 import { Badge } from "@/components/atoms/badge";
 import { Text } from "@/components/atoms/text";
+import { AttachmentList } from "@/components/molecules/attachment-list";
 import { ReimbursementStatusBadge } from "@/components/molecules/reimbursement-status-badge";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { PortalMaintenance } from "@/types/portal";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
-import { pluralize } from "@/utils/text";
 
 /** A maintenance on the rental; the renter's own show their reimbursement. */
 export function PortalMaintenanceItem({
@@ -15,7 +15,7 @@ export function PortalMaintenanceItem({
   actions,
 }: {
   maintenance: PortalMaintenance;
-  /** E.g. "Pedir reembolso" / "Pedir de novo". */
+  /** E.g. "Anexar", "Pedir reembolso" / "Pedir de novo". */
   actions?: ReactNode;
 }) {
   const { label } = useLabels();
@@ -25,8 +25,6 @@ export function PortalMaintenanceItem({
   const meta = [
     formatCalendarDate(maintenance.performedAt),
     maintenance.provider,
-    maintenance.documents.length > 0 &&
-      pluralize(maintenance.documents.length, "anexo", "anexos"),
   ].filter(Boolean);
 
   return (
@@ -37,9 +35,11 @@ export function PortalMaintenanceItem({
             <Text weight="medium">
               {label(LABEL_MAPS.maintenanceType, maintenance.type)}
             </Text>
-            {maintenance.mine && (
-              <Badge variant="outline">Registrada por você</Badge>
-            )}
+            <Badge variant={maintenance.mine ? "success" : "outline"}>
+              {maintenance.mine
+                ? "Registrada por você"
+                : "Registrada pela locadora"}
+            </Badge>
           </Box>
           <Text size="xs" tone="muted">
             {meta.join(" · ")}
@@ -72,6 +72,7 @@ export function PortalMaintenanceItem({
             )}
         </Box>
       )}
+      <AttachmentList files={maintenance.documents} />
       {actions && (
         <Box className="flex flex-wrap justify-end gap-2">{actions}</Box>
       )}

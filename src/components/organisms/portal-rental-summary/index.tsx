@@ -53,9 +53,10 @@ export function PortalRentalSummary({ rental }: { rental: PortalRental }) {
               : null}
           </InfoItem>
           <InfoItem span={6} md={4} label="Dia de pagamento">
-            {rental.paymentWeekday !== null
-              ? label(LABEL_MAPS.weekday, rental.paymentWeekday)
-              : null}
+            {rental.billingDayLabel ??
+              (rental.paymentWeekday !== null
+                ? label(LABEL_MAPS.weekday, rental.paymentWeekday)
+                : null)}
           </InfoItem>
         </Row>
       </CardContent>

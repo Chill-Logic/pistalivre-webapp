@@ -1,4 +1,4 @@
-import { CalendarRange, FileText, Link2, Pencil } from "lucide-react";
+import { CalendarRange, Eye, FileText, Link2, Pencil } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -107,6 +107,12 @@ export function RentalDetailPage() {
               <Link to={routeTo.rentalStatement(rental.data.id)}>
                 <CalendarRange />
                 Extrato
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link to={routeTo.rentalCustomerView(rental.data.id)}>
+                <Eye />
+                Ver como cliente
               </Link>
             </Button>
             <Button asChild variant="ghost" size="sm">

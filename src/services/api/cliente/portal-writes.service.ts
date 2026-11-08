@@ -1,5 +1,6 @@
 import { appendInspectionFields } from "@/helpers/inspection";
 import { http } from "@/services/http/client";
+import type { DocumentFile } from "@/types/document";
 import type {
   InspectionRequirements,
   InspectionSubmitInput,
@@ -36,6 +37,25 @@ export const portalWritesService = {
     for (const file of input.files) body.append("files", file);
     const { data } = await http.post<{ id: string }>(
       `/me/rentals/${rentalId}/maintenances`,
+      body,
+    );
+    return data;
+  },
+  /**
+   * One more file on a maintenance the renter registered (e.g. the receipt
+   * a refused refund missed). One file per request; the kind is required.
+   */
+  async attachMaintenanceDocument(
+    rentalId: string,
+    maintenanceId: string,
+    file: File,
+    categoryId: string,
+  ) {
+    const body = new FormData();
+    body.append("categoryId", categoryId);
+    body.append("file", file);
+    const { data } = await http.post<DocumentFile>(
+      `/me/rentals/${rentalId}/maintenances/${maintenanceId}/documents`,
       body,
     );
     return data;
