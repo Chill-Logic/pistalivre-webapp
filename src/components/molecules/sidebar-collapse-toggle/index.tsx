@@ -5,8 +5,8 @@ import { useSidebar } from "@/hooks/ui/useSidebar";
 import { cn } from "@/utils/cn";
 
 /**
- * Desktop only: round button straddling the sidebar's right edge (MyFinance
- * pattern), centered on the header's bottom line (h-14 − half the button).
+ * Desktop only: round button straddling the sidebar's right edge,
+ * centered on the header's bottom line (h-14 − half the button).
  * The chevron turns instead of swapping icons.
  */
 export function SidebarCollapseToggle() {

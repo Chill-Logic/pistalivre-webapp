@@ -20,7 +20,7 @@ type NavSheetProps = {
 };
 
 /**
- * Mobile menu as a bottom sheet (MyFinance pattern): who is signed in, the
+ * Mobile menu as a bottom sheet: who is signed in, the
  * theme, every destination and "Sair". Fixed height, so only the list
  * scrolls; closes by overlay, Esc or choosing an item.
  */

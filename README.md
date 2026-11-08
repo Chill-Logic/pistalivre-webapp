@@ -52,7 +52,7 @@ src/
 
 - **Zero HTML nativo fora de `components/atoms`**: molecules, organisms, templates e pages só compõem componentes (`Box`, `Text`, `Heading`, `List`, `Form`, `Nav`…). Faltou um? Cria o atom. O lint barra (`no-restricted-syntax`).
 - **Toda tela de dados tem skeleton no formato do conteúdo real**: cada organism exporta o seu `XSkeleton` no mesmo arquivo, e a page usa o mesmo template de layout nos dois estados. Sempre dentro de `SkeletonRegion` (aparece só depois de ~150 ms, sem pulo de layout, `aria-busy` + "Carregando…" para leitor de tela). Refetch com dado na tela não troca por skeleton: a lista esmaece (`isPlaceholderData`) e a `TopProgressBar` mostra a atividade. Páginas são lazy (`app/router/pages.ts`) com `PageSkeleton` de fallback.
-- **Layout com Row/Col** (grid de 12 colunas estilo Bootstrap, gutter de 24px — o padrão da casa, mesmo bloco CSS do dalila-ui em `src/index.css`). Use os atoms `Row`/`Col` (`<Col span={12} md={6}>`), nunca `grid-cols-*` solto. Espaço vertical entre linhas com `gap-y-*` no `Row`.
+- **Layout com Row/Col** (grid de 12 colunas estilo Bootstrap, gutter de 24px — o padrão da casa, em `src/index.css`). Use os atoms `Row`/`Col` (`<Col span={12} md={6}>`), nunca `grid-cols-*` solto. Espaço vertical entre linhas com `gap-y-*` no `Row`.
 - **Nada de função solta em componente**: regra vai para `utils/` (pura), `helpers/` (depende do app) ou `hooks/` (depende de React).
 - **Mobile first**: o estilo base é o do celular; `md:` em diante é o desktop. Alvos de toque com 44px. Navegação inferior no celular e sidebar no desktop, as duas a partir de `constants/navigation.ts`.
 - **Código em inglês, interface em português**, URLs em português (`/veiculos`, `/entrar`).

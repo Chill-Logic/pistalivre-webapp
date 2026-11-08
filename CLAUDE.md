@@ -30,7 +30,7 @@ React 19 + Vite 6 + TanStack Query 5 + React Router 7 + Tailwind 3 + Radix/shadc
   único. URLs `/gestao/...` e `/area-cliente/...`.
 - **Toda tela de dados tem skeleton no formato real** (`XSkeleton` no mesmo arquivo, `SkeletonRegion`).
   Refetch = lista esmaecida + `TopProgressBar`, nunca skeleton por cima de dado.
-- Layout com **`Row`/`Col`** (12 colunas do dalila-ui), nunca `grid-cols-*`.
+- Layout com **`Row`/`Col`** (grid de 12 colunas em `src/index.css`), nunca `grid-cols-*`.
 - **Listagens = Lista × Tabela**: desktop com tabela padrão + paginação + itens por página; celular sempre
   cards, de 10 em 10 (infinite). Receita no handoff (`usePagedList`, `DataTable` por colunas,
   `ViewToggle`, `ListFooter`).
@@ -55,7 +55,7 @@ perda/retomada, atividades, questionário), Fornecedores (+ vínculos), Planos, 
 Modelos de contrato e Manutenções com CRUD; Documentos (enviar/renomear/excluir); Vistorias; Reembolsos
 (listar e **recusar**); Financeiro, Débitos e Extrato **só leitura**; Propostas e Assinaturas **só
 leitura**; Projeções (conta no servidor + PDF). Portal do cliente **só leitura**. Shell novo com animações
-(estilo MyFinanceApps, sem a ação central na barra).
+(bottom sheet no celular, sem ação central na barra).
 
 ## O que falta (2026-11-08)
 
