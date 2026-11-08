@@ -55,7 +55,8 @@ perda/retomada, atividades, questionário), Fornecedores (+ vínculos), Planos, 
 Modelos de contrato e Manutenções com CRUD; Documentos (enviar/renomear/excluir); Vistorias; Reembolsos
 (listar e **recusar**); Financeiro, Débitos e Extrato **só leitura**; Propostas e Assinaturas **só
 leitura**; Projeções (conta no servidor + PDF). Portal do cliente **só leitura**. Shell novo com animações
-(bottom sheet no celular, sem ação central na barra).
+(bottom sheet no celular, sem ação central na barra). Locação: cobrança automática e regras do aluguel
+(acerto, valores no tempo, abonos, descontos, pix recebidos) com escrita (B5).
 
 ## O que falta (2026-11-08)
 
