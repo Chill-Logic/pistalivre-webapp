@@ -7,6 +7,8 @@ type ApplyOptions<T extends FieldValues> = {
    * chassi"): the keyword in it says which field it belongs to.
    */
   conflictFields?: Record<string, Path<T>>;
+  /** API field → form field, when the form edits it under another name. */
+  fieldAliases?: Record<string, Path<T>>;
 };
 
 /**
@@ -18,12 +20,13 @@ export function applyApiErrors<T extends FieldValues>(
   error: unknown,
   setError: UseFormSetError<T>,
   known: readonly Path<T>[],
-  { conflictFields = {} }: ApplyOptions<T> = {},
+  { conflictFields = {}, fieldAliases = {} }: ApplyOptions<T> = {},
 ): string | null {
   const apiError = toApiError(error);
   let placed = false;
 
-  for (const [field, message] of Object.entries(apiError.fields ?? {})) {
+  for (const [apiField, message] of Object.entries(apiError.fields ?? {})) {
+    const field = fieldAliases[apiField] ?? apiField;
     if ((known as readonly string[]).includes(field)) {
       setError(field as Path<T>, { type: "server", message });
       placed = true;

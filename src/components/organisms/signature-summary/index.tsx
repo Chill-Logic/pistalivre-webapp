@@ -6,18 +6,15 @@ import { Skeleton } from "@/components/atoms/skeleton";
 import { InfoItem } from "@/components/molecules/info-item";
 import { SignatureStatusBadge } from "@/components/molecules/signature-status-badge";
 import { TextLink } from "@/components/molecules/text-link";
-import { LABEL_MAPS } from "@/constants/label-maps";
-import { documentOwnerHref } from "@/helpers/signature";
-import { useLabels } from "@/hooks/ui/useLabels";
+import { documentOwnerName, documentOwnerHref } from "@/helpers/signature";
 import type { SignatureDetail } from "@/types/signature";
 import { formatDate, formatDateTime } from "@/utils/format";
 import { pluralize } from "@/utils/text";
 
 export function SignatureSummary({ signature }: { signature: SignatureDetail }) {
-  const { label } = useLabels();
   const { document } = signature;
   const ownerLabel = document
-    ? label(LABEL_MAPS.documentOwner, document.ownerType)
+    ? documentOwnerName(document.ownerType)
     : null;
   const ownerHref = document
     ? documentOwnerHref(document.ownerType, document.ownerId)

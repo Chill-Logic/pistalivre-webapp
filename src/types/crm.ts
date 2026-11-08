@@ -141,6 +141,8 @@ export type LeadInput = {
   name: string;
   phone: string;
   email: string | null;
+  /** A catalog model; otherwise the free text goes in `desiredVehicle`. */
+  desiredModelId: string | null;
   desiredVehicle: string | null;
   origin: string;
   note: string | null;

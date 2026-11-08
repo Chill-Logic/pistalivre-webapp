@@ -7,10 +7,8 @@ import {
   DataTable,
   type DataTableColumn,
 } from "@/components/organisms/data-table";
-import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
-import { signersProgress } from "@/helpers/signature";
-import { useLabels } from "@/hooks/ui/useLabels";
+import { documentOwnerName, signersProgress } from "@/helpers/signature";
 import type { SignatureListItem } from "@/types/signature";
 import { formatDate } from "@/utils/format";
 
@@ -26,7 +24,6 @@ export function SignatureTable({
   isLoading,
   isRefreshing,
 }: SignatureTableProps) {
-  const { label } = useLabels();
 
   const columns = useMemo<DataTableColumn<SignatureListItem>[]>(
     () => [
@@ -44,7 +41,7 @@ export function SignatureTable({
         header: "De",
         cell: (signature) =>
           signature.document
-            ? label(LABEL_MAPS.documentOwner, signature.document.ownerType)
+            ? documentOwnerName(signature.document.ownerType)
             : "Documento removido",
         skeleton: "w-20",
       },
@@ -73,7 +70,7 @@ export function SignatureTable({
         skeletonShape: "pill",
       },
     ],
-    [label],
+    [],
   );
 
   return (

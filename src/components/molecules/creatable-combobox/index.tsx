@@ -28,6 +28,8 @@ type CreatableComboboxProps = {
   onChange: (value: string) => void;
   placeholder?: string;
   searchPlaceholder?: string;
+  /** Verb of the "type a new value" entry ("Usar “X”"). */
+  createLabel?: string;
   /** Only digits may be typed (e.g. year). */
   numeric?: boolean;
   error?: string;
@@ -45,6 +47,7 @@ export function CreatableCombobox({
   onChange,
   placeholder = "Selecione",
   searchPlaceholder = "Buscar ou digitar…",
+  createLabel = "Usar",
   numeric = false,
   error,
   disabled = false,
@@ -105,7 +108,7 @@ export function CreatableCombobox({
                     onSelect={() => choose(query)}
                   >
                     <Plus className="size-4" />
-                    Usar “{query.trim()}”
+                    {createLabel} “{query.trim()}”
                   </CommandItem>
                 </CommandGroup>
               )}

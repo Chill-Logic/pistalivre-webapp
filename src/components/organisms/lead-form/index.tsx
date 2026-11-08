@@ -10,6 +10,7 @@ import { Form } from "@/components/atoms/form";
 import { Col, Row } from "@/components/atoms/grid";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Spinner } from "@/components/atoms/spinner";
+import { CreatableCombobox } from "@/components/molecules/creatable-combobox";
 import { FormField } from "@/components/molecules/form-field";
 import { MaskedField } from "@/components/molecules/masked-field";
 import { SelectField } from "@/components/molecules/select-field";
@@ -22,12 +23,15 @@ import {
   type LeadFormValues,
 } from "./schema";
 import { applyApiErrors } from "@/helpers/form";
+import type { SelectOption } from "@/helpers/select";
 import { useCreateLead } from "@/hooks/api/gestao/crm/useCreateLead";
 import type { CrmOptions, LeadDetail } from "@/types/crm";
 import { maskPhone } from "@/utils/masks";
 
 type LeadFormProps = {
   options: CrmOptions;
+  /** Catalog models ("Brand Model"); the value is the model id. */
+  models: SelectOption[];
   cancelTo: string;
   onSaved: (lead: LeadDetail) => void;
 };
@@ -36,7 +40,7 @@ type LeadFormProps = {
  * A lead the staff found (OUTBOUND): the origin picked here becomes its
  * attribution, as if it had come in through a campaign link.
  */
-export function LeadForm({ options, cancelTo, onSaved }: LeadFormProps) {
+export function LeadForm({ options, models, cancelTo, onSaved }: LeadFormProps) {
   const create = useCreateLead();
   const [formError, setFormError] = useState<string | null>(null);
   const {
@@ -52,10 +56,14 @@ export function LeadForm({ options, cancelTo, onSaved }: LeadFormProps) {
 
   const onSubmit = handleSubmit((values) => {
     setFormError(null);
-    create.mutate(toLeadInput(values), {
+    create.mutate(toLeadInput(values, models), {
       onSuccess: onSaved,
       onError: (error) =>
-        setFormError(applyApiErrors(error, setError, LEAD_FORM_FIELDS)),
+        setFormError(
+          applyApiErrors(error, setError, LEAD_FORM_FIELDS, {
+            fieldAliases: { desiredModelId: "desiredVehicle" },
+          }),
+        ),
     });
   });
 
@@ -118,11 +126,21 @@ export function LeadForm({ options, cancelTo, onSaved }: LeadFormProps) {
               />
             </Col>
             <Col>
-              <FormField
-                label="Veículo desejado (opcional)"
-                placeholder="Ex.: Honda CG 160"
-                error={errors.desiredVehicle?.message}
-                {...register("desiredVehicle")}
+              <Controller
+                control={control}
+                name="desiredVehicle"
+                render={({ field }) => (
+                  <CreatableCombobox
+                    label="Veículo desejado (opcional)"
+                    value={field.value}
+                    options={models}
+                    onChange={field.onChange}
+                    placeholder="Escolha ou sugira um veículo"
+                    searchPlaceholder="Buscar ou sugerir…"
+                    createLabel="Sugerir"
+                    error={errors.desiredVehicle?.message}
+                  />
+                )}
               />
             </Col>
             <Col>

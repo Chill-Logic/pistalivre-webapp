@@ -3,6 +3,32 @@ import type { DocumentOwnerType } from "@/types/document";
 import type { SignatureListItem } from "@/types/signature";
 import { pluralize } from "@/utils/text";
 
+/**
+ * "Documento de: Veículo". The API catalog (`DOCUMENT_OWNER_LABELS`) names
+ * the document FOLDERS, in the plural, so the singular lives here.
+ */
+const OWNER_NAME: Record<string, string> = {
+  VEHICLE: "Veículo",
+  CUSTOMER: "Cliente",
+  RENTAL: "Locação",
+  INSPECTION: "Vistoria",
+  MAINTENANCE: "Manutenção",
+  SUPPLIER: "Fornecedor",
+  COMPANY: "Empresa",
+  LEAD: "Lead",
+  LEAD_ACTIVITY: "Atividade de lead",
+  PROPOSAL: "Proposta",
+  REIMBURSEMENT: "Reembolso",
+  PAYMENT: "Pagamento",
+  DEBT: "Dívida da empresa",
+  DEBT_PAYMENT: "Pagamento de dívida",
+};
+
+/** Singular name of the record type a signed document belongs to. */
+export function documentOwnerName(type: string) {
+  return OWNER_NAME[type] ?? type;
+}
+
 /** Screen of the record the signed document belongs to, when there is one. */
 export function documentOwnerHref(type: DocumentOwnerType, id: string) {
   switch (type) {

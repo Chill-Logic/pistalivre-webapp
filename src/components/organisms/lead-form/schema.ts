@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { sameText } from "@/helpers/combobox";
+import type { SelectOption } from "@/helpers/select";
 import type { LeadInput } from "@/types/crm";
 import { onlyDigits } from "@/utils/masks";
 
@@ -41,12 +43,23 @@ export const leadFormDefaults: LeadFormValues = {
   note: "",
 };
 
-export function toLeadInput(values: LeadFormValues): LeadInput {
+/**
+ * A vehicle picked from the catalog goes as `desiredModelId`; one typed by
+ * hand ("Sugerir") stays free text, as in the staff form of the Next app.
+ */
+export function toLeadInput(
+  values: LeadFormValues,
+  models: SelectOption[],
+): LeadInput {
+  const model = values.desiredVehicle
+    ? models.find((option) => sameText(option.label, values.desiredVehicle))
+    : undefined;
   return {
     name: values.name,
     phone: onlyDigits(values.phone),
     email: values.email || null,
-    desiredVehicle: values.desiredVehicle || null,
+    desiredModelId: model?.value ?? null,
+    desiredVehicle: model ? null : values.desiredVehicle || null,
     origin: values.origin,
     note: values.note || null,
   };

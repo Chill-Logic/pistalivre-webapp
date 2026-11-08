@@ -5,18 +5,15 @@ import { Card } from "@/components/atoms/card";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { SignatureStatusBadge } from "@/components/molecules/signature-status-badge";
-import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
-import { signersProgress } from "@/helpers/signature";
-import { useLabels } from "@/hooks/ui/useLabels";
+import { documentOwnerName, signersProgress } from "@/helpers/signature";
 import type { SignatureListItem } from "@/types/signature";
 import { formatDate } from "@/utils/format";
 
 export function SignatureCard({ signature }: { signature: SignatureListItem }) {
   const location = useLocation();
-  const { label } = useLabels();
   const context = signature.document
-    ? label(LABEL_MAPS.documentOwner, signature.document.ownerType)
+    ? documentOwnerName(signature.document.ownerType)
     : "Documento removido";
 
   return (

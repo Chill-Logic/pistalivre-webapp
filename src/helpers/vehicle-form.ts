@@ -47,3 +47,14 @@ export function yearOptions(options: VehicleFormOptions): SelectOption[] {
     .sort((a, b) => b - a)
     .map((year) => ({ value: String(year), label: String(year) }));
 }
+
+/** Every catalog model as "Brand Model", A→Z (the lead's desired vehicle). */
+export function catalogModelOptions(options: VehicleFormOptions): SelectOption[] {
+  const brandName = new Map(options.brands.map((brand) => [brand.id, brand.name]));
+  return options.models
+    .map((model) => ({
+      value: model.id,
+      label: `${brandName.get(model.brandId) ?? ""} ${model.name}`.trim(),
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
+}
