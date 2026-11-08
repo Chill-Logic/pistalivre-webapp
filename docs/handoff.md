@@ -113,6 +113,6 @@ Na ordem:
 ## Pendências e decisões anotadas
 
 - Logo = emblema do Next (`pista-livre/public/logo.png`, recortado): `public/logo.webp` nas telas e `brand/logo-icon.png` (sobre branco) como fonte dos ícones do PWA (`npm run pwa:assets` gera ao lado da fonte; mova para `public/`).
-- No dev, o S3 está com credencial quebrada: abrir/baixar documento dá 500 (problema anterior a este trabalho).
+- S3 do dev: credencial trocada pelo dono em 2026-11-08 (o container foi RECRIADO com `docker compose up -d --no-deps --no-build dev`; `restart` não pega env nova do compose). Abrir/baixar voltou a funcionar.
 - **Divergência de dinheiro, já existente** (anotada pelo backend): a caução vencida aparece como R$ 730,16 na visão da equipe (multa e juros calculados localmente) e como R$ 650 no `/me/charges` (read-through do Asaas). As telas Next fazem igual. Decisão do dono.
 - **Datas**: `paidAt` das cobranças também é data de calendário (meia-noite UTC), então use `formatCalendarDate`. Com `formatDate` (Brasília) ele volta um dia.

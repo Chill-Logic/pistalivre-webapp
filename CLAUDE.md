@@ -72,8 +72,7 @@ portal **segue o tema do celular**; logo = **emblema do Next** (feito).
 
 **Só com o "pode" explícito do dono**: merge da `feat/api-v1-spa` na `main` do `pista-livre` (o Railway faz
 deploy), deploy deste SPA com domínio e `WEBAPP_ORIGIN`, e só então remover as páginas Next antigas.
-A credencial do S3 do dev também é com ele.
 
 **Sucessos nunca testados de verdade no dev** (só com simulação): criar/editar cliente (upsert no Asaas),
-recusar reembolso (só há pedido real), upload de documento (o S3 do dev está com credencial quebrada: abrir
-e baixar arquivo dá 500) e envio do questionário (a sessão fica órfã). Ver `../pista-livre/docs/handoff-api-v1.md`.
+recusar reembolso (só há pedido real), upload de documento (o S3 do dev voltou em 2026-11-08: abrir/baixar
+funciona; enviar ainda não foi testado de verdade) e envio do questionário (a sessão fica órfã). Ver `../pista-livre/docs/handoff-api-v1.md`.
