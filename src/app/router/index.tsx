@@ -66,6 +66,7 @@ import {
   SignatureLinkPage,
 } from "./pages";
 import { ROUTES } from "@/constants/routes";
+import { hostRealm } from "@/helpers/host-realm";
 import { LoginPage } from "@/pages/gestao/login";
 import { NotFoundPage } from "@/pages/comum/not-found";
 
@@ -187,6 +188,15 @@ export const router = createBrowserRouter([
       { path: ROUTES.debtEdit, element: <DebtEditPage /> },
     ],
   },
-  { path: ROUTES.root, element: <Navigate to={ROUTES.dashboard} replace /> },
+  {
+    // Each domain opens its own area (gestao.* → staff, cliente.* → portal).
+    path: ROUTES.root,
+    element: (
+      <Navigate
+        to={hostRealm() === "cliente" ? ROUTES.portal : ROUTES.dashboard}
+        replace
+      />
+    ),
+  },
   { path: "*", element: <NotFoundPage /> },
 ]);

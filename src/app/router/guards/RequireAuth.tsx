@@ -6,6 +6,7 @@ import { PortalShellSkeleton } from "@/components/templates/portal-shell-skeleto
 import { homeOf, loginUrlFor, realmOfKind } from "@/helpers/safe-redirect";
 import { useSession } from "@/hooks/auth/useSession";
 import { useLabelCatalog } from "@/hooks/api/comum/labels/useLabelCatalog";
+import { useHostRealmRedirect } from "@/hooks/ui/useHostRealmRedirect";
 import type { Realm } from "@/types/auth";
 
 /**
@@ -13,12 +14,15 @@ import type { Realm } from "@/types/auth";
  * link as callbackUrl; a session of the OTHER realm → its own home (staff
  * never sees the portal and vice versa, like the Next middleware). Also holds
  * the shell until the label catalog arrives, so codes never flash on screen.
+ * On a domain scoped to the other area, it goes to its own domain.
  */
 export function RequireAuth({ realm }: { realm: Realm }) {
   const session = useSession();
   const labels = useLabelCatalog();
   const location = useLocation();
+  const wrongHost = useHostRealmRedirect(realm);
 
+  if (wrongHost) return null;
   if (session.status === "loading" || labels.isPending) {
     return realm === "cliente" ? <PortalShellSkeleton /> : <AppShellSkeleton />;
   }

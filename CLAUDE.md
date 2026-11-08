@@ -61,7 +61,30 @@ solicitar, cancelar, confirmar, reenviar, vincular envelope); Projeções (conta
 parcelada), registrar recebimento fora do Asaas, "Sincronizar do Asaas" e NF (locação, cliente e avulsa,
 cancelar, vincular) com escrita (B2/B4).
 
-## O que falta (2026-11-08)
+## Deploy (Vercel) e domínios
+
+Um projeto só na Vercel serve as duas áreas, cada uma no seu domínio: **`gestao.pistalivrelocacoes.com.br`**
+(equipe) e **`cliente.pistalivrelocacoes.com.br`** (portal). O app lê o domínio (`helpers/host-realm`): a raiz
+abre a área do domínio, e uma página da outra área vai para o domínio certo (`useHostRealmRedirect`, nos
+guards `RequireAuth`/`RedirectIfAuthenticated`). Qualquer outro host (localhost, previews da Vercel) serve as
+duas áreas, como no dev. Cada domínio guarda o seu login (localStorage por origem).
+- `vercel.json`: build `npm run build`, saída `dist`, todo caminho cai no `index.html` (rotas do SPA) e `sw.js`
+  sem cache (senão o aviso de nova versão do PWA não aparece).
+- Variável de build na Vercel: `VITE_API_URL=https://pistalivrelocacoes.com.br/api` (entra no build: mudou,
+  publica de novo).
+- DNS no **Cloudflare** (o Registro.br só guarda o registro): `CNAME gestao` e `CNAME cliente` para o destino
+  que a Vercel mostrar, com a nuvem **cinza** (DNS only) até a Vercel emitir o certificado.
+- No backend: `WEBAPP_ORIGIN=https://gestao.pistalivrelocacoes.com.br,https://cliente.pistalivrelocacoes.com.br`.
+- Testar local: `http://gestao.localhost:5173` e `http://cliente.localhost:5173` simulam os domínios (a API do
+  dev só aceita `localhost:5173`, então lá só dá para ver os redirecionamentos).
+
+**Follow-up (pedido do dono, 2026-11-08): endereços limpos por domínio.** Hoje os caminhos mantêm o prefixo
+(`gestao.…/gestao/locacoes`, `cliente.…/area-cliente/…`). Depois de no ar, tirar o prefixo quando o domínio já
+diz a área (`gestao.…/locacoes`, `cliente.…/locacoes/123`): os prefixos `GESTAO`/`PORTAL` de
+`constants/routes.ts` passam a depender do host (vazio no domínio da área, igual no localhost), redirecionar os
+caminhos antigos com prefixo para os novos (links já compartilhados) e testar as duas áreas nos dois domínios.
+
+
 
 **Liberado pelo dono em 2026-11-08 ("vamos fazer tudo")**, em andamento com o backend (`pista-livre-99`),
 na ordem: A) reembolso "marcar como pago" (migration aditiva), escritas do portal (feitas), nota do extrato e
