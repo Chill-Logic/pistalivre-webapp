@@ -1,3 +1,4 @@
+import type { AsaasCharges } from "@/types/asaas-charge";
 import { http } from "@/services/http/client";
 import type {
   FinanceSyncResult,
@@ -34,6 +35,13 @@ export const standaloneChargesService = {
     return data;
   },
   /** `chargeId` is the Asaas id (pay_…). Our copy comes on the next sync. */
+  /** Every charge of the customer at Asaas (Asaas down → items [] + error). */
+  async asaasCharges(customerId: string) {
+    const { data } = await http.get<AsaasCharges>(
+      `/customers/${customerId}/asaas-charges`,
+    );
+    return data;
+  },
   async link(chargeId: string, rentalId: string) {
     await http.post(`/charges/${chargeId}/link`, { rentalId });
   },

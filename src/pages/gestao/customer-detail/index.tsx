@@ -35,6 +35,7 @@ import {
   CustomerInvoicesCardSkeleton,
 } from "@/components/organisms/customer-invoices-card";
 import { QueryError } from "@/components/organisms/query-error";
+import { CustomerAsaasChargesCard } from "@/components/organisms/customer-asaas-charges-card";
 import {
   CustomerDebtsCard,
   CustomerDebtsCardSkeleton,
@@ -116,6 +117,12 @@ export function CustomerDetailPage() {
             />
           }
           debts={<CustomerDebtsCard customerId={customer.data.id} />}
+          asaasCharges={
+            <CustomerAsaasChargesCard
+              customerId={customer.data.id}
+              rentals={customer.data.rentals}
+            />
+          }
           documents={
             <DocumentsCard
               documents={customer.data.documents}
