@@ -77,7 +77,6 @@ leitura**; Projeções (conta no servidor + PDF). Portal do cliente **só leitur
   `npm run pwa:assets`).
 
 **Pode ser feito sem decisão**:
-- Editor de modelo de contrato: seletor de variáveis ao digitar `{{` e realce das variáveis no texto.
 - Seções recolhíveis animadas (`grid-rows-[0fr]→[1fr]`), resto do pedido de animações.
 
 **Sucessos nunca testados de verdade no dev** (só com simulação): criar/editar cliente (upsert no Asaas),
