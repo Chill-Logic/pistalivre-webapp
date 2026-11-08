@@ -24,7 +24,6 @@ export function SignatureTable({
   isLoading,
   isRefreshing,
 }: SignatureTableProps) {
-
   const columns = useMemo<DataTableColumn<SignatureListItem>[]>(
     () => [
       {

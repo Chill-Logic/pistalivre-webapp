@@ -11,11 +11,13 @@ import type { SignatureDetail } from "@/types/signature";
 import { formatDate, formatDateTime } from "@/utils/format";
 import { pluralize } from "@/utils/text";
 
-export function SignatureSummary({ signature }: { signature: SignatureDetail }) {
+export function SignatureSummary({
+  signature,
+}: {
+  signature: SignatureDetail;
+}) {
   const { document } = signature;
-  const ownerLabel = document
-    ? documentOwnerName(document.ownerType)
-    : null;
+  const ownerLabel = document ? documentOwnerName(document.ownerType) : null;
   const ownerHref = document
     ? documentOwnerHref(document.ownerType, document.ownerId)
     : null;
