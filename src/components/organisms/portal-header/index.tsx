@@ -6,12 +6,13 @@ import { Header } from "@/components/atoms/landmarks";
 import { Text } from "@/components/atoms/text";
 import { Logo } from "@/components/molecules/logo";
 import { ThemeToggle } from "@/components/molecules/theme-toggle";
+import { PortalPasswordDialog } from "@/components/organisms/portal-password-dialog";
 import { ROUTES } from "@/constants/routes";
 import { useLogout } from "@/hooks/auth/useLogout";
 import type { AuthUser } from "@/types/auth";
 import { firstName } from "@/utils/format";
 
-/** Portal header: no sidebar — logo home, greeting, theme and sign out. */
+/** Portal header: no sidebar — logo home, greeting, theme, password, sign out. */
 export function PortalHeader({ user }: { user: AuthUser }) {
   const logout = useLogout();
 
@@ -28,6 +29,7 @@ export function PortalHeader({ user }: { user: AuthUser }) {
           </Text>
         </Text>
         <ThemeToggle />
+        <PortalPasswordDialog />
         <Button
           variant="ghost"
           size="icon"
