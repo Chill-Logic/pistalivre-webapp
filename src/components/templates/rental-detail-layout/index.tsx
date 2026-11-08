@@ -11,6 +11,11 @@ type RentalDetailLayoutProps = {
   maintenances: ReactNode;
   inspections: ReactNode;
   documents: ReactNode;
+  /** Rent rules (block B5): auto-billing, reconciliation, values, pix. */
+  autoBilling?: ReactNode;
+  reconciliation?: ReactNode;
+  rateSegments?: ReactNode;
+  receipts?: ReactNode;
 };
 
 /** Grid shared by the rental page and its skeleton. */
@@ -23,6 +28,10 @@ export function RentalDetailLayout({
   maintenances,
   inspections,
   documents,
+  autoBilling,
+  reconciliation,
+  rateSegments,
+  receipts,
 }: RentalDetailLayoutProps) {
   return (
     <Row className="items-start gap-y-6">
@@ -34,7 +43,15 @@ export function RentalDetailLayout({
         </Box>
       </Col>
       <Col lg={8}>{charges}</Col>
-      <Col lg={4}>{caution}</Col>
+      <Col lg={4}>
+        <Box className="space-y-6">
+          {autoBilling}
+          {caution}
+        </Box>
+      </Col>
+      {reconciliation && <Col>{reconciliation}</Col>}
+      {rateSegments && <Col lg={6}>{rateSegments}</Col>}
+      {receipts && <Col lg={6}>{receipts}</Col>}
       <Col>{maintenances}</Col>
       <Col>{inspections}</Col>
       <Col>{documents}</Col>

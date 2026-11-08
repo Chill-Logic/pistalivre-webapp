@@ -39,6 +39,22 @@ import {
   DocumentsCard,
   DocumentsCardSkeleton,
 } from "@/components/organisms/documents-card";
+import {
+  RateSegmentsCard,
+  RateSegmentsCardSkeleton,
+} from "@/components/organisms/rate-segments-card";
+import {
+  RentalAutoBillingCard,
+  RentalAutoBillingCardSkeleton,
+} from "@/components/organisms/rental-auto-billing-card";
+import {
+  RentReceiptsCard,
+  RentReceiptsCardSkeleton,
+} from "@/components/organisms/rent-receipts-card";
+import {
+  RentReconciliationCard,
+  RentReconciliationCardSkeleton,
+} from "@/components/organisms/rent-reconciliation-card";
 import { RentalDetailLayout } from "@/components/templates/rental-detail-layout";
 import { queryKeys } from "@/constants/query-keys";
 import { ROUTES, routeTo } from "@/constants/routes";
@@ -82,6 +98,10 @@ export function RentalDetailPage() {
             maintenances={<RelatedMaintenancesSkeleton />}
             inspections={<RelatedInspectionsSkeleton />}
             documents={<DocumentsCardSkeleton />}
+            autoBilling={<RentalAutoBillingCardSkeleton />}
+            reconciliation={<RentReconciliationCardSkeleton />}
+            rateSegments={<RateSegmentsCardSkeleton />}
+            receipts={<RentReceiptsCardSkeleton />}
           />
         </SkeletonRegion>
       )}
@@ -119,6 +139,10 @@ export function RentalDetailPage() {
               }}
             />
           }
+          autoBilling={<RentalAutoBillingCard rentalId={rental.data.id} />}
+          reconciliation={<RentReconciliationCard rentalId={rental.data.id} />}
+          rateSegments={<RateSegmentsCard rentalId={rental.data.id} />}
+          receipts={<RentReceiptsCard rentalId={rental.data.id} />}
         />
       )}
     </Box>
