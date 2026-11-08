@@ -55,6 +55,10 @@ import {
   RentReconciliationCard,
   RentReconciliationCardSkeleton,
 } from "@/components/organisms/rent-reconciliation-card";
+import {
+  RentalInvoicesCard,
+  RentalInvoicesCardSkeleton,
+} from "@/components/organisms/rental-invoices-card";
 import { RentalDetailLayout } from "@/components/templates/rental-detail-layout";
 import { queryKeys } from "@/constants/query-keys";
 import { ROUTES, routeTo } from "@/constants/routes";
@@ -102,6 +106,7 @@ export function RentalDetailPage() {
             reconciliation={<RentReconciliationCardSkeleton />}
             rateSegments={<RateSegmentsCardSkeleton />}
             receipts={<RentReceiptsCardSkeleton />}
+            invoices={<RentalInvoicesCardSkeleton />}
           />
         </SkeletonRegion>
       )}
@@ -143,6 +148,7 @@ export function RentalDetailPage() {
           reconciliation={<RentReconciliationCard rentalId={rental.data.id} />}
           rateSegments={<RateSegmentsCard rentalId={rental.data.id} />}
           receipts={<RentReceiptsCard rentalId={rental.data.id} />}
+          invoices={<RentalInvoicesCard rentalId={rental.data.id} />}
         />
       )}
     </Box>

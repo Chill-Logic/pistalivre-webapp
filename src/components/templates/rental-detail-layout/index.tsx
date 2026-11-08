@@ -16,6 +16,8 @@ type RentalDetailLayoutProps = {
   reconciliation?: ReactNode;
   rateSegments?: ReactNode;
   receipts?: ReactNode;
+  /** NFS-e of the rental (block B4). */
+  invoices?: ReactNode;
 };
 
 /** Grid shared by the rental page and its skeleton. */
@@ -32,6 +34,7 @@ export function RentalDetailLayout({
   reconciliation,
   rateSegments,
   receipts,
+  invoices,
 }: RentalDetailLayoutProps) {
   return (
     <Row className="items-start gap-y-6">
@@ -52,6 +55,7 @@ export function RentalDetailLayout({
       {reconciliation && <Col>{reconciliation}</Col>}
       {rateSegments && <Col lg={6}>{rateSegments}</Col>}
       {receipts && <Col lg={6}>{receipts}</Col>}
+      {invoices && <Col>{invoices}</Col>}
       <Col>{maintenances}</Col>
       <Col>{inspections}</Col>
       <Col>{documents}</Col>

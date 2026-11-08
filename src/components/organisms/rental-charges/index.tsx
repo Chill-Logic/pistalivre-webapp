@@ -15,7 +15,9 @@ import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { ChargeActions } from "@/components/organisms/charge-actions";
 import { ChargeFormDialog } from "@/components/organisms/charge-form-dialog";
+import { ManualPaymentDialog } from "@/components/organisms/manual-payment-dialog";
 import { QueryError } from "@/components/organisms/query-error";
+import { useRental } from "@/hooks/api/gestao/rentals/useRental";
 import { useRentalCharges } from "@/hooks/api/gestao/rentals/useRentalCharges";
 import type { RatePeriod } from "@/types/rental";
 
@@ -34,16 +36,23 @@ export function RentalCharges({
   ratePeriod,
 }: RentalChargesProps) {
   const charges = useRentalCharges(rentalId);
+  // The rental is already cached by the page: who pays, for "Registrar recebimento".
+  const customer = useRental(rentalId).data?.customer;
 
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
         <CardTitle className="text-base">Cobranças</CardTitle>
-        <ChargeFormDialog
-          rentalId={rentalId}
-          rate={rate}
-          ratePeriod={ratePeriod}
-        />
+        <Box className="flex flex-wrap justify-end gap-2">
+          {customer && (
+            <ManualPaymentDialog customer={customer} rentalId={rentalId} />
+          )}
+          <ChargeFormDialog
+            rentalId={rentalId}
+            rate={rate}
+            ratePeriod={ratePeriod}
+          />
+        </Box>
       </CardHeader>
       <CardContent>
         {charges.isPending && (
