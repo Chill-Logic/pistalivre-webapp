@@ -1,5 +1,8 @@
 import { http } from "@/services/http/client";
-import type { ReimbursementRequestInput } from "@/types/portal";
+import type {
+  MaintenanceReportInput,
+  ReimbursementRequestInput,
+} from "@/types/portal";
 
 /**
  * What the renter records: refund requests, maintenance paid out of pocket
@@ -20,5 +23,18 @@ export const portalWritesService = {
     const body = new FormData();
     body.append("file", file);
     await http.post(`/me/reimbursements/${id}/documents`, body);
+  },
+  /** Description, cost, date and the receipts (≥ 1) in one request. */
+  async reportMaintenance(rentalId: string, input: MaintenanceReportInput) {
+    const body = new FormData();
+    body.append("description", input.description);
+    body.append("cost", String(input.cost));
+    if (input.performedAt) body.append("performedAt", input.performedAt);
+    for (const file of input.files) body.append("files", file);
+    const { data } = await http.post<{ id: string }>(
+      `/me/rentals/${rentalId}/maintenances`,
+      body,
+    );
+    return data;
   },
 };

@@ -14,6 +14,7 @@ import {
   ListCardSkeleton,
   ListRowSkeleton,
 } from "@/components/organisms/list-card";
+import { MaintenanceReportDialog } from "@/components/organisms/maintenance-report-dialog";
 import { ReimbursementRequestDialog } from "@/components/organisms/reimbursement-request-dialog";
 import type { PortalRentalSections as Sections } from "@/types/portal";
 
@@ -121,8 +122,15 @@ export function PortalRentalSections({
           </ListCard>
           <ListCard
             title="Manutenções"
-            empty="Nenhuma manutenção registrada."
+            empty={
+              canWrite
+                ? "Nenhuma manutenção registrada. Pagou um serviço no veículo? Registre aqui e peça o reembolso."
+                : "Nenhuma manutenção registrada."
+            }
             isEmpty={sections.maintenances.length === 0}
+            actions={
+              canWrite && <MaintenanceReportDialog rentalId={rentalId} />
+            }
           >
             {sections.maintenances.map((maintenance) => {
               const live =

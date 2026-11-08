@@ -153,3 +153,12 @@ export type ReimbursementRequestInput = {
   amount?: number;
   maintenanceId?: string;
 };
+
+/** POST /me/rentals/:id/maintenances (multipart; a receipt is required). */
+export type MaintenanceReportInput = {
+  description: string;
+  cost: number;
+  /** yyyy-mm-dd; the API defaults to today. */
+  performedAt?: string;
+  files: File[];
+};
