@@ -58,6 +58,7 @@ import {
   VehiclesPage,
   ProposalsPage,
   ProposalDetailPage,
+  ProposalNewPage,
   SignaturesPage,
   SignatureDetailPage,
 } from "./pages";
@@ -120,6 +121,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.planNew, element: <PlanNewPage /> },
       { path: ROUTES.planEdit, element: <PlanEditPage /> },
       { path: ROUTES.proposals, element: <ProposalsPage /> },
+      { path: ROUTES.proposalNew, element: <ProposalNewPage /> },
       { path: ROUTES.proposalDetail, element: <ProposalDetailPage /> },
       { path: ROUTES.projections, element: <ProjectionsPage /> },
       { path: ROUTES.signatures, element: <SignaturesPage /> },

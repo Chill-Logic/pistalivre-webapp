@@ -1,4 +1,4 @@
-import { Plus, Target, UserPlus } from "lucide-react";
+import { FileText, Plus, Target, UserPlus } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -45,6 +45,16 @@ export function LeadDetailPage() {
         {lead.data && (
           <Box className="flex flex-wrap items-center gap-2">
             <LeadDeleteButton leadId={lead.data.id} name={lead.data.name} />
+            {lead.data.status !== "LOST" && (
+              <Button asChild variant="outline" size="sm">
+                <Link
+                  to={`${ROUTES.proposalNew}?lead=${encodeURIComponent(lead.data.id)}`}
+                >
+                  <FileText />
+                  Emitir proposta
+                </Link>
+              </Button>
+            )}
             {!lead.data.customerId && lead.data.status !== "LOST" && (
               <Button asChild size="sm">
                 <Link to={routeTo.newCustomerFromLead(lead.data.id)}>

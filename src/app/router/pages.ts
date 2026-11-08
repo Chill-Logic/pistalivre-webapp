@@ -217,6 +217,10 @@ export const ProposalsPage = lazyPage(
   () => import("@/pages/gestao/proposals"),
   "ProposalsPage",
 );
+export const ProposalNewPage = lazyPage(
+  () => import("@/pages/gestao/proposal-new"),
+  "ProposalNewPage",
+);
 export const ProposalDetailPage = lazyPage(
   () => import("@/pages/gestao/proposal-detail"),
   "ProposalDetailPage",

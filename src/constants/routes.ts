@@ -41,6 +41,7 @@ export const ROUTES = {
   planNew: `${GESTAO}/planos/novo`,
   planEdit: `${GESTAO}/planos/:id/editar`,
   proposals: `${GESTAO}/propostas`,
+  proposalNew: `${GESTAO}/propostas/nova`,
   proposalDetail: `${GESTAO}/propostas/:id`,
   projections: `${GESTAO}/projecoes`,
   signatures: `${GESTAO}/assinaturas`,
