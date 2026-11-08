@@ -15,22 +15,28 @@ import { Form } from "@/components/atoms/form";
 import { Col, Row } from "@/components/atoms/grid";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
+import { CheckboxField } from "@/components/molecules/checkbox-field";
 import { DateField } from "@/components/molecules/date-field";
 import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { SelectField } from "@/components/molecules/select-field";
 import { TextareaField } from "@/components/molecules/textarea-field";
+import { InstallmentComposer } from "@/components/organisms/installment-composer";
 import {
   CustomerRentalPicker,
   type CustomerRentalValue,
 } from "@/components/organisms/customer-rental-picker";
 import { LABEL_MAPS, type LabelMapName } from "@/constants/label-maps";
 import { toApiError } from "@/helpers/api-error";
-import { moneyErrorMessage } from "@/helpers/money-errors";
+import { itemFieldErrors, moneyErrorMessage } from "@/helpers/money-errors";
 import { useCreateStandaloneCharge } from "@/hooks/api/gestao/charges/useStandaloneChargeMutations";
 import { useIdempotencyKey } from "@/hooks/ui/useIdempotencyKey";
 import { useLabels } from "@/hooks/ui/useLabels";
-import type { ChargeMethod, ChargePurpose } from "@/types/charge";
+import type {
+  ChargeMethod,
+  ChargePlanItem,
+  ChargePurpose,
+} from "@/types/charge";
 
 /** House defaults (management app): 10% fine, 1% interest a month. */
 const DEFAULT_FINE = "10";
@@ -91,6 +97,11 @@ export function StandaloneChargeDialog({
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [blocked, setBlocked] = useState(false);
+  const [split, setSplit] = useState(false);
+  const [composerKey, setComposerKey] = useState(0);
+  const [installments, setInstallments] = useState<ChargePlanItem[]>([]);
+  const [itemErrors, setItemErrors] = useState<Record<number, string>>({});
+  const [partial, setPartial] = useState<string | null>(null);
 
   const onOpenChange = (next: boolean) => {
     if (create.isPending) return;
@@ -106,6 +117,11 @@ export function StandaloneChargeDialog({
     setDescription("");
     setErrors({});
     setBlocked(false);
+    setSplit(false);
+    setComposerKey((key) => key + 1);
+    setInstallments([]);
+    setItemErrors({});
+    setPartial(null);
   };
 
   const freeText = purpose === "OTHER" || !target.rentalId;
@@ -114,13 +130,18 @@ export function StandaloneChargeDialog({
     event.preventDefault();
     const next: Errors = {};
     if (!target.customerId) next.customerId = "Escolha o cliente";
-    if (!amount || amount <= 0) next.amount = "Informe o valor";
-    if (!dueDate) next.dueDate = "Informe o vencimento";
+    if (!split && (!amount || amount <= 0)) next.amount = "Informe o valor";
+    if (!split && !dueDate) next.dueDate = "Informe o vencimento";
+    if (split && installments.length === 0) {
+      next.form = "Monte as parcelas antes de emitir.";
+    }
     if (purpose === "OTHER" && !description.trim()) {
       next.description = "Descreva a cobrança";
     }
     setErrors(next);
-    if (Object.keys(next).length > 0 || !amount) return;
+    if (Object.keys(next).length > 0) return;
+    setItemErrors({});
+    setPartial(null);
 
     create.mutate(
       {
@@ -130,8 +151,9 @@ export function StandaloneChargeDialog({
           ...(target.rentalId ? { rentalId: target.rentalId } : {}),
           purpose,
           method,
-          amount,
-          dueDate,
+          ...(split
+            ? { items: installments }
+            : { amount: amount ?? 0, dueDate }),
           finePercent: Number(fine.replace(",", ".")) || 0,
           interestPercent: Number(interest.replace(",", ".")) || 0,
           ...(freeText && description.trim()
@@ -140,13 +162,29 @@ export function StandaloneChargeDialog({
         },
       },
       {
-        onSuccess: () => {
+        onSuccess: (result) => {
           idempotency.renew();
+          if (result.code === "PARTIAL" && result.failed?.length) {
+            // Sending the batch again would duplicate what was issued.
+            setBlocked(true);
+            setPartial(
+              `${result.created.length} emitidas; não saíram: ${result.failed
+                .map((fail) => `parcela ${fail.index + 1} (${fail.message})`)
+                .join(", ")}. Emita essas à parte, uma a uma.`,
+            );
+            return;
+          }
           setOpen(false);
         },
         onError: (error) => {
           const apiError = toApiError(error);
           if (apiError.code === "NOT_RECORDED") setBlocked(true);
+          const perItem = itemFieldErrors(apiError.fields);
+          setItemErrors(perItem);
+          if (Object.keys(perItem).length > 0) {
+            setErrors({ form: "Corrija as parcelas marcadas." });
+            return;
+          }
           const fields = apiError.fields ?? {};
           const placed = Object.keys(fields).length > 0;
           setErrors({
@@ -205,28 +243,53 @@ export function StandaloneChargeDialog({
                 disabled={create.isPending}
               />
             </Col>
-            <Col md={6}>
-              <MoneyField
-                label="Valor"
-                value={amount}
-                onChange={(value) => {
-                  setAmount(value);
+            <Col>
+              <CheckboxField
+                label="Parcelar em várias vezes"
+                hint="Cada parcela vira uma cobrança separada."
+                checked={split}
+                onChange={(checked) => {
+                  setSplit(checked);
                   setErrors({});
                 }}
-                error={errors.amount}
+                disabled={create.isPending}
               />
             </Col>
-            <Col md={6}>
-              <DateField
-                label="Vencimento"
-                value={dueDate}
-                onChange={(value) => {
-                  setDueDate(value);
-                  setErrors({});
-                }}
-                error={errors.dueDate}
-              />
-            </Col>
+            {split ? (
+              <Col>
+                <InstallmentComposer
+                  key={composerKey}
+                  onItemsChange={setInstallments}
+                  itemErrors={itemErrors}
+                  disabled={create.isPending}
+                />
+              </Col>
+            ) : (
+              <>
+                <Col md={6}>
+                  <MoneyField
+                    label="Valor"
+                    value={amount}
+                    onChange={(value) => {
+                      setAmount(value);
+                      setErrors({});
+                    }}
+                    error={errors.amount}
+                  />
+                </Col>
+                <Col md={6}>
+                  <DateField
+                    label="Vencimento"
+                    value={dueDate}
+                    onChange={(value) => {
+                      setDueDate(value);
+                      setErrors({});
+                    }}
+                    error={errors.dueDate}
+                  />
+                </Col>
+              </>
+            )}
             <Col span={6}>
               <FormField
                 label="Multa (%)"
@@ -264,6 +327,7 @@ export function StandaloneChargeDialog({
               código.
             </Text>
           )}
+          {partial && <Alert variant="warning">{partial}</Alert>}
           {errors.form && <Alert>{errors.form}</Alert>}
           <DialogFooter>
             <DialogClose asChild>
@@ -279,7 +343,9 @@ export function StandaloneChargeDialog({
               {create.isPending && (
                 <Spinner className="text-primary-foreground" />
               )}
-              Emitir cobrança
+              {split && installments.length > 0
+                ? `Emitir ${installments.length} ${installments.length === 1 ? "parcela" : "parcelas"}`
+                : "Emitir cobrança"}
             </Button>
           </DialogFooter>
         </Form>
