@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Camera } from "lucide-react";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
@@ -10,8 +11,11 @@ import { pluralize } from "@/utils/text";
 
 export function PortalInspectionItem({
   inspection,
+  actions,
 }: {
   inspection: PortalInspection;
+  /** E.g. delete, on one the renter made. */
+  actions?: ReactNode;
 }) {
   const { label } = useLabels();
 
@@ -43,11 +47,14 @@ export function PortalInspectionItem({
           )}
         </Text>
       </Box>
-      <Text weight="semibold" className="shrink-0 tabular-nums">
-        {inspection.mileage !== null
-          ? formatMileage(inspection.mileage)
-          : "Sem km"}
-      </Text>
+      <Box className="flex shrink-0 flex-col items-end gap-1">
+        <Text weight="semibold" className="tabular-nums">
+          {inspection.mileage !== null
+            ? formatMileage(inspection.mileage)
+            : "Sem km"}
+        </Text>
+        {actions}
+      </Box>
     </Box>
   );
 }

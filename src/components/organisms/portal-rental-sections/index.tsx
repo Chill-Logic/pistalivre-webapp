@@ -1,5 +1,8 @@
+import { ClipboardCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
 import { InvoiceItem } from "@/components/molecules/invoice-item";
 import { PortalChargeItem } from "@/components/molecules/portal-charge-item";
 import { PortalInspectionItem } from "@/components/molecules/portal-inspection-item";
@@ -15,7 +18,9 @@ import {
   ListRowSkeleton,
 } from "@/components/organisms/list-card";
 import { MaintenanceReportDialog } from "@/components/organisms/maintenance-report-dialog";
+import { PortalInspectionDelete } from "@/components/organisms/portal-inspection-delete";
 import { ReimbursementRequestDialog } from "@/components/organisms/reimbursement-request-dialog";
+import { routeTo } from "@/constants/routes";
 import type { PortalRentalSections as Sections } from "@/types/portal";
 
 /**
@@ -112,11 +117,30 @@ export function PortalRentalSections({
             title="Vistorias"
             empty="Nenhuma vistoria registrada."
             isEmpty={sections.inspections.length === 0}
+            actions={
+              canWrite && (
+                <Button asChild size="sm">
+                  <Link to={routeTo.portalInspectionNew(rentalId)}>
+                    <ClipboardCheck />
+                    Realizar vistoria
+                  </Link>
+                </Button>
+              )
+            }
           >
             {sections.inspections.map((inspection) => (
               <PortalInspectionItem
                 key={inspection.id}
                 inspection={inspection}
+                actions={
+                  canWrite &&
+                  inspection.mine && (
+                    <PortalInspectionDelete
+                      rentalId={rentalId}
+                      inspectionId={inspection.id}
+                    />
+                  )
+                }
               />
             ))}
           </ListCard>

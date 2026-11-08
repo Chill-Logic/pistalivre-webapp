@@ -1,5 +1,7 @@
 import { http } from "@/services/http/client";
 import type {
+  InspectionRequirements,
+  InspectionSubmitInput,
   MaintenanceReportInput,
   ReimbursementRequestInput,
 } from "@/types/portal";
@@ -36,5 +38,33 @@ export const portalWritesService = {
       body,
     );
     return data;
+  },
+  async inspectionRequirements(rentalId: string) {
+    const { data } = await http.get<InspectionRequirements>(
+      `/me/rentals/${rentalId}/inspections/requirements`,
+    );
+    return data;
+  },
+  /** One request: photos as `photo_<key>`, OK checks as `check_<key>`. */
+  async sendInspection(rentalId: string, input: InspectionSubmitInput) {
+    const body = new FormData();
+    body.append("type", input.type);
+    body.append("mileage", String(input.mileage));
+    if (input.notes) body.append("notes", input.notes);
+    if (input.type === "FULL") {
+      for (const [key, file] of Object.entries(input.photos)) {
+        body.append(`photo_${key}`, file);
+      }
+      for (const key of input.checksOk) body.append(`check_${key}`, "true");
+    }
+    const { data } = await http.post<{ id: string }>(
+      `/me/rentals/${rentalId}/inspections`,
+      body,
+    );
+    return data;
+  },
+  /** Only one the renter made on this rental. */
+  async deleteInspection(rentalId: string, inspectionId: string) {
+    await http.delete(`/me/rentals/${rentalId}/inspections/${inspectionId}`);
   },
 };

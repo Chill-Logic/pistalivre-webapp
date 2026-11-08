@@ -162,3 +162,27 @@ export type MaintenanceReportInput = {
   performedAt?: string;
   files: File[];
 };
+
+/** One photo or check the inspection asks for (by vehicle type). */
+export type InspectionRequirementItem = {
+  key: string;
+  label: string;
+  required: boolean;
+};
+
+/** GET /me/rentals/:id/inspections/requirements (mileage is built in). */
+export type InspectionRequirements = {
+  photos: InspectionRequirementItem[];
+  checks: InspectionRequirementItem[];
+};
+
+/** POST /me/rentals/:id/inspections; a KM reading takes no photos/checks. */
+export type InspectionSubmitInput = {
+  type: "FULL" | "KM";
+  mileage: number;
+  notes?: string;
+  /** By requirement key. */
+  photos: Record<string, File>;
+  /** Keys of the checks found OK (absent = not OK). */
+  checksOk: string[];
+};
