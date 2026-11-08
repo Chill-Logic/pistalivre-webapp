@@ -3,14 +3,10 @@ import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/atoms/card";
+import { Card, CardContent, CardHeader } from "@/components/atoms/card";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
+import { CollapsibleCard } from "@/components/molecules/collapsible-card";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { DocumentItem } from "@/components/molecules/document-item";
 import { DocumentEditDialog } from "@/components/organisms/document-edit-dialog";
@@ -40,42 +36,43 @@ export function DocumentsCard({
   const { view, download } = useFileActions();
 
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
-        <CardTitle className="text-base">{title}</CardTitle>
-        {manage && (
+    <CollapsibleCard
+      title={title}
+      count={documents.length}
+      storageKey={`documents-${manage?.owner.type.toLowerCase() ?? "view"}`}
+      actions={
+        manage && (
           <DocumentUploadDialog
             owner={manage.owner}
             invalidate={manage.invalidate}
           />
-        )}
-      </CardHeader>
-      <CardContent>
-        {documents.length === 0 ? (
-          <Text tone="muted">{empty}</Text>
-        ) : (
-          <Box className="divide-y">
-            {documents.map((document) => (
-              <DocumentItem
-                key={document.id}
-                document={document}
-                onView={() => view.mutate(document)}
-                onDownload={() => download.mutate(document)}
-                isViewing={view.isPending && view.variables?.id === document.id}
-                isDownloading={
-                  download.isPending && download.variables?.id === document.id
-                }
-                actions={
-                  manage && (
-                    <ManageDocumentActions document={document} {...manage} />
-                  )
-                }
-              />
-            ))}
-          </Box>
-        )}
-      </CardContent>
-    </Card>
+        )
+      }
+    >
+      {documents.length === 0 ? (
+        <Text tone="muted">{empty}</Text>
+      ) : (
+        <Box className="divide-y">
+          {documents.map((document) => (
+            <DocumentItem
+              key={document.id}
+              document={document}
+              onView={() => view.mutate(document)}
+              onDownload={() => download.mutate(document)}
+              isViewing={view.isPending && view.variables?.id === document.id}
+              isDownloading={
+                download.isPending && download.variables?.id === document.id
+              }
+              actions={
+                manage && (
+                  <ManageDocumentActions document={document} {...manage} />
+                )
+              }
+            />
+          ))}
+        </Box>
+      )}
+    </CollapsibleCard>
   );
 }
 
