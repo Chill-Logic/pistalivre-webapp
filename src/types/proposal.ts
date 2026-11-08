@@ -29,3 +29,39 @@ export type ProposalFilters = {
   q: string;
   status: ProposalStatus | "";
 };
+
+/** An active proposal template and its optional clauses. */
+export type ProposalTemplateOption = {
+  id: string;
+  name: string;
+  version: number;
+  clauses: { key: string; label: string }[];
+};
+
+/** The terms filled in the composer (all optional; the template decides). */
+export type ProposalInputs = {
+  vehicleId?: string;
+  rate?: number;
+  ratePeriod?: string;
+  cautionTotal?: number;
+  startDate?: string;
+  notes?: string;
+};
+
+/**
+ * Target + terms of POST /proposals/draft and POST /proposals: from a CRM
+ * lead, or standalone with the recipient typed in (it freezes on it).
+ */
+export type ProposalDraftInput = {
+  leadId?: string;
+  recipient?: { name: string; phone?: string; email?: string };
+  templateId: string;
+  inputs: ProposalInputs;
+  clauses: string[];
+};
+
+export type ConvertProposalInput = {
+  name: string;
+  phone: string;
+  email?: string;
+};

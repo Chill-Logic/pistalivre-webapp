@@ -16,6 +16,7 @@ import {
   ProposalSummary,
   ProposalSummarySkeleton,
 } from "@/components/organisms/proposal-summary";
+import { ProposalActions } from "@/components/organisms/proposal-actions";
 import { QueryError } from "@/components/organisms/query-error";
 import { ProposalDetailLayout } from "@/components/templates/proposal-detail-layout";
 import { ROUTES } from "@/constants/routes";
@@ -30,7 +31,10 @@ export function ProposalDetailPage() {
 
   return (
     <Box className="space-y-4">
-      <BackLink to={backTo} label="Propostas" />
+      <Box className="flex flex-wrap items-center justify-between gap-2">
+        <BackLink to={backTo} label="Propostas" />
+        {proposal.data && <ProposalActions proposal={proposal.data} />}
+      </Box>
       {proposal.isPending && (
         <SkeletonRegion label="Carregando proposta…">
           <ProposalDetailLayout
