@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Skeleton } from "@/components/atoms/skeleton";
@@ -12,13 +13,19 @@ type StatementLineProps = {
   line: Line;
   /** Show which account it came from (when listing every source). */
   showSource: boolean;
+  /** E.g. the edit button, after the amount. */
+  actions?: ReactNode;
 };
 
 /**
  * One bank line. Our description (note) leads when there is one; the bank's
  * own text stays visible below — it is the proof and is never replaced.
  */
-export function StatementLine({ line, showSource }: StatementLineProps) {
+export function StatementLine({
+  line,
+  showSource,
+  actions,
+}: StatementLineProps) {
   const { label } = useLabels();
   const inflow = line.amount >= 0;
   const description = line.note ?? line.suggestion ?? line.originalDescription;
@@ -59,16 +66,19 @@ export function StatementLine({ line, showSource }: StatementLineProps) {
           </Box>
         )}
       </Box>
-      <Text
-        weight="semibold"
-        className={cn(
-          "shrink-0 tabular-nums",
-          inflow ? "text-success-foreground" : "text-foreground",
-          line.internal && "text-muted-foreground line-through",
-        )}
-      >
-        {inflow ? "+" : "−"} {formatCurrency(Math.abs(line.amount))}
-      </Text>
+      <Box className="flex shrink-0 items-start gap-1">
+        <Text
+          weight="semibold"
+          className={cn(
+            "pt-0.5 tabular-nums",
+            inflow ? "text-success-foreground" : "text-foreground",
+            line.internal && "text-muted-foreground line-through",
+          )}
+        >
+          {inflow ? "+" : "−"} {formatCurrency(Math.abs(line.amount))}
+        </Text>
+        {actions}
+      </Box>
     </Box>
   );
 }

@@ -58,3 +58,18 @@ export type StatementFilters = {
   page: number;
   pageSize: number;
 };
+
+/**
+ * PATCH /finance/statement/annotation: OUR note and/or the "internal
+ * transfer" mark of one line (matched by its key). `note: ""` clears it;
+ * date/amount/originalDescription are the line's snapshot, for the audit.
+ */
+export type StatementAnnotationInput = {
+  source: StatementSource;
+  transactionKey: string;
+  note?: string;
+  internal?: boolean;
+  date: string;
+  amount: number;
+  originalDescription: string;
+};

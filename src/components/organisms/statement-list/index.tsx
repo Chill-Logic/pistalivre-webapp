@@ -6,6 +6,7 @@ import {
   StatementLine,
   StatementLineSkeleton,
 } from "@/components/molecules/statement-line";
+import { StatementLineEditDialog } from "@/components/organisms/statement-line-edit-dialog";
 import type { StatementLine as Line } from "@/types/statement";
 import { cn } from "@/utils/cn";
 
@@ -42,7 +43,12 @@ export function StatementList({
     >
       <CardContent className="divide-y pt-1 md:pt-1">
         {lines.map((line) => (
-          <StatementLine key={line.key} line={line} showSource={showSource} />
+          <StatementLine
+            key={line.key}
+            line={line}
+            showSource={showSource}
+            actions={<StatementLineEditDialog line={line} />}
+          />
         ))}
       </CardContent>
     </Card>
