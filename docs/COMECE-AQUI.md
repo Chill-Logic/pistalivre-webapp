@@ -28,8 +28,10 @@ curtas entre ferramentas e nos relatórios de subagentes.
 
 - Um build do webapp serve as duas áreas. O app procura `gestao`/`cliente` no endereço (`helpers/host-realm`) e
   manda a página da outra área para o domínio certo. Em `localhost` e no endereço da Vercel, as duas áreas funcionam.
-- Publicação de 2026-11-08 (fim do dia), com aval do dono: `feat/api-v1-spa` → `main` do `pista-livre` (Railway) e
-  depois `vercel deploy --prod` do webapp. Ver a seção de deploy do `docs/handoff.md` para o resultado.
+- **No ar desde 2026-11-08 ~16:05** (aval do dono): backend `main` do `pista-livre` em `c99b0d3` (merge da
+  `feat/api-v1-spa`, Railway publicou às 16:01) e webapp `74bf7f6` na Vercel (deploy
+  `pistalivre-webapp-dsjxm1avv`). Conferido: rotas novas respondem (401 sem token), rótulos "Custos fixos" na
+  produção, os 3 endereços servem o build novo e o CORS aceita app.gestao e app.cliente.
 
 ## Rodar local
 
