@@ -115,11 +115,11 @@ do dono. Marque `[x]` ao entregar.
   "Registrar pagamento" na linha; anexar ao criar.
 - [x] B — `createdByName` em `payments[]` de `GET /debts/:id`; `paymentCount`/`documentCount` nos itens de `GET /debts`.
 - [x] B+F — Prévia de juros no formulário de dívida e "saldo depois do pagamento" (`POST /debts/preview`) (decidido).
-- [ ] B+F — **Extrato: exportar planilha** por conta + histórico de exportações (`POST/GET/DELETE
+- [x] B+F — **Extrato: exportar planilha** por conta + histórico de exportações (`POST/GET/DELETE
   /finance/statement/exports`) e **PDF oficial do banco** (`GET /finance/statement/bank-pdf`), com Bearer.
 - [x] B+F — **Empresa editável**: `PUT /company`.
 - [x] B+F — **Integrações** pelo webapp (decidido): listar/salvar (segredo em branco mantém), testar conexão, webhook do Inter.
-- [ ] B+F — Histórico de **transferências emitidas**, só leitura (decidido): `GET /finance/transfers`.
+- [x] B+F — Histórico de **transferências emitidas**, só leitura (decidido): `GET /finance/transfers`.
 
 ## Portal do cliente
 
