@@ -77,12 +77,8 @@ leitura**; Projeções (conta no servidor + PDF). Portal do cliente **só leitur
   `npm run pwa:assets`).
 
 **Pode ser feito sem decisão**:
-- Anexos do pagamento de dívida (`DEBT_PAYMENT`) e card de documentos na ficha da locação.
-- Lead: escolher o veículo desejado pelo catálogo (`desiredModelId`); hoje é texto livre.
-- Assinatura: "Documento de" mostra o rótulo no plural (vem de `DOCUMENT_OWNER_LABELS`, nome de pasta).
 - Editor de modelo de contrato: seletor de variáveis ao digitar `{{` e realce das variáveis no texto.
 - Seções recolhíveis animadas (`grid-rows-[0fr]→[1fr]`), resto do pedido de animações.
-- Propostas/Assinaturas paginam no cliente (`pageOfItems`); trocar pela do servidor se o backend paginar.
 
 **Sucessos nunca testados de verdade no dev** (só com simulação): criar/editar cliente (upsert no Asaas),
 recusar reembolso (só há pedido real), upload de documento (o S3 do dev está com credencial quebrada: abrir

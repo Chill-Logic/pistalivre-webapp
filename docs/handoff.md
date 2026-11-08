@@ -88,6 +88,7 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
 - Clientes: lista (busca, situação, filtro de teste; padrão = só reais) + detalhe (dados, CNH com aviso de vencida, endereço e emergência, locações, documentos). O locatário na locação leva à ficha. `DocumentsCard` é genérico (veículo e cliente).
 
 - **Projeções no layout da gestão antiga** (pedido do dono, 2026-11-08: "a tela antiga era melhor"): no desktop os veículos (frota e a adquirir) são uma **tabela densa editável** (`ProjectionTable` + `MoneyInput` compacto), com faturamento, lucro com margem e participação na linha; no celular seguem os cards. Faturamento em vermelho da marca e lucro em verde, como antes. O botão é só **"Relatório"** (o dono não gosta de "Relatório para o contador").
+- **Bloco de 2026-11-08** (backend 90600b8): **lead** escolhe o veículo desejado no catálogo (`catalogModelOptions` sobre `/vehicles/form-options`; escolhido = `desiredModelId`, sugerido à mão = `desiredVehicle`, como no form Next; `applyApiErrors` ganhou `fieldAliases`); **"Documento de"** da assinatura no singular (`documentOwnerName`, o catálogo da API nomeia pastas); **documentos na ficha da locação** (`DocumentsCard` RENTAL; PUT/PATCH respondem `RentalRecord` sem `documents` e o cache preserva os da tela); **"Anexar comprovante"** em cada pagamento de dívida (`DEBT_PAYMENT`; o pagamento segue só leitura); **Propostas/Assinaturas paginam no servidor** (`pageOfItems` saiu). Testado no Puppeteer com uploads simulados (S3 do dev quebrado) e a dívida simulada (o dev não tem dívida).
 
 ## Organização (pedido do dono)
 
@@ -101,7 +102,7 @@ O backend (pista-livre-34) já entregou **todas** as escritas de CRUD (blocos 1�
 Na ordem:
 1. ~~Reembolsos → "Recusar"~~ (feito). "Marcar como pago" **espera o dono** (migration aditiva paidAt/paidAmount).
 2. ~~Manutenções~~ (feito).
-3. ~~Documentos~~ (feito nas fichas que já mostravam documentos). Falta: anexos de pagamento de dívida (`DEBT_PAYMENT`) e documentos da locação (a ficha da locação ainda não tem card de documentos).
+3. ~~Documentos~~ (feito, inclusive ficha da locação e comprovantes do pagamento de dívida).
 4. ~~Fornecedores (+ vínculos)~~ (feito), ~~CRM (bloco 5)~~ (feito), ~~Planos~~ (feito), Usuários (admin × agente; 403), Modelos de contrato (bloco 6).
 5. Telas novas do menu: ~~Projeções~~ (feito); ~~Propostas e Assinaturas~~ (feito, só leitura).
 6. **Pedido do dono (2026-11-07)**: animações/transições — a 1ª leva já entrou (ver Feito: "Shell com cara de app nativo"). **Sem** ação central (botão redondo no meio da barra): o dono vetou. Ainda dá para trazer: seções recolhíveis animadas (`grid-rows-[0fr]→[1fr]`).
