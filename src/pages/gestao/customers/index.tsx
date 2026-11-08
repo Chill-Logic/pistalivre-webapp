@@ -8,7 +8,9 @@ import { ListFooter } from "@/components/organisms/list-footer";
 import { CustomerFilters } from "@/components/organisms/customer-filters";
 import { CustomerTable } from "@/components/organisms/customer-table";
 import { CustomerList } from "@/components/organisms/customer-list";
+import { CustomersAsaasPanel } from "@/components/organisms/customers-asaas-panel";
 import { QueryError } from "@/components/organisms/query-error";
+import { useAsaasDirectory } from "@/hooks/api/gestao/customers/useAsaasDirectory";
 import { useCustomerList } from "@/hooks/api/gestao/customers/useCustomers";
 import { ROUTES } from "@/constants/routes";
 import { useCustomerFilters } from "@/hooks/ui/useCustomerFilters";
@@ -19,6 +21,7 @@ export function CustomersPage() {
     useCustomerFilters();
   const { view, setView, isDesktop } = useListView();
   const customers = useCustomerList(filters, isDesktop);
+  const asaasDirectory = useAsaasDirectory();
 
   return (
     <Box className="space-y-4 md:space-y-6">
@@ -42,6 +45,7 @@ export function CustomersPage() {
         onStatusChange={setStatus}
         onTestChange={setTest}
       />
+      <CustomersAsaasPanel directory={asaasDirectory} />
       {customers.isError ? (
         <QueryError
           error={customers.error}
@@ -50,12 +54,14 @@ export function CustomersPage() {
       ) : view === "tabela" ? (
         <CustomerTable
           customers={customers.items}
+          asaasDirectory={asaasDirectory.data}
           isLoading={customers.isPending}
           isRefreshing={customers.isRefreshing}
         />
       ) : (
         <CustomerList
           customers={customers.items}
+          asaasDirectory={asaasDirectory.data}
           isLoading={customers.isPending}
           isRefreshing={customers.isRefreshing}
         />

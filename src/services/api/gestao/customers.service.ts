@@ -2,6 +2,7 @@ import { toQueryParams } from "@/helpers/query-params";
 import { http } from "@/services/http/client";
 import type { Paginated } from "@/types/api";
 import type {
+  AsaasDirectory,
   CustomerDetail,
   CustomerFilters,
   CustomerListItem,
@@ -32,6 +33,29 @@ export const customersService = {
   },
   async get(id: string) {
     const { data } = await http.get<CustomerDetail>(`/customers/${id}`);
+    return data;
+  },
+  /** Read-through of the Asaas customers, matched by CPF. */
+  async asaasDirectory() {
+    const { data } = await http.get<AsaasDirectory>(
+      "/customers/asaas-directory",
+    );
+    return data;
+  },
+  /** Links to the same person (same CPF) in Asaas; another CPF → 422. */
+  async linkAsaas(id: string, asaasCustomerId: string) {
+    const { data } = await http.post<CustomerDetail>(
+      `/customers/${id}/asaas-link`,
+      { asaasCustomerId },
+    );
+    return data;
+  },
+  /** Creates a linked stub from an "only in Asaas" customer (CPF here → 409). */
+  async importFromAsaas(asaasCustomerId: string) {
+    const { data } = await http.post<CustomerDetail>(
+      "/customers/import-from-asaas",
+      { asaasCustomerId },
+    );
     return data;
   },
 };

@@ -1,4 +1,9 @@
-import type { CustomerAddress } from "@/types/customer";
+import type {
+  AsaasDirectory,
+  CustomerAddress,
+  CustomerAsaasPresence,
+  CustomerListItem,
+} from "@/types/customer";
 import { calendarDay, todayInBrasilia } from "@/utils/date";
 import { formatZip } from "@/utils/document";
 
@@ -25,4 +30,26 @@ export function hasEmergencyContact(contact: {
   phone: string | null;
 }) {
   return Boolean(contact.name || contact.phone);
+}
+
+/**
+ * Linked × same CPF on both sides ("Em ambos", with the Asaas id to link to)
+ * × not linked. Without the directory (loading or Asaas down), only what the
+ * list itself knows.
+ */
+export function customerAsaasPresence(
+  customer: Pick<CustomerListItem, "id" | "document" | "asaasLinked">,
+  directory: AsaasDirectory | undefined,
+): CustomerAsaasPresence {
+  if (customer.asaasLinked) return { state: "linked", linkTo: null };
+  const match = directory?.reconcilable.find(
+    (item) => item.customerId === customer.id,
+  );
+  const digits = customer.document.replace(/\D/g, "");
+  const inBoth =
+    Boolean(match) || Boolean(directory?.inBothDocuments.includes(digits));
+  return {
+    state: inBoth ? "both" : "unlinked",
+    linkTo: match?.asaasCustomerId ?? null,
+  };
 }

@@ -12,8 +12,44 @@ export type CustomerListItem = {
   document: string;
   status: CustomerStatus;
   isTest: boolean;
+  /** Has a linked Asaas customer (billing/NF ready). */
+  asaasLinked: boolean;
   lastLoginAt: string | null;
   createdAt: string;
+};
+
+/** A customer that exists only in Asaas (can be imported). */
+export type AsaasOnlyCustomer = {
+  /** Asaas id (cus_…). */
+  id: string;
+  name: string;
+  document: string;
+  email: string | null;
+  phone: string | null;
+};
+
+/** Same CPF here and in Asaas, not linked yet (one click to link). */
+export type AsaasReconcilable = {
+  customerId: string;
+  customerName: string;
+  document: string;
+  asaasCustomerId: string;
+};
+
+/** GET /customers/asaas-directory (Asaas down → empty lists + `error`). */
+export type AsaasDirectory = {
+  asaasOnly: AsaasOnlyCustomer[];
+  reconcilable: AsaasReconcilable[];
+  /** CPFs (digits only) present on both sides: the "Em ambos" tag. */
+  inBothDocuments: string[];
+  error: string | null;
+};
+
+/** The Asaas tag of a customer in the list. */
+export type CustomerAsaasPresence = {
+  state: "linked" | "both" | "unlinked";
+  /** Asaas id to link to (same CPF there), when not linked yet. */
+  linkTo: string | null;
 };
 
 export type CustomerAddress = {

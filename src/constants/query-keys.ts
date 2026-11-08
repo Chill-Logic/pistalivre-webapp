@@ -41,6 +41,8 @@ export const queryKeys = {
     list: (filters: CustomerFilters) =>
       [...queryKeys.customers.all, "list", filters] as const,
     detail: (id: string) => [...queryKeys.customers.all, "detail", id] as const,
+    asaasDirectory: () =>
+      [...queryKeys.customers.all, "asaas-directory"] as const,
   },
   labels: {
     all: ["labels"] as const,
