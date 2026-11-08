@@ -54,7 +54,7 @@ Gestão inteira fora o que move dinheiro: Painel; Veículos, Clientes, Locaçõe
 perda/retomada, atividades, questionário), Fornecedores (+ vínculos), Planos, Usuários (admin × agente),
 Modelos de contrato e Manutenções com CRUD; Documentos (enviar/renomear/excluir); Vistorias; Reembolsos
 (listar e **recusar**); Financeiro, Débitos e Extrato **só leitura**; Propostas e Assinaturas **só
-leitura**; Projeções (conta no servidor + PDF). Portal do cliente com as escritas (senha, carteira pix, pedir reembolso, manutenção, vistoria). Shell novo com animações
+leitura**; Projeções (conta no servidor + PDF). Portal do cliente com as escritas (senha, carteira pix, pedir reembolso, manutenção, vistoria). Extrato do aluguel (tela + PDF) na gestão e no portal; dias abonados intercalados nas cobranças. Shell novo com animações
 (bottom sheet no celular, sem ação central na barra). Locação: cobrança automática e regras do aluguel
 (acerto, valores no tempo, abonos, descontos, pix recebidos) com escrita (B5). Cobrança avulsa (unitária e
 parcelada), registrar recebimento fora do Asaas, "Sincronizar do Asaas" e NF (locação, cliente e avulsa,
