@@ -48,6 +48,7 @@ export const ROUTES = {
   maintenanceDetail: `${GESTAO}/manutencoes/:id`,
   maintenanceEdit: `${GESTAO}/manutencoes/:id/editar`,
   inspections: `${GESTAO}/vistorias`,
+  inspectionPick: `${GESTAO}/vistorias/nova`,
   inspectionDetail: `${GESTAO}/vistorias/:id`,
   crm: `${GESTAO}/crm`,
   leadNew: `${GESTAO}/crm/novo`,

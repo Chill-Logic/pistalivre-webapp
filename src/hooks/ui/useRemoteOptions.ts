@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import type { RemoteOption } from "@/components/molecules/remote-combobox";
 import { useCustomers } from "@/hooks/api/gestao/customers/useCustomers";
+import { useRentals } from "@/hooks/api/gestao/rentals/useRentals";
 import { useVehicles } from "@/hooks/api/gestao/vehicles/useVehicles";
 import { queryKeys } from "@/constants/query-keys";
 import { suppliersService } from "@/services/api/gestao/suppliers.service";
@@ -143,4 +144,36 @@ export function useUserOptions() {
     [users.data],
   );
   return { search, setSearch, options, isLoading: users.isFetching };
+}
+
+/**
+ * Rental search for pickers (any situation). Without a typed term it searches
+ * `fallback` (e.g. the chosen vehicle's plate), so that vehicle's rentals
+ * come first. `items` keeps each rental's vehicle.
+ */
+export function useRentalOptions({ fallback = "" }: { fallback?: string } = {}) {
+  const [search, setSearch] = useState("");
+  const typed = useDebouncedValue(search);
+  const rentals = useRentals({
+    page: 1,
+    pageSize: PICKER_SIZE,
+    q: typed.trim() || fallback,
+    status: "",
+  });
+  const options = useMemo<RemoteOption[]>(
+    () =>
+      (rentals.data?.items ?? []).map((rental) => ({
+        value: rental.id,
+        label: `${rental.code} · ${rental.customer.name}`,
+        detail: `${formatPlate(rental.vehicle.plate)} · ${vehicleName(rental.vehicle)}`,
+      })),
+    [rentals.data],
+  );
+  return {
+    search,
+    setSearch,
+    options,
+    items: rentals.data?.items ?? [],
+    isLoading: rentals.isFetching,
+  };
 }

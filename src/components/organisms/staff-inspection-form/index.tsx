@@ -110,7 +110,7 @@ export function StaffInspectionForm({
           />
           {!rental && (
             <Text size="xs" tone="muted">
-              Locatário só numa vistoria aberta pela locação.
+              Locatário só numa vistoria com locação.
             </Text>
           )}
         </Col>

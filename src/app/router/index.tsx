@@ -135,6 +135,7 @@ const gestaoRoutes: RouteObject[] = [
       { path: ROUTES.maintenanceDetail, element: <MaintenanceDetailPage /> },
       { path: ROUTES.maintenanceEdit, element: <MaintenanceEditPage /> },
       { path: ROUTES.inspections, element: <InspectionsPage /> },
+      { path: ROUTES.inspectionPick, element: <InspectionNewPage /> },
       { path: ROUTES.inspectionDetail, element: <InspectionDetailPage /> },
       {
         path: LEGACY_ROUTES.vehicleInspection,
