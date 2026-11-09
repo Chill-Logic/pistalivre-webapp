@@ -1,6 +1,6 @@
 # Comece aqui — pistalivre-webapp
 
-Resumo para a próxima sessão. Atualizado em **2026-11-08 (fim do dia)**. O histórico completo fica em
+Resumo para a próxima sessão. Atualizado em **2026-11-09 (noite)**. O histórico completo fica em
 `docs/handoff.md`, as regras em `CLAUDE.md`, o contrato da API em `../pista-livre/docs/api-v1.md` e a auditoria
 Next × webapp em `docs/auditoria-next.md`. **Fale com o dono sempre em português do Brasil**, inclusive nas frases
 curtas entre ferramentas e nos relatórios de subagentes.
@@ -38,6 +38,26 @@ curtas entre ferramentas e nos relatórios de subagentes.
   leitura, regra de visibilidade no servidor. O portal do cliente não muda. Controle segmentado novo
   (`atoms/segmented-control`, tokens `--segment-*`). Dev: `parceiro@dev.com.br` / `parceiro123` (Meteor PLA1009 com
   histórico). Proposta e decisões: doc "Proposta: área do parceiro". **Backend antes do front.**
+  - **Titularidade no veículo:** a ficha do veículo tem **Titular** (em nome de quem está o documento) e
+    **Proprietário** (de quem é), empresa ou um parceiro; a lista mostra o selo "Parceiro: …" embaixo do nome.
+    Investimento: titular a empresa, proprietário o investidor; administração: o parceiro nos dois. O servidor
+    recusa (422) incluir no contrato um veículo que não bate. "Cadastrar novo veículo" no diálogo do contrato
+    abre o cadastro já preenchido e volta ao contrato com o veículo escolhido.
+  - **Proposta versionada:** o editor (texto-base + chat de IA) → "Enviar proposta ao parceiro" congela termos,
+    veículos e PDF como versão N. O parceiro **aceita** (grava data, IP e navegador; pede marcar "Li o
+    contrato") ou **recusa com motivo** na área dele. Versão nova retira a pendente; mudar um termo também.
+    **Ativar exige a versão aceita idêntica aos termos.** Da aceita, "Enviar para assinatura" cria o pedido em
+    **rascunho** no módulo de Assinaturas (parceiro já como signatário); a tela de Assinaturas envia ao
+    Clicksign. Contrato ativo trava os termos (só saída de veículo e encerramento).
+  - **Despesas por base:** no faturamento, o padrão é o modelo do contador (manutenção do parceiro); no lucro,
+    "Parceiro" fica bloqueado (as despesas saem antes da divisão). A apuração no texto segue a recorrência do
+    repasse (semanal, quinzenal ou mensal).
+  - **Extrato do parceiro:** extrato do aluguel da locação (tela e PDF), como o cliente vê, preso à janela do
+    contrato e sem os débitos do cliente.
+  - **Menu:** lateral recolhível no desktop, barra de baixo no celular; tema claro e escuro.
+  - **Volta real no dev (2026-11-09):** parceiro "Investidor Teste QA" (`investidor.qa.20261109@teste.dev` /
+    `investidorqa123`), contrato PAR-RJUE36QC (investimento, 50% do faturamento, quinzenal) com a QAT9C11:
+    v1 recusada, v2 retirada, v3 aceita, ativo, pedido de assinatura em rascunho (nada enviado ao Clicksign).
 - **Contas do mês (no ar desde 2026-11-09 10:27):** Financeiro › Contas do mês (`/gestao/financeiro/contas?mes=`)
   junta custos fixos, parcelas de dívidas e avulsas do mês, com os meses anteriores em aberto. Registrar = pago (dia,
   valor, comprovante), em aberto ou sem cobrança, inclusive retroativo; parcela paga pelo diálogo da dívida. O custo
