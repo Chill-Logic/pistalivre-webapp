@@ -135,7 +135,7 @@ export function ProposalComposer({
   const runAi = () => {
     setErrors({});
     personalize.mutate(
-      { html, instructions: instructions.trim() },
+      { html, instructions: instructions.trim(), leadId: lead?.id },
       {
         onSuccess: load,
         onError: (error) => setErrors({ ai: toApiError(error).message }),

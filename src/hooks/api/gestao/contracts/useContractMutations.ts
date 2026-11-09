@@ -23,10 +23,12 @@ export function usePersonalizeContract() {
     mutationFn: ({
       html,
       instructions,
+      rentalId,
     }: {
       html: string;
       instructions: string;
-    }) => contractsService.personalize(html, instructions),
+      rentalId: string;
+    }) => contractsService.personalize(html, instructions, rentalId),
   });
 }
 

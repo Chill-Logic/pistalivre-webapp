@@ -49,10 +49,12 @@ export function usePersonalizeProposal() {
     mutationFn: ({
       html,
       instructions,
+      leadId,
     }: {
       html: string;
       instructions: string;
-    }) => proposalsService.personalize(html, instructions),
+      leadId?: string;
+    }) => proposalsService.personalize(html, instructions, leadId),
   });
 }
 

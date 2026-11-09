@@ -39,13 +39,17 @@ export const proposalsService = {
     );
     return data.html;
   },
-  /** AI rewrites the text following the instructions. Nothing saved. */
-  async personalize(html: string, instructions: string) {
+  /**
+   * AI rewrites the text following the instructions. Nothing saved; the
+   * call's cost is recorded against the lead, when there is one.
+   */
+  async personalize(html: string, instructions: string, leadId?: string) {
     const { data } = await http.post<{ html: string }>(
       "/proposals/personalize",
       {
         html,
         instructions,
+        ...(leadId ? { leadId } : {}),
       },
     );
     return data.html;

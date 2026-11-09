@@ -31,11 +31,14 @@ export const contractsService = {
     );
     return data;
   },
-  /** AI rewrites the text following the instructions. Nothing saved. */
-  async personalize(html: string, instructions: string) {
+  /**
+   * AI rewrites the text following the instructions. Nothing saved; the
+   * call's cost is recorded against the rental.
+   */
+  async personalize(html: string, instructions: string, rentalId: string) {
     const { data } = await http.post<{ html: string }>(
       "/contracts/personalize",
-      { html, instructions },
+      { html, instructions, rentalId },
     );
     return data.html;
   },

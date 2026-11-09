@@ -57,7 +57,7 @@ export function ContractEditor({
   const runAi = () => {
     setErrors({});
     personalize.mutate(
-      { html, instructions: instructions.trim() },
+      { html, instructions: instructions.trim(), rentalId },
       {
         onSuccess: (next) => {
           // Loads the AI's version into the editor (remounts it).
