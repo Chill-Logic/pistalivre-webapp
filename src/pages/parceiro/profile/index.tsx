@@ -30,7 +30,7 @@ export function PartnerProfilePage() {
   return (
     <Box className="space-y-4">
       {/* Desktop: "Perfil" is in the sidebar, no way back needed. */}
-      <Box className="lg:hidden">
+      <Box className="md:hidden">
         <BackLink to={ROUTES.partnerArea} label="Meus contratos" />
       </Box>
       <Box className="space-y-6">

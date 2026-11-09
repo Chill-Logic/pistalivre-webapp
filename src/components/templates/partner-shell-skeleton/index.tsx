@@ -13,7 +13,7 @@ export function PartnerShellSkeleton() {
       className="flex min-h-dvh"
     >
       <Box
-        className="hidden h-dvh shrink-0 flex-col border-r bg-card lg:flex"
+        className="hidden h-dvh shrink-0 flex-col border-r bg-card md:flex"
         style={{ width: SIDEBAR_WIDTH.expanded }}
       >
         <Box className="flex h-14 items-center justify-center px-3">
@@ -30,18 +30,22 @@ export function PartnerShellSkeleton() {
       </Box>
       <Box className="min-w-0 flex-1">
         <Box className="border-b bg-card">
-          <Box className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4 lg:mx-0 lg:max-w-none lg:px-8">
-            <Skeleton shape="circle" className="size-8 lg:hidden" />
+          <Box className="flex h-14 items-center gap-3 px-4 md:px-8">
+            <Skeleton shape="circle" className="size-8 md:hidden" />
             <Skeleton shape="text" className="w-28 flex-none" />
             <Box className="flex-1" />
             <Skeleton className="size-8" />
-            <Skeleton className="h-8 w-20 lg:hidden" />
             <Skeleton className="h-8 w-16" />
           </Box>
         </Box>
-        <Box className="mx-auto max-w-5xl px-4 pt-4 md:pt-6 lg:mx-0 lg:max-w-none lg:px-8">
+        <Box className="px-4 pt-4 md:px-8 md:pt-6">
           <PageSkeleton />
         </Box>
+      </Box>
+      <Box className="fixed inset-x-0 bottom-0 flex h-16 items-center justify-around border-t bg-card md:hidden">
+        {PARTNER_NAV_ITEMS.map((item) => (
+          <Skeleton key={item.to} className="size-6" />
+        ))}
       </Box>
     </SkeletonRegion>
   );
