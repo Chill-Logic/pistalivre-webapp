@@ -96,6 +96,8 @@ import {
   PartnerProfilePage,
   PartnerRentalPage,
   PartnerVehiclePage,
+  PartnerVehiclesPage,
+  PartnerRentalsPage,
 } from "./pages";
 import {
   HOST_REALM,
@@ -122,7 +124,9 @@ const partnerRoutes: RouteObject[] = [
     element: <RequireAuth realm="parceiro" />,
     children: [
       { path: ROUTES.partnerArea, element: <PartnerHomePage /> },
+      { path: ROUTES.partnerAreaVehicles, element: <PartnerVehiclesPage /> },
       { path: ROUTES.partnerAreaVehicle, element: <PartnerVehiclePage /> },
+      { path: ROUTES.partnerAreaRentals, element: <PartnerRentalsPage /> },
       { path: ROUTES.partnerAreaRental, element: <PartnerRentalPage /> },
       { path: ROUTES.partnerAreaProfile, element: <PartnerProfilePage /> },
     ],

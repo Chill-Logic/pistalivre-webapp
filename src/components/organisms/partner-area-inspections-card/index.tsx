@@ -3,6 +3,7 @@ import { PartnerAreaListRow } from "@/components/molecules/partner-area-list-row
 import {
   PartnerAreaTableCard,
   PartnerAreaTableCardSkeleton,
+  type PartnerAreaColumn,
 } from "@/components/organisms/partner-area-table-card";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { useLabels } from "@/hooks/ui/useLabels";
@@ -17,13 +18,29 @@ export function PartnerAreaInspectionsCard({
 }) {
   const { label } = useLabels();
 
-  // Short rows (date, type, km): a list on every screen, beside the data.
+  // Short rows (date, type, km): a small dense table beside the maintenance.
+  const columns: PartnerAreaColumn<PartnerAreaInspection>[] = [
+    { header: "Data", cell: (item) => formatDate(item.createdAt) },
+    {
+      header: "Tipo",
+      cell: (item) => label(LABEL_MAPS.inspectionType, item.type),
+    },
+    {
+      header: "Km",
+      align: "right",
+      cell: (item) =>
+        item.mileage !== null ? formatMileage(item.mileage) : "—",
+    },
+  ];
+
   return (
     <PartnerAreaTableCard
       title="Vistorias"
       empty="Nenhuma vistoria no período."
       items={inspections}
       rowKey={(item) => item.id}
+      columns={columns}
+      narrowFromXl
       renderItem={(item) => (
         <PartnerAreaListRow
           title={label(LABEL_MAPS.inspectionType, item.type)}
@@ -43,6 +60,6 @@ export function PartnerAreaInspectionsCard({
 
 export function PartnerAreaInspectionsCardSkeleton() {
   return (
-    <PartnerAreaTableCardSkeleton rows={2} />
+    <PartnerAreaTableCardSkeleton rows={2} columns={["w-24", "w-20", "w-14"]} narrowFromXl />
   );
 }

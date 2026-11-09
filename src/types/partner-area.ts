@@ -61,6 +61,8 @@ export type PartnerAreaContract = {
   payoutDay: number | null;
   startDate: string;
   endDate: string | null;
+  /** The contract's PDF is available (GET /partner/contracts/:id/document). */
+  hasDocument: boolean;
   vehicles: PartnerAreaContractVehicle[];
 };
 
@@ -195,4 +197,16 @@ export type PartnerAreaProfileInput = {
 export type PartnerAreaPasswordInput = {
   currentPassword: string;
   newPassword: string;
+};
+
+/** A rental of the partner (Locações page), with its motorcycle. */
+export type PartnerAreaRentalRow = PartnerAreaRental & {
+  vehicleLabel: string;
+  plate: string;
+};
+
+/** A motorcycle of the partner (Motos page), with its contract. */
+export type PartnerAreaVehicleRow = PartnerAreaContractVehicle & {
+  contractId: string;
+  contractCode: string;
 };

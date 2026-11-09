@@ -28,19 +28,19 @@ export function PartnerAreaVehicleSummary({
       </CardHeader>
       <CardContent>
         <Row as="dl" className="gap-y-4">
-          <InfoItem label="Placa" span={6} mono>
+          <InfoItem label="Placa" span={6} md={2} mono>
             {formatPlate(vehicle.plate)}
           </InfoItem>
-          <InfoItem label="Ano" span={6}>
+          <InfoItem label="Ano" span={6} md={2}>
             {vehicle.year}
           </InfoItem>
-          <InfoItem label="Cor" span={6}>
+          <InfoItem label="Cor" span={6} md={2}>
             {vehicle.color}
           </InfoItem>
-          <InfoItem label="Situação" span={6}>
+          <InfoItem label="Situação" span={6} md={2}>
             <PartnerVehicleStatusBadge status={vehicle.status} />
           </InfoItem>
-          <InfoItem label="No seu contrato" span={12}>
+          <InfoItem label="No seu contrato" span={12} md={4}>
             {windows.length === 0 ? null : (
               <List className="space-y-0.5">
                 {windows.map((window) => (
@@ -66,12 +66,12 @@ export function PartnerAreaVehicleSummarySkeleton() {
       <CardContent>
         <Row className="gap-y-4">
           {["w-20", "w-12", "w-16", "w-16"].map((width, index) => (
-            <Col key={index} span={6} className="space-y-2">
+            <Col key={index} span={6} md={2} className="space-y-2">
               <Skeleton shape="text" className="w-12 text-xs" />
               <Skeleton shape="text" className={`${width} text-sm`} />
             </Col>
           ))}
-          <Col className="space-y-2">
+          <Col md={4} className="space-y-2">
             <Skeleton shape="text" className="w-24 text-xs" />
             <Box>
               <Skeleton shape="text" className="w-32 text-sm" />

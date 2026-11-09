@@ -33,6 +33,8 @@ import { usePartnerVehicle } from "@/hooks/api/parceiro/area/usePartnerVehicle";
 /**
  * One of the partner's motorcycles: data, when it is in the contract, and
  * what happened while it was theirs (rentals, maintenance, inspections).
+ * Desktop: the data in one strip, the rentals wide, then the maintenance
+ * beside the inspections.
  */
 export function PartnerVehiclePage() {
   const { id = "" } = useParams();
@@ -66,23 +68,18 @@ export function PartnerVehiclePage() {
             }
           />
           <Row className="gap-y-6">
-            <Col lg={4} className="space-y-6">
+            <Col>
               <PartnerAreaVehicleSummary detail={query.data} />
-              <Box className="hidden lg:block">
-                <PartnerAreaInspectionsCard
-                  inspections={query.data.inspections}
-                />
-              </Box>
-            </Col>
-            <Col lg={8}>
-              <PartnerAreaRentalsCard rentals={query.data.rentals} />
             </Col>
             <Col>
+              <PartnerAreaRentalsCard rentals={query.data.rentals} />
+            </Col>
+            <Col xl={8}>
               <PartnerAreaMaintenancesCard
                 maintenances={query.data.maintenances}
               />
             </Col>
-            <Col className="lg:hidden">
+            <Col xl={4}>
               <PartnerAreaInspectionsCard
                 inspections={query.data.inspections}
               />
@@ -102,19 +99,16 @@ function PartnerVehicleSkeleton() {
         <Skeleton shape="pill" className="h-5 w-16" />
       </Box>
       <Row className="gap-y-6">
-        <Col lg={4} className="space-y-6">
+        <Col>
           <PartnerAreaVehicleSummarySkeleton />
-          <Box className="hidden lg:block">
-            <PartnerAreaInspectionsCardSkeleton />
-          </Box>
-        </Col>
-        <Col lg={8}>
-          <PartnerAreaRentalsCardSkeleton />
         </Col>
         <Col>
+          <PartnerAreaRentalsCardSkeleton />
+        </Col>
+        <Col xl={8}>
           <PartnerAreaMaintenancesCardSkeleton />
         </Col>
-        <Col className="lg:hidden">
+        <Col xl={4}>
           <PartnerAreaInspectionsCardSkeleton />
         </Col>
       </Row>

@@ -1,4 +1,7 @@
+import { Bike, FileSignature, LayoutDashboard, UserRound } from "lucide-react";
 import type { BadgeVariantProps } from "@/components/atoms/badge/variants";
+import type { NavItem } from "@/constants/navigation";
+import { ROUTES } from "@/constants/routes";
 import type {
   PartnerAreaCycleState,
   PartnerAreaPaymentKind,
@@ -42,3 +45,16 @@ export const PARTNER_PAYMENT_KIND: Record<PartnerAreaPaymentKind, string> = {
   payment: "Pagamento",
   credit: "Desconto da locadora",
 };
+
+/** Desktop sidebar of the partner area (the phone keeps the simple header). */
+export const PARTNER_NAV_ITEMS: NavItem[] = [
+  {
+    label: "Início",
+    to: ROUTES.partnerArea,
+    icon: LayoutDashboard,
+    exact: true,
+  },
+  { label: "Motos", to: ROUTES.partnerAreaVehicles, icon: Bike },
+  { label: "Locações", to: ROUTES.partnerAreaRentals, icon: FileSignature },
+  { label: "Perfil", to: ROUTES.partnerAreaProfile, icon: UserRound },
+];

@@ -28,6 +28,7 @@ import {
   PartnerAreaVehicleItem,
   PartnerAreaVehicleItemSkeleton,
 } from "@/components/molecules/partner-area-vehicle-item";
+import { PartnerAreaContractPdfButton } from "@/components/organisms/partner-area-contract-pdf-button";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
 import { contractTerms, periodText } from "@/helpers/partner-area";
@@ -71,8 +72,11 @@ export function PartnerAreaContractCard({
             {contract.code}
           </Text>
         </Box>
-        <Box className="flex">
+        <Box className="flex flex-wrap items-center gap-2">
           <PartnerContractStatusBadge status={contract.status} />
+          {contract.hasDocument && (
+            <PartnerAreaContractPdfButton contractId={contract.id} />
+          )}
         </Box>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -86,6 +90,11 @@ export function PartnerAreaContractCard({
             </InfoItem>
           ))}
         </Row>
+        {!contract.hasDocument && (
+          <Text size="xs" tone="muted">
+            O contrato em PDF ainda não foi disponibilizado.
+          </Text>
+        )}
 
         <Box className="space-y-3">
           <Heading level={2} variant="section">

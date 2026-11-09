@@ -29,7 +29,10 @@ export function PartnerProfilePage() {
 
   return (
     <Box className="space-y-4">
-      <BackLink to={ROUTES.partnerArea} label="Meus contratos" />
+      {/* Desktop: "Perfil" is in the sidebar, no way back needed. */}
+      <Box className="lg:hidden">
+        <BackLink to={ROUTES.partnerArea} label="Meus contratos" />
+      </Box>
       <Box className="space-y-6">
         <PageHeader title="Perfil" />
         <Row className="gap-y-6">

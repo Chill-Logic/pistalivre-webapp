@@ -28,6 +28,14 @@ export const partnerAreaService = {
     );
     return data;
   },
+  /** The contract's PDF (404 when there is none, or not the partner's). */
+  async contractDocument(id: string) {
+    const { data } = await http.get<Blob>(
+      `/partner/contracts/${encodeURIComponent(id)}/document`,
+      { responseType: "blob" },
+    );
+    return data;
+  },
   /** Only the phone and the pix key are the partner's to change. */
   async updateProfile(input: PartnerAreaProfileInput) {
     const { data } = await http.patch<{

@@ -11,17 +11,21 @@ import { useLogout } from "@/hooks/auth/useLogout";
 import type { AuthUser } from "@/types/auth";
 import { firstName } from "@/utils/format";
 
-/** Partner header: logo home, greeting, theme, profile and sign out. */
+/**
+ * Partner header: logo home, greeting, theme, profile and sign out. From `lg`
+ * up the sidebar has the logo and the profile, so the header keeps only the
+ * greeting, the theme and "Sair" (like the staff's).
+ */
 export function PartnerAreaHeader({ user }: { user: AuthUser }) {
   const logout = useLogout();
 
   return (
     <Header className="sticky top-0 z-30 border-b bg-card/95 pt-safe-t backdrop-blur supports-[backdrop-filter]:bg-card/80">
-      <Box className="mx-auto flex h-14 w-full max-w-5xl items-center gap-2 px-4">
+      <Box className="mx-auto flex h-14 w-full max-w-5xl items-center gap-2 px-4 lg:mx-0 lg:max-w-none lg:px-8">
         <Link
           to={ROUTES.partnerArea}
           aria-label="Início"
-          className="rounded-md"
+          className="rounded-md lg:hidden"
         >
           <Logo />
         </Link>
@@ -32,7 +36,12 @@ export function PartnerAreaHeader({ user }: { user: AuthUser }) {
           </Text>
         </Text>
         <ThemeToggle />
-        <Button asChild variant="ghost" size="sm" className="px-2 sm:px-3">
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="px-2 sm:px-3 lg:hidden"
+        >
           <Link to={ROUTES.partnerAreaProfile} title="Perfil">
             <UserRound />
             <Text inline className="sr-only sm:not-sr-only">

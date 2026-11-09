@@ -30,6 +30,8 @@ export type NavItem = {
   icon: LucideIcon;
   /** Only administrators see it (the API answers 403 to agents anyway). */
   adminOnly?: boolean;
+  /** Active only on this exact path (an area's home). */
+  exact?: boolean;
 };
 
 const DASHBOARD: NavItem = {

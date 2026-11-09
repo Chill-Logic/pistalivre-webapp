@@ -6,15 +6,25 @@ import {
   PartnerAreaContractCard,
   PartnerAreaContractCardSkeleton,
 } from "@/components/organisms/partner-area-contract-card";
+import {
+  PartnerAreaStats,
+  PartnerAreaStatsSkeleton,
+} from "@/components/organisms/partner-area-stats";
 import { QueryBoundary } from "@/components/organisms/query-boundary";
+import { WIDE_MEDIA_QUERY } from "@/constants/layout";
 import { usePartnerHome } from "@/hooks/api/parceiro/area/usePartnerHome";
+import { usePartnerRentals } from "@/hooks/api/parceiro/area/usePartnerRentals";
+import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 
 /**
  * Partner home: each contract (terms) with its motorcycles and who is renting
- * each one now. Read only; what shows is decided on the server.
+ * each one now. On the desktop, a strip of indicators (counts only) on top.
+ * Read only; what shows is decided on the server.
  */
 export function PartnerHomePage() {
   const home = usePartnerHome();
+  const isWide = useMediaQuery(WIDE_MEDIA_QUERY);
+  const rentals = usePartnerRentals(isWide);
 
   return (
     <Box className="space-y-6">
@@ -22,7 +32,14 @@ export function PartnerHomePage() {
       <QueryBoundary
         query={home}
         label="Carregando contratos…"
-        skeleton={<PartnerAreaContractCardSkeleton />}
+        skeleton={
+          <Box className="space-y-6">
+            <Box className="hidden lg:block">
+              <PartnerAreaStatsSkeleton />
+            </Box>
+            <PartnerAreaContractCardSkeleton />
+          </Box>
+        }
       >
         {({ contracts }) =>
           contracts.length === 0 ? (
@@ -39,6 +56,18 @@ export function PartnerHomePage() {
                   : "space-y-6 transition-opacity"
               }
             >
+              {isWide && (
+                <PartnerAreaStats
+                  contracts={contracts}
+                  rentalCount={
+                    rentals.isError
+                      ? null
+                      : rentals.isPending
+                        ? undefined
+                        : rentals.rentals.length
+                  }
+                />
+              )}
               {contracts.map((contract) => (
                 <PartnerAreaContractCard key={contract.id} contract={contract} />
               ))}

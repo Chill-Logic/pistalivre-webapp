@@ -23,7 +23,10 @@ export function NavLink({
   onNavigate,
 }: NavLinkProps) {
   const Icon = item.icon;
-  const isActive = useIsActiveRoute(item.to, item.to === ROUTES.dashboard);
+  const isActive = useIsActiveRoute(
+    item.to,
+    item.exact || item.to === ROUTES.dashboard,
+  );
 
   return (
     <TooltipWhenCollapsed collapsed={collapsed} label={item.label}>

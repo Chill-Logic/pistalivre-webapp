@@ -113,7 +113,9 @@ export const ROUTES = {
   /** Partner area (app.parceiro): read only, the partner's motorcycles. */
   partnerArea: PARTNER || "/",
   partnerAreaLogin: `${PARTNER}/entrar`,
+  partnerAreaVehicles: `${PARTNER}/motos`,
   partnerAreaVehicle: `${PARTNER}/motos/:id`,
+  partnerAreaRentals: `${PARTNER}/locacoes`,
   partnerAreaRental: `${PARTNER}/locacoes/:id`,
   partnerAreaProfile: `${PARTNER}/perfil`,
 } as const;

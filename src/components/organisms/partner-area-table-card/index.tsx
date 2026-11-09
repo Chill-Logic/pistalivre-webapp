@@ -44,7 +44,20 @@ type PartnerAreaTableCardProps<Item> = {
   renderItem: (item: Item) => ReactNode;
   /** Under the rows (a short note). */
   footer?: ReactNode;
+  /**
+   * The card sits in a narrow side column from `xl` up: there the rows go
+   * back to the list (the table shows only between `md` and `xl`).
+   */
+  narrowFromXl?: boolean;
 };
+
+/** Where the list and the table show (static classes for Tailwind). */
+function visibility(hasColumns: boolean, narrowFromXl: boolean) {
+  if (!hasColumns) return { list: "", table: "hidden" };
+  return narrowFromXl
+    ? { list: "md:hidden xl:block", table: "hidden md:block xl:hidden" }
+    : { list: "md:hidden", table: "hidden md:block" };
+}
 
 /**
  * A titled list of the partner area — divided rows on the phone, a table on
@@ -58,7 +71,9 @@ export function PartnerAreaTableCard<Item>({
   columns,
   renderItem,
   footer,
+  narrowFromXl = false,
 }: PartnerAreaTableCardProps<Item>) {
+  const show = visibility(Boolean(columns), narrowFromXl);
   return (
     <Card className="h-full">
       <CardHeader>
@@ -69,13 +84,13 @@ export function PartnerAreaTableCard<Item>({
           <Text tone="muted">{empty}</Text>
         ) : (
           <>
-            <List className={cn("divide-y", columns && "md:hidden")}>
+            <List className={cn("divide-y", show.list)}>
               {items.map((item, index) => (
                 <ListItem key={rowKey(item, index)}>{renderItem(item)}</ListItem>
               ))}
             </List>
             {columns && (
-            <Box className="hidden md:block">
+            <Box className={show.table}>
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
@@ -126,12 +141,15 @@ type PartnerAreaTableCardSkeletonProps = {
   rows?: number;
   /** Width of the bar in each desktop column; none = a list everywhere. */
   columns?: string[];
+  narrowFromXl?: boolean;
 };
 
 export function PartnerAreaTableCardSkeleton({
   rows = 3,
   columns,
+  narrowFromXl = false,
 }: PartnerAreaTableCardSkeletonProps) {
+  const show = visibility(Boolean(columns), narrowFromXl);
   const lines = Array.from({ length: rows }, (_, index) => index);
   return (
     <Card className="h-full">
@@ -139,7 +157,7 @@ export function PartnerAreaTableCardSkeleton({
         <Skeleton shape="text" className="w-32 text-base" />
       </CardHeader>
       <CardContent>
-        <Box className={cn("divide-y", columns && "md:hidden")}>
+        <Box className={cn("divide-y", show.list)}>
           {lines.map((line) => (
             <Box
               key={line}
@@ -154,7 +172,7 @@ export function PartnerAreaTableCardSkeleton({
           ))}
         </Box>
         {columns && (
-          <Box className="hidden overflow-hidden rounded-lg border md:block">
+          <Box className={cn("overflow-hidden rounded-lg border", show.table)}>
             <Box className="flex gap-6 bg-muted/40 px-4 py-3">
               {columns.map((_, index) => (
                 <Skeleton key={index} shape="text" className="w-14 text-xs" />

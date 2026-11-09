@@ -349,6 +349,14 @@ export const PartnerVehiclePage = lazyPage(
   () => import("@/pages/parceiro/vehicle-detail"),
   "PartnerVehiclePage",
 );
+export const PartnerVehiclesPage = lazyPage(
+  () => import("@/pages/parceiro/vehicles"),
+  "PartnerVehiclesPage",
+);
+export const PartnerRentalsPage = lazyPage(
+  () => import("@/pages/parceiro/rentals"),
+  "PartnerRentalsPage",
+);
 export const PartnerRentalPage = lazyPage(
   () => import("@/pages/parceiro/rental-detail"),
   "PartnerRentalPage",
