@@ -9,8 +9,10 @@ import {
   LayoutDashboard,
   Megaphone,
   PenLine,
+  Plug,
   Receipt,
   ScrollText,
+  ShieldCheck,
   Tags,
   TrendingUp,
   UserRound,
@@ -25,6 +27,8 @@ export type NavItem = {
   label: string;
   to: string;
   icon: LucideIcon;
+  /** Only administrators see it (the API answers 403 to agents anyway). */
+  adminOnly?: boolean;
 };
 
 const DASHBOARD: NavItem = {
@@ -74,5 +78,7 @@ export const SIDEBAR_NAV: NavItem[] = [
   { label: "Assinaturas", to: ROUTES.signatures, icon: PenLine },
   { label: "Documentos", to: ROUTES.documents, icon: FileText },
   { label: "Empresa", to: ROUTES.company, icon: Building2 },
+  { label: "Integrações", to: ROUTES.integrations, icon: Plug },
   { label: "Usuários", to: ROUTES.users, icon: Users },
+  { label: "Auditoria", to: ROUTES.audit, icon: ShieldCheck, adminOnly: true },
 ];

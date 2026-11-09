@@ -20,6 +20,10 @@ curtas entre ferramentas e nos relatórios de subagentes.
   baixou ("Agora não" = 7 dias); "Abrir no app" fixo no header para quem já usou/baixou; gestão mostra o uso no
   cliente e no usuário e filtra clientes por `app=`. **Backend antes do front** (o CORS precisa do header novo).
 - **Integrações (Asaas, Inter, Clicksign) só admin**: agente vê só a situação (decisão do dono).
+- **IA agêntica + MCP (2026-11-09):** chat de IA ao lado do editor de contrato e de proposta (`ai-chat-dock`/
+  `ai-chat-panel`, no lugar do "Personalizar com IA"); menu **Integrações** (todos: conectar Claude/ChatGPT/Gemini ao
+  MCP com tutoriais, meus apps; admin: abas Permissões e Aplicativos) e **Auditoria** (só admin, `adminOnly` no
+  NavItem). Consentimento OAuth em `/gestao/autorizar-ia`. Backend e decisões em `../pista-livre/docs/handoff-ia-mcp.md`.
 - **Contas do mês (no ar desde 2026-11-09 10:27):** Financeiro › Contas do mês (`/gestao/financeiro/contas?mes=`)
   junta custos fixos, parcelas de dívidas e avulsas do mês, com os meses anteriores em aberto. Registrar = pago (dia,
   valor, comprovante), em aberto ou sem cobrança, inclusive retroativo; parcela paga pelo diálogo da dívida. O custo

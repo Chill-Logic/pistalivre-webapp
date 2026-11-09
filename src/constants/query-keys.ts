@@ -109,6 +109,15 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.suppliers.all, "detail", id] as const,
     months: (id: string) => [...queryKeys.suppliers.all, "months", id] as const,
   },
+  ai: {
+    all: ["ai"] as const,
+    me: () => [...queryKeys.ai.all, "me"] as const,
+    consent: (query: string) => [...queryKeys.ai.all, "consent", query] as const,
+    permissions: () => [...queryKeys.ai.all, "permissions"] as const,
+    clients: () => [...queryKeys.ai.all, "clients"] as const,
+    audit: () => [...queryKeys.ai.all, "audit"] as const,
+    auditEntry: (id: string) => [...queryKeys.ai.all, "audit-entry", id] as const,
+  },
   aiUsage: {
     all: ["ai-usage"] as const,
     summary: (month: string) => [...queryKeys.aiUsage.all, "summary", month] as const,

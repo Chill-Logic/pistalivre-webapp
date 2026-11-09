@@ -4,7 +4,7 @@ import { Logo } from "@/components/molecules/logo";
 import { SidebarCollapseToggle } from "@/components/molecules/sidebar-collapse-toggle";
 import { SidebarNav } from "@/components/molecules/sidebar-nav";
 import { SIDEBAR_WIDTH } from "@/constants/layout";
-import { SIDEBAR_NAV } from "@/constants/navigation";
+import { useNavItems } from "@/hooks/ui/useNavItems";
 import { useSidebar } from "@/hooks/ui/useSidebar";
 
 /**
@@ -13,6 +13,7 @@ import { useSidebar } from "@/hooks/ui/useSidebar";
  */
 export function AppSidebar() {
   const { isDesktop, isCollapsed } = useSidebar();
+  const navItems = useNavItems();
 
   // Mobile navigation is the bottom bar + menu sheet.
   if (!isDesktop) return null;
@@ -28,7 +29,7 @@ export function AppSidebar() {
         <Logo size={isCollapsed ? "sm" : "xl"} />
       </Box>
       <Box className="flex-1 overflow-y-auto overflow-x-hidden p-3">
-        <SidebarNav items={SIDEBAR_NAV} collapsed={isCollapsed} />
+        <SidebarNav items={navItems} collapsed={isCollapsed} />
       </Box>
       <SidebarCollapseToggle />
     </Aside>

@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/atoms/card";
 import { Col, Row } from "@/components/atoms/grid";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
-import { AiPersonalizeBox } from "@/components/molecules/ai-personalize-box";
+import { AiChatDock } from "@/components/organisms/ai-chat-dock";
 import { CheckboxField } from "@/components/molecules/checkbox-field";
 import { DateField } from "@/components/molecules/date-field";
 import { FormField } from "@/components/molecules/form-field";
@@ -23,9 +23,9 @@ import { LABEL_MAPS } from "@/constants/label-maps";
 import { toApiError } from "@/helpers/api-error";
 import { moneyErrorMessage } from "@/helpers/money-errors";
 import { useContractOptions } from "@/hooks/api/gestao/contracts/useContractOptions";
+import { useAiChatAvailable } from "@/hooks/api/gestao/ai/useAi";
 import {
   useIssueProposal,
-  usePersonalizeProposal,
   useProposalDraft,
   useProposalPreview,
 } from "@/hooks/api/gestao/proposals/useProposalMutations";
@@ -47,12 +47,20 @@ type ProposalComposerProps = {
   onIssued: (proposal: ProposalDetail) => void;
 };
 
-type Errors = Partial<Record<"recipient" | "draft" | "ai" | "issue", string>>;
+type Errors = Partial<Record<"recipient" | "draft" | "issue", string>>;
+
+/** Starting points offered by the assistant (it asks for what's missing). */
+const PROPOSAL_SUGGESTIONS = [
+  "Destacar o plano de interesse do lead",
+  "Deixar a proposta mais curta e direta",
+  "Mostrar o valor semanal e o mensal",
+  "Revisar o texto e corrigir erros",
+];
 
 /**
  * "Proposta de locação", as in the management app: the terms + the optional
  * clauses → "Gerar prévia" (the template merged by the server) → review the
- * text (optionally rewritten by the AI) → "Visualizar PDF" → "Emitir". Only
+ * text (with the AI assistant beside it from the start) → "Visualizar PDF" → "Emitir". Only
  * "Emitir" saves anything. Standalone: the recipient typed here freezes on
  * the proposal (it feeds the template's {{lead.*}}).
  */
@@ -65,11 +73,11 @@ export function ProposalComposer({
   const { options } = useLabels();
   const vehicles = useVehicleOptions();
   const draft = useProposalDraft();
-  const personalize = usePersonalizeProposal();
   const preview = useProposalPreview();
   const issue = useIssueProposal();
   const idempotency = useIdempotencyKey();
   const { aiEnabled } = useContractOptions();
+  const chatAvailable = useAiChatAvailable() && aiEnabled;
 
   const [recipientName, setRecipientName] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
@@ -84,7 +92,6 @@ export function ProposalComposer({
   const [clauses, setClauses] = useState(template.clauses.map((c) => c.key));
   const [html, setHtml] = useState("");
   const [version, setVersion] = useState(0);
-  const [instructions, setInstructions] = useState("");
   const [errors, setErrors] = useState<Errors>({});
 
   const standalone = !lead;
@@ -132,17 +139,6 @@ export function ProposalComposer({
     });
   };
 
-  const runAi = () => {
-    setErrors({});
-    personalize.mutate(
-      { html, instructions: instructions.trim(), leadId: lead?.id },
-      {
-        onSuccess: load,
-        onError: (error) => setErrors({ ai: toApiError(error).message }),
-      },
-    );
-  };
-
   const doIssue = () => {
     setErrors({});
     issue.mutate(
@@ -157,9 +153,9 @@ export function ProposalComposer({
     );
   };
 
-  const busy = draft.isPending || personalize.isPending || issue.isPending;
+  const busy = draft.isPending || issue.isPending;
 
-  return (
+  const composer = (
     <Card>
       <CardContent className="space-y-6 pt-4 md:pt-6">
         {standalone ? (
@@ -311,20 +307,6 @@ export function ProposalComposer({
 
         {html && (
           <Box className="space-y-4 border-t pt-6">
-            {aiEnabled && (
-              <AiPersonalizeBox
-                label="Ajustes e acordos desta proposta"
-                placeholder="Ex.: plano fidelidade de 30 meses; aluguel R$ 490 aos sábados; caução abatida na transferência."
-                hint="A IA reescreve o texto abaixo; você revisa antes de emitir."
-                instructions={instructions}
-                onInstructionsChange={setInstructions}
-                onRun={runAi}
-                isPending={personalize.isPending}
-                disabled={busy}
-                error={errors.ai}
-              />
-            )}
-
             <ProposalHtmlEditor
               key={version}
               label="Texto da proposta (o que estiver aqui vai para o PDF)"
@@ -362,5 +344,24 @@ export function ProposalComposer({
         )}
       </CardContent>
     </Card>
+  );
+
+  if (!chatAvailable) return composer;
+  return (
+    <Row className="items-start gap-y-4">
+      <Col lg={8} className="order-2 lg:order-1">
+        {composer}
+      </Col>
+      <Col lg={4} className="order-1 lg:order-2">
+        <AiChatDock
+          mode="proposal"
+          html={html}
+          onApply={load}
+          suggestions={PROPOSAL_SUGGESTIONS}
+          leadId={lead?.id}
+          disabledReason={html ? undefined : "Gere a prévia para eu poder ajustar o texto da proposta com você."}
+        />
+      </Col>
+    </Row>
   );
 }

@@ -24,7 +24,13 @@ import {
   DebtEditPage,
   DebtNewPage,
   DocumentsPage,
+  AiConsentPage,
   AiUsagePage,
+  AuditPage,
+  IntegrationsAppsPage,
+  IntegrationsPage,
+  IntegrationsPermissionsPage,
+  IntegrationsSectionPage,
   FinanceBillsPage,
   FinanceDebtsPage,
   FinancePage,
@@ -234,6 +240,20 @@ const gestaoRoutes: RouteObject[] = [
       { path: ROUTES.company, element: <CompanyPage /> },
       { path: ROUTES.companyEdit, element: <CompanyEditPage /> },
       { path: ROUTES.aiUsage, element: <AiUsagePage /> },
+      { path: ROUTES.audit, element: <AuditPage /> },
+      { path: ROUTES.aiConsent, element: <AiConsentPage /> },
+      {
+        element: (
+          <IntegrationsSectionPage
+            preload={[IntegrationsPage.preload, IntegrationsPermissionsPage.preload, IntegrationsAppsPage.preload]}
+          />
+        ),
+        children: [
+          { path: ROUTES.integrations, element: <IntegrationsPage /> },
+          { path: ROUTES.integrationsPermissions, element: <IntegrationsPermissionsPage /> },
+          { path: ROUTES.integrationsApps, element: <IntegrationsAppsPage /> },
+        ],
+      },
       {
         element: (
           <FinanceSectionPage

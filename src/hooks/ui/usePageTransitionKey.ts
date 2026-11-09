@@ -1,8 +1,9 @@
 import { useLocation } from "react-router-dom";
 import { FINANCE_TABS } from "@/constants/finance";
+import { INTEGRATION_TABS } from "@/constants/integrations";
 import { MODEL_TABS } from "@/constants/models";
 
-const TABBED_SECTIONS = [MODEL_TABS, FINANCE_TABS];
+const TABBED_SECTIONS = [MODEL_TABS, FINANCE_TABS, INTEGRATION_TABS];
 
 /**
  * Key of the page enter animation: the path, except that all tabs of a

@@ -7,13 +7,14 @@ import { Button } from "@/components/atoms/button";
 import { Card, CardContent } from "@/components/atoms/card";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
-import { AiPersonalizeBox } from "@/components/molecules/ai-personalize-box";
+import { Col, Row } from "@/components/atoms/grid";
+import { AiChatDock } from "@/components/organisms/ai-chat-dock";
 import { ProposalHtmlEditor } from "@/components/organisms/proposal-html-editor";
 import { toApiError } from "@/helpers/api-error";
+import { useAiChatAvailable } from "@/hooks/api/gestao/ai/useAi";
 import {
   useContractPreview,
   useCreateContract,
-  usePersonalizeContract,
 } from "@/hooks/api/gestao/contracts/useContractMutations";
 import { useIdempotencyKey } from "@/hooks/ui/useIdempotencyKey";
 import type { Contract } from "@/types/contract";
@@ -28,11 +29,20 @@ type ContractEditorProps = {
   onSaved: (contract: Contract) => void;
 };
 
-type Errors = Partial<Record<"ai" | "save", string>>;
+type Errors = Partial<Record<"save", string>>;
+
+/** Starting points offered by the assistant (it asks for what's missing). */
+const CONTRACT_SUGGESTIONS = [
+  "Trocar para o plano fidelidade de 30 meses",
+  "Ajustar o valor do aluguel desta locação",
+  "Incluir caução parcelada em 3 vezes",
+  "Revisar o texto e corrigir erros",
+];
 
 /**
- * The contract text to review, as in the management app: optionally
- * rewritten by the AI → "Visualizar PDF" → "Gerar PDF e salvar". Only the
+ * The contract text to review, as in the management app, with the AI
+ * assistant beside it (it reads the rental and edits the draft on request) →
+ * "Visualizar PDF" → "Gerar PDF e salvar". Only the
  * last one saves (freezes the text, renders the PDF with the signature block
  * the server rebuilds, and attaches it to the rental under "Contrato").
  */
@@ -44,29 +54,19 @@ export function ContractEditor({
   cancelTo,
   onSaved,
 }: ContractEditorProps) {
-  const personalize = usePersonalizeContract();
+  const chatAvailable = useAiChatAvailable() && aiEnabled;
   const preview = useContractPreview();
   const create = useCreateContract(rentalId);
   const idempotency = useIdempotencyKey();
 
   const [html, setHtml] = useState(initialHtml);
   const [version, setVersion] = useState(0);
-  const [instructions, setInstructions] = useState("");
   const [errors, setErrors] = useState<Errors>({});
 
-  const runAi = () => {
-    setErrors({});
-    personalize.mutate(
-      { html, instructions: instructions.trim(), rentalId },
-      {
-        onSuccess: (next) => {
-          // Loads the AI's version into the editor (remounts it).
-          setHtml(next);
-          setVersion((v) => v + 1);
-        },
-        onError: (error) => setErrors({ ai: toApiError(error).message }),
-      },
-    );
+  // The assistant changed the text (or Desfazer): reload the editor with it.
+  const applyAi = (next: string) => {
+    setHtml(next);
+    setVersion((v) => v + 1);
   };
 
   const save = () => {
@@ -86,24 +86,11 @@ export function ContractEditor({
     );
   };
 
-  const busy = personalize.isPending || create.isPending;
+  const busy = create.isPending;
 
-  return (
+  const editor = (
     <Card>
       <CardContent className="space-y-4 pt-4 md:pt-6">
-        {aiEnabled && (
-          <AiPersonalizeBox
-            label="Acordos feitos com o cliente"
-            placeholder="Ex.: plano fidelidade de 30 meses; caução parcelada em 3x de R$ 217; carência de 7 dias para a 1ª cobrança."
-            hint="Descreva os acordos (caução, prazos, cláusulas extras…). A IA reescreve o contrato abaixo; você revisa antes de gerar o PDF."
-            instructions={instructions}
-            onInstructionsChange={setInstructions}
-            onRun={runAi}
-            isPending={personalize.isPending}
-            disabled={busy}
-            error={errors.ai}
-          />
-        )}
 
         <Text tone="muted">
           Revise o contrato abaixo. Você pode ajustar o texto antes de gerar o
@@ -141,5 +128,23 @@ export function ContractEditor({
         </Box>
       </CardContent>
     </Card>
+  );
+
+  if (!chatAvailable) return editor;
+  return (
+    <Row className="items-start gap-y-4">
+      <Col lg={8} className="order-2 lg:order-1">
+        {editor}
+      </Col>
+      <Col lg={4} className="order-1 lg:order-2">
+        <AiChatDock
+          mode="contract"
+          html={html}
+          onApply={applyAi}
+          suggestions={CONTRACT_SUGGESTIONS}
+          rentalId={rentalId}
+        />
+      </Col>
+    </Row>
   );
 }

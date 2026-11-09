@@ -10,7 +10,7 @@ import {
 import { Text } from "@/components/atoms/text";
 import { SidebarNav } from "@/components/molecules/sidebar-nav";
 import { ThemeToggle } from "@/components/molecules/theme-toggle";
-import { SIDEBAR_NAV } from "@/constants/navigation";
+import { useNavItems } from "@/hooks/ui/useNavItems";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { useSidebar } from "@/hooks/ui/useSidebar";
 import type { AuthUser } from "@/types/auth";
@@ -27,6 +27,7 @@ type NavSheetProps = {
 export function NavSheet({ user }: NavSheetProps) {
   const { isDrawerOpen, setDrawerOpen, closeDrawer } = useSidebar();
   const logout = useLogout();
+  const navItems = useNavItems();
 
   return (
     <Sheet open={isDrawerOpen} onOpenChange={setDrawerOpen}>
@@ -47,7 +48,7 @@ export function NavSheet({ user }: NavSheetProps) {
           <ThemeToggle />
         </Box>
         <Box className="min-h-0 flex-1 overflow-y-auto overscroll-contain border-t px-3 py-2">
-          <SidebarNav items={SIDEBAR_NAV} onNavigate={closeDrawer} />
+          <SidebarNav items={navItems} onNavigate={closeDrawer} />
         </Box>
         <Box className="shrink-0 border-t px-3 py-2">
           <Button
