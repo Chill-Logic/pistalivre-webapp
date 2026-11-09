@@ -1,3 +1,5 @@
+import type { PwaUsageFields } from "@/helpers/pwa";
+
 export type UserRole = "ADMIN" | "AGENT";
 
 export type StaffUser = {
@@ -7,7 +9,7 @@ export type StaffUser = {
   role: UserRole;
   lastLoginAt: string | null;
   createdAt: string;
-};
+} & PwaUsageFields;
 
 export type StaffUserDetail = StaffUser & {
   /** Digits only. */

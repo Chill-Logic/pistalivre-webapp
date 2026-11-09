@@ -26,6 +26,7 @@ export function useCustomerOptions() {
     q,
     status: "",
     test: "",
+    app: "",
   });
   const options = useMemo<RemoteOption[]>(
     () =>
@@ -151,7 +152,9 @@ export function useUserOptions() {
  * `fallback` (e.g. the chosen vehicle's plate), so that vehicle's rentals
  * come first. `items` keeps each rental's vehicle.
  */
-export function useRentalOptions({ fallback = "" }: { fallback?: string } = {}) {
+export function useRentalOptions({
+  fallback = "",
+}: { fallback?: string } = {}) {
   const [search, setSearch] = useState("");
   const typed = useDebouncedValue(search);
   const rentals = useRentals({

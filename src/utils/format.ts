@@ -48,6 +48,18 @@ export function formatCalendarDate(value: string | Date) {
   return new Date(value).toLocaleDateString("pt-BR", { timeZone: "UTC" });
 }
 
+/** "há 5 min", "há 3 h", "há 2 dias"; past a month, the date. */
+export function formatRelativeTime(value: string | Date, now = Date.now()) {
+  const minutes = Math.floor((now - new Date(value).getTime()) / 60_000);
+  if (minutes < 1) return "agora há pouco";
+  if (minutes < 60) return `há ${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `há ${hours} h`;
+  const days = Math.floor(hours / 24);
+  if (days < 31) return days === 1 ? "há 1 dia" : `há ${days} dias`;
+  return `em ${formatDate(value)}`;
+}
+
 /** First name for greetings ("Olá, Maria"). */
 export function firstName(fullName: string) {
   return fullName.trim().split(/\s+/)[0] ?? "";

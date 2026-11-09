@@ -6,6 +6,7 @@ import { Heading } from "@/components/atoms/heading";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { InfoItem } from "@/components/molecules/info-item";
 import { LABEL_MAPS } from "@/constants/label-maps";
+import { pwaUsageText } from "@/helpers/pwa";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { StaffUserDetail } from "@/types/user";
 import { formatCpf } from "@/utils/document";
@@ -13,6 +14,7 @@ import { formatCalendarDate, formatDateTime } from "@/utils/format";
 
 export function UserSummary({ user }: { user: StaffUserDetail }) {
   const { label } = useLabels();
+  const appUsage = pwaUsageText(user);
   return (
     <Card>
       <CardHeader>
@@ -39,6 +41,11 @@ export function UserSummary({ user }: { user: StaffUserDetail }) {
               ? formatDateTime(user.lastLoginAt)
               : "Nunca acessou"}
           </InfoItem>
+          {appUsage && (
+            <InfoItem md={6} label="App">
+              {appUsage}
+            </InfoItem>
+          )}
           <InfoItem md={6} label="Cadastrado em">
             {formatDateTime(user.createdAt)}
           </InfoItem>

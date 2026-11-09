@@ -1,6 +1,7 @@
 import axios from "axios";
 import { env } from "@/config/env";
 import { authToken } from "@/helpers/auth-token";
+import { isStandalone } from "@/helpers/pwa";
 import { toApiError, withJsonErrorBody } from "@/helpers/api-error";
 
 /** Single axios instance for the API: bearer auth + normalized errors. */
@@ -13,6 +14,8 @@ export const http = axios.create({
 http.interceptors.request.use((config) => {
   const token = authToken.get();
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  // Lets the API record who uses the installed app (the PWA invite).
+  config.headers["X-Client-Mode"] = isStandalone() ? "pwa" : "browser";
   return config;
 });
 

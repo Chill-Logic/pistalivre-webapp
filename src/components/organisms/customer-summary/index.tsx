@@ -5,12 +5,14 @@ import { Heading } from "@/components/atoms/heading";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { CustomerStatusBadge } from "@/components/molecules/customer-status-badge";
 import { InfoItem } from "@/components/molecules/info-item";
+import { pwaUsageText } from "@/helpers/pwa";
 import type { CustomerDetail } from "@/types/customer";
 import { formatCpf } from "@/utils/document";
 import { ageInYears, todayInBrasilia } from "@/utils/date";
 import { formatCalendarDate, formatDateTime } from "@/utils/format";
 
 export function CustomerSummary({ customer }: { customer: CustomerDetail }) {
+  const appUsage = pwaUsageText(customer);
   return (
     <Card>
       <CardHeader>
@@ -55,6 +57,11 @@ export function CustomerSummary({ customer }: { customer: CustomerDetail }) {
               ? formatDateTime(customer.lastLoginAt)
               : "Nunca"}
           </InfoItem>
+          {appUsage && (
+            <InfoItem md={6} label="App">
+              {appUsage}
+            </InfoItem>
+          )}
           <InfoItem md={6} label="Asaas">
             {customer.asaasCustomerId ? "Vinculado" : "Não vinculado"}
           </InfoItem>

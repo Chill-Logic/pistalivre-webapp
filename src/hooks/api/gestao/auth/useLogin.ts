@@ -11,6 +11,9 @@ export function useLogin() {
       // Seed the cache first so the guard sees the user without a refetch.
       queryClient.setQueryData(queryKeys.auth.me(), user);
       authToken.set(token);
+      // The login answer has no `pwa`: refetch it in the background
+      // (after the token is stored, or it would go without one).
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.me() });
     },
   });
 }

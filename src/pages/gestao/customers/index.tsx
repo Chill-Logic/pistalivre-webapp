@@ -17,8 +17,15 @@ import { useCustomerFilters } from "@/hooks/ui/useCustomerFilters";
 import { useListView } from "@/hooks/ui/useListView";
 
 export function CustomersPage() {
-  const { filters, setSearch, setStatus, setTest, setPage, setPageSize } =
-    useCustomerFilters();
+  const {
+    filters,
+    setSearch,
+    setStatus,
+    setTest,
+    setApp,
+    setPage,
+    setPageSize,
+  } = useCustomerFilters();
   const { view, setView, isDesktop } = useListView();
   const customers = useCustomerList(filters, isDesktop);
   const asaasDirectory = useAsaasDirectory();
@@ -44,6 +51,7 @@ export function CustomersPage() {
         onSearch={setSearch}
         onStatusChange={setStatus}
         onTestChange={setTest}
+        onAppChange={setApp}
       />
       <CustomersAsaasPanel directory={asaasDirectory} />
       {customers.isError ? (

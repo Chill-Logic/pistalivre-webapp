@@ -5,6 +5,7 @@ import { Header } from "@/components/atoms/landmarks";
 import { Text } from "@/components/atoms/text";
 import { Logo } from "@/components/molecules/logo";
 import { ThemeToggle } from "@/components/molecules/theme-toggle";
+import { PwaOpenInApp } from "@/components/organisms/pwa-open-in-app";
 import { useLogout } from "@/hooks/auth/useLogout";
 import type { AuthUser } from "@/types/auth";
 import { firstName } from "@/utils/format";
@@ -25,6 +26,7 @@ export function AppHeader({ user }: AppHeaderProps) {
           {firstName(user.name)}
         </Text>
       </Text>
+      <PwaOpenInApp user={user} />
       <Box className="hidden md:flex">
         <ThemeToggle />
       </Box>

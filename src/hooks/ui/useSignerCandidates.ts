@@ -50,6 +50,7 @@ export function useSignerCandidates() {
     q,
     status: "",
     test: "",
+    app: "",
   });
   const userFilters = { page: 1, pageSize: PICKER_SIZE, q, role: "" } as const;
   const users = useQuery({

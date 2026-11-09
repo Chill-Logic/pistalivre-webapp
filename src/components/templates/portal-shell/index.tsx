@@ -4,6 +4,7 @@ import { Box } from "@/components/atoms/box";
 import { Main } from "@/components/atoms/landmarks";
 import { OfflineBanner } from "@/components/molecules/offline-banner";
 import { PortalHeader } from "@/components/organisms/portal-header";
+import { PwaInstallInvite } from "@/components/organisms/pwa-install-invite";
 import { TopProgressBar } from "@/components/organisms/top-progress-bar";
 import { PageSkeleton } from "@/components/templates/page-skeleton";
 import { useRealtimeSync } from "@/hooks/api/comum/realtime/useRealtimeSync";
@@ -21,6 +22,7 @@ export function PortalShell({ user }: { user: AuthUser }) {
       <PortalHeader user={user} />
       <OfflineBanner />
       <Main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-10 pt-4 md:pt-6">
+        <PwaInstallInvite user={user} />
         <Suspense fallback={<PageSkeleton />}>
           <Outlet />
         </Suspense>

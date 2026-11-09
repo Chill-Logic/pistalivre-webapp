@@ -10,11 +10,17 @@ const TEST_OPTIONS = [
   { value: "all", label: "Reais e de teste" },
 ];
 
+const APP_OPTIONS = [
+  { value: "pwa", label: "Usa o app" },
+  { value: "browser", label: "Só navegador" },
+];
+
 type CustomerFiltersProps = {
   filters: Filters;
   onSearch: (value: string) => void;
   onStatusChange: (value: string) => void;
   onTestChange: (value: string) => void;
+  onAppChange: (value: string) => void;
 };
 
 export function CustomerFilters({
@@ -22,6 +28,7 @@ export function CustomerFilters({
   onSearch,
   onStatusChange,
   onTestChange,
+  onAppChange,
 }: CustomerFiltersProps) {
   const { label } = useLabels();
   // The API filters by lowercase scope; the labels come from the catalog.
@@ -32,14 +39,14 @@ export function CustomerFilters({
 
   return (
     <Row className="gap-y-2">
-      <Col md={6}>
+      <Col>
         <SearchInput
           value={filters.q}
           onSearch={onSearch}
           placeholder="Buscar por nome, e-mail ou CPF"
         />
       </Col>
-      <Col sm={6} md={3}>
+      <Col sm={4}>
         <FilterSelect
           label="Situação"
           value={filters.status}
@@ -48,13 +55,22 @@ export function CustomerFilters({
           onChange={onStatusChange}
         />
       </Col>
-      <Col sm={6} md={3}>
+      <Col sm={4}>
         <FilterSelect
           label="Clientes de teste"
           value={filters.test}
           allLabel="Só clientes reais"
           options={TEST_OPTIONS}
           onChange={onTestChange}
+        />
+      </Col>
+      <Col sm={4}>
+        <FilterSelect
+          label="App"
+          value={filters.app}
+          allLabel="App: todos"
+          options={APP_OPTIONS}
+          onChange={onAppChange}
         />
       </Col>
     </Row>

@@ -7,6 +7,7 @@ import { Text } from "@/components/atoms/text";
 import { Logo } from "@/components/molecules/logo";
 import { ThemeToggle } from "@/components/molecules/theme-toggle";
 import { PortalPasswordDialog } from "@/components/organisms/portal-password-dialog";
+import { PwaOpenInApp } from "@/components/organisms/pwa-open-in-app";
 import { ROUTES } from "@/constants/routes";
 import { useLogout } from "@/hooks/auth/useLogout";
 import type { AuthUser } from "@/types/auth";
@@ -28,6 +29,7 @@ export function PortalHeader({ user }: { user: AuthUser }) {
             {firstName(user.name)}
           </Text>
         </Text>
+        <PwaOpenInApp user={user} compact />
         <ThemeToggle />
         <PortalPasswordDialog />
         <Button

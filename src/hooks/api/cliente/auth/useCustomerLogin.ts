@@ -10,6 +10,9 @@ export function useCustomerLogin() {
     onSuccess: ({ token, user }) => {
       queryClient.setQueryData(queryKeys.auth.me(), user);
       authToken.set(token);
+      // The login answer has no `pwa`: refetch it in the background
+      // (after the token is stored, or it would go without one).
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.me() });
     },
   });
 }

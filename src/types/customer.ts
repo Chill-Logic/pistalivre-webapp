@@ -1,3 +1,4 @@
+import type { PwaUsageFields } from "@/helpers/pwa";
 import type { DocumentFile } from "@/types/document";
 import type { RentalListItem } from "@/types/rental";
 
@@ -16,7 +17,7 @@ export type CustomerListItem = {
   asaasLinked: boolean;
   lastLoginAt: string | null;
   createdAt: string;
-};
+} & PwaUsageFields;
 
 /** A customer that exists only in Asaas (can be imported). */
 export type AsaasOnlyCustomer = {
@@ -96,4 +97,6 @@ export type CustomerFilters = {
   status: "" | "active" | "prospect";
   /** "" = real customers only (API default) | "test" | "all". */
   test: "" | "test" | "all";
+  /** "" = all | "pwa" (used or downloaded the app) | "browser". */
+  app: "" | "pwa" | "browser";
 };

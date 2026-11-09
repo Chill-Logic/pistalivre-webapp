@@ -6,6 +6,7 @@ import { OfflineBanner } from "@/components/molecules/offline-banner";
 import { AppHeader } from "@/components/organisms/app-header";
 import { AppSidebar } from "@/components/organisms/app-sidebar";
 import { BottomNav } from "@/components/organisms/bottom-nav";
+import { PwaInstallInvite } from "@/components/organisms/pwa-install-invite";
 import { TopProgressBar } from "@/components/organisms/top-progress-bar";
 import { PageSkeleton } from "@/components/templates/page-skeleton";
 import { usePageTransitionKey } from "@/hooks/ui/usePageTransitionKey";
@@ -34,6 +35,7 @@ export function AppShell({ user }: AppShellProps) {
         <AppHeader user={user} />
         <OfflineBanner />
         <Main className="flex-1 px-4 pb-24 pt-4 md:px-8 md:pb-8 md:pt-6">
+          <PwaInstallInvite user={user} />
           <Box
             key={transitionKey}
             className="duration-300 ease-out animate-in fade-in-0 slide-in-from-bottom-2 motion-reduce:animate-none"
