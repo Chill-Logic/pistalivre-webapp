@@ -12,6 +12,23 @@ export function formatCurrency(value: number) {
   return currency.format(value);
 }
 
+const usd = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 4,
+});
+
+/** US$ 0,1787 — AI costs are tiny per call: up to 4 decimals. */
+export function formatUsd(value: number) {
+  return usd.format(value);
+}
+
+/** 14.020 */
+export function formatInteger(value: number) {
+  return integer.format(value);
+}
+
 /** 12.345 km */
 export function formatMileage(km: number) {
   return `${integer.format(km)} km`;

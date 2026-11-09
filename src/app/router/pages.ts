@@ -92,6 +92,10 @@ export const FinanceStatementPage = lazyPage(
   () => import("@/pages/gestao/finance-statement"),
   "FinanceStatementPage",
 );
+export const AiUsagePage = lazyPage(
+  () => import("@/pages/gestao/ai-usage"),
+  "AiUsagePage",
+);
 export const FinanceBillsPage = lazyPage(
   () => import("@/pages/gestao/finance-bills"),
   "FinanceBillsPage",

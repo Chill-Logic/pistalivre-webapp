@@ -109,6 +109,10 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.suppliers.all, "detail", id] as const,
     months: (id: string) => [...queryKeys.suppliers.all, "months", id] as const,
   },
+  aiUsage: {
+    all: ["ai-usage"] as const,
+    summary: (month: string) => [...queryKeys.aiUsage.all, "summary", month] as const,
+  },
   expenses: {
     all: ["expenses"] as const,
     month: (month: string) => [...queryKeys.expenses.all, "month", month] as const,

@@ -24,6 +24,7 @@ import {
   DebtEditPage,
   DebtNewPage,
   DocumentsPage,
+  AiUsagePage,
   FinanceBillsPage,
   FinanceDebtsPage,
   FinancePage,
@@ -232,6 +233,7 @@ const gestaoRoutes: RouteObject[] = [
       { path: ROUTES.userEdit, element: <UserEditPage /> },
       { path: ROUTES.company, element: <CompanyPage /> },
       { path: ROUTES.companyEdit, element: <CompanyEditPage /> },
+      { path: ROUTES.aiUsage, element: <AiUsagePage /> },
       {
         element: (
           <FinanceSectionPage

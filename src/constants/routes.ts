@@ -84,6 +84,7 @@ export const ROUTES = {
   userEdit: `${GESTAO}/usuarios/:id/editar`,
   company: `${GESTAO}/empresa`,
   companyEdit: `${GESTAO}/empresa/editar`,
+  aiUsage: `${GESTAO}/empresa/uso-de-ia`,
   finance: `${GESTAO}/financeiro`,
   financeDebts: `${GESTAO}/financeiro/debitos`,
   debtNew: `${GESTAO}/financeiro/debitos/nova`,

@@ -1,4 +1,7 @@
-import { Lock } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/atoms/button";
+import { ROUTES } from "@/constants/routes";
+import { ChartColumn, Lock } from "lucide-react";
 import { Alert } from "@/components/atoms/alert";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
@@ -82,6 +85,14 @@ export function CompanyIntegrations({
                     )}
                     {integration.provider === "inter" && (
                       <InterWebhookPanel configured={integration.configured} />
+                    )}
+                    {integration.provider === "ai" && (
+                      <Button asChild variant="ghost" size="sm">
+                        <Link to={ROUTES.aiUsage}>
+                          <ChartColumn />
+                          Ver uso e custo
+                        </Link>
+                      </Button>
                     )}
                   </Box>
                 )}
