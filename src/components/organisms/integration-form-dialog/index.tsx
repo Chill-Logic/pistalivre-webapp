@@ -106,7 +106,12 @@ export function IntegrationFormDialog({
           ))}
           <CheckboxField
             label="Integração ativa"
-            hint="Desligada, o sistema usa a configuração do servidor."
+            hint={
+              // The AI has no server fallback: off means off.
+              integration.provider === "ai"
+                ? "Desligada, a personalização com IA some de contratos e propostas."
+                : "Desligada, o sistema usa a configuração do servidor."
+            }
             checked={active}
             onChange={setActive}
             disabled={save.isPending}

@@ -59,6 +59,8 @@ export type IntegrationField = {
   multiline?: boolean | null;
   /** Checkbox group; the value is the checked options. */
   options?: { value: string; label: string }[] | null;
+  /** Single choice (select); the value is the chosen option. */
+  choices?: { value: string; label: string }[] | null;
   /** File read as text in the browser (e.g. a PEM). */
   file?: boolean | null;
   accept?: string | null;
