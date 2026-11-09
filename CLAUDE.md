@@ -67,7 +67,8 @@ cancelar, vincular) com escrita (B2/B4).
 ## Deploy (Vercel) e domínios
 
 Um projeto só na Vercel serve as duas áreas, cada uma no seu domínio, com prefixo de ambiente:
-**`app.gestao.pistalivrelocacoes.com.br`** (equipe) e **`app.cliente.pistalivrelocacoes.com.br`** (portal); um dia,
+**`app.gestao.pistalivrelocacoes.com.br`** (equipe), **`app.cliente.pistalivrelocacoes.com.br`** (portal) e
+**`app.parceiro.pistalivrelocacoes.com.br`** (área do parceiro: investidores e proprietários, só leitura); um dia,
 `dev.gestao`/`dev.cliente` funcionam igual, sem mudar código. O app procura o rótulo `gestao`/`cliente` no
 endereço (`helpers/host-realm`) e, ao trocar de área, mantém o prefixo (`app.cliente` → `app.gestao`): a raiz
 abre a área do domínio, e uma página da outra área vai para o domínio certo (`useHostRealmRedirect`, nos
@@ -81,9 +82,9 @@ duas áreas, como no dev. Cada domínio guarda o seu login (localStorage por ori
   produção em `https://pistalivre-webapp.vercel.app`; `VITE_API_URL` cadastrada em Production e Preview.
   GitHub ligado desde 2026-11-09: **push na `main` publica em produção** (outras branches = prévia). A CLI
   (`/home/ojhon/.nvm/versions/node/v22.15.1/bin/vercel deploy --prod`, pasta ligada em `.vercel/`) segue valendo.
-- DNS no **Cloudflare** (o Registro.br só guarda o registro): `CNAME app.gestao` e `CNAME app.cliente` para
+- DNS no **Cloudflare** (o Registro.br só guarda o registro): `CNAME app.gestao`, `CNAME app.cliente` e `CNAME app.parceiro` para
   `460e80aaac8cf57f.vercel-dns-017.com` (o destino que a Vercel deu ao projeto), com a nuvem **cinza** (DNS only) até a Vercel emitir o certificado.
-- No backend: `WEBAPP_ORIGIN=https://app.gestao.pistalivrelocacoes.com.br,https://app.cliente.pistalivrelocacoes.com.br,https://pistalivre-webapp.vercel.app`
+- No backend: `WEBAPP_ORIGIN=https://app.gestao.pistalivrelocacoes.com.br,https://app.cliente.pistalivrelocacoes.com.br,https://pistalivre-webapp.vercel.app,https://app.parceiro.pistalivrelocacoes.com.br`
   (um ambiente `dev.` novo entra nessa lista ou na variável do backend de dev).
 - Testar local: `http://app.gestao.localhost:5173` e `http://app.cliente.localhost:5173` simulam os domínios (a API do
   dev só aceita `localhost:5173`, então lá só dá para ver os redirecionamentos).

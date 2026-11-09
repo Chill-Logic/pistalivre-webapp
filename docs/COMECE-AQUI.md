@@ -29,6 +29,15 @@ curtas entre ferramentas e nos relatórios de subagentes.
   **Confirmar/Cancelar** (`ai-action-card`, `/ai/actions/:id/confirm|cancel`); Permissões agrupadas por área, com
   "Escrita" e "Começa desligada"; **Auditoria › Lacunas** (`/gestao/auditoria/lacunas`): perguntas que a IA não
   conseguiu responder e ferramentas recusadas por falta de permissão. **Backend antes do front.**
+- **Parceiros e área do parceiro (2026-11-09, local, ainda não publicado):** gestão › **Parceiros** (equipe toda):
+  parceiro pessoa ou empresa (`document` + `documentType`), acesso à área do parceiro, contratos de investimento
+  (aporte em bens ou dinheiro, % do faturamento ou do lucro) ou administração (taxa), com 1 a N motos e a janela de
+  cada uma; contrato em PDF montado no editor com o assistente de IA (`/gestao/parceiros/contratos/:id/documento`).
+  Terceiro realm **`parceiro`** (`app.parceiro…`; `/parceiro` em localhost): login próprio, painel com menu lateral no
+  desktop, contratos, motos, locações (extrato recortado na janela do contrato), PDF do contrato e perfil — só
+  leitura, regra de visibilidade no servidor. O portal do cliente não muda. Controle segmentado novo
+  (`atoms/segmented-control`, tokens `--segment-*`). Dev: `parceiro@dev.com.br` / `parceiro123` (Meteor PLA1009 com
+  histórico). Proposta e decisões: doc "Proposta: área do parceiro". **Backend antes do front.**
 - **Contas do mês (no ar desde 2026-11-09 10:27):** Financeiro › Contas do mês (`/gestao/financeiro/contas?mes=`)
   junta custos fixos, parcelas de dívidas e avulsas do mês, com os meses anteriores em aberto. Registrar = pago (dia,
   valor, comprovante), em aberto ou sem cobrança, inclusive retroativo; parcela paga pelo diálogo da dívida. O custo
