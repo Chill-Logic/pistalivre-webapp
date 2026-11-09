@@ -208,5 +208,9 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.partners.all, "detail", id] as const,
     contract: (id: string) =>
       [...queryKeys.partners.all, "contract", id] as const,
+    contractDocument: (id: string) =>
+      [...queryKeys.partners.all, "contract-document", id] as const,
+    contractDocumentDraft: (id: string) =>
+      [...queryKeys.partners.all, "contract-document-draft", id] as const,
   },
 };

@@ -1,17 +1,6 @@
-import { Eye } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Alert } from "@/components/atoms/alert";
-import { Box } from "@/components/atoms/box";
-import { Button } from "@/components/atoms/button";
-import { Card, CardContent } from "@/components/atoms/card";
-import { Spinner } from "@/components/atoms/spinner";
-import { Text } from "@/components/atoms/text";
-import { Col, Row } from "@/components/atoms/grid";
-import { AiChatDock } from "@/components/organisms/ai-chat-dock";
-import { ProposalHtmlEditor } from "@/components/organisms/proposal-html-editor";
+import { AiDocumentEditor } from "@/components/organisms/ai-document-editor";
 import { toApiError } from "@/helpers/api-error";
-import { useAiChatAvailable } from "@/hooks/api/gestao/ai/useAi";
 import {
   useContractPreview,
   useCreateContract,
@@ -28,8 +17,6 @@ type ContractEditorProps = {
   cancelTo: string;
   onSaved: (contract: Contract) => void;
 };
-
-type Errors = Partial<Record<"save", string>>;
 
 /** Starting points offered by the assistant (it asks for what's missing). */
 const CONTRACT_SUGGESTIONS = [
@@ -54,23 +41,13 @@ export function ContractEditor({
   cancelTo,
   onSaved,
 }: ContractEditorProps) {
-  const chatAvailable = useAiChatAvailable() && aiEnabled;
   const preview = useContractPreview();
   const create = useCreateContract(rentalId);
   const idempotency = useIdempotencyKey();
+  const [error, setError] = useState<string | null>(null);
 
-  const [html, setHtml] = useState(initialHtml);
-  const [version, setVersion] = useState(0);
-  const [errors, setErrors] = useState<Errors>({});
-
-  // The assistant changed the text (or Desfazer): reload the editor with it.
-  const applyAi = (next: string) => {
-    setHtml(next);
-    setVersion((v) => v + 1);
-  };
-
-  const save = () => {
-    setErrors({});
+  const save = (html: string) => {
+    setError(null);
     create.mutate(
       { key: idempotency.key, input: { templateId, html } },
       {
@@ -78,73 +55,27 @@ export function ContractEditor({
           idempotency.renew();
           onSaved(contract);
         },
-        onError: (error) => {
-          const apiError = toApiError(error);
-          setErrors({ save: apiError.fields?.cnh ?? apiError.message });
+        onError: (failure) => {
+          const apiError = toApiError(failure);
+          setError(apiError.fields?.cnh ?? apiError.message);
         },
       },
     );
   };
 
-  const busy = create.isPending;
-
-  const editor = (
-    <Card>
-      <CardContent className="space-y-4 pt-4 md:pt-6">
-
-        <Text tone="muted">
-          Revise o contrato abaixo. Você pode ajustar o texto antes de gerar o
-          PDF; o que estiver aqui fica congelado no documento. As assinaturas
-          entram no fim do PDF.
-        </Text>
-
-        <ProposalHtmlEditor
-          key={version}
-          label="Texto do contrato"
-          value={html}
-          onChange={setHtml}
-        />
-
-        {errors.save && <Alert>{errors.save}</Alert>}
-        <Box className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button asChild variant="ghost">
-            <Link to={cancelTo}>Cancelar</Link>
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => preview.mutate({ rentalId, templateId, html })}
-            disabled={preview.isPending || busy || !html.trim()}
-          >
-            {preview.isPending ? <Spinner /> : <Eye />}
-            Visualizar PDF
-          </Button>
-          <Button type="button" onClick={save} disabled={busy || !html.trim()}>
-            {create.isPending && (
-              <Spinner className="text-primary-foreground" />
-            )}
-            {create.isPending ? "Gerando PDF…" : "Gerar PDF e salvar"}
-          </Button>
-        </Box>
-      </CardContent>
-    </Card>
-  );
-
-  if (!chatAvailable) return editor;
   return (
-    <Row className="gap-y-4">
-      <Col lg={8} className="order-2 lg:order-1">
-        {editor}
-      </Col>
-      <Col lg={4} className="order-1 lg:order-2">
-        <AiChatDock
-          mode="contract"
-          html={html}
-          onApply={applyAi}
-          suggestions={CONTRACT_SUGGESTIONS}
-          rentalId={rentalId}
-        />
-      </Col>
-    </Row>
+    <AiDocumentEditor
+      initialHtml={initialHtml}
+      aiEnabled={aiEnabled}
+      intro="Revise o contrato abaixo. Você pode ajustar o texto antes de gerar o PDF; o que estiver aqui fica congelado no documento. As assinaturas entram no fim do PDF."
+      label="Texto do contrato"
+      cancelTo={cancelTo}
+      chat={{ mode: "contract", suggestions: CONTRACT_SUGGESTIONS, rentalId }}
+      onPreview={(html) => preview.mutate({ rentalId, templateId, html })}
+      previewing={preview.isPending}
+      onSave={save}
+      saving={create.isPending}
+      error={error}
+    />
   );
 }

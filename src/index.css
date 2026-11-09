@@ -127,6 +127,12 @@
     --error-bg: 4 93% 94%;
     --error-fg: 4 76% 40%;
 
+    /* Segmented control: recessed track, raised thumb. */
+    --segment-track: 240 5% 93%;
+    --segment-inset: 240 6% 10% / 0.06;
+    --segment-thumb: 0 0% 100%;
+    --segment-thumb-border: 240 6% 88%;
+
     --radius: 0.6rem;
   }
 
@@ -160,6 +166,12 @@
     --warning-fg: 45 90% 76%;
     --error-bg: 4 45% 22%;
     --error-fg: 4 85% 80%;
+
+    /* Track below the card, thumb above it (muted = card here). */
+    --segment-track: 240 6% 9%;
+    --segment-inset: 0 0% 0% / 0.35;
+    --segment-thumb: 240 4% 24%;
+    --segment-thumb-border: 240 5% 32%;
   }
 }
 
@@ -193,6 +205,12 @@
     --warning-fg: 45 90% 76%;
     --error-bg: 4 45% 22%;
     --error-fg: 4 85% 80%;
+
+    /* Track below the card, thumb above it (muted = card here). */
+    --segment-track: 240 6% 9%;
+    --segment-inset: 0 0% 0% / 0.35;
+    --segment-thumb: 240 4% 24%;
+    --segment-thumb-border: 240 5% 32%;
   }
 }
 

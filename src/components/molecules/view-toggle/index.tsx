@@ -1,12 +1,27 @@
 import { LayoutGrid, Table2 } from "lucide-react";
-import { Box } from "@/components/atoms/box";
-import { Button } from "@/components/atoms/button";
+import { SegmentedControl } from "@/components/atoms/segmented-control";
+import type { ReactNode } from "react";
 import type { ListView } from "@/constants/pagination";
-import { cn } from "@/utils/cn";
 
-const OPTIONS: { value: ListView; label: string; icon: typeof Table2 }[] = [
-  { value: "lista", label: "Lista", icon: LayoutGrid },
-  { value: "tabela", label: "Tabela", icon: Table2 },
+const OPTIONS: { value: ListView; label: ReactNode }[] = [
+  {
+    value: "lista",
+    label: (
+      <>
+        <LayoutGrid aria-hidden />
+        Lista
+      </>
+    ),
+  },
+  {
+    value: "tabela",
+    label: (
+      <>
+        <Table2 aria-hidden />
+        Tabela
+      </>
+    ),
+  },
 ];
 
 type ViewToggleProps = {
@@ -19,35 +34,14 @@ type ViewToggleProps = {
  * Desktop only: the phone always shows cards.
  */
 export function ViewToggle({ view, onChange }: ViewToggleProps) {
-  const index = OPTIONS.findIndex((option) => option.value === view);
-
   return (
-    <Box
-      role="group"
+    <SegmentedControl
       aria-label="Visualização"
-      className="relative hidden shrink-0 rounded-md md:inline-flex border bg-muted/40 p-0.5"
-    >
-      <Box
-        aria-hidden
-        className="absolute inset-y-0.5 left-0.5 w-[calc(50%-2px)] rounded bg-card shadow-sm transition-transform duration-200 ease-out motion-reduce:transition-none"
-        style={{ transform: `translateX(${index * 100}%)` }}
-      />
-      {OPTIONS.map(({ value, label, icon: Icon }) => (
-        <Button
-          key={value}
-          variant="ghost"
-          size="sm"
-          aria-pressed={view === value}
-          onClick={() => onChange(value)}
-          className={cn(
-            "relative z-10 h-9 flex-1 gap-1.5 px-3 hover:bg-transparent md:h-8",
-            view === value ? "text-foreground" : "text-muted-foreground",
-          )}
-        >
-          <Icon />
-          {label}
-        </Button>
-      ))}
-    </Box>
+      size="sm"
+      value={view}
+      onValueChange={onChange}
+      options={OPTIONS}
+      className="hidden w-auto shrink-0 md:flex"
+    />
   );
 }

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryKeys } from "@/constants/query-keys";
 import { errorMessage } from "@/helpers/api-error";
+import { openBlobInNewTab } from "@/helpers/files";
 import { partnersService } from "@/services/api/gestao/partners.service";
 import type {
   PartnerContract,
@@ -103,4 +104,32 @@ export function usePartnerContractVehicles(contractId: string) {
   });
 
   return { add, update, remove };
+}
+
+/** "Visualizar PDF": the edited text in a new tab, nothing saved. */
+export function usePartnerContractDocumentPreview(contractId: string) {
+  return useMutation({
+    mutationFn: (html: string) =>
+      openBlobInNewTab(() => partnersService.previewDocument(contractId, html)),
+    onError: (error) =>
+      toast.error(
+        `Não foi possível gerar a prévia do PDF: ${errorMessage(error)}`,
+      ),
+  });
+}
+
+/** "Gerar PDF e salvar": errors stay with the editor (422 without a moto). */
+export function useGeneratePartnerContractDocument(contractId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (html: string) =>
+      partnersService.generateDocument(contractId, html),
+    onSuccess: (result) => {
+      queryClient.setQueryData(
+        queryKeys.partners.contractDocument(contractId),
+        result,
+      );
+      toast.success("Contrato em PDF gerado e anexado");
+    },
+  });
 }

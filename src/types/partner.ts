@@ -1,3 +1,4 @@
+import type { DocumentFile } from "@/types/document";
 /** CPF = a person; CNPJ = a company (may be the new alphanumeric one). */
 export type PartnerDocumentType = "CPF" | "CNPJ";
 
@@ -12,7 +13,7 @@ export type PartnerContributionType = "ASSETS" | "CASH";
 /** What the partner's share is taken from. */
 export type PartnerShareBase = "REVENUE" | "PROFIT";
 
-/** Someone whose motorcycles the company manages (gestão, admin only). */
+/** Someone whose motorcycles the company manages (gestão, the whole staff). */
 export type Partner = {
   id: string;
   name: string;
@@ -130,4 +131,17 @@ export type PartnerVehicleUpdate = {
   acquisitionValue: number | null;
   joinedAt: string;
   leftAt: string | null;
+};
+
+/** The contract's PDF (GET/POST /partner-contracts/:id/document). */
+export type PartnerContractDocument = {
+  document: DocumentFile | null;
+  generatedAt: string | null;
+};
+
+/** Base text merged with the contract's data, for the editor. */
+export type PartnerContractDocumentDraft = {
+  html: string;
+  /** Whether the AI is configured (the chat also needs the person's tools). */
+  aiEnabled: boolean;
 };

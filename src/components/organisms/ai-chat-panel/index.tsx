@@ -28,6 +28,8 @@ const GREETING: Record<AiChatMode, string> = {
     "Olá! Posso ajustar este contrato com você: trocar valores e prazos, incluir acordos, revisar o texto. Consulto a locação, o cliente e os planos quando precisar.",
   proposal:
     "Olá! Posso ajustar esta proposta com você: destacar o plano certo, mudar valores, deixar o texto mais direto. Consulto o lead e os planos quando precisar.",
+  partner_contract:
+    "Olá! Posso montar este contrato de parceria com você: incluir cláusulas, ajustar prazos e a rescisão, explicar a participação e revisar a linguagem. Consulto o contrato, o parceiro e as motos quando precisar.",
 };
 
 export type AiChatPanelProps = {
@@ -38,6 +40,7 @@ export type AiChatPanelProps = {
   suggestions: string[];
   rentalId?: string;
   leadId?: string;
+  partnerContractId?: string;
   /** Why the assistant can't work yet (e.g. no preview to edit). */
   disabledReason?: string;
   className?: string;
@@ -57,6 +60,7 @@ export function AiChatPanel({
   suggestions,
   rentalId,
   leadId,
+  partnerContractId,
   disabledReason,
   className,
 }: AiChatPanelProps) {
@@ -86,6 +90,7 @@ export function AiChatPanel({
         message,
         ...(rentalId ? { rentalId } : {}),
         ...(leadId ? { leadId } : {}),
+        ...(partnerContractId ? { partnerContractId } : {}),
       },
       {
         onSuccess: (answer) => {

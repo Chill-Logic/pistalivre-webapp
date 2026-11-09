@@ -337,6 +337,10 @@ export const PartnerContractPage = lazyPage(
   () => import("@/pages/gestao/partner-contract"),
   "PartnerContractPage",
 );
+export const PartnerContractDocumentPage = lazyPage(
+  () => import("@/pages/gestao/partner-contract-document"),
+  "PartnerContractDocumentPage",
+);
 export const PartnerLoginPage = lazyPage(
   () => import("@/pages/parceiro/login"),
   "PartnerLoginPage",

@@ -5,7 +5,6 @@ import { Button } from "@/components/atoms/button";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
-import { AdminOnly } from "@/components/organisms/admin-only";
 import {
   PartnerAccessCard,
   PartnerAccessCardSkeleton,
@@ -21,18 +20,15 @@ import {
 } from "@/components/organisms/partner-summary";
 import { QueryError } from "@/components/organisms/query-error";
 import { PartnerDetailLayout } from "@/components/templates/partner-detail-layout";
-import { PARTNERS_ADMIN_ONLY } from "@/constants/partner";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { usePartner } from "@/hooks/api/gestao/partners/usePartners";
 import { useBackToList } from "@/hooks/ui/useBackToList";
-import { useUserPermissions } from "@/hooks/ui/useUserPermissions";
 
 export function PartnerDetailPage() {
   const { id = "" } = useParams();
-  const { isAdmin } = useUserPermissions();
   const backTo = useBackToList(ROUTES.partners);
-  const partner = usePartner(isAdmin ? id : "");
+  const partner = usePartner(id);
 
   return (
     <Box className="space-y-4">
@@ -55,7 +51,6 @@ export function PartnerDetailPage() {
           </Box>
         )}
       </Box>
-      <AdminOnly description={PARTNERS_ADMIN_ONLY}>
         {partner.isPending && (
           <SkeletonRegion label="Carregando parceiro…">
             <PartnerDetailLayout
@@ -90,7 +85,6 @@ export function PartnerDetailPage() {
             }
           />
         )}
-      </AdminOnly>
     </Box>
   );
 }

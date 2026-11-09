@@ -23,6 +23,27 @@ export function usePartner(id: string) {
   });
 }
 
+/** The contract's PDF, if it was generated. */
+export function usePartnerContractDocument(id: string) {
+  return useQuery({
+    queryKey: queryKeys.partners.contractDocument(id),
+    queryFn: () => partnersService.getDocument(id),
+    enabled: Boolean(id),
+  });
+}
+
+/** The editor's starting text: read once per visit (the person edits it). */
+export function usePartnerContractDocumentDraft(id: string, enabled: boolean) {
+  return useQuery({
+    queryKey: queryKeys.partners.contractDocumentDraft(id),
+    queryFn: () => partnersService.documentDraft(id),
+    enabled: enabled && Boolean(id),
+    staleTime: Infinity,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
+  });
+}
+
 /** One contract with its motos and its partner. */
 export function usePartnerContract(id: string) {
   return useQuery({

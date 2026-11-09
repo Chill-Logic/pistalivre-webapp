@@ -5,9 +5,12 @@ import { Button } from "@/components/atoms/button";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
-import { AdminOnly } from "@/components/organisms/admin-only";
 import { PartnerContractDeleteButton } from "@/components/organisms/partner-contract-delete-button";
 import { PartnerContractDialog } from "@/components/organisms/partner-contract-dialog";
+import {
+  PartnerContractDocumentCard,
+  PartnerContractDocumentCardSkeleton,
+} from "@/components/organisms/partner-contract-document-card";
 import {
   PartnerContractStatusCard,
   PartnerContractStatusCardSkeleton,
@@ -22,16 +25,13 @@ import {
 } from "@/components/organisms/partner-contract-vehicles-card";
 import { QueryError } from "@/components/organisms/query-error";
 import { PartnerContractLayout } from "@/components/templates/partner-contract-layout";
-import { PARTNERS_ADMIN_ONLY } from "@/constants/partner";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { usePartnerContract } from "@/hooks/api/gestao/partners/usePartners";
-import { useUserPermissions } from "@/hooks/ui/useUserPermissions";
 
 export function PartnerContractPage() {
   const { id = "" } = useParams();
-  const { isAdmin } = useUserPermissions();
-  const contract = usePartnerContract(isAdmin ? id : "");
+  const contract = usePartnerContract(id);
   const data = contract.data;
 
   return (
@@ -63,12 +63,12 @@ export function PartnerContractPage() {
           </Box>
         )}
       </Box>
-      <AdminOnly description={PARTNERS_ADMIN_ONLY}>
         {contract.isPending && (
           <SkeletonRegion label="Carregando contrato…">
             <PartnerContractLayout
               summary={<PartnerContractSummarySkeleton />}
               status={<PartnerContractStatusCardSkeleton />}
+              document={<PartnerContractDocumentCardSkeleton />}
               vehicles={<PartnerContractVehiclesCardSkeleton />}
             />
           </SkeletonRegion>
@@ -90,10 +90,10 @@ export function PartnerContractPage() {
           <PartnerContractLayout
             summary={<PartnerContractSummary contract={data} />}
             status={<PartnerContractStatusCard contract={data} />}
+            document={<PartnerContractDocumentCard contract={data} />}
             vehicles={<PartnerContractVehiclesCard contract={data} />}
           />
         )}
-      </AdminOnly>
     </Box>
   );
 }

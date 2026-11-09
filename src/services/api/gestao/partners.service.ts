@@ -1,3 +1,4 @@
+import { rethrowBlobError } from "@/helpers/api-error";
 import { toQueryParams } from "@/helpers/query-params";
 import { http } from "@/services/http/client";
 import type { Paginated } from "@/types/api";
@@ -5,6 +6,8 @@ import type {
   Partner,
   PartnerContract,
   PartnerContractDetail,
+  PartnerContractDocument,
+  PartnerContractDocumentDraft,
   PartnerContractInput,
   PartnerDetail,
   PartnerFilters,
@@ -14,7 +17,7 @@ import type {
   PartnerVehicleUpdate,
 } from "@/types/partner";
 
-/** Partners and their contracts (admin only: agents get 403). */
+/** Partners and their contracts (the whole staff: admins and agents). */
 export const partnersService = {
   async list(filters: PartnerFilters) {
     const { data } = await http.get<Paginated<PartnerListRow>>("/partners", {
@@ -92,6 +95,43 @@ export const partnersService = {
   async removeVehicle(contractId: string, linkId: string) {
     const { data } = await http.delete<PartnerContract>(
       `/partner-contracts/${contractId}/vehicles/${linkId}`,
+    );
+    return data;
+  },
+  /** The PDF attached to the contract (null until it is generated). */
+  async getDocument(id: string) {
+    const { data } = await http.get<PartnerContractDocument>(
+      `/partner-contracts/${id}/document`,
+    );
+    return data;
+  },
+  /** Base text with the contract's data; nothing saved. */
+  async documentDraft(id: string) {
+    const { data } = await http.get<PartnerContractDocumentDraft>(
+      `/partner-contracts/${id}/document/draft`,
+    );
+    return data;
+  },
+  /** The PDF of the edited text, nothing saved. */
+  async previewDocument(id: string, html: string) {
+    const { data } = await http
+      .post<Blob>(
+        `/partner-contracts/${id}/document/preview`,
+        { html },
+        { responseType: "blob", timeout: 120_000 },
+      )
+      .catch(rethrowBlobError);
+    return data;
+  },
+  /**
+   * Freezes the text as the contract's PDF (the server adds the signatures).
+   * Generating again points to the new file; the old one stays. Needs a moto.
+   */
+  async generateDocument(id: string, html: string) {
+    const { data } = await http.post<PartnerContractDocument>(
+      `/partner-contracts/${id}/document`,
+      { html },
+      { timeout: 120_000 },
     );
     return data;
   },

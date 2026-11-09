@@ -33,7 +33,7 @@ export type AiMe = {
   grants: AiGrant[];
 };
 
-export type AiChatMode = "contract" | "proposal";
+export type AiChatMode = "contract" | "proposal" | "partner_contract";
 
 export type AiChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -46,6 +46,8 @@ export type AiChatInput = {
   message: string;
   rentalId?: string;
   leadId?: string;
+  /** mode "partner_contract": the partner contract whose PDF is being made. */
+  partnerContractId?: string;
 };
 
 /** A write the agent proposed: nothing happens until the person confirms. */

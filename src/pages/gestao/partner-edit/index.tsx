@@ -5,31 +5,25 @@ import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { PageHeader } from "@/components/molecules/page-header";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
-import { AdminOnly } from "@/components/organisms/admin-only";
 import {
   PartnerForm,
   PartnerFormSkeleton,
 } from "@/components/organisms/partner-form";
 import { QueryError } from "@/components/organisms/query-error";
-import { PARTNERS_ADMIN_ONLY } from "@/constants/partner";
 import { routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { usePartner } from "@/hooks/api/gestao/partners/usePartners";
-import { useUserPermissions } from "@/hooks/ui/useUserPermissions";
 
 export function PartnerEditPage() {
   const { id = "" } = useParams();
-  const { isAdmin } = useUserPermissions();
-  const partner = usePartner(isAdmin ? id : "");
+  const partner = usePartner(id);
   const detailUrl = routeTo.partner(id);
 
   return (
     <Box className="space-y-4">
       <BackLink to={detailUrl} label={partner.data?.name ?? "Parceiro"} />
       <PageHeader title="Editar parceiro" />
-      <AdminOnly description={PARTNERS_ADMIN_ONLY}>
-        <PartnerEditContent id={id} />
-      </AdminOnly>
+      <PartnerEditContent id={id} />
     </Box>
   );
 }

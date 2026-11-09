@@ -79,7 +79,6 @@ export const SIDEBAR_NAV: NavItem[] = [
     label: "Parceiros",
     to: ROUTES.partners,
     icon: BriefcaseBusiness,
-    adminOnly: true,
   },
   FINANCE,
   { label: "Projeções", to: ROUTES.projections, icon: TrendingUp },
