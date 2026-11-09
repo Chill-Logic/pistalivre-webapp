@@ -1,4 +1,4 @@
-import { Bike } from "lucide-react";
+import { Car } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -31,7 +31,7 @@ import { isNotFound } from "@/helpers/api-error";
 import { usePartnerVehicle } from "@/hooks/api/parceiro/area/usePartnerVehicle";
 
 /**
- * One of the partner's motorcycles: data, when it is in the contract, and
+ * One of the partner's vehicles: data, when it is in the contract, and
  * what happened while it was theirs (rentals, maintenance, inspections).
  * Desktop: the data in one strip, the rentals wide, then the maintenance
  * beside the inspections.
@@ -47,9 +47,9 @@ export function PartnerVehiclePage() {
       {query.isError &&
         (isNotFound(query.error) ? (
           <EmptyState
-            icon={Bike}
-            title="Moto não encontrada"
-            description="Esta moto não está entre as suas. Confira o endereço ou volte para os seus contratos."
+            icon={Car}
+            title="Veículo não encontrado"
+            description="Este veículo não está entre os seus. Confira o endereço ou volte para os seus contratos."
             action={
               <Button asChild variant="outline">
                 <Link to={ROUTES.partnerArea}>Ver meus contratos</Link>
@@ -93,7 +93,7 @@ export function PartnerVehiclePage() {
 
 function PartnerVehicleSkeleton() {
   return (
-    <SkeletonRegion label="Carregando moto…" className="space-y-6">
+    <SkeletonRegion label="Carregando veículo…" className="space-y-6">
       <Box className="flex items-center justify-between gap-3">
         <Skeleton shape="text" className="w-64 text-2xl" />
         <Skeleton shape="pill" className="h-5 w-16" />

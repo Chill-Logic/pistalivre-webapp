@@ -2,7 +2,7 @@ export type UserRole = "ADMIN" | "AGENT" | "CUSTOMER" | "PARTNER";
 
 /**
  * Who owns the token: staff (`user`), a renter (`customer`) or a partner
- * (`partner`: investor or owner of motorcycles the company manages).
+ * (`partner`: investor or owner of vehicles the company manages).
  */
 export type AuthKind = "user" | "customer" | "partner";
 

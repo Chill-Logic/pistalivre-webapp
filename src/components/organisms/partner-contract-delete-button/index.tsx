@@ -30,7 +30,7 @@ export function PartnerContractDeleteButton({
         </Button>
       }
       title={`Excluir o rascunho ${code}?`}
-      description="O contrato e as motos incluídas nele são apagados. Isso não pode ser desfeito."
+      description="O contrato e os veículos incluídos nele são apagados. Isso não pode ser desfeito."
       confirmLabel="Excluir rascunho"
       isPending={remove.isPending}
       onConfirm={() =>

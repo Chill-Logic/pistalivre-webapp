@@ -20,7 +20,7 @@ export function PartnersEmpty() {
     <EmptyState
       icon={BriefcaseBusiness}
       title="Nenhum parceiro encontrado"
-      description="Investidores e donos de motos geridas pela empresa aparecem aqui."
+      description="Investidores e donos de veículos geridos pela empresa aparecem aqui."
     />
   );
 }

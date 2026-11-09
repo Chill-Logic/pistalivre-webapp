@@ -18,8 +18,8 @@ import { useLabels } from "@/hooks/ui/useLabels";
 import { formatPlate } from "@/utils/plate";
 
 /**
- * Every rental of the partner's motorcycles, cut to the partner's window
- * (gathered from each motorcycle: the API has no list of them). A table on
+ * Every rental of the partner's vehicles, cut to the partner's window
+ * (gathered from each vehicle: the API has no list of them). A table on
  * the desktop, cards on the phone. Short list: no paging.
  */
 export function PartnerRentalsPage() {
@@ -29,7 +29,7 @@ export function PartnerRentalsPage() {
     <EmptyState
       icon={FileSignature}
       title="Nenhuma locação ainda"
-      description="As locações das suas motos aparecem aqui, a partir de quando cada moto entrou no seu contrato."
+      description="As locações dos seus veículos aparecem aqui, a partir de quando cada veículo entrou no seu contrato."
     />
   );
 
@@ -50,7 +50,10 @@ export function PartnerRentalsPage() {
           </Box>
           <Box className="md:hidden">
             {query.isPending ? (
-              <SkeletonRegion label="Carregando locações…" className="space-y-3">
+              <SkeletonRegion
+                label="Carregando locações…"
+                className="space-y-3"
+              >
                 {[0, 1, 2].map((index) => (
                   <Box
                     key={index}

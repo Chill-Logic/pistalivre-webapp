@@ -113,7 +113,7 @@ import { LoginPage } from "@/pages/gestao/login";
 import { NotFoundPage } from "@/pages/comum/not-found";
 import type { Realm } from "@/types/auth";
 
-/** Partner area: read only, the partner's motorcycles and their rentals. */
+/** Partner area: read only, the partner's vehicles and their rentals. */
 const partnerRoutes: RouteObject[] = [
   {
     element: <RedirectIfAuthenticated realm="parceiro" />,

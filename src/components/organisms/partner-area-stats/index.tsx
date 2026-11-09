@@ -35,14 +35,14 @@ export function PartnerAreaStats({
       </Col>
       <Col span={6} lg={3}>
         <StatCard
-          label="Motos no contrato"
+          label="Veículos no contrato"
           value={counts.vehiclesInContract}
           hint="Nos contratos ativos"
         />
       </Col>
       <Col span={6} lg={3}>
         <StatCard
-          label="Motos alugadas agora"
+          label="Veículos alugados agora"
           value={counts.vehiclesRented}
           tone={counts.vehiclesRented > 0 ? "success" : "default"}
           hint={
@@ -62,7 +62,7 @@ export function PartnerAreaStats({
             label="Locações acompanhadas"
             value={rentalCount ?? "Indisponível"}
             tone={rentalCount === null ? "muted" : "default"}
-            hint="Desde que as motos entraram"
+            hint="Desde que os veículos entraram"
           />
         )}
       </Col>

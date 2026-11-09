@@ -95,7 +95,7 @@ export function contractTerms(contract: PartnerAreaContract, label: LabelFn) {
 }
 
 /**
- * Every motorcycle of the partner's contracts, once each (a motorcycle that
+ * Every vehicle of the partner's contracts, once each (a vehicle that
  * moved between contracts shows the one it is in now, or the latest).
  */
 export function partnerVehicleRows(contracts: PartnerAreaContract[]) {
@@ -137,7 +137,7 @@ export function partnerHomeCounts(contracts: PartnerAreaContract[]) {
   };
 }
 
-/** The rentals of every motorcycle, newest first (Locações page). */
+/** The rentals of every vehicle, newest first (Locações page). */
 export function partnerRentalRows(details: PartnerAreaVehicleDetail[]) {
   const rows = new Map<string, PartnerAreaRentalRow>();
   for (const { vehicle, rentals } of details) {

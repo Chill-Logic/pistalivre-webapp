@@ -38,7 +38,7 @@ export type PartnerAreaContractVehicle = {
   vehicleId: string;
   plate: string | null;
   label: string | null;
-  /** Today's state; null once the motorcycle left the contract. */
+  /** Today's state; null once the vehicle left the contract. */
   status: VehicleStatus | null;
   acquisitionValue: number | null;
   joinedAt: string;
@@ -72,7 +72,7 @@ export type PartnerAreaHome = {
   contracts: PartnerAreaContract[];
 };
 
-/** A rental of a partner's motorcycle, cut to what the partner may see. */
+/** A rental of a partner's vehicle, cut to what the partner may see. */
 export type PartnerAreaRental = {
   id: string;
   code: string;
@@ -115,10 +115,10 @@ export type PartnerAreaVehicleDetail = {
     label: string;
     year: number;
     color: string | null;
-    /** null once the motorcycle left the contract. */
+    /** null once the vehicle left the contract. */
     status: VehicleStatus | null;
   };
-  /** When the motorcycle was the partner's (to = null: still is). */
+  /** When the vehicle was the partner's (to = null: still is). */
   windows: { from: string; to: string | null }[];
   rentals: PartnerAreaRental[];
   maintenances: PartnerAreaMaintenance[];
@@ -199,13 +199,13 @@ export type PartnerAreaPasswordInput = {
   newPassword: string;
 };
 
-/** A rental of the partner (Locações page), with its motorcycle. */
+/** A rental of the partner (Locações page), with its vehicle. */
 export type PartnerAreaRentalRow = PartnerAreaRental & {
   vehicleLabel: string;
   plate: string;
 };
 
-/** A motorcycle of the partner (Motos page), with its contract. */
+/** A vehicle of the partner (Veículos page), with its contract. */
 export type PartnerAreaVehicleRow = PartnerAreaContractVehicle & {
   contractId: string;
   contractCode: string;

@@ -23,8 +23,8 @@ const COLUMNS: DataTableColumn<PartnerAreaVehicleRow>[] = [
     skeleton: "w-20",
   },
   {
-    header: "Moto",
-    cell: (vehicle) => vehicle.label ?? "Moto",
+    header: "Veículo",
+    cell: (vehicle) => vehicle.label ?? "Veículo",
     className: "max-w-64 truncate",
     skeleton: "w-48",
   },
@@ -65,7 +65,7 @@ const COLUMNS: DataTableColumn<PartnerAreaVehicleRow>[] = [
         <>
           <TextLink
             to={routeTo.partnerAreaRental(vehicle.currentRental.id)}
-            // The row opens the motorcycle; this opens the rental.
+            // The row opens the vehicle; this opens the rental.
             onClick={(event) => event.stopPropagation()}
           >
             {vehicle.currentRental.customerName}
@@ -90,7 +90,7 @@ type PartnerAreaVehicleTableProps = {
   empty: ReactNode;
 };
 
-/** The partner's motorcycles on the desktop: one row each, opens the motorcycle. */
+/** The partner's vehicles on the desktop: one row each, opens the vehicle. */
 export function PartnerAreaVehicleTable({
   vehicles,
   isLoading,
@@ -106,7 +106,7 @@ export function PartnerAreaVehicleTable({
       isLoading={isLoading}
       isRefreshing={isRefreshing}
       empty={empty}
-      loadingLabel="Carregando motos…"
+      loadingLabel="Carregando veículos…"
       skeletonRows={3}
     />
   );

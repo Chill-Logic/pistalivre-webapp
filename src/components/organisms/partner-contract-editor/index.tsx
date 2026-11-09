@@ -25,7 +25,7 @@ const PARTNER_CONTRACT_SUGGESTIONS = [
 
 /**
  * The partner contract's text (investment or management, merged with its
- * terms and motos), with the AI assistant beside it → "Visualizar PDF" →
+ * terms and vehicles), with the AI assistant beside it → "Visualizar PDF" →
  * "Gerar PDF e salvar", which freezes it as the contract's PDF (the server
  * adds the signatures). Generating again keeps the old file.
  */

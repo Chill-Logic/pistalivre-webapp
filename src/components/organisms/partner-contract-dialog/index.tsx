@@ -56,7 +56,7 @@ type PartnerContractDialogProps = {
 };
 
 /**
- * The contract's terms. Investment: the contribution (motos or money) and the
+ * The contract's terms. Investment: the contribution (vehicles or money) and the
  * partner's share; management: the company's fee. The payout is always made
  * outside the system.
  */
@@ -78,7 +78,7 @@ export function PartnerContractDialog({
         <DialogDescription>
           {contract
             ? "Os termos do contrato. A situação muda no card Situação."
-            : "Nasce como rascunho: depois inclua as motos e ative."}
+            : "Nasce como rascunho: depois inclua os veículos e ative."}
         </DialogDescription>
         {open && (
           <ContractForm

@@ -1,4 +1,4 @@
-import { Bike, FileText } from "lucide-react";
+import { Car, FileText } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
@@ -23,8 +23,8 @@ import { formatDateTime } from "@/utils/format";
 
 /**
  * "Montar contrato" of a partner contract: the base text merged with its
- * terms and motos, the AI assistant beside it, "Visualizar PDF" and "Gerar
- * PDF e salvar" (back to the contract). Needs a moto in the contract.
+ * terms and vehicles, the AI assistant beside it, "Visualizar PDF" and "Gerar
+ * PDF e salvar" (back to the contract). Needs a vehicle in the contract.
  */
 export function PartnerContractDocumentPage() {
   const { id = "" } = useParams();
@@ -70,9 +70,9 @@ export function PartnerContractDocumentPage() {
 
       {contract.data && !hasVehicles && (
         <EmptyState
-          icon={Bike}
-          title="Inclua as motos antes"
-          description="O documento descreve as motos do contrato: inclua ao menos uma para montá-lo."
+          icon={Car}
+          title="Inclua os veículos antes"
+          description="O documento descreve os veículos do contrato: inclua ao menos um para montá-lo."
           action={
             <Button asChild variant="outline">
               <Link to={contractUrl}>Voltar ao contrato</Link>

@@ -17,7 +17,7 @@ import { useLabels } from "@/hooks/ui/useLabels";
 import type { PartnerAreaRentalDetail } from "@/types/partner-area";
 import { formatPlate } from "@/utils/plate";
 
-/** Who rents (the name only), which motorcycle, the visible period and rate. */
+/** Who rents (the name only), which vehicle, the visible period and rate. */
 export function PartnerAreaRentalSummary({
   rental,
 }: {
@@ -37,12 +37,12 @@ export function PartnerAreaRentalSummary({
           <InfoItem label="Código" span={12} mono>
             {rental.code}
           </InfoItem>
-          <InfoItem label="Moto" span={12}>
+          <InfoItem label="Veículo" span={12}>
             <Link
               to={routeTo.partnerAreaVehicle(rental.vehicleId)}
               className="rounded-sm font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              {rental.vehicleLabel ?? "Moto"}
+              {rental.vehicleLabel ?? "Veículo"}
             </Link>
             {rental.plate && (
               <Text size="xs" tone="muted" mono>

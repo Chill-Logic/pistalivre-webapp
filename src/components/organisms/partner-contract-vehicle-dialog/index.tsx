@@ -26,7 +26,7 @@ import { useVehicleOptions } from "@/hooks/ui/useRemoteOptions";
 import type { PartnerContract, PartnerContractVehicle } from "@/types/partner";
 import { todayInBrasilia } from "@/utils/date";
 
-/** add = include a moto; edit = correct value/dates; leave = record the exit. */
+/** add = include a vehicle; edit = correct value/dates; leave = record the exit. */
 type Mode = "add" | "edit" | "leave";
 
 type Errors = {
@@ -40,20 +40,20 @@ type Errors = {
 type PartnerContractVehicleDialogProps = {
   contract: PartnerContract;
   mode: Mode;
-  /** The moto's link (edit and leave). */
+  /** The vehicle's link (edit and leave). */
   link?: PartnerContractVehicle;
   trigger: ReactNode;
 };
 
 const TITLES: Record<Mode, string> = {
-  add: "Incluir moto",
-  edit: "Corrigir moto",
+  add: "Incluir veículo",
+  edit: "Corrigir veículo",
   leave: "Registrar saída",
 };
 
 /**
- * A moto in the partner's contract: which one, what the partner paid for it
- * and the window in which it is theirs (entry, exit). A moto sits in one open
+ * A vehicle in the partner's contract: which one, what the partner paid for it
+ * and the window in which it is theirs (entry, exit). A vehicle sits in one open
  * contract at a time (409 on the picker).
  */
 export function PartnerContractVehicleDialog({
@@ -97,7 +97,10 @@ export function PartnerContractVehicleDialog({
     const apiError = toApiError(error);
     const fields = apiError.fields ?? {};
     const placed =
-      fields.vehicleId || fields.acquisitionValue || fields.joinedAt || fields.leftAt;
+      fields.vehicleId ||
+      fields.acquisitionValue ||
+      fields.joinedAt ||
+      fields.leftAt;
     setErrors({
       vehicleId: fields.vehicleId,
       acquisitionValue: fields.acquisitionValue,
@@ -110,7 +113,7 @@ export function PartnerContractVehicleDialog({
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
     const found: Errors = {
-      vehicleId: mode === "add" && !picked ? "Escolha a moto" : undefined,
+      vehicleId: mode === "add" && !picked ? "Escolha o veículo" : undefined,
       joinedAt: !joinedAt
         ? "Informe a entrada"
         : joinedAt < contract.startDate
@@ -146,7 +149,9 @@ export function PartnerContractVehicleDialog({
         input: { acquisitionValue, joinedAt, leftAt: leftAt || null },
       },
       {
-        onSuccess: done(mode === "leave" ? "Saída registrada" : "Moto atualizada"),
+        onSuccess: done(
+          mode === "leave" ? "Saída registrada" : "Veículo atualizado",
+        ),
         onError,
       },
     );
@@ -161,13 +166,13 @@ export function PartnerContractVehicleDialog({
         </DialogTitle>
         <DialogDescription>
           {mode === "leave"
-            ? "O parceiro mantém o histórico da moto até o dia da saída, e ela fica livre para outro contrato."
-            : "O parceiro vê a moto a partir do dia da entrada (num contrato ativo)."}
+            ? "O parceiro mantém o histórico do veículo até o dia da saída, e ele fica livre para outro contrato."
+            : "O parceiro vê o veículo a partir do dia da entrada (num contrato ativo)."}
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
           {mode === "add" && (
             <RemoteCombobox
-              label="Moto"
+              label="Veículo"
               value={picked?.value ?? ""}
               selectedLabel={picked?.label}
               options={options}
@@ -178,7 +183,7 @@ export function PartnerContractVehicleDialog({
                 setPicked(option);
                 setErrors((current) => ({ ...current, vehicleId: undefined }));
               }}
-              placeholder="Escolha a moto"
+              placeholder="Escolha o veículo"
               searchPlaceholder="Placa, marca ou modelo…"
               error={errors.vehicleId}
             />
@@ -199,9 +204,12 @@ export function PartnerContractVehicleDialog({
               />
             </>
           )}
-          {(mode === "leave" || (mode === "edit" && contract.status !== "DRAFT")) && (
+          {(mode === "leave" ||
+            (mode === "edit" && contract.status !== "DRAFT")) && (
             <DateField
-              label={mode === "leave" ? "Saída do contrato" : "Saída (opcional)"}
+              label={
+                mode === "leave" ? "Saída do contrato" : "Saída (opcional)"
+              }
               value={leftAt}
               onChange={setLeftAt}
               clearable={mode === "edit"}
@@ -209,7 +217,9 @@ export function PartnerContractVehicleDialog({
               error={errors.leftAt}
             />
           )}
-          {mode === "leave" && errors.joinedAt && <Alert>{errors.joinedAt}</Alert>}
+          {mode === "leave" && errors.joinedAt && (
+            <Alert>{errors.joinedAt}</Alert>
+          )}
           {errors.form && <Alert>{errors.form}</Alert>}
           <DialogFooter>
             <DialogClose asChild>
@@ -218,7 +228,9 @@ export function PartnerContractVehicleDialog({
               </Button>
             </DialogClose>
             <Button type="submit" disabled={save.isPending}>
-              {save.isPending && <Spinner className="text-primary-foreground" />}
+              {save.isPending && (
+                <Spinner className="text-primary-foreground" />
+              )}
               {mode === "add"
                 ? "Incluir"
                 : mode === "leave"

@@ -14,7 +14,7 @@ export function usePartnerList(filters: PartnerFilters, isDesktop: boolean) {
   });
 }
 
-/** One partner with its contracts (and their motos). */
+/** One partner with its contracts (and their vehicles). */
 export function usePartner(id: string) {
   return useQuery({
     queryKey: queryKeys.partners.detail(id),
@@ -44,7 +44,7 @@ export function usePartnerContractDocumentDraft(id: string, enabled: boolean) {
   });
 }
 
-/** One contract with its motos and its partner. */
+/** One contract with its vehicles and its partner. */
 export function usePartnerContract(id: string) {
   return useQuery({
     queryKey: queryKeys.partners.contract(id),

@@ -21,7 +21,7 @@ type PartnerAreaRentalTableProps = {
   empty: ReactNode;
 };
 
-/** Every rental of the partner's motorcycles on the desktop (opens the rental). */
+/** Every rental of the partner's vehicles on the desktop (opens the rental). */
 export function PartnerAreaRentalTable({
   rentals,
   isLoading,
@@ -47,12 +47,12 @@ export function PartnerAreaRentalTable({
       skeleton: "w-24",
     },
     {
-      header: "Moto",
+      header: "Veículo",
       cell: (rental) => (
         <>
           <TextLink
             to={routeTo.partnerAreaVehicle(rental.vehicleId)}
-            // The row opens the rental; this opens the motorcycle.
+            // The row opens the rental; this opens the vehicle.
             onClick={(event) => event.stopPropagation()}
           >
             {rental.vehicleLabel}

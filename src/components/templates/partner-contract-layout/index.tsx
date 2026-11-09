@@ -9,7 +9,7 @@ type PartnerContractLayoutProps = {
   vehicles: ReactNode;
 };
 
-/** Terms beside the situation and the PDF on the desktop; the motos below. */
+/** Terms beside the situation and the PDF on the desktop; the vehicles below. */
 export function PartnerContractLayout({
   summary,
   status,

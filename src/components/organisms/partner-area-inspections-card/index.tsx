@@ -10,7 +10,7 @@ import { useLabels } from "@/hooks/ui/useLabels";
 import type { PartnerAreaInspection } from "@/types/partner-area";
 import { formatDate, formatMileage } from "@/utils/format";
 
-/** Inspections done while the motorcycle was the partner's. */
+/** Inspections done while the vehicle was the partner's. */
 export function PartnerAreaInspectionsCard({
   inspections,
 }: {
@@ -60,6 +60,10 @@ export function PartnerAreaInspectionsCard({
 
 export function PartnerAreaInspectionsCardSkeleton() {
   return (
-    <PartnerAreaTableCardSkeleton rows={2} columns={["w-24", "w-20", "w-14"]} narrowFromXl />
+    <PartnerAreaTableCardSkeleton
+      rows={2}
+      columns={["w-24", "w-20", "w-14"]}
+      narrowFromXl
+    />
   );
 }

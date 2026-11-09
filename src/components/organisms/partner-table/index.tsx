@@ -55,7 +55,7 @@ export function PartnerTable({
         skeleton: "w-44",
       },
       {
-        header: "Motos ativas",
+        header: "Veículos ativos",
         cell: (partner) => partner.vehicleCount,
         className: "tabular-nums",
         align: "right",

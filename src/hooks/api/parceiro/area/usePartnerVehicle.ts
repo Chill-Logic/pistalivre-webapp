@@ -3,7 +3,7 @@ import { queryKeys } from "@/constants/query-keys";
 import { isNotFound } from "@/helpers/api-error";
 import { partnerAreaService } from "@/services/api/parceiro/partner-area.service";
 
-/** One of the partner's motorcycles (404 = not theirs, never retried). */
+/** One of the partner's vehicles (404 = not theirs, never retried). */
 export function usePartnerVehicle(id: string) {
   return useQuery({
     queryKey: queryKeys.partnerArea.vehicle(id),

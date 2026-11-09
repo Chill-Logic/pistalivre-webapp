@@ -111,11 +111,11 @@ export const ROUTES = {
   portalRental: `${PORTAL}/locacoes/:id`,
   portalInspectionNew: `${PORTAL}/locacoes/:id/vistorias/nova`,
   portalRentalStatement: `${PORTAL}/locacoes/:id/extrato`,
-  /** Partner area (app.parceiro): read only, the partner's motorcycles. */
+  /** Partner area (app.parceiro): read only, the partner's vehicles. */
   partnerArea: PARTNER || "/",
   partnerAreaLogin: `${PARTNER}/entrar`,
-  partnerAreaVehicles: `${PARTNER}/motos`,
-  partnerAreaVehicle: `${PARTNER}/motos/:id`,
+  partnerAreaVehicles: `${PARTNER}/veiculos`,
+  partnerAreaVehicle: `${PARTNER}/veiculos/:id`,
   partnerAreaRentals: `${PARTNER}/locacoes`,
   partnerAreaRental: `${PARTNER}/locacoes/:id`,
   partnerAreaProfile: `${PARTNER}/perfil`,
@@ -198,6 +198,6 @@ export const routeTo = {
   portalRentalStatement: (id: string) => `${PORTAL}/locacoes/${id}/extrato`,
   portalInspectionNew: (id: string) =>
     `${PORTAL}/locacoes/${id}/vistorias/nova`,
-  partnerAreaVehicle: (id: string) => `${PARTNER}/motos/${id}`,
+  partnerAreaVehicle: (id: string) => `${PARTNER}/veiculos/${id}`,
   partnerAreaRental: (id: string) => `${PARTNER}/locacoes/${id}`,
 };

@@ -42,7 +42,7 @@ export function PartnerCard({ partner }: { partner: PartnerListRow }) {
           </Text>
           <Box className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <Text weight="medium">
-              {pluralize(partner.vehicleCount, "moto", "motos")}
+              {pluralize(partner.vehicleCount, "veículo", "veículos")}
               <Text inline size="xs" tone="muted" weight="normal">
                 {" "}
                 em contrato ativo ·{" "}

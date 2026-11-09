@@ -1,4 +1,4 @@
-import { Bike, LogOut, Pencil, Plus, Trash2 } from "lucide-react";
+import { Car, LogOut, Pencil, Plus, Trash2 } from "lucide-react";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -22,7 +22,7 @@ import { formatCalendarDate, formatCurrency } from "@/utils/format";
 import { formatPlate } from "@/utils/plate";
 
 /**
- * The contract's motos with the window each is the partner's. Draft: include,
+ * The contract's vehicles with the window each is the partner's. Draft: include,
  * correct, remove (a mistake). Active: include, correct, record the exit.
  * Ended: read only.
  */
@@ -44,7 +44,7 @@ export function PartnerContractVehiclesCard({
     <Card>
       <CardHeader className="flex-row flex-wrap items-center justify-between gap-2 space-y-0">
         <CardTitle className="text-base">
-          Motos
+          Veículos
           {contract.vehicles.length > 0 && (
             <Text inline size="sm" tone="muted" weight="normal">
               {" "}
@@ -59,7 +59,7 @@ export function PartnerContractVehiclesCard({
             trigger={
               <Button size="sm">
                 <Plus />
-                Incluir moto
+                Incluir veículo
               </Button>
             }
           />
@@ -68,14 +68,16 @@ export function PartnerContractVehiclesCard({
       <CardContent>
         {ordered.length === 0 ? (
           <EmptyState
-            icon={Bike}
-            title="Nenhuma moto"
-            description="Inclua as motos do parceiro para ativar o contrato."
+            icon={Car}
+            title="Nenhum veículo"
+            description="Inclua os veículos do parceiro para ativar o contrato."
           />
         ) : (
           <List className="divide-y">
             {ordered.map((link) => {
-              const plate = link.plate ? formatPlate(link.plate) : "Moto removida";
+              const plate = link.plate
+                ? formatPlate(link.plate)
+                : "Veículo removido";
               return (
                 <ListItem
                   key={link.id}
@@ -97,7 +99,8 @@ export function PartnerContractVehiclesCard({
                     )}
                     <Text size="xs" tone="muted" className="tabular-nums">
                       Entrou em {formatCalendarDate(link.joinedAt)}
-                      {link.leftAt && ` · saiu em ${formatCalendarDate(link.leftAt)}`}
+                      {link.leftAt &&
+                        ` · saiu em ${formatCalendarDate(link.leftAt)}`}
                       {link.acquisitionValue !== null &&
                         ` · aquisição ${formatCurrency(link.acquisitionValue)}`}
                     </Text>
@@ -146,9 +149,11 @@ export function PartnerContractVehiclesCard({
                             </Button>
                           }
                           title={`Remover ${plate} do contrato?`}
-                          description="O contrato ainda é rascunho, então a moto sai sem deixar histórico."
+                          description="O contrato ainda é rascunho, então o veículo sai sem deixar histórico."
                           confirmLabel="Remover"
-                          isPending={remove.isPending && remove.variables === link.id}
+                          isPending={
+                            remove.isPending && remove.variables === link.id
+                          }
                           onConfirm={() => remove.mutate(link.id)}
                         />
                       )}

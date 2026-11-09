@@ -35,7 +35,7 @@ import { formatCalendarDate } from "@/utils/format";
 import { pluralize } from "@/utils/text";
 
 /**
- * Draft → Ativar (needs a moto) → Encerrar (needs the end day). What the
+ * Draft → Ativar (needs a vehicle) → Encerrar (needs the end day). What the
  * partner sees follows it: drafts are invisible to them.
  */
 export function PartnerContractStatusCard({
@@ -66,12 +66,12 @@ export function PartnerContractStatusCard({
         {contract.status === "DRAFT" && (
           <>
             <Text tone="muted">
-              Rascunho: o parceiro ainda não vê este contrato. Inclua as motos
-              e ative.
+              Rascunho: o parceiro ainda não vê este contrato. Inclua os
+              veículos e ative.
             </Text>
             {!hasVehicles && (
               <Text size="xs" tone="muted">
-                Para ativar, inclua ao menos uma moto.
+                Para ativar, inclua ao menos um veículo.
               </Text>
             )}
             <ConfirmDialog
@@ -84,7 +84,7 @@ export function PartnerContractStatusCard({
                 </Button>
               }
               title={`Ativar ${contract.code}?`}
-              description={`O parceiro passa a ver ${contract.vehicles.length === 1 ? "a moto" : `as ${contract.vehicles.length} motos`} deste contrato na área dele, desde o dia em que cada uma entrou. Depois de ativo, uma moto só sai registrando a saída.`}
+              description={`O parceiro passa a ver ${contract.vehicles.length === 1 ? "o veículo" : `os ${contract.vehicles.length} veículos`} deste contrato na área dele, desde o dia em que cada um entrou. Depois de ativo, um veículo só sai registrando a saída.`}
               confirmLabel="Ativar"
               isPending={update.isPending}
               onConfirm={activate}
@@ -95,8 +95,12 @@ export function PartnerContractStatusCard({
           <>
             <Text tone="muted">
               Ativo com{" "}
-              {pluralize(currentVehicles(contract).length, "moto", "motos")}. O
-              parceiro acompanha as locações na área dele.
+              {pluralize(
+                currentVehicles(contract).length,
+                "veículo",
+                "veículos",
+              )}
+              . O parceiro acompanha as locações na área dele.
             </Text>
             <EndContractDialog contract={contract} />
           </>
@@ -163,7 +167,7 @@ function EndContractDialog({ contract }: { contract: PartnerContract }) {
       <DialogContent>
         <DialogTitle>Encerrar {contract.code}?</DialogTitle>
         <DialogDescription>
-          O parceiro continua vendo o histórico das motos até o dia do fim, e
+          O parceiro continua vendo o histórico dos veículos até o dia do fim, e
           elas ficam livres para outro contrato.
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
@@ -176,12 +180,22 @@ function EndContractDialog({ contract }: { contract: PartnerContract }) {
           {errors.form && <Alert>{errors.form}</Alert>}
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={update.isPending}>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={update.isPending}
+              >
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit" variant="destructive" disabled={update.isPending}>
-              {update.isPending && <Spinner className="text-primary-foreground" />}
+            <Button
+              type="submit"
+              variant="destructive"
+              disabled={update.isPending}
+            >
+              {update.isPending && (
+                <Spinner className="text-primary-foreground" />
+              )}
               Encerrar
             </Button>
           </DialogFooter>

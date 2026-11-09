@@ -13,7 +13,7 @@ import type {
 } from "@/types/partner-area";
 import type { VehicleStatus } from "@/types/vehicle";
 
-/** Today's state of the motorcycle; none once it left the contract. */
+/** Today's state of the vehicle; none once it left the contract. */
 export function PartnerVehicleStatusBadge({
   status,
 }: {

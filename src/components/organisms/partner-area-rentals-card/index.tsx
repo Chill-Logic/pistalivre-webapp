@@ -17,7 +17,7 @@ import type { PartnerAreaRental } from "@/types/partner-area";
 const LINK_CLASS =
   "rounded-sm font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
-/** Rentals of the motorcycle, cut to the partner's window (active and closed). */
+/** Rentals of the vehicle, cut to the partner's window (active and closed). */
 export function PartnerAreaRentalsCard({
   rentals,
 }: {
@@ -33,7 +33,10 @@ export function PartnerAreaRentalsCard({
       wrap: true,
       cell: (rental) => (
         <>
-          <Link to={routeTo.partnerAreaRental(rental.id)} className={LINK_CLASS}>
+          <Link
+            to={routeTo.partnerAreaRental(rental.id)}
+            className={LINK_CLASS}
+          >
             {rental.customerName}
           </Link>
           <Text size="xs" tone="muted" mono>
@@ -56,7 +59,7 @@ export function PartnerAreaRentalsCard({
   return (
     <PartnerAreaTableCard
       title="Locações"
-      empty="Nenhuma locação enquanto a moto está com você."
+      empty="Nenhuma locação enquanto o veículo está com você."
       items={rentals}
       rowKey={(rental) => rental.id}
       columns={columns}
@@ -71,7 +74,7 @@ export function PartnerAreaRentalsCard({
           aside={<RentalStatusBadge status={rental.status} />}
         />
       )}
-      footer="De cada locação aparece só o trecho em que a moto estava no seu contrato."
+      footer="De cada locação aparece só o trecho em que o veículo estava no seu contrato."
     />
   );
 }

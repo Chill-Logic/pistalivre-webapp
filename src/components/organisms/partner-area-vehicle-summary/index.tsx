@@ -14,7 +14,7 @@ import { periodText } from "@/helpers/partner-area";
 import type { PartnerAreaVehicleDetail } from "@/types/partner-area";
 import { formatPlate } from "@/utils/plate";
 
-/** The motorcycle and when it was (or is) in the partner's contract. */
+/** The vehicle and when it was (or is) in the partner's contract. */
 export function PartnerAreaVehicleSummary({
   detail,
 }: {
@@ -24,7 +24,7 @@ export function PartnerAreaVehicleSummary({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Dados da moto</CardTitle>
+        <CardTitle className="text-base">Dados do veículo</CardTitle>
       </CardHeader>
       <CardContent>
         <Row as="dl" className="gap-y-4">

@@ -14,7 +14,7 @@ const LINK =
   "flex items-center gap-3 px-4 py-3 transition-colors hover:bg-accent/50 active:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring";
 
 /**
- * A motorcycle of the contract, on the phone: the motorcycle opens its page;
+ * A vehicle of the contract, on the phone: the vehicle opens its page;
  * the current rental (renter's name and since when) opens the rental.
  */
 export function PartnerAreaVehicleItem({
@@ -29,7 +29,7 @@ export function PartnerAreaVehicleItem({
         <Box className="min-w-0 flex-1 space-y-1.5">
           <Box className="flex items-start justify-between gap-2">
             <Text size="base" weight="semibold" className="min-w-0">
-              {vehicle.label ?? "Moto"}
+              {vehicle.label ?? "Veículo"}
             </Text>
             <PartnerVehicleStatusBadge status={vehicle.status} />
           </Box>

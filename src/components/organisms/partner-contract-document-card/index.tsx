@@ -21,7 +21,7 @@ import { formatDateTime, formatFileSize } from "@/utils/format";
 
 /**
  * The contract's PDF: open it or generate it again, or "Montar contrato"
- * (the editor with the AI assistant). The server asks for a moto in the
+ * (the editor with the AI assistant). The server asks for a vehicle in the
  * contract, so without one the button explains why it waits.
  */
 export function PartnerContractDocumentCard({
@@ -77,7 +77,11 @@ export function PartnerContractDocumentCard({
                 )}
                 Abrir PDF
               </Button>
-              <Button asChild variant="outline" className="w-full sm:w-auto sm:flex-1">
+              <Button
+                asChild
+                variant="outline"
+                className="w-full sm:w-auto sm:flex-1"
+              >
                 <Link to={editorUrl}>
                   <RefreshCw />
                   Gerar de novo
@@ -94,7 +98,7 @@ export function PartnerContractDocumentCard({
             </Text>
             {!hasVehicles && (
               <Text size="xs" tone="muted">
-                Para montar o documento, inclua ao menos uma moto no contrato.
+                Para montar o documento, inclua ao menos um veículo no contrato.
               </Text>
             )}
             {hasVehicles ? (

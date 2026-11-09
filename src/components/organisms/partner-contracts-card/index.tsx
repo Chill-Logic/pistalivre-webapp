@@ -49,7 +49,9 @@ export function PartnerContractsCard({
         </CardTitle>
         <PartnerContractDialog
           partnerId={partnerId}
-          onCreated={(contract) => navigate(routeTo.partnerContract(contract.id))}
+          onCreated={(contract) =>
+            navigate(routeTo.partnerContract(contract.id))
+          }
           trigger={
             <Button size="sm">
               <Plus />
@@ -63,13 +65,13 @@ export function PartnerContractsCard({
           <EmptyState
             icon={FileText}
             title="Nenhum contrato"
-            description="Crie o contrato, inclua as motos e ative."
+            description="Crie o contrato, inclua os veículos e ative."
           />
         ) : (
           <List className="-mx-2 divide-y">
             {contracts.map((contract) => {
-              const motos = currentVehicles(contract).length;
-              const left = contract.vehicles.length - motos;
+              const count = currentVehicles(contract).length;
+              const left = contract.vehicles.length - count;
               return (
                 <ListItem key={contract.id}>
                   <Link
@@ -92,7 +94,7 @@ export function PartnerContractsCard({
                         )}
                       </Text>
                       <Text size="xs" tone="muted">
-                        {pluralize(motos, "moto", "motos")}
+                        {pluralize(count, "veículo", "veículos")}
                         {left > 0 && ` (+${left} que saíram)`} · desde{" "}
                         {formatCalendarDate(contract.startDate)}
                         {contract.endDate &&

@@ -1,4 +1,4 @@
-import { Bike } from "lucide-react";
+import { Car } from "lucide-react";
 import { Box } from "@/components/atoms/box";
 import { List, ListItem } from "@/components/atoms/list";
 import { EmptyState } from "@/components/molecules/empty-state";
@@ -14,7 +14,7 @@ import { partnerVehicleRows } from "@/helpers/partner-area";
 import { usePartnerHome } from "@/hooks/api/parceiro/area/usePartnerHome";
 
 /**
- * Every motorcycle of the partner's contracts (from GET /partner): a table
+ * Every vehicle of the partner's contracts (from GET /partner): a table
  * on the desktop, cards on the phone. Short list: no paging.
  */
 export function PartnerVehiclesPage() {
@@ -22,15 +22,15 @@ export function PartnerVehiclesPage() {
   const vehicles = home.data ? partnerVehicleRows(home.data.contracts) : [];
   const empty = (
     <EmptyState
-      icon={Bike}
-      title="Nenhuma moto ainda"
-      description="Quando a locadora colocar uma moto no seu contrato, ela aparece aqui."
+      icon={Car}
+      title="Nenhum veículo ainda"
+      description="Quando a locadora colocar um veículo no seu contrato, ele aparece aqui."
     />
   );
 
   return (
     <Box className="space-y-4 md:space-y-6">
-      <PageHeader title="Motos" />
+      <PageHeader title="Veículos" />
       {home.isError ? (
         <QueryError error={home.error} onRetry={() => home.refetch()} />
       ) : (
@@ -45,7 +45,10 @@ export function PartnerVehiclesPage() {
           </Box>
           <Box className="md:hidden">
             {home.isPending ? (
-              <SkeletonRegion label="Carregando motos…" className="space-y-3">
+              <SkeletonRegion
+                label="Carregando veículos…"
+                className="space-y-3"
+              >
                 <PartnerAreaVehicleItemSkeleton />
                 <PartnerAreaVehicleItemSkeleton />
               </SkeletonRegion>

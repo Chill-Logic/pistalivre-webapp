@@ -21,13 +21,13 @@ export function partnerDocument(
   return `${partner.documentType} ${formatted}`;
 }
 
-/** "ABC-1234 · Honda CG 160 2024", with what the API knows of the moto. */
+/** "ABC-1234 · Honda CG 160 2024", with what the API knows of the vehicle. */
 export function partnerVehicleName(vehicle: PartnerContractVehicle) {
-  const plate = vehicle.plate ? formatPlate(vehicle.plate) : "Moto removida";
+  const plate = vehicle.plate ? formatPlate(vehicle.plate) : "Veículo removido";
   return vehicle.label ? `${plate} · ${vehicle.label}` : plate;
 }
 
-/** Motos still in the contract (no exit day). */
+/** Vehicles still in the contract (no exit day). */
 export function currentVehicles(contract: PartnerContract) {
   return contract.vehicles.filter((vehicle) => !vehicle.leftAt);
 }
@@ -48,7 +48,8 @@ export function contractTerms(
     return `${formatPercent(contract.sharePercent)}${base} para o parceiro`;
   }
   const fee = [
-    contract.adminFeePercent !== null && formatPercent(contract.adminFeePercent),
+    contract.adminFeePercent !== null &&
+      formatPercent(contract.adminFeePercent),
     contract.adminFeeFixed !== null && formatCurrency(contract.adminFeeFixed),
   ].filter(Boolean);
   return fee.length

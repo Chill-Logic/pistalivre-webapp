@@ -15,14 +15,15 @@ import type {
 /**
  * Every contract route answers with the contract (without its partner): it
  * replaces the cached page, keeping the partner, and the partner's page and
- * the lists (contract and moto counts) are refetched.
+ * the lists (contract and vehicle counts) are refetched.
  */
 function useApplyContract() {
   const queryClient = useQueryClient();
   return (contract: PartnerContract) => {
     queryClient.setQueryData<PartnerContractDetail>(
       queryKeys.partners.contract(contract.id),
-      (current) => (current ? { ...contract, partner: current.partner } : current),
+      (current) =>
+        current ? { ...contract, partner: current.partner } : current,
     );
     queryClient.invalidateQueries({
       queryKey: queryKeys.partners.all,
@@ -69,7 +70,7 @@ export function useDeletePartnerContract(contractId: string) {
   });
 }
 
-/** The contract's motos: include, correct/leave, remove (draft only). */
+/** The contract's vehicles: include, correct/leave, remove (draft only). */
 export function usePartnerContractVehicles(contractId: string) {
   const apply = useApplyContract();
 
@@ -78,7 +79,7 @@ export function usePartnerContractVehicles(contractId: string) {
       partnersService.addVehicle(contractId, input),
     onSuccess: (contract) => {
       apply(contract);
-      toast.success("Moto incluída no contrato");
+      toast.success("Veículo incluído no contrato");
     },
   });
 
@@ -98,7 +99,7 @@ export function usePartnerContractVehicles(contractId: string) {
       partnersService.removeVehicle(contractId, linkId),
     onSuccess: (contract) => {
       apply(contract);
-      toast.success("Moto removida do contrato");
+      toast.success("Veículo removido do contrato");
     },
     onError: (error) => toast.error(errorMessage(error)),
   });
@@ -118,7 +119,7 @@ export function usePartnerContractDocumentPreview(contractId: string) {
   });
 }
 
-/** "Gerar PDF e salvar": errors stay with the editor (422 without a moto). */
+/** "Gerar PDF e salvar": errors stay with the editor (422 without a vehicle). */
 export function useGeneratePartnerContractDocument(contractId: string) {
   const queryClient = useQueryClient();
   return useMutation({

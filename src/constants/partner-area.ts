@@ -1,4 +1,4 @@
-import { Bike, FileSignature, LayoutDashboard, UserRound } from "lucide-react";
+import { Car, FileSignature, LayoutDashboard, UserRound } from "lucide-react";
 import type { BadgeVariantProps } from "@/components/atoms/badge/variants";
 import type { NavItem } from "@/constants/navigation";
 import { ROUTES } from "@/constants/routes";
@@ -54,7 +54,7 @@ export const PARTNER_NAV_ITEMS: NavItem[] = [
     icon: LayoutDashboard,
     exact: true,
   },
-  { label: "Motos", to: ROUTES.partnerAreaVehicles, icon: Bike },
+  { label: "Veículos", to: ROUTES.partnerAreaVehicles, icon: Car },
   { label: "Locações", to: ROUTES.partnerAreaRentals, icon: FileSignature },
   { label: "Perfil", to: ROUTES.partnerAreaProfile, icon: UserRound },
 ];

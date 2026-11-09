@@ -91,7 +91,7 @@ export const partnersService = {
     );
     return data;
   },
-  /** Only on a DRAFT; on an active contract the moto leaves with `leftAt`. */
+  /** Only on a DRAFT; on an active contract the vehicle leaves with `leftAt`. */
   async removeVehicle(contractId: string, linkId: string) {
     const { data } = await http.delete<PartnerContract>(
       `/partner-contracts/${contractId}/vehicles/${linkId}`,
@@ -125,7 +125,7 @@ export const partnersService = {
   },
   /**
    * Freezes the text as the contract's PDF (the server adds the signatures).
-   * Generating again points to the new file; the old one stays. Needs a moto.
+   * Generating again points to the new file; the old one stays. Needs a vehicle.
    */
   async generateDocument(id: string, html: string) {
     const { data } = await http.post<PartnerContractDocument>(

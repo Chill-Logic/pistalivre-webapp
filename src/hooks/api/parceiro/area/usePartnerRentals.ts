@@ -6,8 +6,8 @@ import { partnerAreaService } from "@/services/api/parceiro/partner-area.service
 
 /**
  * Every rental the partner may see. The API has no list of them: it comes
- * from each motorcycle's page (same cache as the motorcycle's own page; the
- * partner has few motorcycles). `enabled = false` skips the motorcycles.
+ * from each vehicle's page (same cache as the vehicle's own page; the
+ * partner has few vehicles). `enabled = false` skips the vehicles.
  */
 export function usePartnerRentals(enabled = true) {
   const home = usePartnerHome();

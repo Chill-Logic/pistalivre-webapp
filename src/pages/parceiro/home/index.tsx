@@ -1,4 +1,4 @@
-import { Bike } from "lucide-react";
+import { Car } from "lucide-react";
 import { Box } from "@/components/atoms/box";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { PageHeader } from "@/components/molecules/page-header";
@@ -17,7 +17,7 @@ import { usePartnerRentals } from "@/hooks/api/parceiro/area/usePartnerRentals";
 import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 
 /**
- * Partner home: each contract (terms) with its motorcycles and who is renting
+ * Partner home: each contract (terms) with its vehicles and who is renting
  * each one now. On the desktop, a strip of indicators (counts only) on top.
  * Read only; what shows is decided on the server.
  */
@@ -44,9 +44,9 @@ export function PartnerHomePage() {
         {({ contracts }) =>
           contracts.length === 0 ? (
             <EmptyState
-              icon={Bike}
+              icon={Car}
               title="Nenhum contrato ainda"
-              description="Quando a locadora ativar o seu contrato, as suas motos aparecem aqui."
+              description="Quando a locadora ativar o seu contrato, os seus veículos aparecem aqui."
             />
           ) : (
             <Box
@@ -69,7 +69,10 @@ export function PartnerHomePage() {
                 />
               )}
               {contracts.map((contract) => (
-                <PartnerAreaContractCard key={contract.id} contract={contract} />
+                <PartnerAreaContractCard
+                  key={contract.id}
+                  contract={contract}
+                />
               ))}
             </Box>
           )

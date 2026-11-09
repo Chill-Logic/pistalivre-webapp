@@ -9,7 +9,7 @@ import type {
 
 /**
  * The partner's own area (partner Bearer). What may be read is decided on
- * the server: another motorcycle, or a rental outside the window, is a 404.
+ * the server: another vehicle, or a rental outside the window, is a 404.
  */
 export const partnerAreaService = {
   async home() {

@@ -2,18 +2,18 @@ import type { DocumentFile } from "@/types/document";
 /** CPF = a person; CNPJ = a company (may be the new alphanumeric one). */
 export type PartnerDocumentType = "CPF" | "CNPJ";
 
-/** INVESTMENT = motos in the company's name; MANAGEMENT = in the partner's. */
+/** INVESTMENT = vehicles in the company's name; MANAGEMENT = in the partner's. */
 export type PartnerContractType = "INVESTMENT" | "MANAGEMENT";
 
 export type PartnerContractStatus = "DRAFT" | "ACTIVE" | "ENDED";
 
-/** The investor's contribution: the motorcycles themselves, or money. */
+/** The investor's contribution: the vehicles themselves, or money. */
 export type PartnerContributionType = "ASSETS" | "CASH";
 
 /** What the partner's share is taken from. */
 export type PartnerShareBase = "REVENUE" | "PROFIT";
 
-/** Someone whose motorcycles the company manages (gestão, the whole staff). */
+/** Someone whose vehicles the company manages (gestão, the whole staff). */
 export type Partner = {
   id: string;
   name: string;
@@ -34,13 +34,13 @@ export type Partner = {
   createdAt: string;
 };
 
-/** List row: + contracts and motos currently in an active contract. */
+/** List row: + contracts and vehicles currently in an active contract. */
 export type PartnerListRow = Partner & {
   contractCount: number;
   vehicleCount: number;
 };
 
-/** A moto in a contract and the window in which it is the partner's. */
+/** A vehicle in a contract and the window in which it is the partner's. */
 export type PartnerContractVehicle = {
   /** The link id (routes …/vehicles/:linkId). */
   id: string;

@@ -11,12 +11,12 @@ import { parsePercentInput, percentInputOf } from "@/utils/percent";
 /** Radix select reserves "": the "no value" entry of the payout day. */
 export const NO_DAY = "__none__";
 
-const percentText = z
-  .string()
-  .refine((text) => {
-    const value = parsePercentInput(text);
-    return value === null || (Number.isFinite(value) && value >= 0 && value <= 100);
-  }, "Percentual inválido");
+const percentText = z.string().refine((text) => {
+  const value = parsePercentInput(text);
+  return (
+    value === null || (Number.isFinite(value) && value >= 0 && value <= 100)
+  );
+}, "Percentual inválido");
 
 /** Mirrors the API's partnerContractSchema (same PT messages). */
 export const contractFormSchema = z
@@ -43,7 +43,8 @@ export const contractFormSchema = z
       issue("endDate", "O fim vem antes do início");
     }
     if (c.type === "INVESTMENT") {
-      if (!c.contributionType) issue("contributionType", "Escolha o tipo de aporte");
+      if (!c.contributionType)
+        issue("contributionType", "Escolha o tipo de aporte");
       if (c.contributionType === "CASH" && !c.contributionAmount) {
         issue("contributionAmount", "Informe o valor do aporte");
       }
@@ -82,7 +83,7 @@ export function contractFormDefaults(
 ): ContractFormValues {
   return {
     type: contract?.type ?? "INVESTMENT",
-    // A new investment starts as the common case: motos, share of revenue.
+    // A new investment starts as the common case: vehicles, share of revenue.
     contributionType: contract ? (contract.contributionType ?? "") : "ASSETS",
     contributionAmount: contract?.contributionAmount ?? null,
     contributionDate: contract?.contributionDate ?? "",
@@ -116,7 +117,9 @@ export function toContractInput(
       ? ((values.shareBase || null) as PartnerShareBase | null)
       : null,
     sharePercent: investment ? parsePercentInput(values.sharePercent) : null,
-    adminFeePercent: investment ? null : parsePercentInput(values.adminFeePercent),
+    adminFeePercent: investment
+      ? null
+      : parsePercentInput(values.adminFeePercent),
     adminFeeFixed: investment ? null : values.adminFeeFixed,
     payoutDay: values.payoutDay === NO_DAY ? null : Number(values.payoutDay),
     startDate: values.startDate,

@@ -15,7 +15,7 @@ import {
   formatMileage,
 } from "@/utils/format";
 
-/** Maintenance done while the motorcycle was the partner's. */
+/** Maintenance done while the vehicle was the partner's. */
 export function PartnerAreaMaintenancesCard({
   maintenances,
 }: {

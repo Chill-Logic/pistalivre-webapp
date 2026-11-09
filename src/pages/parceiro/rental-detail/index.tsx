@@ -31,7 +31,7 @@ import { isNotFound } from "@/helpers/api-error";
 import { usePartnerRental } from "@/hooks/api/parceiro/area/usePartnerRental";
 
 /**
- * A rental of the partner's motorcycle, cut to the partner's window: the
+ * A rental of the partner's vehicle, cut to the partner's window: the
  * renter's name, the rent's situation and its cycles and payments — all
  * computed on the server (the same math as the customer's statement).
  */
@@ -45,7 +45,9 @@ export function PartnerRentalPage() {
     <Box className="space-y-4">
       <BackLink
         to={
-          rental ? routeTo.partnerAreaVehicle(rental.vehicleId) : ROUTES.partnerArea
+          rental
+            ? routeTo.partnerAreaVehicle(rental.vehicleId)
+            : ROUTES.partnerArea
         }
         label={rental?.vehicleLabel ?? "Meus contratos"}
       />
@@ -55,7 +57,7 @@ export function PartnerRentalPage() {
           <EmptyState
             icon={FileText}
             title="Locação não encontrada"
-            description="Esta locação não é de uma moto sua (ou é de antes dela entrar no seu contrato)."
+            description="Esta locação não é de um veículo seu (ou é de antes dele entrar no seu contrato)."
             action={
               <Button asChild variant="outline">
                 <Link to={ROUTES.partnerArea}>Ver meus contratos</Link>

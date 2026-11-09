@@ -39,7 +39,7 @@ import { formatPlate } from "@/utils/plate";
 import { pluralize } from "@/utils/text";
 
 const TABLE_HEADERS = [
-  "Moto",
+  "Veículo",
   "Situação",
   "Aquisição",
   "No contrato",
@@ -50,7 +50,7 @@ const LINK_CLASS =
   "rounded-sm font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 /**
- * One contract of the partner: its terms, then its motorcycles — cards on
+ * One contract of the partner: its terms, then its vehicles — cards on
  * the phone, a table on the desktop — each with the current rental.
  */
 export function PartnerAreaContractCard({
@@ -98,10 +98,10 @@ export function PartnerAreaContractCard({
 
         <Box className="space-y-3">
           <Heading level={2} variant="section">
-            {pluralize(contract.vehicles.length, "moto", "motos")}
+            {pluralize(contract.vehicles.length, "veículo", "veículos")}
           </Heading>
           {contract.vehicles.length === 0 ? (
-            <Text tone="muted">Nenhuma moto neste contrato.</Text>
+            <Text tone="muted">Nenhum veículo neste contrato.</Text>
           ) : (
             <>
               <List className="space-y-3 md:hidden">
@@ -135,7 +135,7 @@ export function PartnerAreaContractCard({
                             to={routeTo.partnerAreaVehicle(vehicle.vehicleId)}
                             className={LINK_CLASS}
                           >
-                            {vehicle.label ?? "Moto"}
+                            {vehicle.label ?? "Veículo"}
                           </Link>
                           <Text size="xs" tone="muted">
                             {vehicle.plate ? formatPlate(vehicle.plate) : "—"}

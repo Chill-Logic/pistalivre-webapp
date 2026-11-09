@@ -29,7 +29,7 @@ const GREETING: Record<AiChatMode, string> = {
   proposal:
     "Olá! Posso ajustar esta proposta com você: destacar o plano certo, mudar valores, deixar o texto mais direto. Consulto o lead e os planos quando precisar.",
   partner_contract:
-    "Olá! Posso montar este contrato de parceria com você: incluir cláusulas, ajustar prazos e a rescisão, explicar a participação e revisar a linguagem. Consulto o contrato, o parceiro e as motos quando precisar.",
+    "Olá! Posso montar este contrato de parceria com você: incluir cláusulas, ajustar prazos e a rescisão, explicar a participação e revisar a linguagem. Consulto o contrato, o parceiro e os veículos quando precisar.",
 };
 
 export type AiChatPanelProps = {
