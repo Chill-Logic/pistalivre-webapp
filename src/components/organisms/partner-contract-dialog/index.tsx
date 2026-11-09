@@ -192,7 +192,7 @@ function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
         </Col>
         {isInvestment ? (
           <>
-            <Col sm={6}>
+            <Col>
               <Controller
                 control={control}
                 name="contributionType"
@@ -207,7 +207,7 @@ function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
                 )}
               />
             </Col>
-            <Col sm={6}>
+            <Col>
               <Controller
                 control={control}
                 name="shareBase"

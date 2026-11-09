@@ -28,14 +28,17 @@ const COLUMNS: DataTableColumn<Vehicle>[] = [
   {
     header: "Veículo",
     cell: (vehicle) => (
-      <Box className="flex min-w-0 items-center gap-2">
-        <Text inline size={null} truncate>
+      // The partner's badge goes under the name: side by side it squeezed
+      // the vehicle's name down to "Honda CG 160…".
+      <Box className="flex min-w-0 flex-col items-start gap-1">
+        <Text inline size={null} truncate className="max-w-full">
           {vehicleName(vehicle)}
         </Text>
         {vehicle.owner && (
           <Badge
             variant="outline"
-            className="max-w-40 shrink-0 truncate font-normal"
+            className="max-w-full font-normal"
+            title={`Parceiro: ${vehicle.owner.name}`}
           >
             Parceiro: {vehicle.owner.name}
           </Badge>

@@ -125,6 +125,7 @@ export function SegmentedControl<T extends string>({
             disabled={off}
             onClick={() => choose(at)}
             onKeyDown={(event) => onKeyDown(event, at)}
+            title={typeof option.label === "string" ? option.label : undefined}
             className={cn(
               "relative z-10 inline-flex min-w-0 flex-1 basis-0 items-center justify-center gap-1.5 truncate rounded-md px-3 font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed [&_svg]:size-4 [&_svg]:shrink-0",
               size === "default" ? "text-sm" : "text-xs",
@@ -135,7 +136,13 @@ export function SegmentedControl<T extends string>({
                   : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
             )}
           >
-            {option.label}
+            {/* A text label gets a block of its own for the ellipsis: on the
+                centred flex button, a long one spilled out on both sides. */}
+            {typeof option.label === "string" ? (
+              <span className="block min-w-0 truncate">{option.label}</span>
+            ) : (
+              option.label
+            )}
           </button>
         );
       })}
