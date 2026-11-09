@@ -20,12 +20,12 @@ curtas entre ferramentas e nos relatórios de subagentes.
   baixou ("Agora não" = 7 dias); "Abrir no app" fixo no header para quem já usou/baixou; gestão mostra o uso no
   cliente e no usuário e filtra clientes por `app=`. **Backend antes do front** (o CORS precisa do header novo).
 - **Integrações (Asaas, Inter, Clicksign) só admin**: agente vê só a situação (decisão do dono).
-- **Contas do mês (2026-11-09, só commit local):** Financeiro › Contas do mês (`/gestao/financeiro/contas?mes=`)
+- **Contas do mês (no ar desde 2026-11-09 10:27):** Financeiro › Contas do mês (`/gestao/financeiro/contas?mes=`)
   junta custos fixos, parcelas de dívidas e avulsas do mês, com os meses anteriores em aberto. Registrar = pago (dia,
   valor, comprovante), em aberto ou sem cobrança, inclusive retroativo; parcela paga pelo diálogo da dívida. O custo
   fixo ganhou "Como é cobrado", "Vence todo" (opcional), "Desde"/"Vale até" e o card "Meses". Sem "vencido" (o
   dono quer organização, não julgamento). Backend: `Expense` + `GET /expenses/month` (`c062d80` no `pista-livre`).
-- **IA configurável (2026-11-09, só commit local):** provedor (Anthropic, OpenAI, Gemini), modelo e chave em Empresa ›
+- **IA configurável (no ar desde 2026-11-09 10:27):** provedor (Anthropic, OpenAI, Gemini), modelo e chave em Empresa ›
   Integrações › Inteligência artificial; o `GEMINI_*` do env saiu (`9c0e9a6`). Depois de publicar, a IA fica
   desligada até alguém salvar a integração.
 
