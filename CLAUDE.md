@@ -88,11 +88,10 @@ duas áreas, como no dev. Cada domínio guarda o seu login (localStorage por ori
 - Testar local: `http://app.gestao.localhost:5173` e `http://app.cliente.localhost:5173` simulam os domínios (a API do
   dev só aceita `localhost:5173`, então lá só dá para ver os redirecionamentos).
 
-**Follow-up (pedido do dono, 2026-11-08): endereços limpos por domínio.** Hoje os caminhos mantêm o prefixo
-(`app.gestao.…/gestao/locacoes`, `app.cliente.…/area-cliente/…`). Depois de no ar, tirar o prefixo quando o domínio já
-diz a área (`app.gestao.…/locacoes`, `app.cliente.…/locacoes/123`): os prefixos `GESTAO`/`PORTAL` de
-`constants/routes.ts` passam a depender do host (vazio no domínio da área, igual no localhost), redirecionar os
-caminhos antigos com prefixo para os novos (links já compartilhados) e testar as duas áreas nos dois domínios.
+**Endereços limpos (feito em 2026-11-09).** No domínio da área não há prefixo (`app.gestao.…/locacoes`,
+`app.cliente.…/locacoes/123`): `constants/routes.ts` lê o host uma vez e deixa `GESTAO`/`PORTAL` vazios; cada
+domínio registra só as rotas da sua área. Caminhos antigos com prefixo redirecionam (`RealmPrefixRedirect`), e um
+caminho da outra área vai para o domínio dela. Em localhost e no vercel.app os prefixos continuam.
 
 
 
@@ -110,8 +109,8 @@ portal **segue o tema do celular**; logo = **emblema do Next** (feito).
 **No ar desde 2026-11-08 13:28** (autorizado pelo dono): a `feat/api-v1-spa` foi juntada na `main` do
 `pista-livre` (df0985f, o Railway publicou), com `WEBAPP_ORIGIN` = app.gestao, app.cliente e
 pistalivre-webapp.vercel.app. O SPA está na Vercel nos dois domínios. As telas Next antigas
-(`pistalivrelocacoes.com.br/gestao` e `/area-cliente`) **seguem no ar**: removê-las só com novo aval do dono,
-depois de ele aprovar o site novo.
+foram **removidas em 2026-11-09** (aval do dono): `pistalivrelocacoes.com.br/`, `/gestao/*` e `/area-cliente/*`
+redirecionam (307) para app.gestao/app.cliente.
 
 **Sucessos nunca testados de verdade no dev** (só com simulação): criar/editar cliente (upsert no Asaas),
 recusar reembolso (só há pedido real) e envio do questionário (a sessão fica órfã). Upload de

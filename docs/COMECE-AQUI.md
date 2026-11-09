@@ -24,7 +24,7 @@ curtas entre ferramentas e nos relatórios de subagentes.
 | Webapp, portal do cliente | https://app.cliente.pistalivrelocacoes.com.br |
 | Webapp, endereço da Vercel | https://pistalivre-webapp.vercel.app (as duas áreas) |
 | Backend (Next + `/api/v1`) | https://pistalivrelocacoes.com.br (Railway publica a `main` do `pista-livre`) |
-| Site antigo (telas Next) | `pistalivrelocacoes.com.br/gestao` e `/area-cliente`, **seguem no ar** |
+| Site antigo (telas Next) | removido em 2026-11-09: `/`, `/gestao` e `/area-cliente` redirecionam para o SPA |
 
 - Um build do webapp serve as duas áreas. O app procura `gestao`/`cliente` no endereço (`helpers/host-realm`) e
   manda a página da outra área para o domínio certo. Em `localhost` e no endereço da Vercel, as duas áreas funcionam.
@@ -90,11 +90,8 @@ curtas entre ferramentas e nos relatórios de subagentes.
 - Enviar assinatura de ponta a ponta (dispara e-mail real pelo Clicksign).
 
 **Decisão do dono**
-- Remover as telas Next antigas, depois de ele aprovar o site novo.
-- **Endereços limpos**: tirar `/gestao` e `/area-cliente` dos caminhos nos domínios app.gestao/app.cliente
-  (receita no CLAUDE.md, seção "Deploy (Vercel) e domínios").
-- Aumentar a memória do servidor de dev (`NODE_OPTIONS` no compose).
-- Apagar o `cnh.pdf` falso (14 bytes) do cliente `cmulg283b0009qlt88apl8nd5` no dev.
+- Nenhuma no momento. Feitos em 2026-11-09: telas Next removidas, endereços limpos, heap de 6 GB no dev
+  (vale quando o container for recriado), `cnh.pdf` falso apagado.
 
 **Pequenos (pode fazer sem decisão)**
 - Rótulos de situação de contrato e de transferência estão em constantes locais (`constants/contract.ts`,
