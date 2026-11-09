@@ -1,4 +1,8 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  type RouteObject,
+} from "react-router-dom";
 import { RedirectIfAuthenticated } from "./guards/RedirectIfAuthenticated";
 import { RequireAuth } from "./guards/RequireAuth";
 import {
@@ -73,17 +77,20 @@ import {
   SignatureDetailPage,
   SignatureLinkPage,
 } from "./pages";
-import { LEGACY_ROUTES, ROUTES, routeTo } from "@/constants/routes";
+import {
+  HOST_REALM,
+  LEGACY_ROUTES,
+  REALM_PREFIX,
+  ROUTES,
+  routeTo,
+} from "@/constants/routes";
 import { LegacyRedirect } from "@/components/molecules/legacy-redirect";
-import { hostRealm } from "@/helpers/host-realm";
+import { RealmPrefixRedirect } from "@/components/molecules/realm-prefix-redirect";
 import { LoginPage } from "@/pages/gestao/login";
 import { NotFoundPage } from "@/pages/comum/not-found";
+import type { Realm } from "@/types/auth";
 
-export const router = createBrowserRouter([
-  {
-    element: <RedirectIfAuthenticated realm="gestao" />,
-    children: [{ path: ROUTES.login, element: <LoginPage /> }],
-  },
+const portalRoutes: RouteObject[] = [
   {
     element: <RedirectIfAuthenticated realm="cliente" />,
     children: [{ path: ROUTES.portalLogin, element: <CustomerLoginPage /> }],
@@ -106,6 +113,13 @@ export const router = createBrowserRouter([
         element: <LegacyRedirect to={() => ROUTES.portal} />,
       },
     ],
+  },
+];
+
+const gestaoRoutes: RouteObject[] = [
+  {
+    element: <RedirectIfAuthenticated realm="gestao" />,
+    children: [{ path: ROUTES.login, element: <LoginPage /> }],
   },
   {
     element: <RequireAuth realm="gestao" />,
@@ -237,15 +251,35 @@ export const router = createBrowserRouter([
       { path: ROUTES.debtEdit, element: <DebtEditPage /> },
     ],
   },
-  {
-    // Each domain opens its own area (gestao.* → staff, cliente.* → portal).
-    path: ROUTES.root,
-    element: (
-      <Navigate
-        to={hostRealm() === "cliente" ? ROUTES.portal : ROUTES.dashboard}
-        replace
-      />
-    ),
-  },
+];
+
+/** Addresses still carrying an area prefix, on an area's own domain. */
+const prefixRedirects = (["gestao", "cliente"] as Realm[]).flatMap((realm) =>
+  [REALM_PREFIX[realm], `${REALM_PREFIX[realm]}/*`].map((path) => ({
+    path,
+    element: <RealmPrefixRedirect realm={realm} />,
+  })),
+);
+
+/**
+ * An area's own domain registers only that area, without prefix (its home is
+ * the root) and redirects the prefixed addresses; any other host serves both
+ * areas with their prefixes, the root opening the staff area.
+ */
+function routesForHost(realm: Realm | null): RouteObject[] {
+  if (realm === "gestao") return [...gestaoRoutes, ...prefixRedirects];
+  if (realm === "cliente") return [...portalRoutes, ...prefixRedirects];
+  return [
+    ...gestaoRoutes,
+    ...portalRoutes,
+    {
+      path: ROUTES.root,
+      element: <Navigate to={ROUTES.dashboard} replace />,
+    },
+  ];
+}
+
+export const router = createBrowserRouter([
+  ...routesForHost(HOST_REALM),
   { path: "*", element: <NotFoundPage /> },
 ]);

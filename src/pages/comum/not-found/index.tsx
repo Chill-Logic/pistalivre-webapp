@@ -3,7 +3,7 @@ import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Heading } from "@/components/atoms/heading";
 import { Text } from "@/components/atoms/text";
-import { ROUTES } from "@/constants/routes";
+import { HOST_REALM, ROUTES } from "@/constants/routes";
 
 export function NotFoundPage() {
   return (
@@ -16,7 +16,9 @@ export function NotFoundPage() {
         O endereço que você acessou não existe ou foi movido.
       </Text>
       <Button asChild>
-        <Link to={ROUTES.dashboard}>Voltar ao painel</Link>
+        <Link to={HOST_REALM === "cliente" ? ROUTES.portal : ROUTES.dashboard}>
+          {HOST_REALM === "cliente" ? "Voltar ao início" : "Voltar ao painel"}
+        </Link>
       </Button>
     </Box>
   );

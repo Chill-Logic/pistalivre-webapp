@@ -1,15 +1,32 @@
+import type { Realm } from "@/types/auth";
+import { realmOfHostname } from "@/utils/host-label";
+
 /**
  * Public URLs (Portuguese, as in the product), split by area like the pages:
- * /gestao for staff and /area-cliente for the customer portal. Keep every
- * path here.
+ * /gestao for staff and /area-cliente for the customer portal. On an area's
+ * own domain (app.gestao.…, app.cliente.…) the domain already says the area,
+ * so its prefix is dropped (app.gestao.…/locacoes); hosts that serve both
+ * areas (localhost, the Vercel address) keep both prefixes. Keep every path
+ * here.
  */
-const GESTAO = "/gestao";
-const PORTAL = "/area-cliente";
+export const REALM_PREFIX: Record<Realm, string> = {
+  gestao: "/gestao",
+  cliente: "/area-cliente",
+};
+
+/** Area of the current domain (null = serves both). Fixed for the page load. */
+export const HOST_REALM =
+  typeof window === "undefined"
+    ? null
+    : realmOfHostname(window.location.hostname);
+
+const GESTAO = HOST_REALM === "gestao" ? "" : REALM_PREFIX.gestao;
+const PORTAL = HOST_REALM === "cliente" ? "" : REALM_PREFIX.cliente;
 
 export const ROUTES = {
   root: "/",
   login: `${GESTAO}/entrar`,
-  dashboard: GESTAO,
+  dashboard: GESTAO || "/",
   vehicles: `${GESTAO}/veiculos`,
   vehicleNew: `${GESTAO}/veiculos/novo`,
   vehicleDetail: `${GESTAO}/veiculos/:id`,
@@ -72,14 +89,13 @@ export const ROUTES = {
   debtDetail: `${GESTAO}/financeiro/debitos/:id`,
   debtEdit: `${GESTAO}/financeiro/debitos/:id/editar`,
   financeStatement: `${GESTAO}/financeiro/extrato`,
-  portal: PORTAL,
+  portal: PORTAL || "/",
   portalLogin: `${PORTAL}/entrar`,
   portalRental: `${PORTAL}/locacoes/:id`,
   portalInspectionNew: `${PORTAL}/locacoes/:id/vistorias/nova`,
   portalRentalStatement: `${PORTAL}/locacoes/:id/extrato`,
 } as const;
 
-/** Concrete URLs for routes with params. */
 /** Addresses that moved: the old path keeps working (shared links). */
 export const LEGACY_ROUTES = {
   suppliers: `${GESTAO}/fornecedores/*`,
@@ -88,6 +104,7 @@ export const LEGACY_ROUTES = {
   portalPassword: `${PORTAL}/senha`,
 } as const;
 
+/** Concrete URLs for routes with params. */
 export const routeTo = {
   vehicle: (id: string) => `${ROUTES.vehicles}/${id}`,
   editVehicle: (id: string) => `${ROUTES.vehicles}/${id}/editar`,
@@ -147,9 +164,8 @@ export const routeTo = {
   },
   proposal: (id: string) => `${ROUTES.proposals}/${id}`,
   signature: (id: string) => `${ROUTES.signatures}/${id}`,
-  portalRental: (id: string) => `${ROUTES.portal}/locacoes/${id}`,
-  portalRentalStatement: (id: string) =>
-    `${ROUTES.portal}/locacoes/${id}/extrato`,
+  portalRental: (id: string) => `${PORTAL}/locacoes/${id}`,
+  portalRentalStatement: (id: string) => `${PORTAL}/locacoes/${id}/extrato`,
   portalInspectionNew: (id: string) =>
-    `${ROUTES.portal}/locacoes/${id}/vistorias/nova`,
+    `${PORTAL}/locacoes/${id}/vistorias/nova`,
 };

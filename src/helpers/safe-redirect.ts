@@ -17,6 +17,8 @@ export function realmOfKind(kind: AuthKind): Realm {
 
 function belongsTo(path: string, realm: Realm) {
   const home = homeOf(realm);
+  // On the area's own domain its home is the root: every path is the area's.
+  if (home === "/") return true;
   return (
     path === home || path.startsWith(`${home}/`) || path.startsWith(`${home}?`)
   );
