@@ -5,7 +5,8 @@ export const badgeVariants = cva(
   {
     variants: {
       variant: {
-        neutral: "bg-secondary text-secondary-foreground",
+        // Translucent: visible on a card in both themes (in dark, --secondary = the card).
+        neutral: "bg-foreground/[0.08] text-foreground",
         success: "bg-success text-success-foreground",
         warning: "bg-warning text-warning-foreground",
         error: "bg-error text-error-foreground",
