@@ -84,6 +84,13 @@ export function PortalChargeItem({
           {!amounts.isPaid && " · o valor no pagamento pode ser diferente"}
         </Text>
       )}
+      {amounts.discount > 0 && (
+        // A rent discount covered part of it: not a shortfall.
+        <Text size="xs" tone="muted">
+          De {formatCurrency(amounts.principal)} ·{" "}
+          {formatCurrency(amounts.discount)} de desconto
+        </Text>
+      )}
       {amounts.shortfall > 0 && (
         // Settled for less than due: without this the renter sees only what
         // was received and not what is still owed.

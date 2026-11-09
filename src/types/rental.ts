@@ -90,6 +90,8 @@ export type ChargeAmounts = {
   surcharge: number;
   /** > 0 = paid less than due. */
   shortfall: number;
+  /** Rent discount that covered part of the principal (0 = none). */
+  discount: number;
   isPaid: boolean;
 };
 

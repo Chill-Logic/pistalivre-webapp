@@ -121,6 +121,13 @@ export function ChargeItem({
           Pago em {formatCalendarDate(charge.paidAt)}
         </Text>
       )}
+      {amounts.discount > 0 && (
+        // A rent discount covered part of it: not a shortfall.
+        <Text size="xs" tone="muted">
+          De {formatCurrency(amounts.principal)} ·{" "}
+          {formatCurrency(amounts.discount)} de desconto
+        </Text>
+      )}
       {amounts.shortfall > 0 && (
         // Settled for less than due: without this the staff only sees what
         // came in, not what the customer still owes.
