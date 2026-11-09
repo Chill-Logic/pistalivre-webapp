@@ -1,10 +1,13 @@
-export type UserRole = "ADMIN" | "AGENT" | "CUSTOMER";
+export type UserRole = "ADMIN" | "AGENT" | "CUSTOMER" | "PARTNER";
 
-/** Who owns the token: staff (`user`) or a renter (`customer`). */
-export type AuthKind = "user" | "customer";
+/**
+ * Who owns the token: staff (`user`), a renter (`customer`) or a partner
+ * (`partner`: investor or owner of motorcycles the company manages).
+ */
+export type AuthKind = "user" | "customer" | "partner";
 
-/** The two areas of the app, each with its own login. */
-export type Realm = "gestao" | "cliente";
+/** The three areas of the app, each with its own login. */
+export type Realm = "gestao" | "cliente" | "parceiro";
 
 /** Installed-app (PWA) usage of the logged-in person, ISO dates. */
 export type PwaUsage = {
@@ -23,8 +26,11 @@ export type AuthUser = {
   name: string;
   email: string;
   role: UserRole;
-  /** Absent on an older API or on the login answer: invite stays hidden. */
-  pwa?: PwaUsage;
+  /**
+   * Absent on an older API or on the login answer; null for a partner (the
+   * partner area has no install invite): the invite stays hidden.
+   */
+  pwa?: PwaUsage | null;
 };
 
 export type LoginInput = {

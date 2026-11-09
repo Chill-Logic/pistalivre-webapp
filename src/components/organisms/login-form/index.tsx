@@ -8,14 +8,16 @@ import { FormField } from "@/components/molecules/form-field";
 import { PasswordField } from "@/components/molecules/password-field";
 import { loginSchema, type LoginFormValues } from "./schema";
 import { errorMessage } from "@/helpers/api-error";
-import { useLogin } from "@/hooks/api/gestao/auth/useLogin";
+import type { useLogin } from "@/hooks/api/gestao/auth/useLogin";
 
 type LoginFormProps = {
+  /** The area's login (staff `useLogin`, partner `usePartnerLogin`). */
+  login: ReturnType<typeof useLogin>;
   onSuccess: () => void;
 };
 
-export function LoginForm({ onSuccess }: LoginFormProps) {
-  const login = useLogin();
+/** E-mail and password: the staff's and the partner's login. */
+export function LoginForm({ login, onSuccess }: LoginFormProps) {
   const {
     register,
     handleSubmit,

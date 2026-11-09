@@ -1,20 +1,41 @@
+import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AppShell } from "@/components/templates/app-shell";
 import { AppShellSkeleton } from "@/components/templates/app-shell-skeleton";
+import { PartnerShell } from "@/components/templates/partner-shell";
+import { PartnerShellSkeleton } from "@/components/templates/partner-shell-skeleton";
 import { PortalShell } from "@/components/templates/portal-shell";
 import { PortalShellSkeleton } from "@/components/templates/portal-shell-skeleton";
 import { homeOf, loginUrlFor, realmOfKind } from "@/helpers/safe-redirect";
 import { useSession } from "@/hooks/auth/useSession";
 import { useLabelCatalog } from "@/hooks/api/comum/labels/useLabelCatalog";
 import { useHostRealmRedirect } from "@/hooks/ui/useHostRealmRedirect";
-import type { Realm } from "@/types/auth";
+import type { AuthUser, Realm } from "@/types/auth";
+
+const SHELLS: Record<
+  Realm,
+  {
+    Shell: (props: { user: AuthUser }) => ReactNode;
+    Skeleton: () => ReactNode;
+  }
+> = {
+  gestao: { Shell: AppShell, Skeleton: AppShellSkeleton },
+  cliente: { Shell: PortalShell, Skeleton: PortalShellSkeleton },
+  parceiro: { Shell: PartnerShell, Skeleton: PartnerShellSkeleton },
+};
+
+/** The frame each area shows while the session is being checked. */
+export function RealmShellSkeleton({ realm }: { realm: Realm }) {
+  const { Skeleton } = SHELLS[realm];
+  return <Skeleton />;
+}
 
 /**
  * Private area of a realm: no session → that realm's login, keeping the deep
- * link as callbackUrl; a session of the OTHER realm → its own home (staff
+ * link as callbackUrl; a session of ANOTHER realm → its own home (staff
  * never sees the portal and vice versa, like the Next middleware). Also holds
  * the shell until the label catalog arrives, so codes never flash on screen.
- * On a domain scoped to the other area, it goes to its own domain.
+ * On a domain scoped to another area, it goes to its own domain.
  */
 export function RequireAuth({ realm }: { realm: Realm }) {
   const session = useSession();
@@ -24,7 +45,7 @@ export function RequireAuth({ realm }: { realm: Realm }) {
 
   if (wrongHost) return null;
   if (session.status === "loading" || labels.isPending) {
-    return realm === "cliente" ? <PortalShellSkeleton /> : <AppShellSkeleton />;
+    return <RealmShellSkeleton realm={realm} />;
   }
   if (session.status === "anonymous") {
     return (
@@ -36,9 +57,6 @@ export function RequireAuth({ realm }: { realm: Realm }) {
   }
   const userRealm = realmOfKind(session.user.kind);
   if (userRealm !== realm) return <Navigate to={homeOf(userRealm)} replace />;
-  return realm === "cliente" ? (
-    <PortalShell user={session.user} />
-  ) : (
-    <AppShell user={session.user} />
-  );
+  const { Shell } = SHELLS[realm];
+  return <Shell user={session.user} />;
 }

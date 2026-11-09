@@ -91,6 +91,11 @@ import {
   PartnerDetailPage,
   PartnerEditPage,
   PartnerContractPage,
+  PartnerHomePage,
+  PartnerLoginPage,
+  PartnerProfilePage,
+  PartnerRentalPage,
+  PartnerVehiclePage,
 } from "./pages";
 import {
   HOST_REALM,
@@ -104,6 +109,25 @@ import { RealmPrefixRedirect } from "@/components/molecules/realm-prefix-redirec
 import { LoginPage } from "@/pages/gestao/login";
 import { NotFoundPage } from "@/pages/comum/not-found";
 import type { Realm } from "@/types/auth";
+
+/** Partner area: read only, the partner's motorcycles and their rentals. */
+const partnerRoutes: RouteObject[] = [
+  {
+    element: <RedirectIfAuthenticated realm="parceiro" />,
+    children: [
+      { path: ROUTES.partnerAreaLogin, element: <PartnerLoginPage /> },
+    ],
+  },
+  {
+    element: <RequireAuth realm="parceiro" />,
+    children: [
+      { path: ROUTES.partnerArea, element: <PartnerHomePage /> },
+      { path: ROUTES.partnerAreaVehicle, element: <PartnerVehiclePage /> },
+      { path: ROUTES.partnerAreaRental, element: <PartnerRentalPage /> },
+      { path: ROUTES.partnerAreaProfile, element: <PartnerProfilePage /> },
+    ],
+  },
+];
 
 const portalRoutes: RouteObject[] = [
   {
@@ -309,24 +333,27 @@ const gestaoRoutes: RouteObject[] = [
 ];
 
 /** Addresses still carrying an area prefix, on an area's own domain. */
-const prefixRedirects = (["gestao", "cliente"] as Realm[]).flatMap((realm) =>
-  [REALM_PREFIX[realm], `${REALM_PREFIX[realm]}/*`].map((path) => ({
-    path,
-    element: <RealmPrefixRedirect realm={realm} />,
-  })),
+const prefixRedirects = (["gestao", "cliente", "parceiro"] as Realm[]).flatMap(
+  (realm) =>
+    [REALM_PREFIX[realm], `${REALM_PREFIX[realm]}/*`].map((path) => ({
+      path,
+      element: <RealmPrefixRedirect realm={realm} />,
+    })),
 );
 
 /**
  * An area's own domain registers only that area, without prefix (its home is
- * the root) and redirects the prefixed addresses; any other host serves both
- * areas with their prefixes, the root opening the staff area.
+ * the root) and redirects the prefixed addresses; any other host serves every
+ * area with its prefix, the root opening the staff area.
  */
 function routesForHost(realm: Realm | null): RouteObject[] {
   if (realm === "gestao") return [...gestaoRoutes, ...prefixRedirects];
   if (realm === "cliente") return [...portalRoutes, ...prefixRedirects];
+  if (realm === "parceiro") return [...partnerRoutes, ...prefixRedirects];
   return [
     ...gestaoRoutes,
     ...portalRoutes,
+    ...partnerRoutes,
     {
       path: ROUTES.root,
       element: <Navigate to={ROUTES.dashboard} replace />,

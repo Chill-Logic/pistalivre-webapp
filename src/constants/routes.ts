@@ -3,18 +3,19 @@ import { realmOfHostname } from "@/utils/host-label";
 
 /**
  * Public URLs (Portuguese, as in the product), split by area like the pages:
- * /gestao for staff and /area-cliente for the customer portal. On an area's
- * own domain (app.gestao.…, app.cliente.…) the domain already says the area,
- * so its prefix is dropped (app.gestao.…/locacoes); hosts that serve both
- * areas (localhost, the Vercel address) keep both prefixes. Keep every path
- * here.
+ * /gestao for staff, /area-cliente for the customer portal and /parceiro for
+ * partners. On an area's own domain (app.gestao.…, app.cliente.…,
+ * app.parceiro.…) the domain already says the area, so its prefix is dropped
+ * (app.gestao.…/locacoes); hosts that serve every area (localhost, the Vercel
+ * address) keep the prefixes. Keep every path here.
  */
 export const REALM_PREFIX: Record<Realm, string> = {
   gestao: "/gestao",
   cliente: "/area-cliente",
+  parceiro: "/parceiro",
 };
 
-/** Area of the current domain (null = serves both). Fixed for the page load. */
+/** Area of the current domain (null = serves all). Fixed for the page load. */
 export const HOST_REALM =
   typeof window === "undefined"
     ? null
@@ -22,6 +23,7 @@ export const HOST_REALM =
 
 const GESTAO = HOST_REALM === "gestao" ? "" : REALM_PREFIX.gestao;
 const PORTAL = HOST_REALM === "cliente" ? "" : REALM_PREFIX.cliente;
+const PARTNER = HOST_REALM === "parceiro" ? "" : REALM_PREFIX.parceiro;
 
 export const ROUTES = {
   root: "/",
@@ -108,6 +110,12 @@ export const ROUTES = {
   portalRental: `${PORTAL}/locacoes/:id`,
   portalInspectionNew: `${PORTAL}/locacoes/:id/vistorias/nova`,
   portalRentalStatement: `${PORTAL}/locacoes/:id/extrato`,
+  /** Partner area (app.parceiro): read only, the partner's motorcycles. */
+  partnerArea: PARTNER || "/",
+  partnerAreaLogin: `${PARTNER}/entrar`,
+  partnerAreaVehicle: `${PARTNER}/motos/:id`,
+  partnerAreaRental: `${PARTNER}/locacoes/:id`,
+  partnerAreaProfile: `${PARTNER}/perfil`,
 } as const;
 
 /** Addresses that moved: the old path keeps working (shared links). */
@@ -185,4 +193,6 @@ export const routeTo = {
   portalRentalStatement: (id: string) => `${PORTAL}/locacoes/${id}/extrato`,
   portalInspectionNew: (id: string) =>
     `${PORTAL}/locacoes/${id}/vistorias/nova`,
+  partnerAreaVehicle: (id: string) => `${PARTNER}/motos/${id}`,
+  partnerAreaRental: (id: string) => `${PARTNER}/locacoes/${id}`,
 };

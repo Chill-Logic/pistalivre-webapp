@@ -81,6 +81,15 @@ export const queryKeys = {
     wallet: () => [...queryKeys.portal.all, "wallet"] as const,
     reimbursements: () => [...queryKeys.portal.all, "reimbursements"] as const,
   },
+  /** The partner's own area (app.parceiro, partner Bearer). */
+  partnerArea: {
+    all: ["partner-area"] as const,
+    home: () => [...queryKeys.partnerArea.all, "home"] as const,
+    vehicle: (id: string) =>
+      [...queryKeys.partnerArea.all, "vehicle", id] as const,
+    rental: (id: string) =>
+      [...queryKeys.partnerArea.all, "rental", id] as const,
+  },
   finance: {
     all: ["finance"] as const,
     balances: () => [...queryKeys.finance.all, "balances"] as const,

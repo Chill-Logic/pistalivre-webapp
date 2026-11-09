@@ -4,15 +4,29 @@ import type { AuthKind, Realm } from "@/types/auth";
 const REALMS: Record<Realm, { home: string; login: string; kind: AuthKind }> = {
   gestao: { home: ROUTES.dashboard, login: ROUTES.login, kind: "user" },
   cliente: { home: ROUTES.portal, login: ROUTES.portalLogin, kind: "customer" },
+  parceiro: {
+    home: ROUTES.partnerArea,
+    login: ROUTES.partnerAreaLogin,
+    kind: "partner",
+  },
 };
 
 export function homeOf(realm: Realm) {
   return REALMS[realm].home;
 }
 
-/** The realm a token kind belongs to (staff → gestão, renter → portal). */
+const REALM_OF_KIND: Record<AuthKind, Realm> = {
+  user: "gestao",
+  customer: "cliente",
+  partner: "parceiro",
+};
+
+/**
+ * The realm a token kind belongs to (staff → gestão, renter → portal,
+ * partner → parceiro).
+ */
 export function realmOfKind(kind: AuthKind): Realm {
-  return kind === "customer" ? "cliente" : "gestao";
+  return REALM_OF_KIND[kind] ?? "gestao";
 }
 
 function belongsTo(path: string, realm: Realm) {

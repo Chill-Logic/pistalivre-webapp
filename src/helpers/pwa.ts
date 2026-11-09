@@ -42,7 +42,10 @@ export function installGuide(userAgent = navigator.userAgent): InstallGuide {
  * Invite only who never opened the app nor clicked "Instalar", and not within
  * the snooze after "Agora não". No `pwa` (older API) = don't invite.
  */
-export function shouldInviteToPwa(pwa: PwaUsage | undefined, now = Date.now()) {
+export function shouldInviteToPwa(
+  pwa: PwaUsage | null | undefined,
+  now = Date.now(),
+) {
   if (!pwa || pwa.firstUsedAt || pwa.installedAt) return false;
   if (!pwa.inviteDismissedAt) return true;
   const snoozeMs = PWA_INVITE_SNOOZE_DAYS * 86_400_000;
@@ -50,7 +53,7 @@ export function shouldInviteToPwa(pwa: PwaUsage | undefined, now = Date.now()) {
 }
 
 /** Already opened the app or clicked "Instalar": offer "Abrir no app". */
-export function hasPwa(pwa: PwaUsage | undefined) {
+export function hasPwa(pwa: PwaUsage | null | undefined) {
   return Boolean(pwa && (pwa.firstUsedAt || pwa.installedAt));
 }
 

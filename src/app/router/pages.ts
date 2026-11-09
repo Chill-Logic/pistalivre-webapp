@@ -337,3 +337,23 @@ export const PartnerContractPage = lazyPage(
   () => import("@/pages/gestao/partner-contract"),
   "PartnerContractPage",
 );
+export const PartnerLoginPage = lazyPage(
+  () => import("@/pages/parceiro/login"),
+  "PartnerLoginPage",
+);
+export const PartnerHomePage = lazyPage(
+  () => import("@/pages/parceiro/home"),
+  "PartnerHomePage",
+);
+export const PartnerVehiclePage = lazyPage(
+  () => import("@/pages/parceiro/vehicle-detail"),
+  "PartnerVehiclePage",
+);
+export const PartnerRentalPage = lazyPage(
+  () => import("@/pages/parceiro/rental-detail"),
+  "PartnerRentalPage",
+);
+export const PartnerProfilePage = lazyPage(
+  () => import("@/pages/parceiro/profile"),
+  "PartnerProfilePage",
+);
