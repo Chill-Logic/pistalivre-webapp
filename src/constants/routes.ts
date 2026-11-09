@@ -118,6 +118,7 @@ export const ROUTES = {
   partnerAreaVehicle: `${PARTNER}/veiculos/:id`,
   partnerAreaRentals: `${PARTNER}/locacoes`,
   partnerAreaRental: `${PARTNER}/locacoes/:id`,
+  partnerAreaRentalStatement: `${PARTNER}/locacoes/:id/extrato`,
   partnerAreaProfile: `${PARTNER}/perfil`,
 } as const;
 
@@ -200,4 +201,6 @@ export const routeTo = {
     `${PORTAL}/locacoes/${id}/vistorias/nova`,
   partnerAreaVehicle: (id: string) => `${PARTNER}/veiculos/${id}`,
   partnerAreaRental: (id: string) => `${PARTNER}/locacoes/${id}`,
+  partnerAreaRentalStatement: (id: string) =>
+    `${PARTNER}/locacoes/${id}/extrato`,
 };

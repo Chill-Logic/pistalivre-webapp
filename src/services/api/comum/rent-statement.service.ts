@@ -6,14 +6,20 @@ import type {
 
 /**
  * The rental's rent statement (screen and PDF), the same model the
- * management prints. Staff reads `/rentals/:id/…`, the renter `/me/rentals/:id/…`.
+ * management prints. Staff reads `/rentals/:id/…`, the renter `/me/rentals/:id/…`,
+ * the partner `/partner/rentals/:id/…` (cut to their window by the server,
+ * without the customer's debts).
  */
-export type RentStatementScope = "staff" | "portal";
+export type RentStatementScope = "staff" | "portal" | "partner";
+
+const BASE: Record<RentStatementScope, string> = {
+  staff: "/rentals",
+  portal: "/me/rentals",
+  partner: "/partner/rentals",
+};
 
 const base = (scope: RentStatementScope, rentalId: string) =>
-  scope === "portal"
-    ? `/me/rentals/${rentalId}/statement`
-    : `/rentals/${rentalId}/statement`;
+  `${BASE[scope]}/${rentalId}/statement`;
 
 export const rentStatementService = {
   async get(

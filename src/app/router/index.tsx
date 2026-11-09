@@ -96,6 +96,7 @@ import {
   PartnerLoginPage,
   PartnerProfilePage,
   PartnerRentalPage,
+  PartnerRentalStatementPage,
   PartnerVehiclePage,
   PartnerVehiclesPage,
   PartnerRentalsPage,
@@ -129,6 +130,10 @@ const partnerRoutes: RouteObject[] = [
       { path: ROUTES.partnerAreaVehicle, element: <PartnerVehiclePage /> },
       { path: ROUTES.partnerAreaRentals, element: <PartnerRentalsPage /> },
       { path: ROUTES.partnerAreaRental, element: <PartnerRentalPage /> },
+      {
+        path: ROUTES.partnerAreaRentalStatement,
+        element: <PartnerRentalStatementPage />,
+      },
       { path: ROUTES.partnerAreaProfile, element: <PartnerProfilePage /> },
     ],
   },

@@ -9,14 +9,18 @@ import {
 } from "@/services/api/comum/rent-statement.service";
 import type { RentStatementParams } from "@/types/rent-statement";
 
-/** Under the rental's (staff) or the portal's keys, so their invalidation reaches it. */
+/** Under the rental's (staff), the portal's or the partner area's keys, so their invalidation reaches it. */
 const statementKey = (
   scope: RentStatementScope,
   rentalId: string,
   params: RentStatementParams,
 ) =>
   [
-    ...(scope === "portal" ? queryKeys.portal.all : queryKeys.rentals.all),
+    ...(scope === "portal"
+      ? queryKeys.portal.all
+      : scope === "partner"
+        ? queryKeys.partnerArea.all
+        : queryKeys.rentals.all),
     "statement",
     rentalId,
     params,

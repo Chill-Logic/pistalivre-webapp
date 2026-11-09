@@ -1,4 +1,4 @@
-import { FileText, Receipt } from "lucide-react";
+import { FileText, Receipt, ReceiptText } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -71,7 +71,19 @@ export function PartnerRentalPage() {
         <Box className="space-y-6">
           <PageHeader
             title={rental.customerName}
-            actions={<RentalStatusBadge status={rental.status} />}
+            actions={
+              <>
+                <RentalStatusBadge status={rental.status} />
+                {statement && (
+                  <Button asChild variant="outline" size="sm">
+                    <Link to={routeTo.partnerAreaRentalStatement(rental.id)}>
+                      <ReceiptText />
+                      Extrato
+                    </Link>
+                  </Button>
+                )}
+              </>
+            }
           />
           <Row className="gap-y-6">
             <Col lg={4}>
