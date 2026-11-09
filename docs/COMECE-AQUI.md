@@ -28,6 +28,10 @@ curtas entre ferramentas e nos relatórios de subagentes.
 
 - Um build do webapp serve as duas áreas. O app procura `gestao`/`cliente` no endereço (`helpers/host-realm`) e
   manda a página da outra área para o domínio certo. Em `localhost` e no endereço da Vercel, as duas áreas funcionam.
+- **Última publicação: 2026-11-09 ~00:20** (aval do dono): backend `main` do `pista-livre` em `3de0dce` (desconto
+  no `amounts`, telas Next removidas com redirecionamento) e webapp `8126a6b` na Vercel (endereços limpos, vistoria
+  avulsa, Locações abrindo em todas as situações). Conferido: redirecionamentos 307 do site antigo e dos caminhos com
+  prefixo, `/quero-alugar` e `/api/v1` respondendo.
 - **No ar desde 2026-11-08 ~16:05** (aval do dono): backend `main` do `pista-livre` em `c99b0d3` (merge da
   `feat/api-v1-spa`, Railway publicou às 16:01) e webapp `74bf7f6` na Vercel (deploy
   `pistalivre-webapp-dsjxm1avv`). Conferido: rotas novas respondem (401 sem token), rótulos "Custos fixos" na
