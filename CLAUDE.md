@@ -48,7 +48,8 @@ React 19 + Vite 6 + TanStack Query 5 + React Router 7 + Tailwind 3 + Radix/shadc
 
 Várias sessões Claude podem mexer **na mesma pasta**: `git add <caminhos>` (nunca `-A`),
 `git pull --rebase --autostash` antes do push, mudanças **aditivas** nos compartilhados (router, `pages.ts`,
-`routes.ts`, `query-keys.ts`, `label-maps.ts`). Push na `main` deste repo pode; **deploy não**.
+`routes.ts`, `query-keys.ts`, `label-maps.ts`). **Push na `main` = deploy** (Vercel ligada ao GitHub): só com aval do dono;
+sem aval, commit local ou push numa branch.
 
 ## O que já existe (resumo — detalhe no handoff)
 
@@ -78,9 +79,8 @@ duas áreas, como no dev. Cada domínio guarda o seu login (localStorage por ori
   publica de novo).
 - Projeto criado em 2026-11-08: `csjhonathans-projects/pistalivre-webapp` (conta pessoal, plano Hobby),
   produção em `https://pistalivre-webapp.vercel.app`; `VITE_API_URL` cadastrada em Production e Preview.
-  O GitHub **não** ficou conectado (o app da Vercel não tem acesso à organização Chill-Logic), então o deploy é
-  pela CLI: `/home/ojhon/.nvm/versions/node/v22.15.1/bin/vercel deploy --prod` (pasta já ligada em `.vercel/`).
-  Para deploy a cada push: dar acesso ao app da Vercel na org Chill-Logic e rodar `vercel git connect`.
+  GitHub ligado desde 2026-11-09: **push na `main` publica em produção** (outras branches = prévia). A CLI
+  (`/home/ojhon/.nvm/versions/node/v22.15.1/bin/vercel deploy --prod`, pasta ligada em `.vercel/`) segue valendo.
 - DNS no **Cloudflare** (o Registro.br só guarda o registro): `CNAME app.gestao` e `CNAME app.cliente` para
   `460e80aaac8cf57f.vercel-dns-017.com` (o destino que a Vercel deu ao projeto), com a nuvem **cinza** (DNS only) até a Vercel emitir o certificado.
 - No backend: `WEBAPP_ORIGIN=https://app.gestao.pistalivrelocacoes.com.br,https://app.cliente.pistalivrelocacoes.com.br,https://pistalivre-webapp.vercel.app`

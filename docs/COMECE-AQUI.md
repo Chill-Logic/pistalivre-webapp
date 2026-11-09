@@ -57,9 +57,9 @@ curtas entre ferramentas e nos relatórios de subagentes.
 - **Ordem:** backend primeiro (o front novo depende dos endpoints), depois o webapp.
 - **Backend:** juntar a `feat/api-v1-spa` na `main` do `pista-livre`; o Railway publica sozinho (~9 min). Antes,
   conferir se a branch está toda no GitHub (`git rev-list origin/feat/api-v1-spa..feat/api-v1-spa`).
-- **Webapp:** `/home/ojhon/.nvm/versions/node/v22.15.1/bin/vercel deploy --prod` na pasta do projeto (já ligada em
-  `.vercel/`, conta `csjhonathan`). O GitHub **não** está conectado à Vercel, então um push **não** publica.
-- Commit e push na `main` deste repo podem, **mas** se o dono disser "só sobe quando eu pedir", nem commitar.
+- **Webapp:** desde 2026-11-09 o GitHub está ligado à Vercel: **push na `main` publica em produção** (outras
+  branches ganham prévia). Por isso, **push na `main` só com aval do dono**; sem aval, commit local ou push numa
+  branch. A CLI (`/home/ojhon/.nvm/versions/node/v22.15.1/bin/vercel deploy --prod`) segue valendo.
 
 ## Regras que mais pegam
 
