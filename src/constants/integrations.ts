@@ -196,4 +196,24 @@ export const AI_AUDIT_METHOD_LABELS: Record<string, string> = {
   "client.block": "Aplicativo bloqueado",
   "client.unblock": "Aplicativo desbloqueado",
   "grant.revoke": "Autorização revogada",
+  "gap.report": "Pergunta sem resposta",
+  "action.confirm": "Ação confirmada",
+  "action.cancel": "Ação cancelada",
 };
+
+/** Why the AI couldn't answer (registrar_pergunta_sem_resposta). */
+export const AI_GAP_REASON_LABELS: Record<string, string> = {
+  sem_ferramenta: "Sem ferramenta",
+  sem_permissao: "Sem permissão",
+  dado_insuficiente: "Dado insuficiente",
+  sem_motivo: "Sem motivo",
+};
+
+/** The always-on tool the AI calls when nothing answers. */
+export const AI_GAP_TOOL = "registrar_pergunta_sem_resposta";
+
+/** Auditoria: every event, and the gaps (what went unanswered). */
+export const AUDIT_TABS: SectionTab[] = [
+  { label: "Eventos", to: ROUTES.audit, end: true },
+  { label: "Lacunas", to: ROUTES.auditGaps },
+];

@@ -89,6 +89,7 @@ export const ROUTES = {
   integrationsPermissions: `${GESTAO}/integracoes/permissoes`,
   integrationsApps: `${GESTAO}/integracoes/aplicativos`,
   audit: `${GESTAO}/auditoria`,
+  auditGaps: `${GESTAO}/auditoria/lacunas`,
   aiConsent: `${GESTAO}/autorizar-ia`,
   finance: `${GESTAO}/financeiro`,
   financeDebts: `${GESTAO}/financeiro/debitos`,

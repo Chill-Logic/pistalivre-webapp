@@ -1,9 +1,16 @@
 /** An AI tool as the screens list it. */
-export type AiToolBrief = { name: string; title: string; kind: "read" | "draft" };
+/** read = looks at data; draft = edits the open document; write = changes data after the person confirms. */
+export type AiToolKind = "read" | "draft" | "write";
+
+export type AiToolBrief = { name: string; title: string; kind: AiToolKind };
 
 export type AiTool = AiToolBrief & {
   description: string;
   channels: ("chat" | "mcp")[];
+  /** Off until the admin turns it on (sensitive reads and every write). */
+  defaultOff: boolean;
+  /** "Financeiro", "Comercial e painel"… (groups the admin screen). */
+  area: string;
 };
 
 /** An app's authorization by one person (OAuth grant). */
@@ -41,11 +48,23 @@ export type AiChatInput = {
   leadId?: string;
 };
 
+/** A write the agent proposed: nothing happens until the person confirms. */
+export type AiChatAction = {
+  id: string;
+  tool: string;
+  title: string;
+  summary: string;
+  /** Label → value, labels ready from the server. */
+  details: Record<string, unknown>;
+  expiresAt: string;
+};
+
 export type AiChatResponse = {
   reply: string;
   html: string;
   changed: boolean;
   steps: AiChatStep[];
+  actions: AiChatAction[];
   stopReason: "ok" | "refusal" | "max_tokens" | "max_steps";
 };
 
@@ -59,7 +78,14 @@ export type AiConsent = {
 export type AiPermissions = {
   tools: AiTool[];
   roles: Record<string, string[]>;
-  users: { id: string; name: string; role: string; allow: string[]; deny: string[]; effective: string[] }[];
+  users: {
+    id: string;
+    name: string;
+    role: string;
+    allow: string[];
+    deny: string[];
+    effective: string[];
+  }[];
 };
 
 /** GET /ai/clients (admin): an app and who authorized it. */
@@ -94,6 +120,15 @@ export type AiAuditEntry = {
   ok: boolean;
   error: string | null;
   durationMs: number;
+};
+
+/** GET /ai/audit/gaps (admin): what went unanswered. */
+export type AiGaps = {
+  questions: {
+    total: number;
+    byReason: { reason: string; count: number }[];
+  };
+  denied: { tool: string; count: number; people: string[]; lastAt: string }[];
 };
 
 export type AiAuditFilters = {

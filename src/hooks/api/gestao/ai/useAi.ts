@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryKeys } from "@/constants/query-keys";
 import { errorMessage } from "@/helpers/api-error";
@@ -20,6 +25,22 @@ export function useAiChatAvailable() {
 /** One message to the editor's agent (nothing is saved). */
 export function useAiChat() {
   return useMutation({ mutationFn: aiService.chat });
+}
+
+/**
+ * "Confirmar" / "Cancelar" on a write the agent proposed. A confirmed write
+ * may have changed the CRM: its lists refetch.
+ */
+export function useAiChatAction() {
+  const queryClient = useQueryClient();
+  return {
+    confirm: useMutation({
+      mutationFn: aiService.confirmAction,
+      onSuccess: () =>
+        queryClient.invalidateQueries({ queryKey: queryKeys.crm.all }),
+    }),
+    cancel: useMutation({ mutationFn: aiService.cancelAction }),
+  };
 }
 
 /** Revokes an app's authorization (own, or anyone's for the admin). */
@@ -44,7 +65,10 @@ export function useAiConsent(query: string) {
 }
 
 export function useAiPermissions() {
-  return useQuery({ queryKey: queryKeys.ai.permissions(), queryFn: aiService.permissions });
+  return useQuery({
+    queryKey: queryKeys.ai.permissions(),
+    queryFn: aiService.permissions,
+  });
 }
 
 /** Saving a role or a person: the overview comes back and replaces the cache. */
@@ -56,7 +80,8 @@ export function useSaveAiPermissions() {
   };
   return {
     role: useMutation({
-      mutationFn: ({ role, tools }: { role: string; tools: string[] }) => aiService.setRoleTools(role, tools),
+      mutationFn: ({ role, tools }: { role: string; tools: string[] }) =>
+        aiService.setRoleTools(role, tools),
       onSuccess: (data) => {
         store(data);
         toast.success("Permissões do papel salvas");
@@ -64,8 +89,15 @@ export function useSaveAiPermissions() {
       onError: (error) => toast.error(errorMessage(error)),
     }),
     user: useMutation({
-      mutationFn: ({ userId, allow, deny }: { userId: string; allow: string[]; deny: string[] }) =>
-        aiService.setUserOverrides(userId, { allow, deny }),
+      mutationFn: ({
+        userId,
+        allow,
+        deny,
+      }: {
+        userId: string;
+        allow: string[];
+        deny: string[];
+      }) => aiService.setUserOverrides(userId, { allow, deny }),
       onSuccess: (data) => {
         store(data);
         toast.success("Permissões da pessoa salvas");
@@ -76,19 +108,35 @@ export function useSaveAiPermissions() {
 }
 
 export function useAiClients() {
-  return useQuery({ queryKey: queryKeys.ai.clients(), queryFn: aiService.clients });
+  return useQuery({
+    queryKey: queryKeys.ai.clients(),
+    queryFn: aiService.clients,
+  });
 }
 
 export function useBlockAiClient() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, blocked }: { id: string; blocked: boolean }) => aiService.setClientBlocked(id, blocked),
+    mutationFn: ({ id, blocked }: { id: string; blocked: boolean }) =>
+      aiService.setClientBlocked(id, blocked),
     onSuccess: (items, { blocked }) => {
       queryClient.setQueryData(queryKeys.ai.clients(), items);
-      toast.success(blocked ? "Aplicativo bloqueado" : "Aplicativo desbloqueado");
+      toast.success(
+        blocked ? "Aplicativo bloqueado" : "Aplicativo desbloqueado",
+      );
     },
     onError: (error) => toast.error(errorMessage(error)),
   });
+}
+
+/** Lacunas: unanswered questions by reason and the refused tools, in a period. */
+export function useAiGaps(de: string, ate: string) {
+  const query = useQuery({
+    queryKey: queryKeys.ai.gaps(de, ate),
+    queryFn: () => aiService.gaps({ de, ate }),
+    placeholderData: keepPreviousData,
+  });
+  return { ...query, isRefreshing: query.isFetching && !query.isPending };
 }
 
 /** The audit: pages on the desktop, 10 by 10 on the phone. */

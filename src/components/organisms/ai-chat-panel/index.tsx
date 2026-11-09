@@ -7,15 +7,18 @@ import { List, ListItem } from "@/components/atoms/list";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { Textarea } from "@/components/atoms/textarea";
+import { AiActionCard } from "@/components/organisms/ai-action-card";
 import { toApiError } from "@/helpers/api-error";
 import { useAiChat } from "@/hooks/api/gestao/ai/useAi";
-import type { AiChatMode, AiChatStep } from "@/types/ai";
+import type { AiChatAction, AiChatMode, AiChatStep } from "@/types/ai";
 import { cn } from "@/utils/cn";
 
 type ChatEntry = {
   role: "user" | "assistant";
   content: string;
   steps?: AiChatStep[];
+  /** Writes the agent proposed: the person confirms each one. */
+  actions?: AiChatAction[];
   /** The document before this answer changed it (Desfazer). */
   before?: string;
 };
@@ -42,9 +45,10 @@ export type AiChatPanelProps = {
 
 /**
  * The editor's AI assistant: a conversation with an agent that reads the
- * system's data and edits the open draft with the person's tools. Nothing is
- * saved — the person reviews and saves. Each answer lists what the agent did;
- * a change to the document can be undone.
+ * system's data and edits the open draft with the person's tools. The draft is
+ * never saved — the person reviews and saves. Each answer lists what the agent
+ * did; a change to the document can be undone; a write it proposed waits for
+ * "Confirmar".
  */
 export function AiChatPanel({
   mode,
@@ -75,7 +79,14 @@ export function AiChatPanel({
     setEntries((current) => [...current, { role: "user", content: message }]);
     const before = html;
     chat.mutate(
-      { mode, html, history, message, ...(rentalId ? { rentalId } : {}), ...(leadId ? { leadId } : {}) },
+      {
+        mode,
+        html,
+        history,
+        message,
+        ...(rentalId ? { rentalId } : {}),
+        ...(leadId ? { leadId } : {}),
+      },
       {
         onSuccess: (answer) => {
           setEntries((current) => [
@@ -84,6 +95,7 @@ export function AiChatPanel({
               role: "assistant",
               content: answer.reply,
               steps: answer.steps,
+              actions: answer.actions,
               before: answer.changed ? before : undefined,
             },
           ]);
@@ -108,7 +120,10 @@ export function AiChatPanel({
         <Text weight="semibold">Assistente de IA</Text>
       </Box>
 
-      <Box className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4" aria-live="polite">
+      <Box
+        className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4"
+        aria-live="polite"
+      >
         <Box className="space-y-3">
           <Sparkles className="size-5 text-primary" aria-hidden />
           <Text size="sm">{GREETING[mode]}</Text>
@@ -143,7 +158,13 @@ export function AiChatPanel({
 
         <List className="space-y-3">
           {entries.map((entry, index) => (
-            <ListItem key={index} className={cn("flex", entry.role === "user" ? "justify-end" : "justify-start")}>
+            <ListItem
+              key={index}
+              className={cn(
+                "flex",
+                entry.role === "user" ? "justify-end" : "justify-start",
+              )}
+            >
               {entry.role === "user" ? (
                 <Box className="max-w-[85%] rounded-2xl rounded-br-sm bg-primary/10 px-3 py-2">
                   <Text size="sm" className="whitespace-pre-wrap break-words">
@@ -160,9 +181,15 @@ export function AiChatPanel({
                       {entry.steps.map((step, i) => (
                         <ListItem key={i} className="flex items-center gap-1.5">
                           {step.ok ? (
-                            <Check className="size-3 text-success" aria-hidden />
+                            <Check
+                              className="size-3 text-success"
+                              aria-hidden
+                            />
                           ) : (
-                            <X className="size-3 text-destructive" aria-hidden />
+                            <X
+                              className="size-3 text-destructive"
+                              aria-hidden
+                            />
                           )}
                           <Text inline size="xs" tone="muted">
                             {step.title}
@@ -171,6 +198,9 @@ export function AiChatPanel({
                       ))}
                     </List>
                   )}
+                  {entry.actions?.map((action) => (
+                    <AiActionCard key={action.id} action={action} />
+                  ))}
                   {entry.before !== undefined && (
                     <Box className="flex items-center justify-between gap-2 border-t pt-2">
                       <Text size="xs" tone="muted">
@@ -183,7 +213,9 @@ export function AiChatPanel({
                         onClick={() => {
                           onApply(entry.before as string);
                           setEntries((current) =>
-                            current.map((e, i) => (i === index ? { ...e, before: undefined } : e)),
+                            current.map((e, i) =>
+                              i === index ? { ...e, before: undefined } : e,
+                            ),
                           );
                         }}
                       >
@@ -227,7 +259,9 @@ export function AiChatPanel({
             size="icon"
             aria-label="Enviar"
             onClick={() => send(draft)}
-            disabled={chat.isPending || !draft.trim() || Boolean(disabledReason)}
+            disabled={
+              chat.isPending || !draft.trim() || Boolean(disabledReason)
+            }
           >
             <SendHorizontal />
           </Button>

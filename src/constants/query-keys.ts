@@ -117,6 +117,7 @@ export const queryKeys = {
     clients: () => [...queryKeys.ai.all, "clients"] as const,
     audit: () => [...queryKeys.ai.all, "audit"] as const,
     auditEntry: (id: string) => [...queryKeys.ai.all, "audit-entry", id] as const,
+    gaps: (de: string, ate: string) => [...queryKeys.ai.all, "gaps", de, ate] as const,
   },
   aiUsage: {
     all: ["ai-usage"] as const,

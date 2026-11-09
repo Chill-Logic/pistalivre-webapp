@@ -92,12 +92,26 @@ export const FinanceStatementPage = lazyPage(
   () => import("@/pages/gestao/finance-statement"),
   "FinanceStatementPage",
 );
-export const AuditPage = lazyPage(() => import("@/pages/gestao/audit"), "AuditPage");
+export const AuditPage = lazyPage(
+  () => import("@/pages/gestao/audit"),
+  "AuditPage",
+);
+export const AuditGapsPage = lazyPage(
+  () => import("@/pages/gestao/audit-gaps"),
+  "AuditGapsPage",
+);
+export const AuditSectionPage = lazyPage(
+  () => import("@/pages/gestao/audit-section"),
+  "AuditSectionPage",
+);
 export const IntegrationsSectionPage = lazyPage(
   () => import("@/pages/gestao/integrations-section"),
   "IntegrationsSectionPage",
 );
-export const IntegrationsPage = lazyPage(() => import("@/pages/gestao/integrations"), "IntegrationsPage");
+export const IntegrationsPage = lazyPage(
+  () => import("@/pages/gestao/integrations"),
+  "IntegrationsPage",
+);
 export const IntegrationsPermissionsPage = lazyPage(
   () => import("@/pages/gestao/integrations-permissions"),
   "IntegrationsPermissionsPage",
@@ -106,7 +120,10 @@ export const IntegrationsAppsPage = lazyPage(
   () => import("@/pages/gestao/integrations-apps"),
   "IntegrationsAppsPage",
 );
-export const AiConsentPage = lazyPage(() => import("@/pages/gestao/ai-consent"), "AiConsentPage");
+export const AiConsentPage = lazyPage(
+  () => import("@/pages/gestao/ai-consent"),
+  "AiConsentPage",
+);
 export const AiUsagePage = lazyPage(
   () => import("@/pages/gestao/ai-usage"),
   "AiUsagePage",

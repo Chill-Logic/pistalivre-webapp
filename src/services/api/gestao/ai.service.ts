@@ -8,6 +8,7 @@ import type {
   AiChatResponse,
   AiClient,
   AiConsent,
+  AiGaps,
   AiMe,
   AiPermissions,
 } from "@/types/ai";
@@ -25,6 +26,18 @@ export const aiService = {
     const { data } = await http.post<AiChatResponse>("/ai/chat", input);
     return data;
   },
+  /** Runs a write the chat proposed ("Confirmar"). */
+  async confirmAction(id: string) {
+    const { data } = await http.post<{
+      id: string;
+      summary: string;
+      result: unknown;
+    }>(`/ai/actions/${id}/confirm`);
+    return data;
+  },
+  async cancelAction(id: string) {
+    await http.post(`/ai/actions/${id}/cancel`);
+  },
   async revokeGrant(id: string) {
     await http.delete(`/ai/grants/${id}`);
   },
@@ -34,7 +47,10 @@ export const aiService = {
     return data;
   },
   async decide(params: Record<string, string>, decision: "approve" | "deny") {
-    const { data } = await http.post<{ redirectTo: string }>("/oauth/consent", { ...params, decision });
+    const { data } = await http.post<{ redirectTo: string }>("/oauth/consent", {
+      ...params,
+      decision,
+    });
     return data.redirectTo;
   },
   async permissions() {
@@ -42,11 +58,20 @@ export const aiService = {
     return data;
   },
   async setRoleTools(role: string, tools: string[]) {
-    const { data } = await http.put<AiPermissions>(`/ai/permissions/roles/${role}`, { tools });
+    const { data } = await http.put<AiPermissions>(
+      `/ai/permissions/roles/${role}`,
+      { tools },
+    );
     return data;
   },
-  async setUserOverrides(userId: string, overrides: { allow: string[]; deny: string[] }) {
-    const { data } = await http.put<AiPermissions>(`/ai/permissions/users/${userId}`, overrides);
+  async setUserOverrides(
+    userId: string,
+    overrides: { allow: string[]; deny: string[] },
+  ) {
+    const { data } = await http.put<AiPermissions>(
+      `/ai/permissions/users/${userId}`,
+      overrides,
+    );
     return data;
   },
   async clients() {
@@ -54,11 +79,22 @@ export const aiService = {
     return data.items;
   },
   async setClientBlocked(id: string, blocked: boolean) {
-    const { data } = await http.patch<{ items: AiClient[] }>(`/ai/clients/${id}`, { blocked });
+    const { data } = await http.patch<{ items: AiClient[] }>(
+      `/ai/clients/${id}`,
+      { blocked },
+    );
     return data.items;
   },
   async audit(filters: AiAuditFilters) {
-    const { data } = await http.get<Paginated<AiAuditEntry>>("/ai/audit", { params: toQueryParams(filters) });
+    const { data } = await http.get<Paginated<AiAuditEntry>>("/ai/audit", {
+      params: toQueryParams(filters),
+    });
+    return data;
+  },
+  async gaps(period: { de: string; ate: string }) {
+    const { data } = await http.get<AiGaps>("/ai/audit/gaps", {
+      params: toQueryParams(period),
+    });
     return data;
   },
   async auditEntry(id: string) {

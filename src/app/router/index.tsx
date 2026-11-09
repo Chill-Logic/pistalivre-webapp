@@ -26,7 +26,9 @@ import {
   DocumentsPage,
   AiConsentPage,
   AiUsagePage,
+  AuditGapsPage,
   AuditPage,
+  AuditSectionPage,
   IntegrationsAppsPage,
   IntegrationsPage,
   IntegrationsPermissionsPage,
@@ -240,17 +242,34 @@ const gestaoRoutes: RouteObject[] = [
       { path: ROUTES.company, element: <CompanyPage /> },
       { path: ROUTES.companyEdit, element: <CompanyEditPage /> },
       { path: ROUTES.aiUsage, element: <AiUsagePage /> },
-      { path: ROUTES.audit, element: <AuditPage /> },
+      {
+        element: (
+          <AuditSectionPage
+            preload={[AuditPage.preload, AuditGapsPage.preload]}
+          />
+        ),
+        children: [
+          { path: ROUTES.audit, element: <AuditPage /> },
+          { path: ROUTES.auditGaps, element: <AuditGapsPage /> },
+        ],
+      },
       { path: ROUTES.aiConsent, element: <AiConsentPage /> },
       {
         element: (
           <IntegrationsSectionPage
-            preload={[IntegrationsPage.preload, IntegrationsPermissionsPage.preload, IntegrationsAppsPage.preload]}
+            preload={[
+              IntegrationsPage.preload,
+              IntegrationsPermissionsPage.preload,
+              IntegrationsAppsPage.preload,
+            ]}
           />
         ),
         children: [
           { path: ROUTES.integrations, element: <IntegrationsPage /> },
-          { path: ROUTES.integrationsPermissions, element: <IntegrationsPermissionsPage /> },
+          {
+            path: ROUTES.integrationsPermissions,
+            element: <IntegrationsPermissionsPage />,
+          },
           { path: ROUTES.integrationsApps, element: <IntegrationsAppsPage /> },
         ],
       },

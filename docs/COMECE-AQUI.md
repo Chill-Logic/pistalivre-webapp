@@ -24,6 +24,11 @@ curtas entre ferramentas e nos relatórios de subagentes.
   `ai-chat-panel`, no lugar do "Personalizar com IA"); menu **Integrações** (todos: conectar Claude/ChatGPT/Gemini ao
   MCP com tutoriais, meus apps; admin: abas Permissões e Aplicativos) e **Auditoria** (só admin, `adminOnly` no
   NavItem). Consentimento OAuth em `/gestao/autorizar-ia`. Backend e decisões em `../pista-livre/docs/handoff-ia-mcp.md`.
+- **Ferramentas da IA em todas as áreas (2026-11-09, commits locais, não publicados):** 50 ferramentas (leitura de
+  tudo, escritas leves do CRM sempre com confirmação). No chat, cada escrita proposta vira um cartão com
+  **Confirmar/Cancelar** (`ai-action-card`, `/ai/actions/:id/confirm|cancel`); Permissões agrupadas por área, com
+  "Escrita" e "Começa desligada"; **Auditoria › Lacunas** (`/gestao/auditoria/lacunas`): perguntas que a IA não
+  conseguiu responder e ferramentas recusadas por falta de permissão. **Backend antes do front.**
 - **Contas do mês (no ar desde 2026-11-09 10:27):** Financeiro › Contas do mês (`/gestao/financeiro/contas?mes=`)
   junta custos fixos, parcelas de dívidas e avulsas do mês, com os meses anteriores em aberto. Registrar = pago (dia,
   valor, comprovante), em aberto ou sem cobrança, inclusive retroativo; parcela paga pelo diálogo da dívida. O custo
