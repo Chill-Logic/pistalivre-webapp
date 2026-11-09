@@ -19,9 +19,17 @@ const usd = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 4,
 });
 
-/** US$ 0,1787 — AI costs are tiny per call: up to 4 decimals. */
+// Under a cent: the 6 decimals the server stores, or a tiny call shows as 0,00.
+const usdTiny = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 6,
+});
+
+/** US$ 0,1787 · US$ 0,000005 — AI costs are tiny per call. */
 export function formatUsd(value: number) {
-  return usd.format(value);
+  return (value > 0 && value < 0.01 ? usdTiny : usd).format(value);
 }
 
 /** 14.020 */
