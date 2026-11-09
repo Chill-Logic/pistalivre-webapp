@@ -6,6 +6,7 @@ import type {
   PartnerContractCosts,
   PartnerOfferRatePeriod,
   PartnerPayoutFrequency,
+  PartnerProposalStatus,
 } from "@/types/partner";
 
 /**
@@ -77,10 +78,61 @@ export type PartnerAreaContract = {
   vehicles: PartnerAreaContractVehicle[];
 };
 
+/** What a contract says (terms only): shared by contracts and proposals. */
+export type PartnerAreaTerms = Pick<
+  PartnerAreaContract,
+  | "type"
+  | "contributionType"
+  | "contributionAmount"
+  | "contributionDate"
+  | "shareBase"
+  | "sharePercent"
+  | "adminFeePercent"
+  | "adminFeeFixed"
+  | "payoutFrequency"
+  | "payoutDay"
+  | "payoutWeekday"
+>;
+
+/** A vehicle offered in a proposal, with the rent the company intends. */
+export type PartnerAreaProposalVehicle = {
+  vehicleId: string;
+  plate: string | null;
+  label: string | null;
+  acquisitionValue: number | null;
+  offerRate: number | null;
+  offerRatePeriod: PartnerOfferRatePeriod | null;
+  joinedAt: string;
+};
+
+/** The version the partner decides on (the latest not withdrawn). */
+export type PartnerAreaProposalVersion = {
+  id: string;
+  number: number;
+  status: PartnerProposalStatus;
+  createdAt: string;
+  decidedAt: string | null;
+  /** Their reason, when they refused. */
+  decisionNote: string | null;
+};
+
+/** A draft contract sent to the partner, with the terms it proposes. */
+export type PartnerAreaProposal = PartnerAreaTerms & {
+  contractId: string;
+  code: string;
+  costs: PartnerContractCosts;
+  startDate: string;
+  endDate: string | null;
+  vehicles: PartnerAreaProposalVehicle[];
+  version: PartnerAreaProposalVersion;
+};
+
 /** GET /partner */
 export type PartnerAreaHome = {
   partner: PartnerAreaProfile;
   contracts: PartnerAreaContract[];
+  /** Draft contracts with a version sent (absent on an older API). */
+  proposals?: PartnerAreaProposal[];
 };
 
 /** A rental of a partner's vehicle, cut to what the partner may see. */

@@ -1,4 +1,4 @@
-import { Car, FileText } from "lucide-react";
+import { Car, FileText, Lock } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
@@ -16,29 +16,34 @@ import { isNotFound } from "@/helpers/api-error";
 import { currentVehicles } from "@/helpers/partner";
 import {
   usePartnerContract,
-  usePartnerContractDocument,
   usePartnerContractDocumentDraft,
+  usePartnerContractProposals,
 } from "@/hooks/api/gestao/partners/usePartners";
 import { formatDateTime } from "@/utils/format";
 
 /**
- * "Montar contrato" of a partner contract: the base text merged with its
- * terms and vehicles, the AI assistant beside it, "Visualizar PDF" and "Gerar
- * PDF e salvar" (back to the contract). Needs a vehicle in the contract.
+ * The text of a partner contract's proposal: the base text merged with its
+ * terms and vehicles, the AI assistant beside it, "Visualizar PDF" and
+ * "Enviar proposta ao parceiro" (back to the contract). Only a draft with a
+ * vehicle: an active contract has its terms locked.
  */
 export function PartnerContractDocumentPage() {
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const contract = usePartnerContract(id);
+  const isDraft = contract.data?.status === "DRAFT";
   const hasVehicles = contract.data
     ? currentVehicles(contract.data).length > 0
     : false;
-  const draft = usePartnerContractDocumentDraft(id, hasVehicles);
-  const current = usePartnerContractDocument(hasVehicles ? id : "");
+  const editable = isDraft && hasVehicles;
+  const draft = usePartnerContractDocumentDraft(id, editable);
+  const proposals = usePartnerContractProposals(editable ? id : "");
   const contractUrl = routeTo.partnerContract(id);
-  const generatedAt = current.data?.document
-    ? (current.data.generatedAt ?? current.data.document.createdAt)
-    : null;
+  const versions = proposals.data?.items ?? [];
+  const pending = versions.find((version) => version.status === "PROPOSED");
+  const accepted = proposals.data?.acceptedMatchesTerms
+    ? versions.find((v) => v.id === proposals.data?.acceptedVersionId)
+    : undefined;
 
   return (
     <Box className="space-y-4">
@@ -46,9 +51,9 @@ export function PartnerContractDocumentPage() {
         to={contract.data ? contractUrl : ROUTES.partners}
         label={contract.data?.code ?? "Contrato"}
       />
-      <PageHeader title="Documento do contrato" />
+      <PageHeader title="Proposta ao parceiro" />
 
-      {(contract.isPending || (hasVehicles && draft.isPending)) && (
+      {(contract.isPending || (editable && draft.isPending)) && (
         <SkeletonRegion label="Montando o contrato…">
           <PartnerContractEditorSkeleton />
         </SkeletonRegion>
@@ -68,7 +73,20 @@ export function PartnerContractDocumentPage() {
           />
         ))}
 
-      {contract.data && !hasVehicles && (
+      {contract.data && !isDraft && (
+        <EmptyState
+          icon={Lock}
+          title="Os termos deste contrato estão travados"
+          description="Ele já foi aceito e ativado: o texto não muda mais. Um veículo novo entra num contrato novo."
+          action={
+            <Button asChild variant="outline">
+              <Link to={contractUrl}>Voltar ao contrato</Link>
+            </Button>
+          }
+        />
+      )}
+
+      {isDraft && !hasVehicles && (
         <EmptyState
           icon={Car}
           title="Inclua os veículos antes"
@@ -81,25 +99,30 @@ export function PartnerContractDocumentPage() {
         />
       )}
 
-      {hasVehicles && draft.isError && (
+      {editable && draft.isError && (
         <QueryError error={draft.error} onRetry={() => draft.refetch()} />
       )}
 
-      {hasVehicles && draft.data && (
+      {editable && draft.data && (
         <>
-          {generatedAt && (
+          {pending ? (
             <Alert variant="info" role="note">
-              Este contrato já tem um PDF, gerado em{" "}
-              {formatDateTime(generatedAt)}. Gerar de novo passa a valer o novo;
-              o anterior fica guardado.
+              A versão {pending.number}, enviada em{" "}
+              {formatDateTime(pending.createdAt)}, está aguardando o parceiro.
+              Enviar de novo a retira e manda esta no lugar.
             </Alert>
-          )}
+          ) : accepted ? (
+            <Alert variant="info" role="note">
+              O parceiro já aceitou a versão {accepted.number} com estes termos.
+              Enviar outra pede um novo aceite.
+            </Alert>
+          ) : null}
           <PartnerContractEditor
             contractId={id}
             initialHtml={draft.data.html}
             aiEnabled={draft.data.aiEnabled}
             cancelTo={contractUrl}
-            onSaved={() => navigate(contractUrl, { replace: true })}
+            onSent={() => navigate(contractUrl, { replace: true })}
           />
         </>
       )}

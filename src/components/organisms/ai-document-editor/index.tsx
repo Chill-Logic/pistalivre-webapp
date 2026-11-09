@@ -1,5 +1,5 @@
 import { Eye } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
@@ -28,6 +28,12 @@ type AiDocumentEditorProps = {
   previewing: boolean;
   onSave: (html: string) => void;
   saving: boolean;
+  /** The main action (default "Gerar PDF e salvar"). */
+  saveLabel?: string;
+  /** While it runs (default "Gerando PDF…"). */
+  savingLabel?: string;
+  /** Icon before the main action's label. */
+  saveIcon?: ReactNode;
   /** Why the last save failed (stays with the editor). */
   error?: string | null;
 };
@@ -49,6 +55,9 @@ export function AiDocumentEditor({
   previewing,
   onSave,
   saving,
+  saveLabel = "Gerar PDF e salvar",
+  savingLabel = "Gerando PDF…",
+  saveIcon,
   error,
 }: AiDocumentEditorProps) {
   const chatAvailable = useAiChatAvailable() && aiEnabled;
@@ -94,8 +103,12 @@ export function AiDocumentEditor({
             onClick={() => onSave(html)}
             disabled={saving || empty}
           >
-            {saving && <Spinner className="text-primary-foreground" />}
-            {saving ? "Gerando PDF…" : "Gerar PDF e salvar"}
+            {saving ? (
+              <Spinner className="text-primary-foreground" />
+            ) : (
+              saveIcon
+            )}
+            {saving ? savingLabel : saveLabel}
           </Button>
         </Box>
       </CardContent>

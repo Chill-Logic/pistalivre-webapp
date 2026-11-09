@@ -1,10 +1,12 @@
+import { Send } from "lucide-react";
 import { useState } from "react";
 import { AiDocumentEditor } from "@/components/organisms/ai-document-editor";
 import { toApiError } from "@/helpers/api-error";
 import {
-  useGeneratePartnerContractDocument,
   usePartnerContractDocumentPreview,
+  useSendPartnerProposal,
 } from "@/hooks/api/gestao/partners/usePartnerContractMutations";
+import type { PartnerProposalVersion } from "@/types/partner";
 
 type PartnerContractEditorProps = {
   contractId: string;
@@ -12,7 +14,7 @@ type PartnerContractEditorProps = {
   initialHtml: string;
   aiEnabled: boolean;
   cancelTo: string;
-  onSaved: () => void;
+  onSent: (version: PartnerProposalVersion) => void;
 };
 
 /** Starting points offered by the assistant (it asks for what's missing). */
@@ -26,24 +28,24 @@ const PARTNER_CONTRACT_SUGGESTIONS = [
 /**
  * The partner contract's text (investment or management, merged with its
  * terms and vehicles), with the AI assistant beside it → "Visualizar PDF" →
- * "Gerar PDF e salvar", which freezes it as the contract's PDF (the server
- * adds the signatures). Generating again keeps the old file.
+ * "Enviar proposta ao parceiro": the text, the terms and the vehicles freeze
+ * as the next version (with its PDF), which the partner accepts or refuses.
  */
 export function PartnerContractEditor({
   contractId,
   initialHtml,
   aiEnabled,
   cancelTo,
-  onSaved,
+  onSent,
 }: PartnerContractEditorProps) {
   const preview = usePartnerContractDocumentPreview(contractId);
-  const generate = useGeneratePartnerContractDocument(contractId);
+  const send = useSendPartnerProposal(contractId);
   const [error, setError] = useState<string | null>(null);
 
   const save = (html: string) => {
     setError(null);
-    generate.mutate(html, {
-      onSuccess: () => onSaved(),
+    send.mutate(html, {
+      onSuccess: onSent,
       onError: (failure) => setError(toApiError(failure).message),
     });
   };
@@ -52,7 +54,7 @@ export function PartnerContractEditor({
     <AiDocumentEditor
       initialHtml={initialHtml}
       aiEnabled={aiEnabled}
-      intro="Revise o contrato do parceiro abaixo. Ajuste o texto antes de gerar o PDF; o que estiver aqui fica congelado no documento. As assinaturas entram no fim do PDF."
+      intro="Revise o contrato do parceiro abaixo. Ao enviar, o texto, os termos e os veículos ficam congelados numa nova versão da proposta, que o parceiro aceita ou recusa na área dele. As assinaturas entram no fim do PDF."
       label="Texto do contrato"
       cancelTo={cancelTo}
       chat={{
@@ -63,7 +65,10 @@ export function PartnerContractEditor({
       onPreview={(html) => preview.mutate(html)}
       previewing={preview.isPending}
       onSave={save}
-      saving={generate.isPending}
+      saving={send.isPending}
+      saveLabel="Enviar proposta ao parceiro"
+      savingLabel="Enviando proposta…"
+      saveIcon={<Send />}
       error={error}
     />
   );

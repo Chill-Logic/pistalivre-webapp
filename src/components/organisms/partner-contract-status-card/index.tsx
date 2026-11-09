@@ -29,14 +29,16 @@ import { PartnerContractStatusBadge } from "@/components/molecules/partner-contr
 import { errorMessage, toApiError } from "@/helpers/api-error";
 import { contractInputOf, currentVehicles } from "@/helpers/partner";
 import { useUpdatePartnerContract } from "@/hooks/api/gestao/partners/usePartnerContractMutations";
+import { usePartnerContractProposals } from "@/hooks/api/gestao/partners/usePartners";
 import type { PartnerContract } from "@/types/partner";
 import { todayInBrasilia } from "@/utils/date";
 import { formatCalendarDate } from "@/utils/format";
 import { pluralize } from "@/utils/text";
 
 /**
- * Draft → Ativar (needs a vehicle) → Encerrar (needs the end day). What the
- * partner sees follows it: drafts are invisible to them.
+ * Draft → Ativar (needs a vehicle and the partner's acceptance of a version
+ * with exactly these terms) → Encerrar (needs the end day). Of a draft the
+ * partner only sees the proposal; once active, the terms are locked.
  */
 export function PartnerContractStatusCard({
   contract,
@@ -45,7 +47,11 @@ export function PartnerContractStatusCard({
 }) {
   const update = useUpdatePartnerContract(contract.id);
   const [activateOpen, setActivateOpen] = useState(false);
+  const isDraft = contract.status === "DRAFT";
+  const proposals = usePartnerContractProposals(isDraft ? contract.id : "");
   const hasVehicles = contract.vehicles.length > 0;
+  const accepted = Boolean(proposals.data?.acceptedMatchesTerms);
+  const canActivate = hasVehicles && accepted;
 
   const activate = () =>
     update.mutate(contractInputOf(contract, { status: "ACTIVE" }), {
@@ -66,19 +72,27 @@ export function PartnerContractStatusCard({
         {contract.status === "DRAFT" && (
           <>
             <Text tone="muted">
-              Rascunho: o parceiro ainda não vê este contrato. Inclua os
-              veículos e ative.
+              Rascunho: o parceiro vê só a proposta enviada. Com o aceite dele,
+              ative o contrato.
             </Text>
-            {!hasVehicles && (
+            {!hasVehicles ? (
               <Text size="xs" tone="muted">
                 Para ativar, inclua ao menos um veículo.
               </Text>
+            ) : (
+              !proposals.isPending &&
+              !accepted && (
+                <Text size="xs" tone="muted">
+                  Para ativar, o parceiro precisa aceitar a proposta com estes
+                  termos.
+                </Text>
+              )
             )}
             <ConfirmDialog
               open={activateOpen}
               onOpenChange={setActivateOpen}
               trigger={
-                <Button className="w-full sm:w-auto" disabled={!hasVehicles}>
+                <Button className="w-full sm:w-auto" disabled={!canActivate}>
                   <CirclePlay />
                   Ativar contrato
                 </Button>
@@ -100,7 +114,8 @@ export function PartnerContractStatusCard({
                 "veículo",
                 "veículos",
               )}
-              . O parceiro acompanha as locações na área dele.
+              . O parceiro acompanha as locações na área dele. Os termos estão
+              travados: um veículo novo entra num contrato novo.
             </Text>
             <EndContractDialog contract={contract} />
           </>

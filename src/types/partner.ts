@@ -175,3 +175,35 @@ export type PartnerContractDocumentDraft = {
   /** Whether the AI is configured (the chat also needs the person's tools). */
   aiEnabled: boolean;
 };
+
+/** A version of the contract sent to the partner (the terms frozen in it). */
+export type PartnerProposalStatus =
+  | "PROPOSED"
+  | "ACCEPTED"
+  | "REJECTED"
+  | "WITHDRAWN"
+  | "SUPERSEDED";
+
+export type PartnerProposalVersion = {
+  id: string;
+  number: number;
+  status: PartnerProposalStatus;
+  createdAt: string;
+  decidedAt: string | null;
+  /** The partner's reason, on a refusal. */
+  decisionNote: string | null;
+  /** Where the partner accepted/refused from. */
+  decidedIp: string | null;
+  /** The signature request made from the accepted version. */
+  signatureRequestId: string | null;
+  /** The version's PDF. */
+  document: DocumentFile | null;
+};
+
+/** GET /partner-contracts/:id/proposals (newest first). */
+export type PartnerProposals = {
+  items: PartnerProposalVersion[];
+  acceptedVersionId: string | null;
+  /** The accepted version says what the contract says (activation needs it). */
+  acceptedMatchesTerms: boolean;
+};

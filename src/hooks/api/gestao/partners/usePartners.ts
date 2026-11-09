@@ -32,6 +32,15 @@ export function usePartnerContractDocument(id: string) {
   });
 }
 
+/** The versions of the proposal (and whether the accepted one still holds). */
+export function usePartnerContractProposals(id: string) {
+  return useQuery({
+    queryKey: queryKeys.partners.contractProposals(id),
+    queryFn: () => partnersService.proposals(id),
+    enabled: Boolean(id),
+  });
+}
+
 /** The editor's starting text: read once per visit (the person edits it). */
 export function usePartnerContractDocumentDraft(id: string, enabled: boolean) {
   return useQuery({

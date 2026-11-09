@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Alert } from "@/components/atoms/alert";
@@ -18,6 +18,7 @@ import { Box } from "@/components/atoms/box";
 import { Col, Row } from "@/components/atoms/grid";
 import { Heading } from "@/components/atoms/heading";
 import { Spinner } from "@/components/atoms/spinner";
+import { Text } from "@/components/atoms/text";
 import { DateField } from "@/components/molecules/date-field";
 import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
@@ -28,12 +29,19 @@ import {
   CONTRACT_FORM_FIELDS,
   contractFormDefaults,
   contractFormSchema,
+  costsWithoutPartner,
+  defaultCostsFor,
+  isProfitShare,
   NO_DAY,
   toContractInput,
   type ContractFormValues,
 } from "./schema";
 import { LABEL_MAPS } from "@/constants/label-maps";
-import { PARTNER_COST_KEYS, PARTNER_COST_PAYERS } from "@/constants/partner";
+import {
+  PARTNER_COST_KEYS,
+  PARTNER_COST_PAYERS,
+  PARTNER_COST_RULE_HINT,
+} from "@/constants/partner";
 import { applyApiErrors } from "@/helpers/form";
 import {
   useCreatePartnerContract,
@@ -80,8 +88,8 @@ export function PartnerContractDialog({
         </DialogTitle>
         <DialogDescription>
           {contract
-            ? "Os termos do contrato. A situação muda no card Situação."
-            : "Nasce como rascunho: depois inclua os veículos e ative."}
+            ? "Os termos do contrato. Mudar um termo retira a proposta que estiver aguardando o parceiro."
+            : "Nasce como rascunho: inclua os veículos, envie a proposta e ative depois do aceite do parceiro."}
         </DialogDescription>
         {open && (
           <ContractForm
@@ -116,6 +124,8 @@ function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
     register,
     handleSubmit,
     setError,
+    setValue,
+    getValues,
     watch,
     formState: { errors },
   } = useForm<ContractFormValues>({
@@ -125,6 +135,27 @@ function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
   const isInvestment = watch("type") === "INVESTMENT";
   const isCash = watch("contributionType") === "CASH";
   const isMonthly = watch("payoutFrequency") === "MONTHLY";
+  const shareBase = watch("shareBase");
+  const profitShare = isProfitShare(watch("type"), shareBase);
+  const costHint =
+    isInvestment && (shareBase === "PROFIT" || shareBase === "REVENUE")
+      ? PARTNER_COST_RULE_HINT[shareBase]
+      : null;
+  // Whether the person chose an expense (then the defaults stop following).
+  const costsTouched = useRef(false);
+
+  /**
+   * The type or the base changed: on the profit nothing is the partner's
+   * (it becomes the company's); a new contract nobody touched follows the
+   * default of its type and base.
+   */
+  const syncCosts = (type: string, base: string) => {
+    if (isProfitShare(type, base)) {
+      setValue("costs", costsWithoutPartner(getValues("costs")));
+    } else if (!contract && !costsTouched.current) {
+      setValue("costs", defaultCostsFor(type, base));
+    }
+  };
 
   const onSubmit = handleSubmit((values) => {
     setFormError(null);
@@ -150,7 +181,10 @@ function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
                 label="Tipo do contrato"
                 value={field.value}
                 options={options(LABEL_MAPS.partnerContractType)}
-                onChange={field.onChange}
+                onChange={(next) => {
+                  field.onChange(next);
+                  syncCosts(next, getValues("shareBase"));
+                }}
                 error={errors.type?.message}
               />
             )}
@@ -182,7 +216,10 @@ function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
                     label="Parte do parceiro sobre o"
                     value={field.value}
                     options={options(LABEL_MAPS.partnerShareBase)}
-                    onChange={field.onChange}
+                    onChange={(next) => {
+                      field.onChange(next);
+                      syncCosts(getValues("type"), next);
+                    }}
                     error={errors.shareBase?.message}
                   />
                 )}
@@ -364,14 +401,23 @@ function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
                     options={PARTNER_COST_PAYERS[key].map((payer) => ({
                       value: payer,
                       label: label(LABEL_MAPS.partnerCostPayer, payer),
+                      disabled: profitShare && payer === "PARTNER",
                     }))}
-                    onChange={field.onChange}
+                    onChange={(next) => {
+                      costsTouched.current = true;
+                      field.onChange(next);
+                    }}
                     error={errors.costs?.[key]?.message}
                   />
                 )}
               />
             ))}
           </Box>
+          {costHint && (
+            <Text size="xs" tone="muted">
+              {costHint}
+            </Text>
+          )}
         </Col>
         <Col className="border-t pt-4">
           <TextareaField

@@ -2,6 +2,7 @@ import { LABEL_MAPS, type LabelMapName } from "@/constants/label-maps";
 import {
   PARTNER_COST_KEYS,
   PARTNER_DEFAULT_COSTS,
+  PARTNER_PROPOSAL_STATUS_LABELS,
   WEEKDAY_PLURAL,
 } from "@/constants/partner";
 import { ratePeriodSuffix } from "@/helpers/billing";
@@ -14,9 +15,10 @@ import type {
   PartnerContractVehicle,
   PartnerOfferRatePeriod,
   PartnerPayoutFrequency,
+  PartnerProposalVersion,
 } from "@/types/partner";
 import { formatCnpj, formatCpf } from "@/utils/document";
-import { formatCurrency } from "@/utils/format";
+import { formatCurrency, formatDateTime } from "@/utils/format";
 import { formatPercent } from "@/utils/percent";
 import { formatPlate } from "@/utils/plate";
 
@@ -154,4 +156,16 @@ export function contractStatusVariant(status: PartnerContractStatus) {
   if (status === "ACTIVE") return "success" as const;
   if (status === "DRAFT") return "warning" as const;
   return "outline" as const;
+}
+
+/**
+ * When a version stopped waiting: "aceita em 09/11/2026 14:02" (null while
+ * pending, or when the server did not record the moment).
+ */
+export function proposalDecisionText(
+  version: Pick<PartnerProposalVersion, "status" | "decidedAt">,
+) {
+  if (version.status === "PROPOSED" || !version.decidedAt) return null;
+  const label = PARTNER_PROPOSAL_STATUS_LABELS[version.status].toLowerCase();
+  return `${label} em ${formatDateTime(version.decidedAt)}`;
 }

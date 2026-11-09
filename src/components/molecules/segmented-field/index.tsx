@@ -9,8 +9,8 @@ import type { SelectOption } from "@/helpers/select";
 type SegmentedFieldProps = {
   label: string;
   value: string;
-  /** Few, short options (2–3): all visible side by side. */
-  options: SelectOption[];
+  /** Few, short options (2–3): all visible side by side; some may be off. */
+  options: (SelectOption & { disabled?: boolean })[];
   onChange: (value: string) => void;
   error?: string;
   disabled?: boolean;

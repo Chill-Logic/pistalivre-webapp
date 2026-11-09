@@ -2,6 +2,7 @@ import { LABEL_MAPS, type LabelMapName } from "@/constants/label-maps";
 import type {
   PartnerAreaContract,
   PartnerAreaRentalRow,
+  PartnerAreaTerms,
   PartnerAreaVehicleDetail,
   PartnerAreaVehicleRow,
 } from "@/types/partner-area";
@@ -56,7 +57,7 @@ export function servicesText(services: string[], label: LabelFn) {
  * The contract's terms, as label/value pairs: investment = contribution and
  * the partner's share; management = the company's fee. Only what was filled.
  */
-export function contractTerms(contract: PartnerAreaContract, label: LabelFn) {
+export function contractTerms(contract: PartnerAreaTerms, label: LabelFn) {
   const terms: { label: string; value: string }[] = [];
   if (contract.type === "INVESTMENT") {
     if (contract.contributionType) {

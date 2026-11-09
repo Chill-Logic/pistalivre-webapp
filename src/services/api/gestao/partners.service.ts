@@ -13,6 +13,8 @@ import type {
   PartnerFilters,
   PartnerInput,
   PartnerListRow,
+  PartnerProposals,
+  PartnerProposalVersion,
   PartnerVehicleInput,
   PartnerVehicleUpdate,
 } from "@/types/partner";
@@ -123,15 +125,32 @@ export const partnersService = {
       .catch(rethrowBlobError);
     return data;
   },
+  /** The versions sent to the partner, newest first. */
+  async proposals(id: string) {
+    const { data } = await http.get<PartnerProposals>(
+      `/partner-contracts/${id}/proposals`,
+    );
+    return data;
+  },
   /**
-   * Freezes the text as the contract's PDF (the server adds the signatures).
-   * Generating again points to the new file; the old one stays. Needs a vehicle.
+   * Sends the proposal: freezes the terms, the vehicles and the PDF of the
+   * text as the next version (a pending one is withdrawn). Draft only.
    */
-  async generateDocument(id: string, html: string) {
-    const { data } = await http.post<PartnerContractDocument>(
-      `/partner-contracts/${id}/document`,
+  async propose(id: string, html: string) {
+    const { data } = await http.post<PartnerProposalVersion>(
+      `/partner-contracts/${id}/proposals`,
       { html },
       { timeout: 120_000 },
+    );
+    return data;
+  },
+  async withdrawProposal(id: string, versionId: string) {
+    await http.post(`/partner-contracts/${id}/proposals/${versionId}/withdraw`);
+  },
+  /** From the accepted version: a signature request (draft) with its PDF. */
+  async requestProposalSignature(id: string, versionId: string) {
+    const { data } = await http.post<{ signatureRequestId: string }>(
+      `/partner-contracts/${id}/proposals/${versionId}/signature`,
     );
     return data;
   },

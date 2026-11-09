@@ -1,4 +1,4 @@
-import { ExternalLink, FilePlus2, FileText, RefreshCw } from "lucide-react";
+import { ExternalLink, FilePen, FilePlus2, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -20,9 +20,11 @@ import type { PartnerContract } from "@/types/partner";
 import { formatDateTime, formatFileSize } from "@/utils/format";
 
 /**
- * The contract's PDF: open it or generate it again, or "Montar contrato"
- * (the editor with the AI assistant). The server asks for a vehicle in the
- * contract, so without one the button explains why it waits.
+ * The contract's PDF — the one of the last proposal sent (each version
+ * generates its own). On a draft, "Montar contrato"/"Editar texto" opens the
+ * editor with the AI assistant, from where a new version goes to the partner.
+ * The server asks for a vehicle, so without one the button explains why it
+ * waits. Active or ended: only the PDF.
  */
 export function PartnerContractDocumentCard({
   contract,
@@ -33,6 +35,7 @@ export function PartnerContractDocumentCard({
   const { view } = useFileActions();
   const editorUrl = routeTo.partnerContractDocument(contract.id);
   const hasVehicles = currentVehicles(contract).length > 0;
+  const isDraft = contract.status === "DRAFT";
 
   if (query.isPending) return <PartnerContractDocumentCardSkeleton />;
 
@@ -59,7 +62,8 @@ export function PartnerContractDocumentCard({
                   {file.fileName}
                 </Text>
                 <Text size="xs" tone="muted">
-                  {generatedAt && `Gerado em ${formatDateTime(generatedAt)}`}
+                  {generatedAt &&
+                    `Da última proposta, gerado em ${formatDateTime(generatedAt)}`}
                   {file.size > 0 && ` · ${formatFileSize(file.size)}`}
                 </Text>
               </Box>
@@ -77,24 +81,28 @@ export function PartnerContractDocumentCard({
                 )}
                 Abrir PDF
               </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="w-full sm:w-auto sm:flex-1"
-              >
-                <Link to={editorUrl}>
-                  <RefreshCw />
-                  Gerar de novo
-                </Link>
-              </Button>
+              {isDraft && (
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full sm:w-auto sm:flex-1"
+                >
+                  <Link to={editorUrl}>
+                    <FilePen />
+                    Editar texto
+                  </Link>
+                </Button>
+              )}
             </Box>
           </>
+        ) : !isDraft ? (
+          <Text tone="muted">Este contrato não tem PDF.</Text>
         ) : (
           <>
             <Text tone="muted">
               Monte o contrato a partir do texto-base com os dados deste
-              contrato, ajuste com o assistente de IA e gere o PDF com as
-              assinaturas.
+              contrato, ajuste com o assistente de IA e envie como proposta: o
+              PDF é gerado a cada versão.
             </Text>
             {!hasVehicles && (
               <Text size="xs" tone="muted">

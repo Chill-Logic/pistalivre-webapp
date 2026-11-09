@@ -36,6 +36,30 @@ export const partnerAreaService = {
     );
     return data;
   },
+  /** The PDF of a proposal's version (the text the partner decides on). */
+  async proposalDocument(contractId: string, versionId: string) {
+    const { data } = await http.get<Blob>(
+      `/partner/contracts/${encodeURIComponent(contractId)}/proposals/${encodeURIComponent(versionId)}/document`,
+      { responseType: "blob" },
+    );
+    return data;
+  },
+  /**
+   * Accepts the pending version (date, IP and browser are recorded). 422 when
+   * it was already decided or the company changed it since.
+   */
+  async acceptProposal(contractId: string, versionId: string) {
+    await http.post(
+      `/partner/contracts/${encodeURIComponent(contractId)}/proposals/${encodeURIComponent(versionId)}/accept`,
+    );
+  },
+  /** Refuses the pending version; the reason is required. */
+  async rejectProposal(contractId: string, versionId: string, note: string) {
+    await http.post(
+      `/partner/contracts/${encodeURIComponent(contractId)}/proposals/${encodeURIComponent(versionId)}/reject`,
+      { note },
+    );
+  },
   /** Only the phone and the pix key are the partner's to change. */
   async updateProfile(input: PartnerAreaProfileInput) {
     const { data } = await http.patch<{

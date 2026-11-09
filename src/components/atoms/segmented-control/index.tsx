@@ -4,6 +4,8 @@ import { cn } from "@/utils/cn";
 export type SegmentedControlOption<T extends string = string> = {
   value: T;
   label: ReactNode;
+  /** Shown but not choosable (aria-disabled, out of the Tab/arrow order). */
+  disabled?: boolean;
 };
 
 type SegmentedControlProps<T extends string> = {
@@ -45,19 +47,35 @@ export function SegmentedControl<T extends string>({
   const index = options.findIndex((option) => option.value === value);
   const count = Math.max(options.length, 1);
 
+  const enabled = options
+    .map((option, at) => (option.disabled ? -1 : at))
+    .filter((at) => at >= 0);
+  // The Tab stop: the chosen segment, or the first one that can be chosen.
+  const tabStop =
+    index >= 0 && !options[index]?.disabled ? index : (enabled[0] ?? -1);
+
   const choose = (next: number) => {
     const option = options[next];
-    if (!option || disabled) return;
+    if (!option || disabled || option.disabled) return;
     if (option.value !== value) onValueChange(option.value);
   };
 
+  /** The next choosable segment from `at`, going `step` (wraps around). */
+  const nextEnabled = (at: number, step: 1 | -1) => {
+    const total = options.length;
+    for (let offset = 1; offset <= total; offset += 1) {
+      const candidate = (at + step * offset + total) % total;
+      if (!options[candidate]?.disabled) return candidate;
+    }
+    return null;
+  };
+
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, at: number) => {
-    const last = options.length - 1;
     let next: number | null = null;
-    if (NEXT_KEYS.includes(event.key)) next = at === last ? 0 : at + 1;
-    else if (PREV_KEYS.includes(event.key)) next = at === 0 ? last : at - 1;
-    else if (event.key === "Home") next = 0;
-    else if (event.key === "End") next = last;
+    if (NEXT_KEYS.includes(event.key)) next = nextEnabled(at, 1);
+    else if (PREV_KEYS.includes(event.key)) next = nextEnabled(at, -1);
+    else if (event.key === "Home") next = enabled[0] ?? null;
+    else if (event.key === "End") next = enabled[enabled.length - 1] ?? null;
     if (next === null) return;
     event.preventDefault();
     // Keyboard: focus follows the choice (a click already focuses).
@@ -91,6 +109,7 @@ export function SegmentedControl<T extends string>({
       )}
       {options.map((option, at) => {
         const checked = at === index;
+        const off = disabled || Boolean(option.disabled);
         return (
           <button
             key={option.value}
@@ -101,8 +120,9 @@ export function SegmentedControl<T extends string>({
             role="radio"
             aria-checked={checked}
             // One Tab stop: the chosen segment (or the first, when none is).
-            tabIndex={checked || (index < 0 && at === 0) ? 0 : -1}
-            disabled={disabled}
+            tabIndex={at === tabStop && !off ? 0 : -1}
+            aria-disabled={option.disabled || undefined}
+            disabled={off}
             onClick={() => choose(at)}
             onKeyDown={(event) => onKeyDown(event, at)}
             className={cn(
@@ -110,7 +130,9 @@ export function SegmentedControl<T extends string>({
               size === "default" ? "text-sm" : "text-xs",
               checked
                 ? "text-foreground"
-                : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
+                : option.disabled
+                  ? "text-muted-foreground/45"
+                  : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
             )}
           >
             {option.label}

@@ -1,7 +1,12 @@
 import { z } from "zod";
-import { PARTNER_DEFAULT_COSTS } from "@/constants/partner";
+import {
+  PARTNER_COST_KEYS,
+  PARTNER_DEFAULT_COSTS,
+  PARTNER_REVENUE_DEFAULT_COSTS,
+} from "@/constants/partner";
 import type {
   PartnerContract,
+  PartnerContractCosts,
   PartnerContractInput,
   PartnerContributionType,
   PartnerShareBase,
@@ -72,6 +77,16 @@ export const contractFormSchema = z
       if (parsePercentInput(c.sharePercent) === null) {
         issue("sharePercent", "Informe o percentual");
       }
+      if (isProfitShare(c.type, c.shareBase)) {
+        for (const key of PARTNER_COST_KEYS) {
+          if (c.costs[key] !== "PARTNER") continue;
+          ctx.addIssue({
+            code: "custom",
+            path: ["costs", key],
+            message: "No lucro, nenhuma despesa é do parceiro",
+          });
+        }
+      }
     } else if (
       parsePercentInput(c.adminFeePercent) === null &&
       c.adminFeeFixed === null
@@ -122,10 +137,10 @@ export function contractFormDefaults(
     payoutDay: contract?.payoutDay ? String(contract.payoutDay) : NO_DAY,
     payoutWeekday:
       contract?.payoutWeekday != null ? String(contract.payoutWeekday) : NO_DAY,
-    costs: {
-      ...PARTNER_DEFAULT_COSTS,
-      ...contract?.costs,
-    } as ContractFormValues["costs"],
+    // A new one starts as investment on the revenue: the accountant's model.
+    costs: (contract
+      ? { ...PARTNER_DEFAULT_COSTS, ...contract.costs }
+      : { ...PARTNER_REVENUE_DEFAULT_COSTS }) as ContractFormValues["costs"],
     startDate: contract?.startDate ?? todayInBrasilia(),
     endDate: contract?.endDate ?? "",
     notes: contract?.notes ?? "",
@@ -169,4 +184,35 @@ export function toContractInput(
     endDate: values.endDate || null,
     notes: values.notes || null,
   };
+}
+
+/**
+ * Investment on the PROFIT: the expenses come off before the split, so none
+ * may be the partner's (the API refuses it with 422 `costs.*`).
+ */
+export function isProfitShare(type: string, shareBase: string) {
+  return type === "INVESTMENT" && shareBase === "PROFIT";
+}
+
+/** The same expenses with the partner's ones moved to the company. */
+export function costsWithoutPartner(costs: PartnerContractCosts) {
+  return Object.fromEntries(
+    PARTNER_COST_KEYS.map((key) => [
+      key,
+      costs[key] === "PARTNER" ? "COMPANY" : costs[key],
+    ]),
+  ) as ContractFormValues["costs"];
+}
+
+/**
+ * The starting expenses of a NEW contract for its type and base, while the
+ * person did not choose any: investment on the revenue = the accountant's
+ * model; otherwise the API's default (all on the company, fines on the renter).
+ */
+export function defaultCostsFor(type: string, shareBase: string) {
+  const costs =
+    type === "INVESTMENT" && shareBase === "REVENUE"
+      ? PARTNER_REVENUE_DEFAULT_COSTS
+      : PARTNER_DEFAULT_COSTS;
+  return { ...costs } as ContractFormValues["costs"];
 }

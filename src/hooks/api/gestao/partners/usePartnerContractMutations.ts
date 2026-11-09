@@ -119,18 +119,68 @@ export function usePartnerContractDocumentPreview(contractId: string) {
   });
 }
 
-/** "Gerar PDF e salvar": errors stay with the editor (422 without a vehicle). */
-export function useGeneratePartnerContractDocument(contractId: string) {
+/** The contract's proposals, its PDF and the lists are read again. */
+function useRefreshProposals(contractId: string) {
+  const queryClient = useQueryClient();
+  return () => {
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.partners.contractProposals(contractId),
+    });
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.partners.contractDocument(contractId),
+    });
+  };
+}
+
+/**
+ * "Enviar proposta ao parceiro": the text becomes the next version (with its
+ * PDF). Errors stay with the editor (422: no vehicle, no offered rent).
+ */
+export function useSendPartnerProposal(contractId: string) {
+  const refresh = useRefreshProposals(contractId);
+  return useMutation({
+    mutationFn: (html: string) => partnersService.propose(contractId, html),
+    onSuccess: (version) => {
+      refresh();
+      toast.success(`Proposta v${version.number} enviada ao parceiro`);
+    },
+  });
+}
+
+/** Takes back the pending version (the partner no longer sees it). */
+export function useWithdrawPartnerProposal(contractId: string) {
+  const refresh = useRefreshProposals(contractId);
+  return useMutation({
+    mutationFn: (versionId: string) =>
+      partnersService.withdrawProposal(contractId, versionId),
+    onSuccess: () => {
+      refresh();
+      toast.success("Proposta retirada");
+    },
+    onError: (error) => {
+      refresh();
+      toast.error(errorMessage(error));
+    },
+  });
+}
+
+/** The accepted version → a signature request in draft (Assinaturas sends it). */
+export function useRequestPartnerProposalSignature(contractId: string) {
+  const refresh = useRefreshProposals(contractId);
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (html: string) =>
-      partnersService.generateDocument(contractId, html),
-    onSuccess: (result) => {
-      queryClient.setQueryData(
-        queryKeys.partners.contractDocument(contractId),
-        result,
+    mutationFn: (versionId: string) =>
+      partnersService.requestProposalSignature(contractId, versionId),
+    onSuccess: () => {
+      refresh();
+      queryClient.invalidateQueries({ queryKey: queryKeys.signatures.all });
+      toast.success(
+        "Pedido de assinatura criado: inclua os signatários da empresa e envie",
       );
-      toast.success("Contrato em PDF gerado e anexado");
+    },
+    onError: (error) => {
+      refresh();
+      toast.error(errorMessage(error));
     },
   });
 }

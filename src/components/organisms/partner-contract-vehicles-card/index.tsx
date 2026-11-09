@@ -24,8 +24,8 @@ import { formatPlate } from "@/utils/plate";
 
 /**
  * The contract's vehicles with the window each is the partner's. Draft: include,
- * correct, remove (a mistake). Active: include, correct, record the exit.
- * Ended: read only.
+ * correct, remove (a mistake). Active (terms locked): only record the exit — a
+ * new vehicle is a new contract. Ended: read only.
  */
 export function PartnerContractVehiclesCard({
   contract,
@@ -53,7 +53,7 @@ export function PartnerContractVehiclesCard({
             </Text>
           )}
         </CardTitle>
-        {!isEnded && (
+        {isDraft && (
           <PartnerContractVehicleDialog
             contract={contract}
             mode="add"
@@ -66,7 +66,13 @@ export function PartnerContractVehiclesCard({
           />
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3">
+        {contract.status === "ACTIVE" && (
+          <Text size="xs" tone="muted">
+            Contrato ativo: os veículos não mudam mais. Um veículo novo entra
+            num contrato novo.
+          </Text>
+        )}
         {ordered.length === 0 ? (
           <EmptyState
             icon={Car}
@@ -130,21 +136,23 @@ export function PartnerContractVehiclesCard({
                   </Box>
                   {!isEnded && (
                     <Box className="-ml-2 flex shrink-0 flex-wrap items-center gap-1 sm:ml-0">
-                      <PartnerContractVehicleDialog
-                        contract={contract}
-                        mode="edit"
-                        link={link}
-                        trigger={
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            aria-label={`Corrigir ${plate}`}
-                          >
-                            <Pencil />
-                            Corrigir
-                          </Button>
-                        }
-                      />
+                      {isDraft && (
+                        <PartnerContractVehicleDialog
+                          contract={contract}
+                          mode="edit"
+                          link={link}
+                          trigger={
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              aria-label={`Corrigir ${plate}`}
+                            >
+                              <Pencil />
+                              Corrigir
+                            </Button>
+                          }
+                        />
+                      )}
                       {!isDraft && !link.leftAt && (
                         <PartnerContractVehicleDialog
                           contract={contract}

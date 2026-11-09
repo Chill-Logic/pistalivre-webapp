@@ -12,6 +12,10 @@ import {
   PartnerContractDocumentCardSkeleton,
 } from "@/components/organisms/partner-contract-document-card";
 import {
+  PartnerContractProposalCard,
+  PartnerContractProposalCardSkeleton,
+} from "@/components/organisms/partner-contract-proposal-card";
+import {
   PartnerContractStatusCard,
   PartnerContractStatusCardSkeleton,
 } from "@/components/organisms/partner-contract-status-card";
@@ -41,7 +45,7 @@ export function PartnerContractPage() {
           to={data ? routeTo.partner(data.partner.id) : ROUTES.partners}
           label={data?.partner.name ?? "Parceiros"}
         />
-        {data && (
+        {data?.status === "DRAFT" && (
           <Box className="flex gap-2">
             <PartnerContractDialog
               partnerId={data.partner.id}
@@ -53,13 +57,11 @@ export function PartnerContractPage() {
                 </Button>
               }
             />
-            {data.status === "DRAFT" && (
-              <PartnerContractDeleteButton
-                contractId={data.id}
-                code={data.code}
-                partnerId={data.partner.id}
-              />
-            )}
+            <PartnerContractDeleteButton
+              contractId={data.id}
+              code={data.code}
+              partnerId={data.partner.id}
+            />
           </Box>
         )}
       </Box>
@@ -67,6 +69,7 @@ export function PartnerContractPage() {
           <SkeletonRegion label="Carregando contrato…">
             <PartnerContractLayout
               summary={<PartnerContractSummarySkeleton />}
+              proposal={<PartnerContractProposalCardSkeleton />}
               status={<PartnerContractStatusCardSkeleton />}
               document={<PartnerContractDocumentCardSkeleton />}
               vehicles={<PartnerContractVehiclesCardSkeleton />}
@@ -89,6 +92,7 @@ export function PartnerContractPage() {
         {data && (
           <PartnerContractLayout
             summary={<PartnerContractSummary contract={data} />}
+            proposal={<PartnerContractProposalCard contract={data} />}
             status={<PartnerContractStatusCard contract={data} />}
             document={<PartnerContractDocumentCard contract={data} />}
             vehicles={<PartnerContractVehiclesCard contract={data} />}
