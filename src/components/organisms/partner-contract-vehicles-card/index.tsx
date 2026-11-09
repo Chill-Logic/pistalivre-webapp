@@ -29,8 +29,13 @@ import { formatPlate } from "@/utils/plate";
  */
 export function PartnerContractVehiclesCard({
   contract,
+  includeVehicleId,
+  onIncludeUsed,
 }: {
   contract: PartnerContract;
+  /** A vehicle just registered for this contract: the add dialog opens with it. */
+  includeVehicleId?: string | null;
+  onIncludeUsed?: () => void;
 }) {
   const { remove } = usePartnerContractVehicles(contract.id);
   const isDraft = contract.status === "DRAFT";
@@ -57,6 +62,8 @@ export function PartnerContractVehiclesCard({
           <PartnerContractVehicleDialog
             contract={contract}
             mode="add"
+            presetVehicleId={includeVehicleId}
+            onPresetUsed={onIncludeUsed}
             trigger={
               <Button size="sm">
                 <Plus />

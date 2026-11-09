@@ -1,6 +1,15 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { Plus } from "lucide-react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Alert } from "@/components/atoms/alert";
+import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import {
   Dialog,
@@ -14,6 +23,7 @@ import {
 import { Form } from "@/components/atoms/form";
 import { Col, Row } from "@/components/atoms/grid";
 import { Spinner } from "@/components/atoms/spinner";
+import { Text } from "@/components/atoms/text";
 import { DateField } from "@/components/molecules/date-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { SegmentedField } from "@/components/molecules/segmented-field";
@@ -21,11 +31,15 @@ import {
   RemoteCombobox,
   type RemoteOption,
 } from "@/components/molecules/remote-combobox";
+import { TextLink } from "@/components/molecules/text-link";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { PARTNER_OFFER_RATE_PERIODS } from "@/constants/partner";
+import { ROUTES, routeTo } from "@/constants/routes";
 import { toApiError } from "@/helpers/api-error";
 import { partnerVehicleName } from "@/helpers/partner";
+import { vehicleName } from "@/helpers/vehicle";
 import { usePartnerContractVehicles } from "@/hooks/api/gestao/partners/usePartnerContractMutations";
+import { useVehicle } from "@/hooks/api/gestao/vehicles/useVehicle";
 import { useLabels } from "@/hooks/ui/useLabels";
 import { useVehicleOptions } from "@/hooks/ui/useRemoteOptions";
 import type {
@@ -34,6 +48,7 @@ import type {
   PartnerOfferRatePeriod,
 } from "@/types/partner";
 import { todayInBrasilia } from "@/utils/date";
+import { formatPlate } from "@/utils/plate";
 
 /** add = include a vehicle; edit = correct value/dates; leave = record the exit. */
 type Mode = "add" | "edit" | "leave";
@@ -54,6 +69,10 @@ type PartnerContractVehicleDialogProps = {
   /** The vehicle's link (edit and leave). */
   link?: PartnerContractVehicle;
   trigger: ReactNode;
+  /** add: open on arrival with this vehicle chosen (back from "Cadastrar"). */
+  presetVehicleId?: string | null;
+  /** Called once the preset was used (the page clears `?incluir=`). */
+  onPresetUsed?: () => void;
 };
 
 const TITLES: Record<Mode, string> = {
@@ -72,6 +91,8 @@ export function PartnerContractVehicleDialog({
   mode,
   link,
   trigger,
+  presetVehicleId,
+  onPresetUsed,
 }: PartnerContractVehicleDialogProps) {
   const [open, setOpen] = useState(false);
   const [picked, setPicked] = useState<RemoteOption | null>(null);
@@ -89,7 +110,22 @@ export function PartnerContractVehicleDialog({
   const [leftAt, setLeftAt] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const { add, update } = usePartnerContractVehicles(contract.id);
-  const picker = useVehicleOptions();
+  // Only the partner's own vehicles can enter its contract.
+  const picker = useVehicleOptions({ owner: contract.partnerId });
+  const newVehicleUrl = `${ROUTES.vehicleNew}?${new URLSearchParams({
+    proprietario: contract.partnerId,
+    titular: contract.type === "INVESTMENT" ? "empresa" : contract.partnerId,
+    voltar: routeTo.partnerContract(contract.id),
+  }).toString()}`;
+  const preset = useVehicle(mode === "add" ? (presetVehicleId ?? "") : "");
+  const [presetUsed, setPresetUsed] = useState(false);
+  const presetNotified = useRef(false);
+  // Tell the page once (it clears `?incluir=`), outside the render.
+  useEffect(() => {
+    if (!presetUsed || presetNotified.current) return;
+    presetNotified.current = true;
+    onPresetUsed?.();
+  }, [presetUsed, onPresetUsed]);
   const inContract = contract.vehicles
     .filter((vehicle) => !vehicle.leftAt)
     .map((vehicle) => vehicle.vehicleId);
@@ -98,11 +134,11 @@ export function PartnerContractVehicleDialog({
   );
   const save = mode === "add" ? add : update;
 
-  const onOpenChange = (next: boolean) => {
+  const onOpenChange = (next: boolean, initial: RemoteOption | null = null) => {
     setOpen(next);
     if (!next) return;
     const today = todayInBrasilia();
-    setPicked(null);
+    setPicked(initial);
     setAcquisitionValue(link?.acquisitionValue ?? null);
     setOfferRate(link?.offerRate ?? null);
     // Motofrete rents by the week: the common case when nothing was saved.
@@ -116,9 +152,27 @@ export function PartnerContractVehicleDialog({
     picker.setSearch("");
   };
 
+  // Back from "Cadastrar novo veículo": open with it chosen (once).
+  if (preset.data && !presetUsed) {
+    setPresetUsed(true);
+    onOpenChange(true, {
+      value: preset.data.id,
+      label: `${formatPlate(preset.data.plate)} · ${vehicleName(preset.data)}`,
+    });
+  }
+
   const onError = (error: unknown) => {
     const apiError = toApiError(error);
-    const fields = apiError.fields ?? {};
+    const fields = { ...apiError.fields };
+    // The ownership rule (422) is about the chosen vehicle: show it there.
+    if (mode === "add" && apiError.status === 422 && !fields.vehicleId) {
+      const other =
+        fields.acquisitionValue ||
+        fields.offerRate ||
+        fields.offerRatePeriod ||
+        fields.joinedAt;
+      if (!other) fields.vehicleId = apiError.message;
+    }
     const placed =
       fields.vehicleId ||
       fields.acquisitionValue ||
@@ -240,7 +294,27 @@ export function PartnerContractVehicleDialog({
               placeholder="Escolha o veículo"
               searchPlaceholder="Placa, marca ou modelo…"
               error={errors.vehicleId}
+              emptyContent={
+                picker.search ? (
+                  "Nenhum veículo deste parceiro com essa busca."
+                ) : (
+                  <Box className="space-y-2 px-3">
+                    <Text size="sm">Este parceiro ainda não tem veículo.</Text>
+                    <TextLink to={newVehicleUrl}>
+                      Cadastrar novo veículo
+                    </TextLink>
+                  </Box>
+                )
+              }
             />
+          )}
+          {mode === "add" && (
+            <Button asChild variant="link" size="sm" className="h-auto px-0">
+              <Link to={newVehicleUrl}>
+                <Plus />
+                Cadastrar novo veículo
+              </Link>
+            </Button>
           )}
           {mode !== "leave" && (
             <>

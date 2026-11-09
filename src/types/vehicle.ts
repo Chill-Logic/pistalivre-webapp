@@ -14,6 +14,9 @@ export type ActiveRental = {
   customer: Ref;
 };
 
+/** A partner on the vehicle's papers; null = the company. */
+export type VehiclePartnerRef = { partnerId: string; name: string };
+
 export type Vehicle = {
   id: string;
   plate: string;
@@ -29,6 +32,10 @@ export type Vehicle = {
   /** Latest reading across inspections and maintenances. */
   currentMileage: number | null;
   activeRental: ActiveRental | null;
+  /** In whose name the document is (null = the company). */
+  titleHolder: VehiclePartnerRef | null;
+  /** Whose vehicle it is (null = the company). */
+  owner: VehiclePartnerRef | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -70,6 +77,10 @@ export type VehicleInput = {
   renavam: string;
   rate: number;
   ratePeriod: RatePeriod;
+  /** null = the company. */
+  titleHolderPartnerId: string | null;
+  /** null = the company. */
+  ownerPartnerId: string | null;
 };
 
 export type VehicleFilters = {
@@ -78,6 +89,8 @@ export type VehicleFilters = {
   q: string;
   type: string;
   status: VehicleStatus | "";
+  /** "company" or a partner id; absent = any owner. */
+  owner?: string;
 };
 
 /** Body of POST/PUT /vehicles and PATCH /vehicles/:id/status: no `documents`. */

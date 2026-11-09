@@ -10,10 +10,12 @@ import { Form } from "@/components/atoms/form";
 import { Col, Row } from "@/components/atoms/grid";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Spinner } from "@/components/atoms/spinner";
+import { Text } from "@/components/atoms/text";
 import { CreatableCombobox } from "@/components/molecules/creatable-combobox";
 import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { SelectField } from "@/components/molecules/select-field";
+import { VehiclePartyField } from "@/components/organisms/vehicle-party-field";
 import {
   toVehicleInput,
   VEHICLE_FORM_FIELDS,
@@ -21,6 +23,7 @@ import {
   vehicleFormSchema,
   type VehicleFormInput,
   type VehicleFormValues,
+  type VehiclePartiesPrefill,
 } from "./schema";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { applyApiErrors } from "@/helpers/form";
@@ -51,6 +54,8 @@ type VehicleFormProps = {
   vehicle?: VehicleDetail;
   cancelTo: string;
   onSaved: (vehicle: VehicleWrite) => void;
+  /** New vehicle: title holder and owner already known (from a contract). */
+  prefill?: VehiclePartiesPrefill;
 };
 
 export function VehicleForm({
@@ -58,6 +63,7 @@ export function VehicleForm({
   vehicle,
   cancelTo,
   onSaved,
+  prefill,
 }: VehicleFormProps) {
   const save = useSaveVehicle(vehicle?.id);
   const { options: labelOptions } = useLabels();
@@ -76,6 +82,7 @@ export function VehicleForm({
     defaultValues: vehicleFormDefaults(
       vehicle,
       vehicle ? typeSlugOfCategory(options, vehicle.category.id) : "",
+      prefill,
     ),
   });
 
@@ -262,6 +269,48 @@ export function VehicleForm({
               />
             </Col>
           </Row>
+
+          <Box className="space-y-4 border-t pt-6">
+            <Box className="space-y-1">
+              <Text weight="semibold">Titularidade</Text>
+              <Text size="xs" tone="muted">
+                Investidor: titular a empresa, proprietário o investidor.
+                Administração: o parceiro nos dois.
+              </Text>
+            </Box>
+            <Row className="gap-y-4">
+              <Col md={6}>
+                <Controller
+                  control={control}
+                  name="titleHolderPartnerId"
+                  render={({ field }) => (
+                    <VehiclePartyField
+                      label="Titular (nome no documento)"
+                      value={field.value}
+                      onChange={field.onChange}
+                      known={vehicle?.titleHolder}
+                      error={errors.titleHolderPartnerId?.message}
+                    />
+                  )}
+                />
+              </Col>
+              <Col md={6}>
+                <Controller
+                  control={control}
+                  name="ownerPartnerId"
+                  render={({ field }) => (
+                    <VehiclePartyField
+                      label="Proprietário"
+                      value={field.value}
+                      onChange={field.onChange}
+                      known={vehicle?.owner}
+                      error={errors.ownerPartnerId?.message}
+                    />
+                  )}
+                />
+              </Col>
+            </Row>
+          </Box>
 
           {formError && <Alert>{formError}</Alert>}
 

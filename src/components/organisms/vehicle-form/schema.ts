@@ -7,6 +7,12 @@ const MAX_YEAR = new Date().getFullYear() + 1;
 const CHASSIS = /^[A-HJ-NPR-Z0-9]{17}$/;
 const RATE_PERIODS = ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"] as const;
 
+/** null = the company; "" = "Parceiro" chosen but no partner picked yet. */
+const partyField = z
+  .string()
+  .nullable()
+  .refine((value) => value !== "", "Escolha o parceiro");
+
 /** Mirrors the API's createVehicleSchema (same PT messages). */
 export const vehicleFormSchema = z.object({
   plate: z
@@ -50,6 +56,8 @@ export const vehicleFormSchema = z.object({
   ratePeriod: z.enum(RATE_PERIODS, {
     errorMap: () => ({ message: "Período inválido" }),
   }),
+  titleHolderPartnerId: partyField,
+  ownerPartnerId: partyField,
 });
 
 export type VehicleFormInput = z.input<typeof vehicleFormSchema>;
@@ -67,11 +75,20 @@ export const VEHICLE_FORM_FIELDS = [
   "renavam",
   "rate",
   "ratePeriod",
+  "titleHolderPartnerId",
+  "ownerPartnerId",
 ] as const;
+
+/** Who is on the papers when nothing is saved yet (e.g. from a contract). */
+export type VehiclePartiesPrefill = {
+  titleHolderPartnerId: string | null;
+  ownerPartnerId: string | null;
+};
 
 export function vehicleFormDefaults(
   vehicle?: VehicleDetail,
   typeSlug = "",
+  prefill?: VehiclePartiesPrefill,
 ): VehicleFormInput {
   return {
     plate: vehicle?.plate ?? "",
@@ -85,6 +102,12 @@ export function vehicleFormDefaults(
     renavam: vehicle?.renavam ?? "",
     rate: vehicle?.rate ?? null,
     ratePeriod: vehicle?.ratePeriod ?? "DAILY",
+    titleHolderPartnerId: vehicle
+      ? (vehicle.titleHolder?.partnerId ?? null)
+      : (prefill?.titleHolderPartnerId ?? null),
+    ownerPartnerId: vehicle
+      ? (vehicle.owner?.partnerId ?? null)
+      : (prefill?.ownerPartnerId ?? null),
   };
 }
 
@@ -100,5 +123,7 @@ export function toVehicleInput(values: VehicleFormValues): VehicleInput {
     renavam: values.renavam,
     rate: values.rate ?? 0,
     ratePeriod: values.ratePeriod,
+    titleHolderPartnerId: values.titleHolderPartnerId || null,
+    ownerPartnerId: values.ownerPartnerId || null,
   };
 }

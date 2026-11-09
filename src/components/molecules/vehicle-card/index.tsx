@@ -1,5 +1,6 @@
 import { ChevronRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Card } from "@/components/atoms/card";
 import { Skeleton } from "@/components/atoms/skeleton";
@@ -39,6 +40,11 @@ export function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
           <VehicleStatusBadge status={effectiveVehicleStatus(vehicle)} />
         </Box>
         <Text truncate>{vehicleName(vehicle)}</Text>
+        {vehicle.owner && (
+          <Badge variant="outline" className="max-w-full truncate font-normal">
+            Parceiro: {vehicle.owner.name}
+          </Badge>
+        )}
         <Text size="xs" tone="muted" truncate>
           {details.join(" · ")}
         </Text>

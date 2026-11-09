@@ -5,6 +5,7 @@ import { useCustomers } from "@/hooks/api/gestao/customers/useCustomers";
 import { useRentals } from "@/hooks/api/gestao/rentals/useRentals";
 import { useVehicles } from "@/hooks/api/gestao/vehicles/useVehicles";
 import { queryKeys } from "@/constants/query-keys";
+import { partnersService } from "@/services/api/gestao/partners.service";
 import { suppliersService } from "@/services/api/gestao/suppliers.service";
 import { usersService } from "@/services/api/gestao/users.service";
 import { useDebouncedValue } from "@/hooks/ui/useDebouncedValue";
@@ -45,12 +46,15 @@ type VehicleOptionsConfig = {
   status?: VehicleStatus;
   /** Always offered (e.g. the rental's current vehicle, now rented). */
   include?: RemoteOption;
+  /** Only this owner's vehicles ("company" or a partner id). */
+  owner?: string;
 };
 
 /** Vehicle search for pickers. */
 export function useVehicleOptions({
   status,
   include,
+  owner,
 }: VehicleOptionsConfig = {}) {
   const [search, setSearch] = useState("");
   const q = useDebouncedValue(search);
@@ -60,6 +64,7 @@ export function useVehicleOptions({
     q,
     type: "",
     status: status ?? "",
+    ...(owner ? { owner } : {}),
   });
   const includeValue = include?.value;
   const includeLabel = include?.label;
@@ -179,4 +184,25 @@ export function useRentalOptions({
     items: rentals.data?.items ?? [],
     isLoading: rentals.isFetching,
   };
+}
+
+/** Partner search for pickers (e.g. a vehicle's owner). */
+export function usePartnerOptions() {
+  const [search, setSearch] = useState("");
+  const q = useDebouncedValue(search);
+  const filters = { page: 1, pageSize: PICKER_SIZE, q, active: "" } as const;
+  const partners = useQuery({
+    queryKey: queryKeys.partners.list(filters),
+    queryFn: () => partnersService.list(filters),
+  });
+  const options = useMemo<RemoteOption[]>(
+    () =>
+      (partners.data?.items ?? []).map((partner) => ({
+        value: partner.id,
+        label: partner.name,
+        detail: partner.tradeName ?? undefined,
+      })),
+    [partners.data],
+  );
+  return { search, setSearch, options, isLoading: partners.isFetching };
 }

@@ -5,9 +5,11 @@ import { Heading } from "@/components/atoms/heading";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { InfoItem } from "@/components/molecules/info-item";
+import { TextLink } from "@/components/molecules/text-link";
 import { VehicleStatusBadge } from "@/components/molecules/vehicle-status-badge";
+import { routeTo } from "@/constants/routes";
 import { effectiveVehicleStatus, vehicleName } from "@/helpers/vehicle";
-import type { Vehicle } from "@/types/vehicle";
+import type { Vehicle, VehiclePartnerRef } from "@/types/vehicle";
 import { formatMileage } from "@/utils/format";
 import { formatPlate } from "@/utils/plate";
 
@@ -47,13 +49,27 @@ export function VehicleSummary({ vehicle }: { vehicle: Vehicle }) {
           <InfoItem span={6} md={4} label="Renavam" mono>
             {vehicle.renavam}
           </InfoItem>
+          <InfoItem span={6} md={4} label="Titular">
+            <PartyName party={vehicle.titleHolder} />
+          </InfoItem>
+          <InfoItem span={6} md={4} label="Proprietário">
+            <PartyName party={vehicle.owner} />
+          </InfoItem>
         </Row>
       </CardContent>
     </Card>
   );
 }
 
-const SUMMARY_FIELDS = 6;
+/** A partner (link to it) or the company. */
+function PartyName({ party }: { party: VehiclePartnerRef | null }) {
+  if (!party) return "Empresa";
+  return (
+    <TextLink to={routeTo.partner(party.partnerId)}>{party.name}</TextLink>
+  );
+}
+
+const SUMMARY_FIELDS = 8;
 
 export function VehicleSummarySkeleton() {
   return (

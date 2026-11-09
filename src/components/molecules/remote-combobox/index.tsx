@@ -1,5 +1,5 @@
 import { Check, ChevronsUpDown } from "lucide-react";
-import { useId, useState } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import {
@@ -36,6 +36,8 @@ type RemoteComboboxProps = {
   searchPlaceholder?: string;
   error?: string;
   disabled?: boolean;
+  /** Shown when the search finds nothing (default "Nada encontrado."). */
+  emptyContent?: ReactNode;
 };
 
 /**
@@ -55,6 +57,7 @@ export function RemoteCombobox({
   searchPlaceholder = "Buscar…",
   error,
   disabled = false,
+  emptyContent = "Nada encontrado.",
 }: RemoteComboboxProps) {
   const [open, setOpen] = useState(false);
   const id = useId();
@@ -99,7 +102,7 @@ export function RemoteCombobox({
                   <Spinner />
                 </Box>
               ) : (
-                <CommandEmpty>Nada encontrado.</CommandEmpty>
+                <CommandEmpty>{emptyContent}</CommandEmpty>
               )}
               {!isLoading &&
                 options.map((option) => (

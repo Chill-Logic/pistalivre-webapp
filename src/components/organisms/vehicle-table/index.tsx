@@ -1,4 +1,6 @@
 import { CarFront } from "lucide-react";
+import { Badge } from "@/components/atoms/badge";
+import { Box } from "@/components/atoms/box";
 import { Text } from "@/components/atoms/text";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { TextLink } from "@/components/molecules/text-link";
@@ -25,8 +27,22 @@ const COLUMNS: DataTableColumn<Vehicle>[] = [
   },
   {
     header: "Veículo",
-    cell: vehicleName,
-    className: "max-w-64 truncate",
+    cell: (vehicle) => (
+      <Box className="flex min-w-0 items-center gap-2">
+        <Text inline size={null} truncate>
+          {vehicleName(vehicle)}
+        </Text>
+        {vehicle.owner && (
+          <Badge
+            variant="outline"
+            className="max-w-40 shrink-0 truncate font-normal"
+          >
+            Parceiro: {vehicle.owner.name}
+          </Badge>
+        )}
+      </Box>
+    ),
+    className: "max-w-80",
     skeleton: "w-48",
   },
   { header: "Tipo", cell: (vehicle) => vehicle.type.name, skeleton: "w-12" },

@@ -1,5 +1,5 @@
 import { FileText, Pencil } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { BackLink } from "@/components/molecules/back-link";
@@ -37,6 +37,18 @@ export function PartnerContractPage() {
   const { id = "" } = useParams();
   const contract = usePartnerContract(id);
   const data = contract.data;
+  // Back from "Cadastrar novo veículo": `?incluir=<vehicleId>`.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const includeVehicleId = searchParams.get("incluir");
+  const clearInclude = () =>
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+        next.delete("incluir");
+        return next;
+      },
+      { replace: true },
+    );
 
   return (
     <Box className="space-y-4">
@@ -65,39 +77,45 @@ export function PartnerContractPage() {
           </Box>
         )}
       </Box>
-        {contract.isPending && (
-          <SkeletonRegion label="Carregando contrato…">
-            <PartnerContractLayout
-              summary={<PartnerContractSummarySkeleton />}
-              proposal={<PartnerContractProposalCardSkeleton />}
-              status={<PartnerContractStatusCardSkeleton />}
-              document={<PartnerContractDocumentCardSkeleton />}
-              vehicles={<PartnerContractVehiclesCardSkeleton />}
-            />
-          </SkeletonRegion>
-        )}
-        {contract.isError &&
-          (isNotFound(contract.error) ? (
-            <EmptyState
-              icon={FileText}
-              title="Contrato não encontrado"
-              description="Ele pode ter sido excluído ou o endereço está errado."
-            />
-          ) : (
-            <QueryError
-              error={contract.error}
-              onRetry={() => contract.refetch()}
-            />
-          ))}
-        {data && (
+      {contract.isPending && (
+        <SkeletonRegion label="Carregando contrato…">
           <PartnerContractLayout
-            summary={<PartnerContractSummary contract={data} />}
-            proposal={<PartnerContractProposalCard contract={data} />}
-            status={<PartnerContractStatusCard contract={data} />}
-            document={<PartnerContractDocumentCard contract={data} />}
-            vehicles={<PartnerContractVehiclesCard contract={data} />}
+            summary={<PartnerContractSummarySkeleton />}
+            proposal={<PartnerContractProposalCardSkeleton />}
+            status={<PartnerContractStatusCardSkeleton />}
+            document={<PartnerContractDocumentCardSkeleton />}
+            vehicles={<PartnerContractVehiclesCardSkeleton />}
           />
-        )}
+        </SkeletonRegion>
+      )}
+      {contract.isError &&
+        (isNotFound(contract.error) ? (
+          <EmptyState
+            icon={FileText}
+            title="Contrato não encontrado"
+            description="Ele pode ter sido excluído ou o endereço está errado."
+          />
+        ) : (
+          <QueryError
+            error={contract.error}
+            onRetry={() => contract.refetch()}
+          />
+        ))}
+      {data && (
+        <PartnerContractLayout
+          summary={<PartnerContractSummary contract={data} />}
+          proposal={<PartnerContractProposalCard contract={data} />}
+          status={<PartnerContractStatusCard contract={data} />}
+          document={<PartnerContractDocumentCard contract={data} />}
+          vehicles={
+            <PartnerContractVehiclesCard
+              contract={data}
+              includeVehicleId={includeVehicleId}
+              onIncludeUsed={clearInclude}
+            />
+          }
+        />
+      )}
     </Box>
   );
 }
