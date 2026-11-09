@@ -33,7 +33,11 @@ import {
 } from "@/helpers/vehicle-form";
 import { useSaveVehicle } from "@/hooks/api/gestao/vehicles/useSaveVehicle";
 import { useLabels } from "@/hooks/ui/useLabels";
-import type { VehicleDetail, VehicleFormOptions } from "@/types/vehicle";
+import type {
+  VehicleDetail,
+  VehicleFormOptions,
+  VehicleWrite,
+} from "@/types/vehicle";
 
 const CONFLICT_FIELDS = {
   placa: "plate",
@@ -46,7 +50,7 @@ type VehicleFormProps = {
   /** Present = edit; absent = create. */
   vehicle?: VehicleDetail;
   cancelTo: string;
-  onSaved: (vehicle: VehicleDetail) => void;
+  onSaved: (vehicle: VehicleWrite) => void;
 };
 
 export function VehicleForm({

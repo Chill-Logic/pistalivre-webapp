@@ -13,8 +13,9 @@ export function useSaveVehicle(id?: string) {
   return useMutation({
     mutationFn: (input: VehicleInput) =>
       id ? vehiclesService.update(id, input) : vehiclesService.create(input),
-    onSuccess: (vehicle) => {
-      queryClient.setQueryData(queryKeys.vehicles.detail(vehicle.id), vehicle);
+    onSuccess: () => {
+      // The POST/PUT answer without documents: refetch the detail instead of
+      // seeding it (seeding crashed the detail page on its documents list).
       queryClient.invalidateQueries({ queryKey: queryKeys.vehicles.all });
       // A new brand/model/year may have been created.
       queryClient.invalidateQueries({

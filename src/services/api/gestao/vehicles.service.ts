@@ -2,6 +2,7 @@ import { toQueryParams } from "@/helpers/query-params";
 import { http } from "@/services/http/client";
 import type { Paginated } from "@/types/api";
 import type {
+  VehicleWrite,
   Vehicle,
   VehicleDetail,
   VehicleFilters,
@@ -23,7 +24,7 @@ export const vehiclesService = {
     return data;
   },
   async changeStatus(id: string, status: VehicleStatus) {
-    const { data } = await http.patch<VehicleDetail>(`/vehicles/${id}/status`, {
+    const { data } = await http.patch<VehicleWrite>(`/vehicles/${id}/status`, {
       status,
     });
     return data;
@@ -38,22 +39,15 @@ export const vehiclesService = {
     return data;
   },
   async create(input: VehicleInput) {
-    const { data } = await http.post<VehicleDetail>("/vehicles", input);
+    const { data } = await http.post<VehicleWrite>("/vehicles", input);
     return data;
   },
   async update(id: string, input: VehicleInput) {
-    const { data } = await http.put<VehicleDetail>(`/vehicles/${id}`, input);
+    const { data } = await http.put<VehicleWrite>(`/vehicles/${id}`, input);
     return data;
   },
   async listTypes() {
     const { data } = await http.get<VehicleType[]>("/vehicle-types");
-    return data;
-  },
-  /** "Ficha técnica" PDF (needs the Bearer, so it comes as a blob). */
-  async datasheet(id: string) {
-    const { data } = await http.get<Blob>(`/vehicles/${id}/datasheet`, {
-      responseType: "blob",
-    });
     return data;
   },
 };

@@ -1,9 +1,7 @@
-import { CarFront, FileText, Pencil } from "lucide-react";
+import { CarFront, Pencil } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
-import { Spinner } from "@/components/atoms/spinner";
-import { Text } from "@/components/atoms/text";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
@@ -46,14 +44,12 @@ import { ROUTES, routeTo } from "@/constants/routes";
 import { queryKeys } from "@/constants/query-keys";
 import { isNotFound } from "@/helpers/api-error";
 import { useVehicle } from "@/hooks/api/gestao/vehicles/useVehicle";
-import { useVehicleDatasheet } from "@/hooks/api/gestao/vehicles/useVehicleDatasheet";
 import { useBackToList } from "@/hooks/ui/useBackToList";
 
 export function VehicleDetailPage() {
   const { id = "" } = useParams();
   const vehicle = useVehicle(id);
   const backTo = useBackToList(ROUTES.vehicles);
-  const datasheet = useVehicleDatasheet();
 
   return (
     <Box className="space-y-4">
@@ -61,18 +57,6 @@ export function VehicleDetailPage() {
         <BackLink to={backTo} label="Veículos" />
         {vehicle.data && (
           <Box className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => datasheet.mutate(vehicle.data.id)}
-              disabled={datasheet.isPending}
-              aria-label="Ficha técnica (PDF)"
-            >
-              {datasheet.isPending ? <Spinner /> : <FileText />}
-              <Text inline size={null} className="max-sm:sr-only">
-                Ficha técnica (PDF)
-              </Text>
-            </Button>
             <Button asChild variant="ghost" size="sm">
               <Link to={routeTo.editVehicle(vehicle.data.id)}>
                 <Pencil />

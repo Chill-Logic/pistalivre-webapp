@@ -53,7 +53,7 @@ export function VehicleDebts({ vehicleId }: { vehicleId: string }) {
       {items.length > 0 && (
         <Row as="ul" className="gap-y-4">
           {items.map((debt) => (
-            <Col as="li" key={debt.id} md={6} xl={4}>
+            <Col as="li" key={debt.id}>
               <DebtCard debt={debt} />
             </Col>
           ))}
@@ -69,13 +69,11 @@ export function VehicleDebts({ vehicleId }: { vehicleId: string }) {
   );
 }
 
+// In the sidebar: one debt per row at every width.
 function VehicleDebtsGrid() {
   return (
     <Row className="gap-y-4">
-      <Col md={6} xl={4}>
-        <DebtCardSkeleton />
-      </Col>
-      <Col md={6} xl={4} className="hidden md:block">
+      <Col>
         <DebtCardSkeleton />
       </Col>
     </Row>

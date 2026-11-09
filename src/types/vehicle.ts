@@ -79,3 +79,6 @@ export type VehicleFilters = {
   type: string;
   status: VehicleStatus | "";
 };
+
+/** Body of POST/PUT /vehicles and PATCH /vehicles/:id/status: no `documents`. */
+export type VehicleWrite = Omit<VehicleDetail, "documents">;
