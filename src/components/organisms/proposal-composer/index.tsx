@@ -348,7 +348,7 @@ export function ProposalComposer({
 
   if (!chatAvailable) return composer;
   return (
-    <Row className="items-start gap-y-4">
+    <Row className="gap-y-4">
       <Col lg={8} className="order-2 lg:order-1">
         {composer}
       </Col>

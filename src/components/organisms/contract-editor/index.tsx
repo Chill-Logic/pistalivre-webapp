@@ -132,7 +132,7 @@ export function ContractEditor({
 
   if (!chatAvailable) return editor;
   return (
-    <Row className="items-start gap-y-4">
+    <Row className="gap-y-4">
       <Col lg={8} className="order-2 lg:order-1">
         {editor}
       </Col>
