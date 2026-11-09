@@ -10,17 +10,32 @@ import { List, ListItem } from "@/components/atoms/list";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { InfoItem } from "@/components/molecules/info-item";
 import { PartnerVehicleStatusBadge } from "@/components/molecules/partner-area-status-badge";
+import { offerRateText } from "@/helpers/partner";
 import { periodText } from "@/helpers/partner-area";
-import type { PartnerAreaVehicleDetail } from "@/types/partner-area";
+import type {
+  PartnerAreaContractVehicle,
+  PartnerAreaVehicleDetail,
+} from "@/types/partner-area";
 import { formatPlate } from "@/utils/plate";
 
-/** The vehicle and when it was (or is) in the partner's contract. */
+type PartnerAreaVehicleSummaryProps = {
+  detail: PartnerAreaVehicleDetail;
+  /** The vehicle's link in the contract (GET /partner): the offered rent. */
+  link?: Pick<PartnerAreaContractVehicle, "offerRate" | "offerRatePeriod">;
+};
+
+/**
+ * The vehicle, the rent the company offers it for and when it was (or is)
+ * in the partner's contract.
+ */
 export function PartnerAreaVehicleSummary({
   detail,
-}: {
-  detail: PartnerAreaVehicleDetail;
-}) {
+  link,
+}: PartnerAreaVehicleSummaryProps) {
   const { vehicle, windows } = detail;
+  const offer = link
+    ? offerRateText(link.offerRate, link.offerRatePeriod)
+    : null;
   return (
     <Card>
       <CardHeader>
@@ -31,7 +46,7 @@ export function PartnerAreaVehicleSummary({
           <InfoItem label="Placa" span={6} md={2} mono>
             {formatPlate(vehicle.plate)}
           </InfoItem>
-          <InfoItem label="Ano" span={6} md={2}>
+          <InfoItem label="Ano" span={6} md={1}>
             {vehicle.year}
           </InfoItem>
           <InfoItem label="Cor" span={6} md={2}>
@@ -40,7 +55,10 @@ export function PartnerAreaVehicleSummary({
           <InfoItem label="Situação" span={6} md={2}>
             <PartnerVehicleStatusBadge status={vehicle.status} />
           </InfoItem>
-          <InfoItem label="No seu contrato" span={12} md={4}>
+          <InfoItem label="Locação oferecida" span={12} md={2}>
+            {offer}
+          </InfoItem>
+          <InfoItem label="No seu contrato" span={12} md={3}>
             {windows.length === 0 ? null : (
               <List className="space-y-0.5">
                 {windows.map((window) => (
@@ -65,13 +83,24 @@ export function PartnerAreaVehicleSummarySkeleton() {
       </CardHeader>
       <CardContent>
         <Row className="gap-y-4">
-          {["w-20", "w-12", "w-16", "w-16"].map((width, index) => (
-            <Col key={index} span={6} md={2} className="space-y-2">
+          {(
+            [
+              ["w-20", 2],
+              ["w-12", 1],
+              ["w-16", 2],
+              ["w-16", 2],
+            ] as const
+          ).map(([width, md], index) => (
+            <Col key={index} span={6} md={md} className="space-y-2">
               <Skeleton shape="text" className="w-12 text-xs" />
               <Skeleton shape="text" className={`${width} text-sm`} />
             </Col>
           ))}
-          <Col md={4} className="space-y-2">
+          <Col md={2} className="space-y-2">
+            <Skeleton shape="text" className="w-24 text-xs" />
+            <Skeleton shape="text" className="w-32 text-sm" />
+          </Col>
+          <Col md={3} className="space-y-2">
             <Skeleton shape="text" className="w-24 text-xs" />
             <Box>
               <Skeleton shape="text" className="w-32 text-sm" />

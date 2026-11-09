@@ -19,6 +19,10 @@ import {
   TableRow,
 } from "@/components/atoms/table";
 import { Text } from "@/components/atoms/text";
+import {
+  CostPayerList,
+  CostPayerListSkeleton,
+} from "@/components/molecules/cost-payer-list";
 import { InfoItem } from "@/components/molecules/info-item";
 import {
   PartnerContractStatusBadge,
@@ -31,6 +35,7 @@ import {
 import { PartnerAreaContractPdfButton } from "@/components/organisms/partner-area-contract-pdf-button";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
+import { offerRateText } from "@/helpers/partner";
 import { contractTerms, periodText } from "@/helpers/partner-area";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { PartnerAreaContract } from "@/types/partner-area";
@@ -42,9 +47,12 @@ const TABLE_HEADERS = [
   "Veículo",
   "Situação",
   "Aquisição",
+  "Locação oferecida",
   "No contrato",
   "Locação atual",
 ];
+
+const RIGHT = ["Aquisição", "Locação oferecida"];
 
 const LINK_CLASS =
   "rounded-sm font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
@@ -89,6 +97,9 @@ export function PartnerAreaContractCard({
               {term.value}
             </InfoItem>
           ))}
+          <InfoItem label="Quem paga as despesas">
+            <CostPayerList costs={contract.costs} />
+          </InfoItem>
         </Row>
         {!contract.hasDocument && (
           <Text size="xs" tone="muted">
@@ -119,7 +130,7 @@ export function PartnerAreaContractCard({
                         <TableHead
                           key={header}
                           className={
-                            header === "Aquisição" ? "text-right" : undefined
+                            RIGHT.includes(header) ? "text-right" : undefined
                           }
                         >
                           {header}
@@ -148,6 +159,12 @@ export function PartnerAreaContractCard({
                           {vehicle.acquisitionValue !== null
                             ? formatCurrency(vehicle.acquisitionValue)
                             : "—"}
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          {offerRateText(
+                            vehicle.offerRate,
+                            vehicle.offerRatePeriod,
+                          ) ?? "—"}
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {periodText(vehicle.joinedAt, vehicle.leftAt)}
@@ -207,6 +224,10 @@ export function PartnerAreaContractCardSkeleton() {
               <Skeleton shape="text" className={`${width} text-sm`} />
             </Col>
           ))}
+          <Col className="space-y-2">
+            <Skeleton shape="text" className="w-36 text-xs" />
+            <CostPayerListSkeleton />
+          </Col>
         </Row>
         <Box className="space-y-3">
           <Skeleton shape="text" className="w-16 text-base" />
@@ -220,6 +241,7 @@ export function PartnerAreaContractCardSkeleton() {
                 <Skeleton shape="text" className="w-48 text-sm" />
                 <Skeleton shape="pill" className="h-5 w-16" />
                 <Skeleton shape="text" className="w-20 text-sm" />
+                <Skeleton shape="text" className="w-28 text-sm" />
                 <Skeleton shape="text" className="w-28 text-sm" />
                 <Skeleton shape="text" className="w-36 text-sm" />
               </Box>

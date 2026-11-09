@@ -28,6 +28,8 @@ import {
 import { QueryError } from "@/components/organisms/query-error";
 import { ROUTES } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
+import { partnerVehicleRows } from "@/helpers/partner-area";
+import { usePartnerHome } from "@/hooks/api/parceiro/area/usePartnerHome";
 import { usePartnerVehicle } from "@/hooks/api/parceiro/area/usePartnerVehicle";
 
 /**
@@ -39,6 +41,13 @@ import { usePartnerVehicle } from "@/hooks/api/parceiro/area/usePartnerVehicle";
 export function PartnerVehiclePage() {
   const { id = "" } = useParams();
   const query = usePartnerVehicle(id);
+  // The offered rent lives on the contract link (GET /partner, usually cached).
+  const home = usePartnerHome();
+  const link = home.data
+    ? partnerVehicleRows(home.data.contracts).find(
+        (row) => row.vehicleId === id,
+      )
+    : undefined;
 
   return (
     <Box className="space-y-4">
@@ -69,7 +78,7 @@ export function PartnerVehiclePage() {
           />
           <Row className="gap-y-6">
             <Col>
-              <PartnerAreaVehicleSummary detail={query.data} />
+              <PartnerAreaVehicleSummary detail={query.data} link={link} />
             </Col>
             <Col>
               <PartnerAreaRentalsCard rentals={query.data.rentals} />

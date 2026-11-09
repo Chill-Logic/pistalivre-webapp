@@ -2,6 +2,11 @@ import type { InspectionType } from "@/types/inspection";
 import type { MaintenanceType } from "@/types/maintenance";
 import type { RatePeriod, RentalStatus } from "@/types/rental";
 import type { VehicleStatus } from "@/types/vehicle";
+import type {
+  PartnerContractCosts,
+  PartnerOfferRatePeriod,
+  PartnerPayoutFrequency,
+} from "@/types/partner";
 
 /**
  * The partner area (app.parceiro): read only, resolved on the server for the
@@ -41,6 +46,9 @@ export type PartnerAreaContractVehicle = {
   /** Today's state; null once the vehicle left the contract. */
   status: VehicleStatus | null;
   acquisitionValue: number | null;
+  /** What the company intends to rent it for (null only on old links). */
+  offerRate: number | null;
+  offerRatePeriod: PartnerOfferRatePeriod | null;
   joinedAt: string;
   leftAt: string | null;
   currentRental: PartnerAreaCurrentRental | null;
@@ -58,7 +66,10 @@ export type PartnerAreaContract = {
   sharePercent: number | null;
   adminFeePercent: number | null;
   adminFeeFixed: number | null;
+  payoutFrequency: PartnerPayoutFrequency;
   payoutDay: number | null;
+  payoutWeekday: number | null;
+  costs: PartnerContractCosts;
   startDate: string;
   endDate: string | null;
   /** The contract's PDF is available (GET /partner/contracts/:id/document). */

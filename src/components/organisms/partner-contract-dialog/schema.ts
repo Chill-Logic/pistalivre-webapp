@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PARTNER_DEFAULT_COSTS } from "@/constants/partner";
 import type {
   PartnerContract,
   PartnerContractInput,
@@ -8,8 +9,16 @@ import type {
 import { todayInBrasilia } from "@/utils/date";
 import { parsePercentInput, percentInputOf } from "@/utils/percent";
 
-/** Radix select reserves "": the "no value" entry of the payout day. */
+/** Radix select reserves "": the "no value" entry of the payout day/weekday. */
 export const NO_DAY = "__none__";
+
+const payer = z.enum(["COMPANY", "PARTNER", "RENTER"], {
+  errorMap: () => ({ message: "Escolha quem paga" }),
+});
+/** Insurance, tracker and taxes: never the renter (the API refuses it). */
+const companyOrPartner = z.enum(["COMPANY", "PARTNER"], {
+  errorMap: () => ({ message: "Só a empresa ou o parceiro" }),
+});
 
 const percentText = z.string().refine((text) => {
   const value = parsePercentInput(text);
@@ -31,7 +40,18 @@ export const contractFormSchema = z
     sharePercent: percentText,
     adminFeePercent: percentText,
     adminFeeFixed: z.number().nullable(),
+    payoutFrequency: z.enum(["WEEKLY", "BIWEEKLY", "MONTHLY"], {
+      errorMap: () => ({ message: "Escolha a recorrência do repasse" }),
+    }),
     payoutDay: z.string(),
+    payoutWeekday: z.string(),
+    costs: z.object({
+      maintenance: payer,
+      insurance: companyOrPartner,
+      tracker: companyOrPartner,
+      taxes: companyOrPartner,
+      fines: payer,
+    }),
     startDate: z.string().min(1, "Informe o início"),
     endDate: z.string(),
     notes: z.string().trim().max(4000),
@@ -72,7 +92,14 @@ export const CONTRACT_FORM_FIELDS = [
   "sharePercent",
   "adminFeePercent",
   "adminFeeFixed",
+  "payoutFrequency",
   "payoutDay",
+  "payoutWeekday",
+  "costs.maintenance",
+  "costs.insurance",
+  "costs.tracker",
+  "costs.taxes",
+  "costs.fines",
   "startDate",
   "endDate",
   "notes",
@@ -91,7 +118,14 @@ export function contractFormDefaults(
     sharePercent: percentInputOf(contract?.sharePercent),
     adminFeePercent: percentInputOf(contract?.adminFeePercent),
     adminFeeFixed: contract?.adminFeeFixed ?? null,
+    payoutFrequency: contract?.payoutFrequency ?? "MONTHLY",
     payoutDay: contract?.payoutDay ? String(contract.payoutDay) : NO_DAY,
+    payoutWeekday:
+      contract?.payoutWeekday != null ? String(contract.payoutWeekday) : NO_DAY,
+    costs: {
+      ...PARTNER_DEFAULT_COSTS,
+      ...contract?.costs,
+    } as ContractFormValues["costs"],
     startDate: contract?.startDate ?? todayInBrasilia(),
     endDate: contract?.endDate ?? "",
     notes: contract?.notes ?? "",
@@ -105,6 +139,7 @@ export function toContractInput(
 ): PartnerContractInput {
   const investment = values.type === "INVESTMENT";
   const cash = investment && values.contributionType === "CASH";
+  const monthly = values.payoutFrequency === "MONTHLY";
   return {
     type: values.type,
     ...(contract ? { status: contract.status } : {}),
@@ -121,7 +156,15 @@ export function toContractInput(
       ? null
       : parsePercentInput(values.adminFeePercent),
     adminFeeFixed: investment ? null : values.adminFeeFixed,
-    payoutDay: values.payoutDay === NO_DAY ? null : Number(values.payoutDay),
+    payoutFrequency: values.payoutFrequency,
+    // Only the day that matches the frequency goes (the other is cleared).
+    payoutDay:
+      monthly && values.payoutDay !== NO_DAY ? Number(values.payoutDay) : null,
+    payoutWeekday:
+      !monthly && values.payoutWeekday !== NO_DAY
+        ? Number(values.payoutWeekday)
+        : null,
+    costs: values.costs,
     startDate: values.startDate,
     endDate: values.endDate || null,
     notes: values.notes || null,

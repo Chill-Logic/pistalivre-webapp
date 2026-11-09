@@ -12,18 +12,27 @@ import {
   DialogTrigger,
 } from "@/components/atoms/dialog";
 import { Form } from "@/components/atoms/form";
+import { Col, Row } from "@/components/atoms/grid";
 import { Spinner } from "@/components/atoms/spinner";
 import { DateField } from "@/components/molecules/date-field";
 import { MoneyField } from "@/components/molecules/money-field";
+import { SegmentedField } from "@/components/molecules/segmented-field";
 import {
   RemoteCombobox,
   type RemoteOption,
 } from "@/components/molecules/remote-combobox";
+import { LABEL_MAPS } from "@/constants/label-maps";
+import { PARTNER_OFFER_RATE_PERIODS } from "@/constants/partner";
 import { toApiError } from "@/helpers/api-error";
 import { partnerVehicleName } from "@/helpers/partner";
 import { usePartnerContractVehicles } from "@/hooks/api/gestao/partners/usePartnerContractMutations";
+import { useLabels } from "@/hooks/ui/useLabels";
 import { useVehicleOptions } from "@/hooks/ui/useRemoteOptions";
-import type { PartnerContract, PartnerContractVehicle } from "@/types/partner";
+import type {
+  PartnerContract,
+  PartnerContractVehicle,
+  PartnerOfferRatePeriod,
+} from "@/types/partner";
 import { todayInBrasilia } from "@/utils/date";
 
 /** add = include a vehicle; edit = correct value/dates; leave = record the exit. */
@@ -32,6 +41,8 @@ type Mode = "add" | "edit" | "leave";
 type Errors = {
   vehicleId?: string;
   acquisitionValue?: string;
+  offerRate?: string;
+  offerRatePeriod?: string;
   joinedAt?: string;
   leftAt?: string;
   form?: string;
@@ -52,8 +63,8 @@ const TITLES: Record<Mode, string> = {
 };
 
 /**
- * A vehicle in the partner's contract: which one, what the partner paid for it
- * and the window in which it is theirs (entry, exit). A vehicle sits in one open
+ * A vehicle in the partner's contract: which one, what the partner paid for it,
+ * the rent the company intends to offer (value + period) and the window in which it is theirs (entry, exit). A vehicle sits in one open
  * contract at a time (409 on the picker).
  */
 export function PartnerContractVehicleDialog({
@@ -65,6 +76,15 @@ export function PartnerContractVehicleDialog({
   const [open, setOpen] = useState(false);
   const [picked, setPicked] = useState<RemoteOption | null>(null);
   const [acquisitionValue, setAcquisitionValue] = useState<number | null>(null);
+  const [offerRate, setOfferRate] = useState<number | null>(null);
+  const [offerRatePeriod, setOfferRatePeriod] = useState<
+    PartnerOfferRatePeriod | ""
+  >("");
+  const { label } = useLabels();
+  const periodOptions = PARTNER_OFFER_RATE_PERIODS.map((period) => ({
+    value: period,
+    label: label(LABEL_MAPS.ratePeriod, period),
+  }));
   const [joinedAt, setJoinedAt] = useState("");
   const [leftAt, setLeftAt] = useState("");
   const [errors, setErrors] = useState<Errors>({});
@@ -84,6 +104,9 @@ export function PartnerContractVehicleDialog({
     const today = todayInBrasilia();
     setPicked(null);
     setAcquisitionValue(link?.acquisitionValue ?? null);
+    setOfferRate(link?.offerRate ?? null);
+    // Motofrete rents by the week: the common case when nothing was saved.
+    setOfferRatePeriod(link?.offerRatePeriod ?? "WEEKLY");
     setJoinedAt(
       link?.joinedAt ??
         (today < contract.startDate ? contract.startDate : today),
@@ -99,11 +122,15 @@ export function PartnerContractVehicleDialog({
     const placed =
       fields.vehicleId ||
       fields.acquisitionValue ||
+      fields.offerRate ||
+      fields.offerRatePeriod ||
       fields.joinedAt ||
       fields.leftAt;
     setErrors({
       vehicleId: fields.vehicleId,
       acquisitionValue: fields.acquisitionValue,
+      offerRate: fields.offerRate,
+      offerRatePeriod: fields.offerRatePeriod,
       joinedAt: fields.joinedAt,
       leftAt: fields.leftAt,
       form: placed ? undefined : apiError.message,
@@ -114,6 +141,14 @@ export function PartnerContractVehicleDialog({
     event.preventDefault();
     const found: Errors = {
       vehicleId: mode === "add" && !picked ? "Escolha o veículo" : undefined,
+      offerRate:
+        mode !== "leave" && !offerRate
+          ? "Informe por quanto a locação será oferecida"
+          : undefined,
+      offerRatePeriod:
+        mode !== "leave" && !offerRatePeriod
+          ? "Escolha a recorrência"
+          : undefined,
       joinedAt: !joinedAt
         ? "Informe a entrada"
         : joinedAt < contract.startDate
@@ -126,7 +161,13 @@ export function PartnerContractVehicleDialog({
             ? "Antes da entrada"
             : undefined,
     };
-    if (found.vehicleId || found.joinedAt || found.leftAt) {
+    if (
+      found.vehicleId ||
+      found.offerRate ||
+      found.offerRatePeriod ||
+      found.joinedAt ||
+      found.leftAt
+    ) {
       setErrors(found);
       return;
     }
@@ -138,7 +179,13 @@ export function PartnerContractVehicleDialog({
 
     if (mode === "add") {
       add.mutate(
-        { vehicleId: picked?.value ?? "", acquisitionValue, joinedAt },
+        {
+          vehicleId: picked?.value ?? "",
+          acquisitionValue,
+          offerRate: offerRate ?? 0,
+          offerRatePeriod: offerRatePeriod || "WEEKLY",
+          joinedAt,
+        },
         { onSuccess: () => setOpen(false), onError },
       );
       return;
@@ -146,7 +193,14 @@ export function PartnerContractVehicleDialog({
     update.mutate(
       {
         linkId: link?.id ?? "",
-        input: { acquisitionValue, joinedAt, leftAt: leftAt || null },
+        input: {
+          acquisitionValue,
+          // "Registrar saída" resends what is saved (old links may lack it).
+          offerRate: offerRate ?? 0,
+          offerRatePeriod: offerRatePeriod || "WEEKLY",
+          joinedAt,
+          leftAt: leftAt || null,
+        },
       },
       {
         onSuccess: done(
@@ -160,7 +214,7 @@ export function PartnerContractVehicleDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
         <DialogTitle>
           {link ? `${TITLES[mode]}: ${partnerVehicleName(link)}` : TITLES[mode]}
         </DialogTitle>
@@ -190,6 +244,37 @@ export function PartnerContractVehicleDialog({
           )}
           {mode !== "leave" && (
             <>
+              <Row className="gap-y-4">
+                <Col sm={5}>
+                  <MoneyField
+                    label="Locação oferecida"
+                    value={offerRate}
+                    onChange={(value) => {
+                      setOfferRate(value);
+                      setErrors((current) => ({
+                        ...current,
+                        offerRate: undefined,
+                      }));
+                    }}
+                    error={errors.offerRate}
+                  />
+                </Col>
+                <Col sm={7}>
+                  <SegmentedField
+                    label="Recorrência"
+                    value={offerRatePeriod}
+                    options={periodOptions}
+                    onChange={(value) => {
+                      setOfferRatePeriod(value as PartnerOfferRatePeriod);
+                      setErrors((current) => ({
+                        ...current,
+                        offerRatePeriod: undefined,
+                      }));
+                    }}
+                    error={errors.offerRatePeriod}
+                  />
+                </Col>
+              </Row>
               <MoneyField
                 label="Valor de aquisição (opcional)"
                 value={acquisitionValue}
@@ -217,9 +302,12 @@ export function PartnerContractVehicleDialog({
               error={errors.leftAt}
             />
           )}
-          {mode === "leave" && errors.joinedAt && (
-            <Alert>{errors.joinedAt}</Alert>
-          )}
+          {mode === "leave" &&
+            (errors.joinedAt || errors.offerRate || errors.offerRatePeriod) && (
+              <Alert>
+                {errors.joinedAt || errors.offerRate || errors.offerRatePeriod}
+              </Alert>
+            )}
           {errors.form && <Alert>{errors.form}</Alert>}
           <DialogFooter>
             <DialogClose asChild>

@@ -16,6 +16,7 @@ import { EmptyState } from "@/components/molecules/empty-state";
 import { TextLink } from "@/components/molecules/text-link";
 import { PartnerContractVehicleDialog } from "@/components/organisms/partner-contract-vehicle-dialog";
 import { routeTo } from "@/constants/routes";
+import { offerRateText } from "@/helpers/partner";
 import { usePartnerContractVehicles } from "@/hooks/api/gestao/partners/usePartnerContractMutations";
 import type { PartnerContract } from "@/types/partner";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
@@ -78,6 +79,7 @@ export function PartnerContractVehiclesCard({
               const plate = link.plate
                 ? formatPlate(link.plate)
                 : "Veículo removido";
+              const offer = offerRateText(link.offerRate, link.offerRatePeriod);
               return (
                 <ListItem
                   key={link.id}
@@ -97,6 +99,27 @@ export function PartnerContractVehiclesCard({
                         {link.label}
                       </Text>
                     )}
+                    <Text size="sm" className="tabular-nums">
+                      {offer ? (
+                        <>
+                          <Text inline size={null} tone="muted">
+                            Locação oferecida{" "}
+                          </Text>
+                          <Text
+                            inline
+                            size={null}
+                            weight="semibold"
+                            className="whitespace-nowrap"
+                          >
+                            {offer}
+                          </Text>
+                        </>
+                      ) : (
+                        <Text inline size={null} tone="destructive">
+                          Locação oferecida não informada
+                        </Text>
+                      )}
+                    </Text>
                     <Text size="xs" tone="muted" className="tabular-nums">
                       Entrou em {formatCalendarDate(link.joinedAt)}
                       {link.leftAt &&
@@ -181,6 +204,7 @@ export function PartnerContractVehiclesCardSkeleton() {
           <Box key={index} className="space-y-2">
             <Skeleton shape="text" className="w-24 text-sm" />
             <Skeleton shape="text" className="w-48 text-xs" />
+            <Skeleton shape="text" className="w-52 text-sm" />
             <Skeleton shape="text" className="w-56 text-xs" />
           </Box>
         ))}

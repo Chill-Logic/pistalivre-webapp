@@ -14,7 +14,9 @@ import {
   DialogTrigger,
 } from "@/components/atoms/dialog";
 import { Form } from "@/components/atoms/form";
+import { Box } from "@/components/atoms/box";
 import { Col, Row } from "@/components/atoms/grid";
+import { Heading } from "@/components/atoms/heading";
 import { Spinner } from "@/components/atoms/spinner";
 import { DateField } from "@/components/molecules/date-field";
 import { FormField } from "@/components/molecules/form-field";
@@ -31,6 +33,7 @@ import {
   type ContractFormValues,
 } from "./schema";
 import { LABEL_MAPS } from "@/constants/label-maps";
+import { PARTNER_COST_KEYS, PARTNER_COST_PAYERS } from "@/constants/partner";
 import { applyApiErrors } from "@/helpers/form";
 import {
   useCreatePartnerContract,
@@ -102,7 +105,7 @@ type ContractFormProps = {
 };
 
 function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
-  const { options } = useLabels();
+  const { options, label } = useLabels();
   const create = useCreatePartnerContract(partnerId);
   const update = useUpdatePartnerContract(contract?.id ?? "");
   const save = contract ? update : create;
@@ -121,6 +124,7 @@ function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
   });
   const isInvestment = watch("type") === "INVESTMENT";
   const isCash = watch("contributionType") === "CASH";
+  const isMonthly = watch("payoutFrequency") === "MONTHLY";
 
   const onSubmit = handleSubmit((values) => {
     setFormError(null);
@@ -257,21 +261,6 @@ function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
         <Col sm={6}>
           <Controller
             control={control}
-            name="payoutDay"
-            render={({ field }) => (
-              <SelectField
-                label="Dia do repasse"
-                value={field.value}
-                options={PAYOUT_DAYS}
-                onChange={field.onChange}
-                error={errors.payoutDay?.message}
-              />
-            )}
-          />
-        </Col>
-        <Col sm={6}>
-          <Controller
-            control={control}
             name="startDate"
             render={({ field }) => (
               <DateField
@@ -299,7 +288,92 @@ function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
             )}
           />
         </Col>
-        <Col>
+        <Col className="space-y-4 border-t pt-4">
+          <Heading level={3} variant="section">
+            Repasse ao parceiro
+          </Heading>
+          <Row className="gap-y-4">
+            <Col sm={7}>
+              <Controller
+                control={control}
+                name="payoutFrequency"
+                render={({ field }) => (
+                  <SegmentedField
+                    label="Recorrência"
+                    value={field.value}
+                    options={options(LABEL_MAPS.partnerPayoutFrequency)}
+                    onChange={field.onChange}
+                    error={errors.payoutFrequency?.message}
+                  />
+                )}
+              />
+            </Col>
+            <Col sm={5}>
+              {isMonthly ? (
+                <Controller
+                  key="payoutDay"
+                  control={control}
+                  name="payoutDay"
+                  render={({ field }) => (
+                    <SelectField
+                      label="Dia do mês"
+                      value={field.value}
+                      options={PAYOUT_DAYS}
+                      onChange={field.onChange}
+                      error={errors.payoutDay?.message}
+                    />
+                  )}
+                />
+              ) : (
+                <Controller
+                  key="payoutWeekday"
+                  control={control}
+                  name="payoutWeekday"
+                  render={({ field }) => (
+                    <SelectField
+                      label="Dia da semana"
+                      value={field.value}
+                      options={[
+                        { value: NO_DAY, label: "Não definido" },
+                        ...options(LABEL_MAPS.weekday),
+                      ]}
+                      onChange={field.onChange}
+                      error={errors.payoutWeekday?.message}
+                    />
+                  )}
+                />
+              )}
+            </Col>
+          </Row>
+        </Col>
+        <Col className="space-y-4 border-t pt-4">
+          <Heading level={3} variant="section">
+            Quem paga cada despesa
+          </Heading>
+          <Box className="space-y-3">
+            {PARTNER_COST_KEYS.map((key) => (
+              <Controller
+                key={key}
+                control={control}
+                name={`costs.${key}`}
+                render={({ field }) => (
+                  <SegmentedField
+                    layout="inline"
+                    label={label(LABEL_MAPS.partnerCost, key)}
+                    value={field.value}
+                    options={PARTNER_COST_PAYERS[key].map((payer) => ({
+                      value: payer,
+                      label: label(LABEL_MAPS.partnerCostPayer, payer),
+                    }))}
+                    onChange={field.onChange}
+                    error={errors.costs?.[key]?.message}
+                  />
+                )}
+              />
+            ))}
+          </Box>
+        </Col>
+        <Col className="border-t pt-4">
           <TextareaField
             label="Observações (opcional)"
             rows={3}

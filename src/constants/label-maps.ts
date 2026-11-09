@@ -52,6 +52,9 @@ export const LABEL_MAPS = {
   partnerContractStatus: "PARTNER_CONTRACT_STATUS_LABELS",
   partnerContributionType: "PARTNER_CONTRIBUTION_TYPE_LABELS",
   partnerShareBase: "PARTNER_SHARE_BASE_LABELS",
+  partnerPayoutFrequency: "PARTNER_PAYOUT_FREQUENCY_LABELS",
+  partnerCostPayer: "PARTNER_COST_PAYER_LABELS",
+  partnerCost: "PARTNER_COST_LABELS",
 } as const;
 
 export type LabelMapName = (typeof LABEL_MAPS)[keyof typeof LABEL_MAPS];

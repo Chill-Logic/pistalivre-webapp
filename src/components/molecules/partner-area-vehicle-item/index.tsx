@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { PartnerVehicleStatusBadge } from "@/components/molecules/partner-area-status-badge";
 import { routeTo } from "@/constants/routes";
+import { offerRateText } from "@/helpers/partner";
 import { inContractText } from "@/helpers/partner-area";
 import type { PartnerAreaContractVehicle } from "@/types/partner-area";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
@@ -23,6 +24,7 @@ export function PartnerAreaVehicleItem({
   vehicle: PartnerAreaContractVehicle;
 }) {
   const rental = vehicle.currentRental;
+  const offer = offerRateText(vehicle.offerRate, vehicle.offerRatePeriod);
   return (
     <Box className="overflow-hidden rounded-lg border bg-card">
       <Link to={routeTo.partnerAreaVehicle(vehicle.vehicleId)} className={LINK}>
@@ -38,6 +40,21 @@ export function PartnerAreaVehicleItem({
             {vehicle.acquisitionValue !== null &&
               ` · Aquisição ${formatCurrency(vehicle.acquisitionValue)}`}
           </Text>
+          {offer && (
+            <Text size="sm" className="tabular-nums">
+              <Text inline size={null} tone="muted">
+                Locação oferecida{" "}
+              </Text>
+              <Text
+                inline
+                size={null}
+                weight="semibold"
+                className="whitespace-nowrap"
+              >
+                {offer}
+              </Text>
+            </Text>
+          )}
           <Text size="xs" tone="muted">
             {inContractText(vehicle.joinedAt, vehicle.leftAt)}
           </Text>
@@ -83,6 +100,7 @@ export function PartnerAreaVehicleItemSkeleton() {
           <Skeleton shape="pill" className="h-5 w-16" />
         </Box>
         <Skeleton shape="text" className="w-48 text-xs" />
+        <Skeleton shape="text" className="w-52 text-sm" />
         <Skeleton shape="text" className="w-40 text-xs" />
       </Box>
       <Box className="space-y-1.5 border-t px-4 py-3">

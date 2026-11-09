@@ -5,9 +5,10 @@ import type {
   PartnerAreaVehicleDetail,
   PartnerAreaVehicleRow,
 } from "@/types/partner-area";
+import { payoutText } from "@/helpers/partner";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
-type LabelFn = (map: LabelMapName, code: string) => string;
+type LabelFn = (map: LabelMapName, code: string | number) => string;
 
 const percent = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
 
@@ -89,8 +90,7 @@ export function contractTerms(contract: PartnerAreaContract, label: LabelFn) {
     if (fee.length)
       terms.push({ label: "Taxa da locadora", value: fee.join(" + ") });
   }
-  if (contract.payoutDay !== null)
-    terms.push({ label: "Repasse", value: `Todo dia ${contract.payoutDay}` });
+  terms.push({ label: "Repasse", value: payoutText(contract, label) });
   return terms;
 }
 

@@ -7,6 +7,7 @@ import {
   type DataTableColumn,
 } from "@/components/organisms/data-table";
 import { routeTo } from "@/constants/routes";
+import { offerRateText } from "@/helpers/partner";
 import { periodText } from "@/helpers/partner-area";
 import type { PartnerAreaVehicleRow } from "@/types/partner-area";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
@@ -14,18 +15,19 @@ import { formatPlate } from "@/utils/plate";
 
 const COLUMNS: DataTableColumn<PartnerAreaVehicleRow>[] = [
   {
-    header: "Placa",
-    cell: (vehicle) => (
-      <Text inline size={null} mono weight="semibold">
-        {vehicle.plate ? formatPlate(vehicle.plate) : "—"}
-      </Text>
-    ),
-    skeleton: "w-20",
-  },
-  {
+    // Plate under the name: one column less, room for the offered rent.
     header: "Veículo",
-    cell: (vehicle) => vehicle.label ?? "Veículo",
-    className: "max-w-64 truncate",
+    cell: (vehicle) => (
+      <>
+        <Text inline size={null} weight="medium">
+          {vehicle.label ?? "Veículo"}
+        </Text>
+        <Text size="xs" tone="muted" mono>
+          {vehicle.plate ? formatPlate(vehicle.plate) : "—"}
+        </Text>
+      </>
+    ),
+    className: "max-w-64 whitespace-normal",
     skeleton: "w-48",
   },
   {
@@ -51,6 +53,13 @@ const COLUMNS: DataTableColumn<PartnerAreaVehicleRow>[] = [
         ? formatCurrency(vehicle.acquisitionValue)
         : "—",
     skeleton: "ml-auto w-20",
+  },
+  {
+    header: "Locação oferecida",
+    align: "right",
+    cell: (vehicle) =>
+      offerRateText(vehicle.offerRate, vehicle.offerRatePeriod) ?? "—",
+    skeleton: "ml-auto w-28",
   },
   {
     header: "No contrato",

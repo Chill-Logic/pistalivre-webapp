@@ -1,4 +1,5 @@
 import type { DocumentFile } from "@/types/document";
+import type { RatePeriod } from "@/types/rental";
 /** CPF = a person; CNPJ = a company (may be the new alphanumeric one). */
 export type PartnerDocumentType = "CPF" | "CNPJ";
 
@@ -12,6 +13,20 @@ export type PartnerContributionType = "ASSETS" | "CASH";
 
 /** What the partner's share is taken from. */
 export type PartnerShareBase = "REVENUE" | "PROFIT";
+
+/** How often the partner is paid (always outside the system). */
+export type PartnerPayoutFrequency = "WEEKLY" | "BIWEEKLY" | "MONTHLY";
+
+/** Who bears an expense of the vehicles. RENTER only for maintenance and fines. */
+export type PartnerCostPayer = "COMPANY" | "PARTNER" | "RENTER";
+
+export type PartnerCostKey =
+  "maintenance" | "insurance" | "tracker" | "taxes" | "fines";
+
+export type PartnerContractCosts = Record<PartnerCostKey, PartnerCostPayer>;
+
+/** The offered rent's period (a partner vehicle is never offered per year). */
+export type PartnerOfferRatePeriod = Exclude<RatePeriod, "YEARLY">;
 
 /** Someone whose vehicles the company manages (gestão, the whole staff). */
 export type Partner = {
@@ -48,6 +63,9 @@ export type PartnerContractVehicle = {
   plate: string | null;
   label: string | null;
   acquisitionValue: number | null;
+  /** What the company intends to rent it for (null only on old links). */
+  offerRate: number | null;
+  offerRatePeriod: PartnerOfferRatePeriod | null;
   /** YYYY-MM-DD */
   joinedAt: string;
   leftAt: string | null;
@@ -66,7 +84,12 @@ export type PartnerContract = {
   sharePercent: number | null;
   adminFeePercent: number | null;
   adminFeeFixed: number | null;
+  payoutFrequency: PartnerPayoutFrequency;
+  /** Monthly payout: day of the month (1–31). */
   payoutDay: number | null;
+  /** Weekly/biweekly payout: 0 = Sunday … 6 = Saturday. */
+  payoutWeekday: number | null;
+  costs: PartnerContractCosts;
   /** YYYY-MM-DD */
   startDate: string;
   endDate: string | null;
@@ -115,7 +138,10 @@ export type PartnerContractInput = {
   sharePercent: number | null;
   adminFeePercent: number | null;
   adminFeeFixed: number | null;
+  payoutFrequency: PartnerPayoutFrequency;
   payoutDay: number | null;
+  payoutWeekday: number | null;
+  costs: PartnerContractCosts;
   startDate: string;
   endDate: string | null;
   notes: string | null;
@@ -124,11 +150,15 @@ export type PartnerContractInput = {
 export type PartnerVehicleInput = {
   vehicleId: string;
   acquisitionValue: number | null;
+  offerRate: number;
+  offerRatePeriod: PartnerOfferRatePeriod;
   joinedAt: string;
 };
 
 export type PartnerVehicleUpdate = {
   acquisitionValue: number | null;
+  offerRate: number;
+  offerRatePeriod: PartnerOfferRatePeriod;
   joinedAt: string;
   leftAt: string | null;
 };

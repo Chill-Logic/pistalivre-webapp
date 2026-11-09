@@ -1,9 +1,19 @@
+import { LABEL_MAPS, type LabelMapName } from "@/constants/label-maps";
+import {
+  PARTNER_COST_KEYS,
+  PARTNER_DEFAULT_COSTS,
+  WEEKDAY_PLURAL,
+} from "@/constants/partner";
+import { ratePeriodSuffix } from "@/helpers/billing";
 import type {
   Partner,
   PartnerContract,
+  PartnerContractCosts,
   PartnerContractInput,
   PartnerContractStatus,
   PartnerContractVehicle,
+  PartnerOfferRatePeriod,
+  PartnerPayoutFrequency,
 } from "@/types/partner";
 import { formatCnpj, formatCpf } from "@/utils/document";
 import { formatCurrency } from "@/utils/format";
@@ -75,12 +85,68 @@ export function contractInputOf(
     sharePercent: contract.sharePercent,
     adminFeePercent: contract.adminFeePercent,
     adminFeeFixed: contract.adminFeeFixed,
+    payoutFrequency: contract.payoutFrequency,
     payoutDay: contract.payoutDay,
+    payoutWeekday: contract.payoutWeekday,
+    costs: contract.costs,
     startDate: contract.startDate,
     endDate: contract.endDate,
     notes: contract.notes,
     ...changes,
   };
+}
+
+type LabelFn = (map: LabelMapName, code: string | number) => string;
+
+type Payout = {
+  payoutFrequency: PartnerPayoutFrequency;
+  payoutDay: number | null;
+  payoutWeekday: number | null;
+};
+
+/**
+ * When the partner is paid (outside the system): "Mensal, todo dia 10",
+ * "Semanal, às sextas", "Quinzenal, às segundas" — or just the frequency
+ * when the day was not set.
+ */
+export function payoutText(contract: Payout, label: LabelFn) {
+  const frequency = label(
+    LABEL_MAPS.partnerPayoutFrequency,
+    contract.payoutFrequency ?? "MONTHLY",
+  );
+  if (contract.payoutFrequency === "MONTHLY" || !contract.payoutFrequency) {
+    return contract.payoutDay
+      ? `${frequency}, todo dia ${contract.payoutDay}`
+      : frequency;
+  }
+  const weekday =
+    contract.payoutWeekday !== null
+      ? WEEKDAY_PLURAL[contract.payoutWeekday]
+      : undefined;
+  return weekday ? `${frequency}, ${weekday}` : frequency;
+}
+
+/** "R$ 480,00 / semana" — the rent the company intends to offer. */
+export function offerRateText(
+  rate: number | null,
+  period: PartnerOfferRatePeriod | null,
+) {
+  if (rate === null) return null;
+  const money = formatCurrency(rate);
+  return period ? `${money} / ${ratePeriodSuffix(period)}` : money;
+}
+
+/** Who pays each expense, in the contract's order (label and payer). */
+export function costPayerRows(
+  costs: PartnerContractCosts | null | undefined,
+  label: LabelFn,
+) {
+  const all = { ...PARTNER_DEFAULT_COSTS, ...costs };
+  return PARTNER_COST_KEYS.map((key) => ({
+    key,
+    label: label(LABEL_MAPS.partnerCost, key),
+    payer: label(LABEL_MAPS.partnerCostPayer, all[key]),
+  }));
 }
 
 /** Badge colour of a contract's situation. */

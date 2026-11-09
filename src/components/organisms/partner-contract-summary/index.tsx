@@ -4,12 +4,16 @@ import { Col, Row } from "@/components/atoms/grid";
 import { Heading } from "@/components/atoms/heading";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
+import {
+  CostPayerList,
+  CostPayerListSkeleton,
+} from "@/components/molecules/cost-payer-list";
 import { InfoItem } from "@/components/molecules/info-item";
 import { PartnerContractStatusBadge } from "@/components/molecules/partner-contract-status-badge";
 import { TextLink } from "@/components/molecules/text-link";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
-import { contractTerms } from "@/helpers/partner";
+import { contractTerms, payoutText } from "@/helpers/partner";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { PartnerContractDetail } from "@/types/partner";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
@@ -88,13 +92,18 @@ export function PartnerContractSummary({
             </>
           )}
           <InfoItem span={6} lg={4} label="Repasse (por fora)">
-            {contract.payoutDay ? `Todo dia ${contract.payoutDay}` : "Não definido"}
+            {payoutText(contract, label)}
           </InfoItem>
           <InfoItem span={6} lg={4} label="Início">
             {formatCalendarDate(contract.startDate)}
           </InfoItem>
           <InfoItem span={6} lg={4} label="Fim">
-            {contract.endDate ? formatCalendarDate(contract.endDate) : "Sem data"}
+            {contract.endDate
+              ? formatCalendarDate(contract.endDate)
+              : "Sem data"}
+          </InfoItem>
+          <InfoItem label="Quem paga">
+            <CostPayerList costs={contract.costs} />
           </InfoItem>
           {contract.notes && (
             <InfoItem label="Observações">
@@ -124,6 +133,10 @@ export function PartnerContractSummarySkeleton() {
               <Skeleton shape="text" className="w-28 text-sm" />
             </Col>
           ))}
+          <Col className="space-y-2">
+            <Skeleton shape="text" className="w-16 text-xs" />
+            <CostPayerListSkeleton />
+          </Col>
         </Row>
       </CardContent>
     </Card>
