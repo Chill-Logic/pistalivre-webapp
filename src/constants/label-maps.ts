@@ -47,6 +47,11 @@ export const LABEL_MAPS = {
   documentOwner: "DOCUMENT_OWNER_LABELS",
   invoiceStatus: "INVOICE_STATUS_LABELS",
   asaasNotificationEvent: "ASAAS_NOTIFICATION_EVENT_LABELS",
+  partnerDocumentType: "PARTNER_DOCUMENT_TYPE_LABELS",
+  partnerContractType: "PARTNER_CONTRACT_TYPE_LABELS",
+  partnerContractStatus: "PARTNER_CONTRACT_STATUS_LABELS",
+  partnerContributionType: "PARTNER_CONTRIBUTION_TYPE_LABELS",
+  partnerShareBase: "PARTNER_SHARE_BASE_LABELS",
 } as const;
 
 export type LabelMapName = (typeof LABEL_MAPS)[keyof typeof LABEL_MAPS];

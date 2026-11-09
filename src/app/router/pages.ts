@@ -317,3 +317,23 @@ export const CrmLinksPage = lazyPage(
   () => import("@/pages/gestao/crm-links"),
   "CrmLinksPage",
 );
+export const PartnersPage = lazyPage(
+  () => import("@/pages/gestao/partners"),
+  "PartnersPage",
+);
+export const PartnerNewPage = lazyPage(
+  () => import("@/pages/gestao/partner-new"),
+  "PartnerNewPage",
+);
+export const PartnerDetailPage = lazyPage(
+  () => import("@/pages/gestao/partner-detail"),
+  "PartnerDetailPage",
+);
+export const PartnerEditPage = lazyPage(
+  () => import("@/pages/gestao/partner-edit"),
+  "PartnerEditPage",
+);
+export const PartnerContractPage = lazyPage(
+  () => import("@/pages/gestao/partner-contract"),
+  "PartnerContractPage",
+);

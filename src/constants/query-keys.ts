@@ -5,6 +5,7 @@ import type { MaintenanceFilters } from "@/types/maintenance";
 import type { RentalFilters } from "@/types/rental";
 import type { StatementFilters } from "@/types/statement";
 import type { InstallmentPlanParams } from "@/types/charge";
+import type { PartnerFilters } from "@/types/partner";
 import type { SupplierFilters } from "@/types/supplier";
 import type { UserFilters } from "@/types/user";
 import type { VehicleFilters } from "@/types/vehicle";
@@ -190,5 +191,13 @@ export const queryKeys = {
     ["installment-plan", params] as const,
   dashboard: {
     all: ["dashboard"] as const,
+  },
+  partners: {
+    all: ["partners"] as const,
+    list: (filters: PartnerFilters) =>
+      [...queryKeys.partners.all, "list", filters] as const,
+    detail: (id: string) => [...queryKeys.partners.all, "detail", id] as const,
+    contract: (id: string) =>
+      [...queryKeys.partners.all, "contract", id] as const,
   },
 };

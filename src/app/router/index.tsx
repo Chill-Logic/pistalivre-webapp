@@ -86,6 +86,11 @@ import {
   SignaturesPage,
   SignatureDetailPage,
   SignatureLinkPage,
+  PartnersPage,
+  PartnerNewPage,
+  PartnerDetailPage,
+  PartnerEditPage,
+  PartnerContractPage,
 } from "./pages";
 import {
   HOST_REALM,
@@ -188,6 +193,11 @@ const gestaoRoutes: RouteObject[] = [
           />
         ),
       },
+      { path: ROUTES.partners, element: <PartnersPage /> },
+      { path: ROUTES.partnerNew, element: <PartnerNewPage /> },
+      { path: ROUTES.partnerContract, element: <PartnerContractPage /> },
+      { path: ROUTES.partnerDetail, element: <PartnerDetailPage /> },
+      { path: ROUTES.partnerEdit, element: <PartnerEditPage /> },
       { path: ROUTES.documents, element: <DocumentsPage /> },
       { path: ROUTES.plans, element: <PlansPage /> },
       { path: ROUTES.planNew, element: <PlanNewPage /> },

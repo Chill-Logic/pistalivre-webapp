@@ -1,6 +1,7 @@
 import {
   Building2,
   Car,
+  BriefcaseBusiness,
   ClipboardCheck,
   FileSignature,
   FileText,
@@ -72,6 +73,12 @@ export const SIDEBAR_NAV: NavItem[] = [
   { label: "Vistorias", to: ROUTES.inspections, icon: ClipboardCheck },
   { label: "Manutenções", to: ROUTES.maintenances, icon: Wrench },
   { label: "Custos fixos", to: ROUTES.suppliers, icon: Receipt },
+  {
+    label: "Parceiros",
+    to: ROUTES.partners,
+    icon: BriefcaseBusiness,
+    adminOnly: true,
+  },
   FINANCE,
   { label: "Projeções", to: ROUTES.projections, icon: TrendingUp },
   { label: "Reembolsos", to: ROUTES.reimbursements, icon: HandCoins },
