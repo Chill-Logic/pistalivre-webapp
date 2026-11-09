@@ -128,6 +128,19 @@ curtas entre ferramentas e nos relatórios de subagentes.
 - Nenhuma no momento. Feitos em 2026-11-09: telas Next removidas, endereços limpos, heap de 6 GB no dev
   (vale quando o container for recriado), `cnh.pdf` falso apagado.
 
+**Área do parceiro — follow-ups (fase 2 em diante; anotado em 2026-11-09; detalhe no `CLAUDE.md` do backend):**
+- **Conta corrente do contrato:** apurar no servidor quanto o parceiro tem a receber por período (faturamento ou lucro,
+  taxa, despesas a cargo dele) e **registrar o repasse feito por fora** (dia, valor, comprovante — o sistema nunca paga).
+  Hoje ele vê o que os veículos renderam, não "quanto você recebe este mês". Extrato do contrato na área do parceiro.
+- **Despesas lançadas contra o contrato:** manutenção, seguro, rastreador, IPVA e multas entrando no demonstrativo,
+  conforme "quem paga" do contrato (no lucro, antes da divisão; a cargo do parceiro, saem inteiras da parte dele).
+- **Rescisão como fluxo do sistema:** encerrar/transferir locações, acerto final, transferência do veículo (paga pela
+  empresa no investimento), titularidade nova na ficha, termo de rescisão para assinatura.
+- **NF da administração** (a taxa); investimento não gera NF.
+- **Fora do código:** contador (como registrar veículos pagos pelo investidor no nome da empresa; natureza do repasse),
+  advogado (revisar o texto-base do contrato), e as perguntas em aberto do doc "Proposta: área do parceiro" (rescisão com
+  locação ativa, perda total, valor da garantia, despesas no lucro e rateio do custo fixo).
+
 **Pequenos (pode fazer sem decisão)**
 - Rótulos de situação de contrato e de transferência estão em constantes locais (`constants/contract.ts`,
   `constants/transfer.ts`); se o `GET /labels` passar a ter esses mapas, mover para `LABEL_MAPS`.
