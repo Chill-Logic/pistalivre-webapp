@@ -14,6 +14,11 @@ curtas entre ferramentas e nos relatórios de subagentes.
   emitidas é só leitura.
 - "Fornecedores" agora é **"Custos fixos"** na interface (rota `/gestao/custos-fixos`, a antiga redireciona); código
   e API seguem `supplier`.
+- **PWA (2026-11-09):** cada domínio instala com o nome da área (`constants/pwa`, `helpers/pwa-manifest`, manifests
+  gerados no `vite.config`). Toda chamada leva `X-Client-Mode: pwa|browser`; o backend grava primeiro/último uso,
+  clique em "Instalar" e "Agora não" (`GET /auth/me` → `user.pwa`). Convite no celular para quem nunca usou nem
+  baixou ("Agora não" = 7 dias); "Abrir no app" fixo no header para quem já usou/baixou; gestão mostra o uso no
+  cliente e no usuário e filtra clientes por `app=`. **Backend antes do front** (o CORS precisa do header novo).
 - **Integrações (Asaas, Inter, Clicksign) só admin**: agente vê só a situação (decisão do dono).
 
 ## O que está no ar
