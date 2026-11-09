@@ -5,12 +5,12 @@ import type {
   SupplierDetail,
   SupplierFilters,
   SupplierInput,
-  SupplierListItem,
+  SupplierListRow,
 } from "@/types/supplier";
 
 export const suppliersService = {
   async list(filters: SupplierFilters) {
-    const { data } = await http.get<Paginated<SupplierListItem>>(
+    const { data } = await http.get<Paginated<SupplierListRow>>(
       "/suppliers",
       { params: toQueryParams(filters) },
     );

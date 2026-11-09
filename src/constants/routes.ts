@@ -90,6 +90,7 @@ export const ROUTES = {
   debtDetail: `${GESTAO}/financeiro/debitos/:id`,
   debtEdit: `${GESTAO}/financeiro/debitos/:id/editar`,
   financeStatement: `${GESTAO}/financeiro/extrato`,
+  financeBills: `${GESTAO}/financeiro/contas`,
   portal: PORTAL || "/",
   portalLogin: `${PORTAL}/entrar`,
   portalRental: `${PORTAL}/locacoes/:id`,

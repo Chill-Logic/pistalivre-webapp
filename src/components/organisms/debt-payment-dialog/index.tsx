@@ -112,9 +112,12 @@ export function DebtPaymentDialog({
 export function DebtListPaymentDialog({
   debtId,
   trigger,
+  installment,
 }: {
   debtId: string;
   trigger: ReactNode;
+  /** Installment to start on (a row of the month's bills). */
+  installment?: number;
 }) {
   const add = useAddDebtPayment(debtId);
   const [open, setOpen] = useState(false);
@@ -132,6 +135,7 @@ export function DebtListPaymentDialog({
           <DebtPaymentLoader
             debtId={debtId}
             add={add}
+            installment={installment}
             onDone={() => setOpen(false)}
           />
         )}
@@ -143,15 +147,24 @@ export function DebtListPaymentDialog({
 function DebtPaymentLoader({
   debtId,
   add,
+  installment,
   onDone,
 }: {
   debtId: string;
   add: AddPayment;
+  installment?: number;
   onDone: () => void;
 }) {
   const debt = useDebt(debtId);
   if (debt.data) {
-    return <DebtPaymentForm debt={debt.data} add={add} onDone={onDone} />;
+    return (
+      <DebtPaymentForm
+        debt={debt.data}
+        add={add}
+        installment={installment}
+        onDone={onDone}
+      />
+    );
   }
   return (
     <>

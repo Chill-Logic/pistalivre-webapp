@@ -24,6 +24,7 @@ import {
   DebtEditPage,
   DebtNewPage,
   DocumentsPage,
+  FinanceBillsPage,
   FinanceDebtsPage,
   FinancePage,
   FinanceSectionPage,
@@ -236,6 +237,7 @@ const gestaoRoutes: RouteObject[] = [
           <FinanceSectionPage
             preload={[
               FinancePage.preload,
+              FinanceBillsPage.preload,
               FinanceDebtsPage.preload,
               FinanceStatementPage.preload,
             ]}
@@ -245,6 +247,7 @@ const gestaoRoutes: RouteObject[] = [
           { path: ROUTES.finance, element: <FinancePage /> },
           { path: ROUTES.financeStatement, element: <FinanceStatementPage /> },
           { path: ROUTES.financeDebts, element: <FinanceDebtsPage /> },
+          { path: ROUTES.financeBills, element: <FinanceBillsPage /> },
         ],
       },
       { path: ROUTES.debtNew, element: <DebtNewPage /> },

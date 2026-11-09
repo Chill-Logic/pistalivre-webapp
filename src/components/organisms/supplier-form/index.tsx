@@ -15,6 +15,7 @@ import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { SelectField } from "@/components/molecules/select-field";
 import {
+  NONE,
   SUPPLIER_FORM_FIELDS,
   supplierFormDefaults,
   supplierFormSchema,
@@ -27,6 +28,26 @@ import { applyApiErrors } from "@/helpers/form";
 import { useSaveSupplier } from "@/hooks/api/gestao/suppliers/useSaveSupplier";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { SupplierDetail } from "@/types/supplier";
+import { addMonths, currentMonth, formatMonth, monthsBetween } from "@/utils/month";
+
+const DUE_DAYS = [
+  { value: NONE, label: "Não sei" },
+  ...Array.from({ length: 31 }, (_, index) => ({
+    value: String(index + 1),
+    label: `Dia ${index + 1}`,
+  })),
+];
+
+/** Months to pick from, newest first, plus the "no value" entry. */
+function monthOptions(from: string, to: string, none: string, keep: string) {
+  const months = monthsBetween(from, to);
+  // A saved month outside the window still shows.
+  if (keep !== NONE && !months.includes(keep)) months.push(keep);
+  return [
+    { value: NONE, label: none },
+    ...months.map((month) => ({ value: month, label: formatMonth(month) })),
+  ];
+}
 
 type SupplierFormProps = {
   supplier?: SupplierDetail;
@@ -55,12 +76,19 @@ export function SupplierForm({
     defaultValues: supplierFormDefaults(supplier),
   });
   const isVehicle = watch("scope") === "VEHICLE";
-  // The API refuses links on a COMPANY supplier; leaving VEHICLE keeps them,
-  // but they stop showing (and counting) until it is switched back.
-  const dropsLinks =
-    supplier?.scope === "VEHICLE" &&
-    !isVehicle &&
-    supplier.vehicles.length > 0;
+  const now = currentMonth();
+  const startOptions = monthOptions(
+    addMonths(now, -36),
+    now,
+    "O mês do cadastro",
+    supplier?.startsOn ?? NONE,
+  );
+  const endOptions = monthOptions(
+    addMonths(now, -12),
+    addMonths(now, 36),
+    "Sem fim",
+    supplier?.endsOn ?? NONE,
+  );
 
   const onSubmit = handleSubmit((values) => {
     setFormError(null);
@@ -94,6 +122,8 @@ export function SupplierForm({
                     options={options(LABEL_MAPS.supplierScope)}
                     onChange={field.onChange}
                     error={errors.scope?.message}
+                    // Once it exists, its months are recorded against it.
+                    disabled={Boolean(supplier)}
                   />
                 )}
               />
@@ -104,10 +134,72 @@ export function SupplierForm({
                 name="monthlyAmount"
                 render={({ field }) => (
                   <MoneyField
-                    label={isVehicle ? "Valor base / mês" : "Valor / mês"}
+                    label={isVehicle ? "Valor padrão / mês" : "Valor / mês"}
                     value={field.value}
                     onChange={field.onChange}
                     error={errors.monthlyAmount?.message}
+                  />
+                )}
+              />
+            </Col>
+            {isVehicle && (
+              <Col md={6} lg={3}>
+                <Controller
+                  control={control}
+                  name="billing"
+                  render={({ field }) => (
+                    <SelectField
+                      label="Como é cobrado"
+                      value={field.value}
+                      options={options(LABEL_MAPS.supplierBilling)}
+                      onChange={field.onChange}
+                      error={errors.billing?.message}
+                    />
+                  )}
+                />
+              </Col>
+            )}
+            <Col md={6} lg={3}>
+              <Controller
+                control={control}
+                name="dueDay"
+                render={({ field }) => (
+                  <SelectField
+                    label="Vence todo"
+                    value={field.value}
+                    options={DUE_DAYS}
+                    onChange={field.onChange}
+                    error={errors.dueDay?.message}
+                  />
+                )}
+              />
+            </Col>
+            <Col md={6} lg={3}>
+              <Controller
+                control={control}
+                name="startsOn"
+                render={({ field }) => (
+                  <SelectField
+                    label="Desde"
+                    value={field.value}
+                    options={startOptions}
+                    onChange={field.onChange}
+                    error={errors.startsOn?.message}
+                  />
+                )}
+              />
+            </Col>
+            <Col md={6} lg={3}>
+              <Controller
+                control={control}
+                name="endsOn"
+                render={({ field }) => (
+                  <SelectField
+                    label="Vale até"
+                    value={field.value}
+                    options={endOptions}
+                    onChange={field.onChange}
+                    error={errors.endsOn?.message}
                   />
                 )}
               />
@@ -128,18 +220,13 @@ export function SupplierForm({
             </Col>
           </Row>
 
-          {isVehicle && (
-            <Alert variant="info" role="note">
-              No escopo Veículo, este é o valor sugerido ao vincular um veículo.
-              O que conta na projeção é o valor de cada veículo vinculado.
-            </Alert>
-          )}
-          {dropsLinks && (
-            <Alert variant="warning" role="note">
-              Este custo fixo tem veículos vinculados. No escopo Empresa eles
-              deixam de aparecer e de contar até ele voltar a ser de Veículo.
-            </Alert>
-          )}
+          <Alert variant="info" role="note">
+            {isVehicle
+              ? "Por veículo, o valor acima é o padrão para novos veículos: o que conta é o valor de cada veículo vinculado. "
+              : ""}
+            Desde o mês em “Desde”, o custo aparece todo mês em Financeiro ›
+            Contas do mês para registrar o pagamento.
+          </Alert>
           {formError && <Alert>{formError}</Alert>}
 
           <Box className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -164,7 +251,7 @@ export function SupplierFormSkeleton() {
     <Card>
       <CardContent className="space-y-6 pt-4 md:pt-6">
         <Row className="gap-y-4">
-          {([6, 3, 3] as const).map((lg, index) => (
+          {([6, 3, 3, 3, 3, 3, 3] as const).map((lg, index) => (
             <Col key={index} md={6} lg={lg} className="space-y-2">
               <Skeleton shape="text" className="w-20 text-sm" />
               <Skeleton className="h-11 md:h-9" />

@@ -9,6 +9,7 @@ import { LABEL_MAPS } from "@/constants/label-maps";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { SupplierDetail } from "@/types/supplier";
 import { formatCurrency, formatDateTime } from "@/utils/format";
+import { formatMonth } from "@/utils/month";
 
 export function SupplierSummary({ supplier }: { supplier: SupplierDetail }) {
   const { label } = useLabels();
@@ -32,15 +33,27 @@ export function SupplierSummary({ supplier }: { supplier: SupplierDetail }) {
           <InfoItem
             span={6}
             md={4}
-            label={isVehicle ? "Valor base / mês" : "Valor / mês"}
+            label={isVehicle ? "Valor padrão / mês" : "Valor / mês"}
           >
             {formatCurrency(supplier.monthlyAmount)}
           </InfoItem>
           {isVehicle && (
-            <InfoItem md={4} label="Total dos veículos / mês">
+            <InfoItem span={6} md={4} label="Total dos veículos / mês">
               {formatCurrency(supplier.vehiclesMonthlyTotal)}
             </InfoItem>
           )}
+          {isVehicle && (
+            <InfoItem span={6} md={4} label="Como é cobrado">
+              {label(LABEL_MAPS.supplierBilling, supplier.billing)}
+            </InfoItem>
+          )}
+          <InfoItem span={6} md={4} label="Vence todo">
+            {supplier.dueDay ? `Dia ${supplier.dueDay}` : "Não informado"}
+          </InfoItem>
+          <InfoItem span={6} md={4} label="Vigência">
+            {supplier.startsOn ? `De ${formatMonth(supplier.startsOn)}` : "Desde o cadastro"}
+            {supplier.endsOn ? ` até ${formatMonth(supplier.endsOn)}` : ", sem fim"}
+          </InfoItem>
           <InfoItem md={4} label="Atualizado em">
             {formatDateTime(supplier.updatedAt)}
           </InfoItem>
@@ -58,7 +71,7 @@ export function SupplierSummarySkeleton() {
       </CardHeader>
       <CardContent>
         <Row className="gap-y-4">
-          {[0, 1, 2, 3].map((index) => (
+          {[0, 1, 2, 3, 4, 5].map((index) => (
             <Col key={index} span={6} md={4} className="space-y-2">
               <Skeleton shape="text" className="w-16 text-xs" />
               <Skeleton shape="text" className="w-24 text-sm" />

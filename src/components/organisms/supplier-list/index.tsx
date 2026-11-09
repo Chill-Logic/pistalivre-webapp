@@ -6,11 +6,11 @@ import {
   SupplierCard,
   SupplierCardSkeleton,
 } from "@/components/molecules/supplier-card";
-import type { SupplierListItem } from "@/types/supplier";
+import type { SupplierListRow } from "@/types/supplier";
 import { cn } from "@/utils/cn";
 
 type SupplierListProps = {
-  suppliers: SupplierListItem[] | undefined;
+  suppliers: SupplierListRow[] | undefined;
   isLoading: boolean;
   isRefreshing?: boolean;
 };

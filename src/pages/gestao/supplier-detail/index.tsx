@@ -11,6 +11,7 @@ import {
 } from "@/components/organisms/documents-card";
 import { QueryError } from "@/components/organisms/query-error";
 import { SupplierDeleteButton } from "@/components/organisms/supplier-delete-button";
+import { SupplierMonthsCard } from "@/components/organisms/supplier-months-card";
 import {
   SupplierSummary,
   SupplierSummarySkeleton,
@@ -51,6 +52,7 @@ export function SupplierDetailPage() {
         <SkeletonRegion label="Carregando custo fixo…">
           <SupplierDetailLayout
             summary={<SupplierSummarySkeleton />}
+            months={null}
             vehicles={null}
             documents={<DocumentsCardSkeleton />}
           />
@@ -72,6 +74,7 @@ export function SupplierDetailPage() {
       {supplier.data && (
         <SupplierDetailLayout
           summary={<SupplierSummary supplier={supplier.data} />}
+          months={<SupplierMonthsCard supplier={supplier.data} />}
           vehicles={
             supplier.data.scope === "VEHICLE" ? (
               <SupplierVehiclesCard

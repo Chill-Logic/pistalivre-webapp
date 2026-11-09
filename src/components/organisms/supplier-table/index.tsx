@@ -10,11 +10,11 @@ import {
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
 import { useLabels } from "@/hooks/ui/useLabels";
-import type { SupplierListItem } from "@/types/supplier";
+import type { SupplierListRow } from "@/types/supplier";
 import { formatCurrency } from "@/utils/format";
 
 type SupplierTableProps = {
-  suppliers: SupplierListItem[] | undefined;
+  suppliers: SupplierListRow[] | undefined;
   isLoading: boolean;
   isRefreshing?: boolean;
 };
@@ -27,7 +27,7 @@ export function SupplierTable({
 }: SupplierTableProps) {
   const { label } = useLabels();
 
-  const columns = useMemo<DataTableColumn<SupplierListItem>[]>(
+  const columns = useMemo<DataTableColumn<SupplierListRow>[]>(
     () => [
       {
         header: "Nome",
@@ -48,16 +48,11 @@ export function SupplierTable({
         header: "Valor / mês",
         cell: (supplier) => (
           <Text inline size={null} className="tabular-nums">
-            {formatCurrency(supplier.monthlyAmount)}
-            {supplier.scope === "VEHICLE" && (
-              <Text inline size="xs" tone="muted">
-                {" "}
-                (base)
-              </Text>
-            )}
+            {formatCurrency(supplier.currentMonthly)}
           </Text>
         ),
         className: "whitespace-nowrap",
+        align: "right",
         skeleton: "w-24",
       },
       {

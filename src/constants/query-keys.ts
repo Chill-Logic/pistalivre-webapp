@@ -107,6 +107,12 @@ export const queryKeys = {
     list: (filters: SupplierFilters) =>
       [...queryKeys.suppliers.all, "list", filters] as const,
     detail: (id: string) => [...queryKeys.suppliers.all, "detail", id] as const,
+    months: (id: string) => [...queryKeys.suppliers.all, "months", id] as const,
+  },
+  expenses: {
+    all: ["expenses"] as const,
+    month: (month: string) => [...queryKeys.expenses.all, "month", month] as const,
+    detail: (id: string) => [...queryKeys.expenses.all, "detail", id] as const,
   },
   crm: {
     all: ["crm"] as const,

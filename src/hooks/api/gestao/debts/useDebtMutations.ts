@@ -16,6 +16,8 @@ function useStoreDebt() {
       predicate: (query) => query.queryKey[1] !== "detail",
     });
     queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+    // Installments show in the month's bills.
+    queryClient.invalidateQueries({ queryKey: queryKeys.expenses.all });
   };
 }
 

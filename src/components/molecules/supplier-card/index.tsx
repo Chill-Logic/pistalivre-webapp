@@ -8,11 +8,11 @@ import { Text } from "@/components/atoms/text";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
 import { useLabels } from "@/hooks/ui/useLabels";
-import type { SupplierListItem } from "@/types/supplier";
+import type { SupplierListRow } from "@/types/supplier";
 import { formatCurrency } from "@/utils/format";
 import { pluralize } from "@/utils/text";
 
-export function SupplierCard({ supplier }: { supplier: SupplierListItem }) {
+export function SupplierCard({ supplier }: { supplier: SupplierListRow }) {
   const location = useLocation();
   const { label } = useLabels();
   const details = [
@@ -39,10 +39,10 @@ export function SupplierCard({ supplier }: { supplier: SupplierListItem }) {
             {details.join(" · ")}
           </Text>
           <Text weight="medium" className="tabular-nums">
-            {formatCurrency(supplier.monthlyAmount)}
+            {formatCurrency(supplier.currentMonthly)}
             <Text inline size="xs" tone="muted" weight="normal">
               {" "}
-              / mês{supplier.scope === "VEHICLE" && " (base)"}
+              / mês
             </Text>
           </Text>
         </Box>

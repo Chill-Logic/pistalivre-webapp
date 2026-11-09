@@ -63,7 +63,8 @@ export type DocumentOwnerType =
   | "LEAD"
   | "LEAD_ACTIVITY"
   | "PROPOSAL"
-  | "REIMBURSEMENT";
+  | "REIMBURSEMENT"
+  | "EXPENSE";
 
 export type DocumentOwner = { type: DocumentOwnerType; id: string };
 
