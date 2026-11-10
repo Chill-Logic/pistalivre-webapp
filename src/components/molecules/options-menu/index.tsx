@@ -43,7 +43,7 @@ export function OptionsMenu({ groups, label = "Opções" }: OptionsMenuProps) {
         {groups.map((group, index) => (
           <Box
             key={index}
-            className="flex flex-col border-t py-1 first:border-t-0 empty:hidden [&_a]:flex [&_a]:w-full [&_a]:items-center [&_a]:gap-2 [&_a]:rounded-sm [&_a]:px-3 [&_a]:py-2 [&_a]:text-sm hover:[&_a]:bg-muted [&_button]:w-full [&_button]:justify-start [&_button]:border-0 [&_button]:bg-transparent [&_button]:shadow-none hover:[&_button]:bg-muted"
+            className="flex flex-col border-t py-1 first:border-t-0 empty:hidden [&_a]:flex [&_a]:w-full [&_a]:items-center [&_a]:justify-start [&_a]:gap-2 [&_a]:rounded-sm [&_a]:px-3 [&_a]:py-2 [&_a]:text-sm hover:[&_a]:bg-muted [&_button]:w-full [&_button]:justify-start [&_button]:text-sm [&_button]:border-0 [&_button]:bg-transparent [&_button]:shadow-none hover:[&_button]:bg-muted"
           >
             {group}
           </Box>

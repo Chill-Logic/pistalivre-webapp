@@ -4,6 +4,7 @@ import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
+import { OptionsMenu } from "@/components/molecules/options-menu";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { RentalDeleteButton } from "@/components/organisms/rental-delete-button";
 import {
@@ -81,6 +82,64 @@ import { useRental } from "@/hooks/api/gestao/rentals/useRental";
 import { useBackToList } from "@/hooks/ui/useBackToList";
 import { useCopy } from "@/hooks/ui/useCopy";
 
+/**
+ * The rental's actions: loose buttons from the tablet up; on the phone, in the
+ * "Opções" menu (five buttons wrapped into three rows over the page).
+ */
+function RentalActions({
+  rentalId,
+  code,
+  isActive,
+  onCopyLink,
+}: {
+  rentalId: string;
+  code: string;
+  isActive: boolean;
+  onCopyLink: () => void;
+}) {
+  const main = (
+    <>
+      <Button variant="ghost" size="sm" onClick={onCopyLink}>
+        <Link2 />
+        Link do cliente
+      </Button>
+      <Button asChild variant="ghost" size="sm">
+        <Link to={routeTo.rentalStatement(rentalId)}>
+          <CalendarRange />
+          Extrato
+        </Link>
+      </Button>
+      <Button asChild variant="ghost" size="sm">
+        <Link to={routeTo.rentalCustomerView(rentalId)}>
+          <Eye />
+          Ver como cliente
+        </Link>
+      </Button>
+      <Button asChild variant="ghost" size="sm">
+        <Link to={routeTo.editRental(rentalId)}>
+          <Pencil />
+          Editar
+        </Link>
+      </Button>
+    </>
+  );
+  const remove = (
+    <RentalDeleteButton rentalId={rentalId} code={code} isActive={isActive} />
+  );
+
+  return (
+    <>
+      <Box className="md:hidden">
+        <OptionsMenu groups={[main, remove]} />
+      </Box>
+      <Box className="hidden flex-wrap justify-end gap-2 md:flex">
+        {main}
+        {remove}
+      </Box>
+    </>
+  );
+}
+
 export function RentalDetailPage() {
   const { id = "" } = useParams();
   const rental = useRental(id);
@@ -92,41 +151,14 @@ export function RentalDetailPage() {
       <Box className="flex items-center justify-between gap-2">
         <BackLink to={backTo} label="Locações" />
         {rental.data && (
-          <Box className="flex flex-wrap justify-end gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() =>
-                copy(portalRentalUrl(rental.data.id), "Link do cliente copiado")
-              }
-            >
-              <Link2 />
-              Link do cliente
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link to={routeTo.rentalStatement(rental.data.id)}>
-                <CalendarRange />
-                Extrato
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link to={routeTo.rentalCustomerView(rental.data.id)}>
-                <Eye />
-                Ver como cliente
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link to={routeTo.editRental(rental.data.id)}>
-                <Pencil />
-                Editar
-              </Link>
-            </Button>
-            <RentalDeleteButton
-              rentalId={rental.data.id}
-              code={rental.data.code}
-              isActive={rental.data.status === "ACTIVE"}
-            />
-          </Box>
+          <RentalActions
+            rentalId={rental.data.id}
+            code={rental.data.code}
+            isActive={rental.data.status === "ACTIVE"}
+            onCopyLink={() =>
+              copy(portalRentalUrl(rental.data.id), "Link do cliente copiado")
+            }
+          />
         )}
       </Box>
       {rental.isPending && (
