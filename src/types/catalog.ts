@@ -7,7 +7,8 @@ export type CatalogFleet = {
   vehicleType: string | null;
   units: number;
   available: number;
-  colors: { color: string; units: number }[];
+  /** Per colour: units and how many are available now. */
+  colors: { color: string; units: number; available: number }[];
 };
 
 /** A model + year as a product of the catalogue, with its picture. */
@@ -41,8 +42,9 @@ export type CatalogVariant = {
   imageSrc: string | null;
   imageSource: "upload" | "link" | null;
   imageUrl: string | null;
-  /** Units of the fleet in this colour (by name). */
+  /** Units of the fleet in this colour (by name), and how many are available. */
   units: number;
+  available: number;
 };
 
 export type CatalogVariantInput = {

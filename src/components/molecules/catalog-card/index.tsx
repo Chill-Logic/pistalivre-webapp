@@ -3,6 +3,7 @@ import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Card, CardContent } from "@/components/atoms/card";
+import { List, ListItem } from "@/components/atoms/list";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { VehicleShowcase } from "@/components/molecules/vehicle-showcase";
@@ -58,7 +59,7 @@ export function CatalogCard({ item, actions }: { item: CatalogItem; actions: Rea
                       role="radio"
                       aria-checked={active}
                       aria-label={entry.color}
-                      title={`${entry.color} · ${entry.units} na frota`}
+                      title={`Ver a foto: ${entry.color}`}
                       onClick={() => setPicked(entry.id)}
                       style={{ backgroundColor: entry.swatch ?? undefined }}
                       className={cn(
@@ -69,22 +70,37 @@ export function CatalogCard({ item, actions }: { item: CatalogItem; actions: Rea
                   );
                 })}
               </Box>
-              {variant && (
-                <Text size="xs">
-                  {variant.color}
-                  {variant.isDefault ? " (padrão)" : ""} · {variant.units} na frota
-                </Text>
-              )}
             </Box>
           )}
-          {item.variants.length === 0 && fleet && fleet.colors.length > 0 && (
-            <Box className="flex flex-wrap gap-1.5">
-              {fleet.colors.map((color) => (
-                <Badge key={color.color} variant="outline" className="font-normal">
-                  {color.color} · {color.units}
-                </Badge>
-              ))}
-            </Box>
+          {fleet && fleet.colors.length > 0 && (
+            <List className="space-y-1" aria-label="Disponibilidade por cor">
+              {fleet.colors.map((entry) => {
+                const swatch = item.variants.find(
+                  (v) => v.color.toLowerCase() === entry.color.toLowerCase(),
+                )?.swatch;
+                return (
+                  // The name stays whole; the counts go below when narrow.
+                  <ListItem key={entry.color} className="flex flex-wrap items-center gap-x-2">
+                    <Box className="flex items-center gap-2">
+                      <Box
+                        aria-hidden="true"
+                        className="size-2.5 shrink-0 rounded-full border"
+                        style={{ backgroundColor: swatch ?? "transparent" }}
+                      />
+                      <Text size="xs" weight="medium">
+                        {entry.color}
+                      </Text>
+                    </Box>
+                    <Text size="xs" tone="muted" className="ml-auto">
+                      {pluralize(entry.units, "unidade", "unidades")} ·{" "}
+                      <Text inline size="xs" tone={entry.available ? "success" : "muted"} weight={entry.available ? "medium" : "normal"}>
+                        {entry.available} {entry.available === 1 ? "disponível" : "disponíveis"}
+                      </Text>
+                    </Text>
+                  </ListItem>
+                );
+              })}
+            </List>
           )}
           <Box className="flex gap-2 pt-1">{actions}</Box>
         </Box>
