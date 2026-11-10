@@ -1,5 +1,10 @@
 import { http } from "@/services/http/client";
-import type { CatalogItem, CatalogItemInput, CatalogOverview } from "@/types/catalog";
+import type {
+  CatalogItem,
+  CatalogItemInput,
+  CatalogOverview,
+  CatalogVariantInput,
+} from "@/types/catalog";
 
 /** Vehicle catalogue (model + year with its picture). */
 export const catalogService = {
@@ -22,6 +27,31 @@ export const catalogService = {
     const form = new FormData();
     form.append("file", file);
     const { data } = await http.put<CatalogItem>(`/catalog/${id}/image`, form);
+    return data;
+  },
+  async addVariant(id: string, input: CatalogVariantInput) {
+    const { data } = await http.post<CatalogItem>(`/catalog/${id}/variants`, input);
+    return data;
+  },
+  async updateVariant(id: string, variantId: string, input: CatalogVariantInput) {
+    const { data } = await http.patch<CatalogItem>(`/catalog/${id}/variants/${variantId}`, input);
+    return data;
+  },
+  async removeVariant(id: string, variantId: string) {
+    const { data } = await http.delete<CatalogItem>(`/catalog/${id}/variants/${variantId}`);
+    return data;
+  },
+  async setDefaultVariant(id: string, variantId: string) {
+    const { data } = await http.post<CatalogItem>(`/catalog/${id}/variants/${variantId}/default`);
+    return data;
+  },
+  async uploadVariantImage(id: string, variantId: string, file: File) {
+    const form = new FormData();
+    form.append("file", file);
+    const { data } = await http.put<CatalogItem>(
+      `/catalog/${id}/variants/${variantId}/image`,
+      form,
+    );
     return data;
   },
   async removeImage(id: string) {

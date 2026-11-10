@@ -24,9 +24,31 @@ export type CatalogItem = {
   imageUrl: string | null;
   active: boolean;
   sortOrder: number;
+  /** The default colour's picture, else the item's, else any colour's. */
+  coverSrc: string | null;
+  variants: CatalogVariant[];
   fleet: CatalogFleet | null;
   createdAt: string;
   updatedAt: string;
+};
+
+/** The same model + year in one paint, with its own picture. */
+export type CatalogVariant = {
+  id: string;
+  color: string;
+  swatch: string | null;
+  isDefault: boolean;
+  imageSrc: string | null;
+  imageSource: "upload" | "link" | null;
+  imageUrl: string | null;
+  /** Units of the fleet in this colour (by name). */
+  units: number;
+};
+
+export type CatalogVariantInput = {
+  color: string;
+  swatch: string | null;
+  imageUrl: string | null;
 };
 
 export type CatalogOverview = {

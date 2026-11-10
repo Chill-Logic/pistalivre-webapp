@@ -62,7 +62,9 @@ curtas entre ferramentas e nos relatórios de subagentes.
   imagem (upload, PNG de preferência, ou link https), descrição, ativo; unidades e cores vêm da frota; "Na frota, fora do
   catálogo" adiciona com um toque. **O veículo nasce do catálogo**: o formulário escolhe "Modelo (do catálogo)" (marca,
   modelo e ano juntos) e o backend recusa modelo + ano fora dele. Marca/modelo novos nascem no catálogo. Landing pública
-  do catálogo: depois (a imagem já tem rota pública). **Backend antes do front.**
+  do catálogo: depois (a imagem já tem rota pública). **Cores:** cada item tem variantes (mesmo modelo + ano, outra
+  pintura) com foto, amostra (paleta ou #hex) e unidades da frota naquela cor; a cor padrão é a capa e no card as
+  amostras trocam a foto. **Backend antes do front.**
 - **Quero alugar e questionário no SPA (2026-11-09, local):** telas públicas do domínio do cliente, sem login:
   `app.cliente…/quero-alugar` (contato + "Responder agora"), `/questionario` (entrada por link de campanha) e
   `/questionario/:token` (perfil → planos → cadastro → WhatsApp). Atribuição first-touch no cookie `pl_ft` e last-touch

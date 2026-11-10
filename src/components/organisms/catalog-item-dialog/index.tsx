@@ -17,12 +17,14 @@ import { Image } from "@/components/atoms/image";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { CheckboxField } from "@/components/molecules/checkbox-field";
+import { CatalogVariantsEditor } from "@/components/organisms/catalog-variants-editor";
 import { FilePicker } from "@/components/molecules/file-picker";
 import { FormField } from "@/components/molecules/form-field";
 import { SegmentedField } from "@/components/molecules/segmented-field";
 import { CreatableCombobox } from "@/components/molecules/creatable-combobox";
 import { TextareaField } from "@/components/molecules/textarea-field";
 import { toApiError } from "@/helpers/api-error";
+import { useCatalog } from "@/hooks/api/gestao/catalog/useCatalog";
 import { useCatalogWrites } from "@/hooks/api/gestao/catalog/useCatalogWrites";
 import { useVehicleFormOptions } from "@/hooks/api/gestao/vehicles/useVehicleFormOptions";
 import { useObjectUrl } from "@/hooks/ui/useObjectUrl";
@@ -53,6 +55,11 @@ type CatalogItemDialogProps = {
  */
 export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogItemDialogProps) {
   const options = useVehicleFormOptions();
+  const catalog = useCatalog();
+  // A new item stays open after "Adicionar": the colours come next.
+  const [createdId, setCreatedId] = useState<string | null>(null);
+  const currentId = item?.id ?? createdId;
+  const current = catalog.data?.items.find((entry) => entry.id === currentId) ?? item ?? null;
   const { save, uploadImage, removeImage } = useCatalogWrites();
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -84,6 +91,7 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
     setErrors({});
   }
   if (!open && seeded) setSeeded(null);
+  if (!open && createdId) setCreatedId(null);
 
   // Brand and model by name: a new one is created with the item.
   const brandId = options.data?.brands.find(
@@ -93,7 +101,7 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
   const pending = save.isPending || uploadImage.isPending || removeImage.isPending;
   const shownImage =
     mode === "upload"
-      ? (preview ?? (item?.imageSource === "upload" ? item.imageSrc : null))
+      ? (preview ?? (current?.imageSource === "upload" ? current.imageSrc : null))
       : imageUrl.startsWith("https://")
         ? imageUrl
         : null;
@@ -108,7 +116,7 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
     if (Object.keys(next).length) return;
     try {
       const saved = await save.mutateAsync({
-        id: item?.id,
+        id: currentId ?? undefined,
         input: {
           modelId: null,
           brand: brand.trim(),
@@ -116,19 +124,25 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
           year: Number(year),
           description: description.trim() || null,
           // A link only counts when "Usar um link" is chosen.
-          imageUrl: mode === "link" ? imageUrl.trim() || null : (item?.imageUrl ?? null),
+          imageUrl: mode === "link" ? imageUrl.trim() || null : (current?.imageUrl ?? null),
           active,
-          sortOrder: item?.sortOrder ?? 0,
+          sortOrder: current?.sortOrder ?? 0,
         },
       });
       if (mode === "upload" && files[0]) {
         await uploadImage.mutateAsync({ id: saved.id, file: files[0] });
       }
       // The upload wins over a link: switching to a link drops the upload.
-      if (mode === "link" && item?.imageSource === "upload") {
+      if (mode === "link" && current?.imageSource === "upload") {
         await removeImage.mutateAsync(saved.id);
       }
-      toast.success(item ? "Catálogo atualizado" : "Adicionado ao catálogo");
+      setFiles([]);
+      if (!currentId) {
+        setCreatedId(saved.id);
+        toast.success("Adicionado ao catálogo. Agora cadastre as cores, se houver.");
+        return;
+      }
+      toast.success("Catálogo atualizado");
       onOpenChange(false);
     } catch (error) {
       const apiError = toApiError(error);
@@ -147,7 +161,7 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
-        <DialogTitle>{item ? "Editar item do catálogo" : "Novo item do catálogo"}</DialogTitle>
+        <DialogTitle>{current ? "Editar item do catálogo" : "Novo item do catálogo"}</DialogTitle>
         <DialogDescription>
           Um modelo e ano, como o cliente vê. As cores e as unidades vêm da frota.
         </DialogDescription>
@@ -204,7 +218,7 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
             disabled={pending}
           />
           <SegmentedField
-            label="Imagem"
+            label="Imagem principal"
             value={mode}
             options={IMAGE_MODES}
             onChange={setMode}
@@ -213,7 +227,7 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
           {mode === "upload" ? (
             <Box className="space-y-1">
               <FilePicker
-                label={item?.imageSource === "upload" ? "Trocar a imagem" : "Escolher a imagem"}
+                label={current?.imageSource === "upload" ? "Trocar a imagem" : "Escolher a imagem"}
                 accept={IMAGE_ACCEPT}
                 files={files}
                 onChange={setFiles}
@@ -221,7 +235,8 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
                 disabled={pending}
               />
               <Text size="xs" tone="muted">
-                PNG com fundo transparente fica melhor. Até 8 MB.
+                PNG com fundo transparente fica melhor. Até 8 MB. Com cores
+                cadastradas, a capa é a foto da cor padrão.
               </Text>
               {errors.file && <Text size="xs" tone="destructive">{errors.file}</Text>}
             </Box>
@@ -248,6 +263,13 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
             onChange={setActive}
             disabled={pending}
           />
+          {current ? (
+            <CatalogVariantsEditor item={current} />
+          ) : (
+            <Text size="xs" tone="muted">
+              Depois de adicionar, dá para cadastrar as cores, cada uma com a foto dela.
+            </Text>
+          )}
           {errors.form && <Alert>{errors.form}</Alert>}
           <DialogFooter>
             <DialogClose asChild>
@@ -257,7 +279,7 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
             </DialogClose>
             <Button type="submit" disabled={pending}>
               {pending && <Spinner className="text-primary-foreground" />}
-              {item ? "Salvar" : "Adicionar"}
+              {current ? "Salvar" : "Adicionar"}
             </Button>
           </DialogFooter>
         </Form>

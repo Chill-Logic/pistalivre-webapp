@@ -1,23 +1,30 @@
 import { CarFront } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
+import { Button } from "@/components/atoms/button";
 import { Card, CardContent } from "@/components/atoms/card";
 import { Image } from "@/components/atoms/image";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import type { CatalogItem } from "@/types/catalog";
+import { cn } from "@/utils/cn";
 import { pluralize } from "@/utils/text";
 
 /** One model + year of the catalogue: picture, text and what the fleet has. */
 export function CatalogCard({ item, actions }: { item: CatalogItem; actions: ReactNode }) {
   const fleet = item.fleet;
+  // A swatch shows that colour's picture; none picked = the cover.
+  const [picked, setPicked] = useState<string | null>(null);
+  const variant =
+    item.variants.find((v) => v.id === picked) ?? item.variants.find((v) => v.isDefault) ?? null;
+  const src = (picked ? variant?.imageSrc : null) ?? item.coverSrc;
   return (
     <Card className="flex h-full flex-col overflow-hidden">
       <Box className="flex aspect-[4/3] items-center justify-center bg-muted/40 p-4">
-        {item.imageSrc ? (
+        {src ? (
           <Image
-            src={item.imageSrc}
+            src={src}
             alt={`${item.brandName} ${item.modelName} ${item.year}`}
             loading="lazy"
             className="max-h-full max-w-full object-contain"
@@ -54,7 +61,40 @@ export function CatalogCard({ item, actions }: { item: CatalogItem; actions: Rea
               ? `${pluralize(fleet.units, "unidade", "unidades")} na frota · ${fleet.available} ${fleet.available === 1 ? "disponível" : "disponíveis"}`
               : "Nenhuma unidade na frota"}
           </Text>
-          {fleet && fleet.colors.length > 0 && (
+          {item.variants.length > 0 && (
+            <Box className="space-y-1">
+              <Box className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Cores">
+                {item.variants.map((entry) => {
+                  const active = entry.id === variant?.id;
+                  return (
+                    <Button
+                      key={entry.id}
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      role="radio"
+                      aria-checked={active}
+                      aria-label={entry.color}
+                      title={`${entry.color} · ${entry.units} na frota`}
+                      onClick={() => setPicked(entry.id)}
+                      style={{ backgroundColor: entry.swatch ?? undefined }}
+                      className={cn(
+                        "size-7 rounded-full",
+                        active && "ring-2 ring-primary ring-offset-2 ring-offset-background",
+                      )}
+                    />
+                  );
+                })}
+              </Box>
+              {variant && (
+                <Text size="xs">
+                  {variant.color}
+                  {variant.isDefault ? " (padrão)" : ""} · {variant.units} na frota
+                </Text>
+              )}
+            </Box>
+          )}
+          {item.variants.length === 0 && fleet && fleet.colors.length > 0 && (
             <Box className="flex flex-wrap gap-1.5">
               {fleet.colors.map((color) => (
                 <Badge key={color.color} variant="outline" className="font-normal">
