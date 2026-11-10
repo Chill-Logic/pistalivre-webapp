@@ -13,9 +13,8 @@ type VehicleShowcaseProps = {
 };
 
 /**
- * A vehicle picture on a soft stage: a short shadow follows the cut-out of a
- * transparent PNG (drop-shadow, not box-shadow) and a contact shadow under its
- * bottom edge grounds it.
+ * A vehicle picture on a soft stage, with a short shadow that follows the
+ * cut-out of a transparent PNG (drop-shadow, not box-shadow).
  */
 export function VehicleShowcase({ src, alt, className, caption }: VehicleShowcaseProps) {
   return (
@@ -26,20 +25,15 @@ export function VehicleShowcase({ src, alt, className, caption }: VehicleShowcas
       )}
     >
       {src ? (
-        // The picture sits on the box's bottom (the wheels of a cropped PNG) and
-        // the contact shadow right there: the vehicle stands instead of floating.
-        <Box className="relative flex h-[84%] w-[92%] items-end justify-center">
-          <Box
-            aria-hidden="true"
-            className="absolute -bottom-[2%] left-1/2 h-[8%] w-[62%] -translate-x-1/2 rounded-[50%] bg-black/30 blur-[6px] dark:bg-black/70"
-          />
-          <Image
-            src={src}
-            alt={alt}
-            loading="lazy"
-            className="relative max-h-full max-w-full object-contain drop-shadow-[0_2px_3px_rgba(0,0,0,0.22)]"
-          />
-        </Box>
+        // Only a shadow that follows the cut-out: it stays on the vehicle
+        // whatever empty space the file has (a floor shadow tied to the
+        // picture's edge floated under files with room below the wheels).
+        <Image
+          src={src}
+          alt={alt}
+          loading="lazy"
+          className="max-h-[86%] max-w-[92%] object-contain drop-shadow-[0_3px_4px_rgba(0,0,0,0.25)]"
+        />
       ) : (
         <Box className="flex flex-col items-center gap-1 text-muted-foreground">
           <CarFront className="size-10" aria-hidden />
