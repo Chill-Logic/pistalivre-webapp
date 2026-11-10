@@ -210,6 +210,14 @@ export type DueChangePreview = {
     uncharged: number;
   };
   /** Open rent charges past due: they stay as they are, late fee included. */
-  overdue: { id: string; dueDate: string; amount: number }[];
+  overdue: {
+    id: string;
+    dueDate: string;
+    amount: number;
+    /** Late fee and interest until today (by the server). */
+    surcharge: number;
+    /** What it costs to pay it today. */
+    total: number;
+  }[];
   autoBilling: boolean;
 };

@@ -33,6 +33,7 @@ import type {
   RentalBilling,
 } from "@/types/billing";
 import type { RatePeriod } from "@/types/rental";
+import { addDays, daysInclusive, weekdayOf } from "@/utils/date";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
 const PERIOD_OPTIONS: { value: RatePeriod; label: string }[] = [
@@ -218,7 +219,7 @@ export function DueChangeDialog({ billing }: { billing: RentalBilling }) {
           {ready && !previewError && (
             <DueChangeSummary
               preview={preview.data}
-              period={period}
+              input={input!}
               billing={billing}
             />
           )}
@@ -249,62 +250,111 @@ export function DueChangeDialog({ billing }: { billing: RentalBilling }) {
   );
 }
 
+/**
+ * The plan in the customer's words: the operator can send a print of this
+ * box. Team-only notes (auto-billing, uncharged cycles) stay outside it.
+ */
 function DueChangeSummary({
   preview,
-  period,
+  input,
   billing,
 }: {
   preview: DueChangePreview;
-  period: RatePeriod;
+  input: DueChangeInput;
   billing: RentalBilling;
 }) {
+  const { label } = useLabels();
   const { bridge, first, uncharged } = preview.plan;
   const { current, firstUncovered } = billing.rateSegments;
+  const changeStart = bridge?.start ?? first.start;
   // The old rule still runs for a while (whole weeks before a monthly one).
-  const keepsGoing = (bridge?.start ?? first.start) > (firstUncovered ?? "");
+  const keepsGoing = changeStart > (firstUncovered ?? "");
+  const day = (iso: string) =>
+    `${label(LABEL_MAPS.weekday, weekdayOf(iso)).toLowerCase()}, ${formatCalendarDate(iso)}`;
+  const rule =
+    input.ratePeriod === "WEEKLY"
+      ? // "todo sábado", "toda segunda" (Sunday is not an option).
+        `por semana, vencendo ${input.weekday === 6 ? "todo" : "toda"} ${label(LABEL_MAPS.weekday, input.weekday ?? 1).toLowerCase()}`
+      : input.ratePeriod === "MONTHLY"
+        ? `por mês, vencendo todo dia ${input.monthDay}`
+        : "por dia";
+
   return (
     <Box className="space-y-2" aria-live="polite">
-      <Box className="space-y-1 rounded-md border p-3">
+      <Box className="space-y-3 rounded-md border p-4">
+        <Text weight="semibold">Como fica o pagamento</Text>
         {keepsGoing && (
           <Text size="sm">
-            Até lá segue como hoje: {formatCurrency(current.rate)} por{" "}
-            {ratePeriodSuffix(current.ratePeriod)}.
+            Até {formatCalendarDate(addDays(changeStart, -1))}, nada muda:{" "}
+            {formatCurrency(current.rate)} por{" "}
+            {ratePeriodSuffix(current.ratePeriod)}, como hoje.
           </Text>
         )}
         {bridge && (
-          <Text size="sm">
-            Período quebrado: de {formatCalendarDate(bridge.start)} a{" "}
-            {formatCalendarDate(bridge.end)},{" "}
-            <Text inline weight="semibold">
-              {formatCurrency(bridge.amount)}
-            </Text>{" "}
-            (proporcional), vence em {formatCalendarDate(bridge.due)}.
-          </Text>
+          <Box>
+            <Text size="sm" weight="medium">
+              Ajuste da troca
+            </Text>
+            <Text size="sm">
+              {daysInclusive(bridge.start, bridge.end) === 1
+                ? `O dia ${formatCalendarDate(bridge.start)}`
+                : `Os ${daysInclusive(bridge.start, bridge.end)} dias de ${formatCalendarDate(bridge.start)} a ${formatCalendarDate(bridge.end)}`}
+              :{" "}
+              <Text inline weight="semibold">
+                {formatCurrency(bridge.amount)}
+              </Text>
+              , vence {day(bridge.due)}.
+            </Text>
+          </Box>
         )}
-        <Text size="sm">
-          {bridge ? "Depois" : `A partir de ${formatCalendarDate(first.start)}`}
-          : {formatCurrency(first.amount)} por {ratePeriodSuffix(period)}, a
-          primeira vence em{" "}
-          <Text inline weight="semibold">
-            {formatCalendarDate(first.due)}
+        <Box>
+          <Text size="sm" weight="medium">
+            {bridge ? "Depois" : `A partir de ${formatCalendarDate(first.start)}`}
           </Text>
-          {period !== "DAILY" &&
-            ` (de ${formatCalendarDate(first.start)} a ${formatCalendarDate(first.end)})`}
-          .
-        </Text>
-        <Text size="xs" tone="muted">
-          {preview.autoBilling
-            ? "A cobrança automática emite cada uma no tempo de sempre."
-            : "A cobrança automática está desligada: emita as cobranças à mão."}
-        </Text>
+          <Text size="sm">
+            <Text inline weight="semibold">
+              {formatCurrency(first.amount)}
+            </Text>{" "}
+            {rule}. A primeira vence {day(first.due)}.
+          </Text>
+        </Box>
+        {preview.overdue.length > 0 && (
+          <Box>
+            <Text size="sm" weight="medium">
+              Em aberto
+            </Text>
+            {preview.overdue.map((charge) => (
+              <Text key={charge.id} size="sm">
+                Vencida em {formatCalendarDate(charge.dueDate)}:{" "}
+                {charge.surcharge > 0 ? (
+                  <>
+                    {formatCurrency(charge.amount)} +{" "}
+                    {formatCurrency(charge.surcharge)} de multa e juros ={" "}
+                    <Text inline weight="semibold">
+                      {formatCurrency(charge.total)}
+                    </Text>{" "}
+                    hoje.
+                  </>
+                ) : (
+                  <Text inline weight="semibold">
+                    {formatCurrency(charge.amount)}
+                  </Text>
+                )}
+              </Text>
+            ))}
+            <Text size="xs" tone="muted">
+              {preview.overdue.length === 1
+                ? "Continua valendo como está; a troca não muda essa cobrança."
+                : "Continuam valendo como estão; a troca não muda essas cobranças."}
+            </Text>
+          </Box>
+        )}
       </Box>
-      {preview.overdue.map((charge) => (
-        <Alert key={charge.id} variant="warning">
-          A cobrança de {formatCurrency(charge.amount)} vencida em{" "}
-          {formatCalendarDate(charge.dueDate)} continua em aberto, com multa e
-          juros: a troca não mexe nela.
-        </Alert>
-      ))}
+      <Text size="xs" tone="muted">
+        {preview.autoBilling
+          ? "A cobrança automática emite cada uma no tempo de sempre."
+          : "A cobrança automática está desligada: emita as cobranças à mão."}
+      </Text>
       {uncharged > 0 && (
         <Alert variant="warning">
           {uncharged === 1

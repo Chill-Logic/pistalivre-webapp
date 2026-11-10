@@ -20,6 +20,17 @@ export function addDays(day: string, days: number) {
   return date.toISOString().slice(0, 10);
 }
 
+/** How many days from `start` to `end` (yyyy-mm-dd), both included. */
+export function daysInclusive(start: string, end: string) {
+  const ms = Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`);
+  return Math.round(ms / 86_400_000) + 1;
+}
+
+/** Day of the week of a yyyy-mm-dd (0 = Sunday). */
+export function weekdayOf(day: string) {
+  return new Date(`${day}T00:00:00Z`).getUTCDay();
+}
+
 /** First and last day (yyyy-mm-dd) of the month `offset` months from `day`. */
 export function monthRange(day: string, offset = 0) {
   const [year, month] = day.split("-").map(Number);
