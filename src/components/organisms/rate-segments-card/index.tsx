@@ -9,6 +9,7 @@ import { Text } from "@/components/atoms/text";
 import { CollapsibleCard } from "@/components/molecules/collapsible-card";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { QueryError } from "@/components/organisms/query-error";
+import { DueChangeDialog } from "@/components/organisms/due-change-dialog";
 import { RateSegmentDialog } from "@/components/organisms/rate-segment-dialog";
 import { ratePeriodSuffix } from "@/helpers/billing";
 import { useRemoveLastRateSegment } from "@/hooks/api/gestao/rentals/useBillingMutations";
@@ -44,7 +45,12 @@ export function RateSegmentsCard({ rentalId }: { rentalId: string }) {
       count={items.length}
       storageKey="rental-rate-segments"
       contentClassName="space-y-3"
-      actions={<RateSegmentDialog billing={view} />}
+      actions={
+        <Box className="flex flex-wrap gap-2">
+          <DueChangeDialog billing={view} />
+          <RateSegmentDialog billing={view} />
+        </Box>
+      }
     >
       <Text size="xs" tone="muted">
         Cada dia usa o valor que valia nele: mudar daqui para a frente não mexe
@@ -72,6 +78,7 @@ export function RateSegmentsCard({ rentalId }: { rentalId: string }) {
                 </Text>
                 <Text size="xs" tone="muted">
                   A partir de {formatCalendarDate(segment.from)}
+                  {segment.restart && " · troca de vencimento"}
                   {segment.debtShare > 0 &&
                     ` · ${formatCurrency(segment.debtShare)} por ${ratePeriodSuffix(segment.debtSharePeriod)} para débitos`}
                 </Text>

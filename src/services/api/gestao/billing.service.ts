@@ -3,6 +3,8 @@ import type {
   AutoBillingInput,
   AutoBillingResult,
   BillingPeriod,
+  DueChangeInput,
+  DueChangePreview,
   RateSegmentInput,
   RateSegmentPreview,
   RentalBilling,
@@ -51,6 +53,20 @@ export const billingService = {
       billing: RentalBilling;
       billed: number;
     }>(`/rentals/${rentalId}/rate-segments`, input, idempotent(key));
+    return data;
+  },
+  async previewDueChange(rentalId: string, input: DueChangeInput) {
+    const { data } = await http.get<DueChangePreview>(
+      `/rentals/${rentalId}/due-change/preview`,
+      { params: input },
+    );
+    return data;
+  },
+  async changeDue(rentalId: string, input: DueChangeInput, key: string) {
+    const { data } = await http.post<{
+      billing: RentalBilling;
+      billed: number;
+    }>(`/rentals/${rentalId}/due-change`, input, idempotent(key));
     return data;
   },
   async removeLastRateSegment(rentalId: string) {

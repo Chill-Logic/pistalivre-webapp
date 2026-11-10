@@ -5,6 +5,7 @@ import { rentalBillingKey } from "@/helpers/billing";
 import { billingService } from "@/services/api/gestao/billing.service";
 import type {
   AutoBillingInput,
+  DueChangeInput,
   RateSegmentInput,
   RentalBilling,
   RentCreditInput,
@@ -74,6 +75,22 @@ export function useAddRateSegment(rentalId: string) {
         billed > 0
           ? `Valores alterados. ${billed === 1 ? "1 cobrança de acerto saiu" : `${billed} cobranças de acerto saíram`} agora.`
           : "Valores alterados",
+      );
+    },
+  });
+}
+
+export function useChangeDue(rentalId: string) {
+  const apply = useApplyBilling(rentalId);
+  return useMutation({
+    mutationFn: ({ input, key }: { input: DueChangeInput; key: string }) =>
+      billingService.changeDue(rentalId, input, key),
+    onSuccess: ({ billing, billed }) => {
+      apply(billing);
+      toast.success(
+        billed > 0
+          ? `Vencimento trocado. ${billed === 1 ? "1 cobrança saiu" : `${billed} cobranças saíram`} agora.`
+          : "Vencimento trocado",
       );
     },
   });

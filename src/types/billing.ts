@@ -9,6 +9,8 @@ export type RateSegment = {
   /** Part of the rate that pays the customer's debts (0 = none). */
   debtShare: number;
   debtSharePeriod: RatePeriod;
+  /** Starts a new cycle without changing the period (a due-day change). */
+  restart?: boolean;
 };
 
 export type WaivedDay = {
@@ -96,6 +98,8 @@ export type RentalBilling = {
     firstUncovered: string | null;
     debtsSettled: boolean;
   };
+  /** "Trocar vencimento": the last day of the month it accepts. */
+  dueChange: { maxMonthDay: number };
   skipWeekdays: number[];
   waivedDays: WaivedDay[];
   rentCredits: RentCredit[];
@@ -173,4 +177,39 @@ export type RentReceiptInput = {
   amount: number;
   receivedAt: string;
   notes?: string;
+};
+
+/** Body of POST /rentals/:id/due-change (and the preview's query). */
+export type DueChangeInput = {
+  ratePeriod: RatePeriod;
+  /** Weekly: the weekday it falls due (0 = Sunday). */
+  weekday?: number;
+  /** Monthly: the day of the month it falls due. */
+  monthDay?: number;
+  rate: number;
+  /** yyyy-mm-dd: not before this day (absent = as soon as possible). */
+  notBefore?: string;
+};
+
+export type DueChangeCycle = {
+  start: string;
+  end: string;
+  due: string;
+  amount: number;
+};
+
+/** What a due change will do, by the server (GET .../due-change/preview). */
+export type DueChangePreview = {
+  plan: {
+    from: string;
+    /** The old cycle's piece until the change, charged on its own. */
+    bridge: DueChangeCycle | null;
+    /** The first cycle on the new due day. */
+    first: DueChangeCycle;
+    /** Whole old cycles already due with no charge (the change doesn't issue them). */
+    uncharged: number;
+  };
+  /** Open rent charges past due: they stay as they are, late fee included. */
+  overdue: { id: string; dueDate: string; amount: number }[];
+  autoBilling: boolean;
 };
