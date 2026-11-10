@@ -1,5 +1,5 @@
 import type { Realm } from "@/types/auth";
-import { realmOfHostname } from "@/utils/host-label";
+import { isLandingHostname, realmOfHostname } from "@/utils/host-label";
 
 /**
  * Public URLs (Portuguese, as in the product), split by area like the pages:
@@ -15,6 +15,10 @@ export const REALM_PREFIX: Record<Realm, string> = {
   parceiro: "/parceiro",
 };
 
+/** The public site's domain: only the published landing is served there. */
+export const IS_LANDING_HOST =
+  typeof window !== "undefined" && isLandingHostname(window.location.hostname);
+
 /** Area of the current domain (null = serves all). Fixed for the page load. */
 export const HOST_REALM =
   typeof window === "undefined"
@@ -27,6 +31,8 @@ const PARTNER = HOST_REALM === "parceiro" ? "" : REALM_PREFIX.parceiro;
 
 export const ROUTES = {
   root: "/",
+  /** The published landing: the root of its own domain, /site elsewhere. */
+  publicLanding: IS_LANDING_HOST ? "/" : "/site",
   login: `${GESTAO}/entrar`,
   dashboard: GESTAO || "/",
   vehicles: `${GESTAO}/veiculos`,
@@ -100,6 +106,9 @@ export const ROUTES = {
   partnerEdit: `${GESTAO}/parceiros/:id/editar`,
   partnerContract: `${GESTAO}/parceiros/contratos/:id`,
   partnerContractDocument: `${GESTAO}/parceiros/contratos/:id/documento`,
+  /** POC: landing editor (pistalivrelocacoes.com.br), draft only. */
+  landingEditor: `${GESTAO}/site`,
+  landingPreview: `${GESTAO}/site/previa`,
   finance: `${GESTAO}/financeiro`,
   financeDebts: `${GESTAO}/financeiro/debitos`,
   debtNew: `${GESTAO}/financeiro/debitos/nova`,

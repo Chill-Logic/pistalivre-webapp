@@ -7,10 +7,12 @@ export function sortPlans(plans: Plan[]) {
   );
 }
 
-/** "12 meses" / "1 mês" / "Sem prazo fixo". */
+/** The plan's term as the business says it: "Mensal", "Anual", "28 meses", "Sem prazo fixo". */
 export function durationLabel(months: number | null) {
   if (months == null) return "Sem prazo fixo";
-  return `${months} ${months === 1 ? "mês" : "meses"}`;
+  if (months === 1) return "Mensal";
+  if (months === 12) return "Anual";
+  return `${months} meses`;
 }
 
 /** The plan's conditions as short tags. */

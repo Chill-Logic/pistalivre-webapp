@@ -82,6 +82,9 @@ import {
   VehicleDetailPage,
   VehicleEditPage,
   VehicleCatalogPage,
+  LandingEditorPage,
+  PublicLandingPage,
+  LandingPreviewPage,
   VehicleNewPage,
   VehiclesPage,
   ProposalsPage,
@@ -107,6 +110,7 @@ import {
 } from "./pages";
 import {
   HOST_REALM,
+  IS_LANDING_HOST,
   LEGACY_ROUTES,
   REALM_PREFIX,
   ROUTES,
@@ -185,6 +189,8 @@ const gestaoRoutes: RouteObject[] = [
       { path: ROUTES.vehicles, element: <VehiclesPage /> },
       { path: ROUTES.vehicleNew, element: <VehicleNewPage /> },
       { path: ROUTES.vehicleCatalog, element: <VehicleCatalogPage /> },
+      { path: ROUTES.landingEditor, element: <LandingEditorPage /> },
+      { path: ROUTES.landingPreview, element: <LandingPreviewPage /> },
       { path: ROUTES.vehicleDetail, element: <VehicleDetailPage /> },
       { path: ROUTES.vehicleEdit, element: <VehicleEditPage /> },
       { path: ROUTES.inspectionNew, element: <InspectionNewPage /> },
@@ -370,6 +376,14 @@ const prefixRedirects = (["gestao", "cliente", "parceiro"] as Realm[]).flatMap(
  * area with its prefix, the root opening the staff area.
  */
 function routesForHost(realm: Realm | null): RouteObject[] {
+  // pistalivrelocacoes.com.br: only the published site (the backend owns the
+  // rest of that domain).
+  if (IS_LANDING_HOST) {
+    return [
+      { path: ROUTES.publicLanding, element: <PublicLandingPage /> },
+      { path: "*", element: <Navigate to={ROUTES.publicLanding} replace /> },
+    ];
+  }
   if (realm === "gestao") return [...gestaoRoutes, ...prefixRedirects];
   if (realm === "cliente") return [...portalRoutes, ...prefixRedirects];
   if (realm === "parceiro") return [...partnerRoutes, ...prefixRedirects];
@@ -377,6 +391,8 @@ function routesForHost(realm: Realm | null): RouteObject[] {
     ...gestaoRoutes,
     ...portalRoutes,
     ...partnerRoutes,
+    // Elsewhere (localhost, the Vercel address) the published site is at /site.
+    { path: ROUTES.publicLanding, element: <PublicLandingPage /> },
     {
       path: ROUTES.root,
       element: <Navigate to={ROUTES.dashboard} replace />,

@@ -96,7 +96,11 @@
  * darker, closed red (feedback-error) — never the brand red as a fill.
  */
 @layer base {
-  :root {
+  /* `.theme-light` re-declares the light palette on a subtree: screens that
+     only exist in light (the landing editor, whose library has no dark UI)
+     stay readable when the app is dark. */
+  :root,
+  .theme-light {
     --background: 60 9% 98%; /* surface-page  #FAFAF9 */
     --foreground: 240 6% 10%; /* text-primary  #18181B */
     --card: 0 0% 100%; /* surface-card  #FFFFFF */
@@ -273,5 +277,9 @@
   .scrollbar-quiet::-webkit-scrollbar-button {
     display: none;
   }
+}
+
+.theme-light {
+  color-scheme: light;
 }
 

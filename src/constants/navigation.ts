@@ -11,6 +11,7 @@ import {
   Car,
   BriefcaseBusiness,
   LayoutGrid,
+  PanelsTopLeft,
   ClipboardCheck,
   FileSignature,
   FileText,
@@ -114,6 +115,8 @@ export const SIDEBAR_NAV: NavEntry[] = [
       { label: "CRM", to: ROUTES.crm, icon: Megaphone },
       { label: "Propostas", to: ROUTES.proposals, icon: Handshake },
       { label: "Planos", to: ROUTES.plans, icon: Tags },
+      // The public site (pistalivrelocacoes.com.br), built from blocks.
+      { label: "Site", to: ROUTES.landingEditor, icon: PanelsTopLeft },
     ],
   },
   {

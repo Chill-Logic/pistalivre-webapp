@@ -1,5 +1,13 @@
 import { lazyPage } from "@/helpers/lazy-page";
 
+export const LandingEditorPage = lazyPage(
+  () => import("@/pages/gestao/landing-editor"),
+  "LandingEditorPage",
+);
+export const LandingPreviewPage = lazyPage(
+  () => import("@/pages/gestao/landing-preview"),
+  "LandingPreviewPage",
+);
 export const DashboardPage = lazyPage(
   () => import("@/pages/gestao/dashboard"),
   "DashboardPage",
@@ -47,6 +55,10 @@ export const InspectionDetailPage = lazyPage(
 export const InspectionNewPage = lazyPage(
   () => import("@/pages/gestao/inspection-new"),
   "InspectionNewPage",
+);
+export const PublicLandingPage = lazyPage(
+  () => import("@/pages/comum/public-landing"),
+  "PublicLandingPage",
 );
 export const CustomerLoginPage = lazyPage(
   () => import("@/pages/cliente/login"),

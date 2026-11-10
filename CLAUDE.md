@@ -68,7 +68,7 @@ cancelar, vincular) com escrita (B2/B4).
 
 Um projeto só na Vercel serve as duas áreas, cada uma no seu domínio, com prefixo de ambiente:
 **`app.gestao.pistalivrelocacoes.com.br`** (equipe), **`app.cliente.pistalivrelocacoes.com.br`** (portal) e
-**`app.parceiro.pistalivrelocacoes.com.br`** (área do parceiro: investidores e proprietários, só leitura); um dia,
+**`app.parceiro.pistalivrelocacoes.com.br`** (área do parceiro: investidores e proprietários, só leitura); e o **site** em `pistalivrelocacoes.com.br` (o Next entrega a raiz com o SPA no modo landing: só a página publicada, `IS_LANDING_HOST`); um dia,
 `dev.gestao`/`dev.cliente` funcionam igual, sem mudar código. O app procura o rótulo `gestao`/`cliente` no
 endereço (`helpers/host-realm`) e, ao trocar de área, mantém o prefixo (`app.cliente` → `app.gestao`): a raiz
 abre a área do domínio, e uma página da outra área vai para o domínio certo (`useHostRealmRedirect`, nos

@@ -58,6 +58,16 @@ curtas entre ferramentas e nos relatórios de subagentes.
   - **Volta real no dev (2026-11-09):** parceiro "Investidor Teste QA" (`investidor.qa.20261109@teste.dev` /
     `investidorqa123`), contrato PAR-RJUE36QC (investimento, 50% do faturamento, quinzenal) com a QAT9C11:
     v1 recusada, v2 retirada, v3 aceita, ativo, pedido de assinatura em rascunho (nada enviado ao Clicksign).
+- **Site pistalivrelocacoes.com.br (2026-11-10, local):** Comercial › **Site** (`/gestao/site`): editor de blocos com
+  a Puck (`@puckeditor/core` 0.23.0 fixo; `@tiptap/extension-text-align` e `@tiptap/html` fixos em 3.30.5, a versão
+  do resto do TipTap, senão o Vite não sobe). Blocos: Seção e Colunas (com blocos dentro), Destaque, Texto, Vantagem,
+  Catálogo e Planos (ao vivo, pelas rotas públicas), Chamada "Quero alugar" (formulário e questionário NA página,
+  `QuestionnaireFlow` compartilhado com o app.cliente) e Perguntas. Fundo/espaçamento por faixa (fundos escuros usam a
+  paleta escura); editor e site sempre no tema claro (`.theme-light`). Rascunho salvo no servidor, **Publicar** (com
+  confirmação), **Versões** (restaurar volta para o rascunho), prévia em `/gestao/site/previa`. No domínio
+  `pistalivrelocacoes.com.br` o app só mostra a página publicada (`IS_LANDING_HOST`, sem service worker); em outros
+  hosts ela fica em `/site`. O Next serve a raiz com título/descrição da página publicada e os arquivos do SPA por
+  rewrite (`SPA_LANDING_URL`). **Backend antes do front.**
 - **Catálogo de veículos (2026-11-09, local):** Veículos › Catálogo (`/gestao/veiculos/catalogo`): cada modelo + ano com
   imagem (upload, PNG de preferência, ou link https), descrição, ativo; unidades e cores vêm da frota; "Na frota, fora do
   catálogo" adiciona com um toque. **O veículo nasce do catálogo**: o formulário escolhe "Modelo (do catálogo)" (marca,

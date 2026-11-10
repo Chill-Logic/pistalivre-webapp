@@ -66,6 +66,17 @@ export const queryKeys = {
   catalog: {
     all: ["catalog"] as const,
   },
+  landing: {
+    all: ["landing"] as const,
+    page: () => [...queryKeys.landing.all, "page"] as const,
+    versions: () => [...queryKeys.landing.all, "versions"] as const,
+  },
+  publicSite: {
+    all: ["public-site"] as const,
+    landing: () => [...queryKeys.publicSite.all, "landing"] as const,
+    catalog: () => [...queryKeys.publicSite.all, "catalog"] as const,
+    plans: () => [...queryKeys.publicSite.all, "plans"] as const,
+  },
   publicLead: {
     all: ["public-lead"] as const,
     form: () => [...queryKeys.publicLead.all, "form"] as const,
