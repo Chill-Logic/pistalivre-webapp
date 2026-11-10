@@ -73,7 +73,9 @@ export type VehicleDocumentReview =
   | "renavam"
   | "chassis"
   | "model"
-  | "year";
+  | "year"
+  | "type"
+  | "category";
 
 /** Who is on the document: the company, a registered partner, or neither. */
 export type VehicleDocumentHolder =
@@ -89,6 +91,9 @@ export type VehicleDocumentResult = {
     renavam: string;
     chassis: string;
     color: string;
+    /** Vehicle type and category of the system, when they matched. */
+    typeSlug: string;
+    categoryId: string | null;
     catalogItemId: string | null;
     brand: string;
     model: string;
@@ -99,6 +104,8 @@ export type VehicleDocumentResult = {
     brandModel: string;
     manufactureYear: number | null;
     modelYear: number | null;
+    /** ESPÉCIE / TIPO ("PASSAGEIRO MOTOCICLETA"). */
+    speciesType: string;
   };
   titleHolder: VehicleDocumentHolder | null;
   review: VehicleDocumentReview[];

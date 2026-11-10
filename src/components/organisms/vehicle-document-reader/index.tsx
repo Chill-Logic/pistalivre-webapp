@@ -71,8 +71,8 @@ export function VehicleDocumentReader({
         <Box className="min-w-0 space-y-0.5">
           <Text weight="semibold">Preencher pelo documento</Text>
           <Text size="xs" tone="muted">
-            Foto ou PDF do CRLV. A IA preenche placa, Renavam, chassi, cor,
-            modelo e titular; confira antes de salvar.
+            Foto ou PDF do CRLV. A IA preenche placa, tipo, categoria, modelo,
+            cor, chassi, Renavam e titular; confira antes de salvar.
           </Text>
         </Box>
       </Box>
@@ -119,7 +119,7 @@ export function VehicleDocumentReader({
               </List>
             </Box>
           ) : (
-            "Documento lido. Confira os campos e complete o tipo, a categoria e a tarifa."
+            "Documento lido. Confira os campos e complete a tarifa."
           )}
         </Alert>
       )}

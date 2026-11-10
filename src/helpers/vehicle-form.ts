@@ -72,8 +72,9 @@ export const DOCUMENT_REVIEW_HINTS = {
 
 /**
  * What the operator should look at after the CRLV was read: the model that
- * isn't in the catalogue, a year that differs, the holder who isn't the
- * company nor a partner. Empty = everything matched.
+ * isn't in the catalogue, a year that differs, a type or category (ESPÉCIE /
+ * TIPO) the system doesn't have, the holder who isn't the company nor a
+ * partner. Empty = everything matched.
  */
 export function documentReadNotes(result: VehicleDocumentResult): string[] {
   const notes: string[] = [];
@@ -90,6 +91,18 @@ export function documentReadNotes(result: VehicleDocumentResult): string[] {
   } else if (review.includes("year")) {
     notes.push(
       `O ano modelo no documento é ${document.modelYear}: confira o modelo escolhido.`,
+    );
+  }
+  const printedSpecies = document.speciesType
+    ? ` ("${document.speciesType}")`
+    : "";
+  if (review.includes("type")) {
+    notes.push(
+      `Não reconheci o tipo do documento${printedSpecies}: escolha o tipo e a categoria.`,
+    );
+  } else if (review.includes("category")) {
+    notes.push(
+      `Nenhuma categoria bate com a espécie do documento${printedSpecies}: escolha a categoria.`,
     );
   }
   for (const field of ["plate", "renavam", "chassis"] as const) {

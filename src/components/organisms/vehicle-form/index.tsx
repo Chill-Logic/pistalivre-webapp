@@ -135,6 +135,9 @@ export function VehicleForm({
     if (fields.renavam) fill("renavam", fields.renavam);
     if (fields.chassis) fill("chassis", fields.chassis);
     if (fields.color) fill("color", fields.color);
+    // The type first: it narrows the categories.
+    if (fields.typeSlug) fill("typeSlug", fields.typeSlug);
+    if (fields.categoryId) fill("categoryId", fields.categoryId);
     if (fields.catalogItemId) {
       fill("brand", fields.brand);
       fill("model", fields.model);
