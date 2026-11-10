@@ -119,7 +119,7 @@ export function VehicleDocumentReader({
               </List>
             </Box>
           ) : (
-            "Documento lido. Confira os campos e complete a tarifa."
+            "Documento lido. Confira os campos antes de salvar."
           )}
         </Alert>
       )}

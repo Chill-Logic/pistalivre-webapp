@@ -17,7 +17,6 @@ import { Skeleton } from "@/components/atoms/skeleton";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { FormField } from "@/components/molecules/form-field";
-import { MoneyField } from "@/components/molecules/money-field";
 import { SelectField } from "@/components/molecules/select-field";
 import { TextLink } from "@/components/molecules/text-link";
 import { VehicleDocumentReader } from "@/components/organisms/vehicle-document-reader";
@@ -31,7 +30,6 @@ import {
   type VehicleFormValues,
   type VehiclePartiesPrefill,
 } from "./schema";
-import { LABEL_MAPS } from "@/constants/label-maps";
 import { ROUTES } from "@/constants/routes";
 import { applyApiErrors } from "@/helpers/form";
 import {
@@ -41,7 +39,6 @@ import {
 } from "@/helpers/vehicle-form";
 import { useCatalog } from "@/hooks/api/gestao/catalog/useCatalog";
 import { useSaveVehicle } from "@/hooks/api/gestao/vehicles/useSaveVehicle";
-import { useLabels } from "@/hooks/ui/useLabels";
 import type {
   VehicleDetail,
   VehicleDocumentResult,
@@ -73,7 +70,6 @@ export function VehicleForm({
   prefill,
 }: VehicleFormProps) {
   const save = useSaveVehicle(vehicle?.id);
-  const { options: labelOptions } = useLabels();
   const [formError, setFormError] = useState<string | null>(null);
 
   const {
@@ -284,35 +280,6 @@ export function VehicleForm({
                 {...register("renavam")}
               />
             </Col>
-            <Col md={6} lg={4}>
-              <Controller
-                control={control}
-                name="rate"
-                render={({ field }) => (
-                  <MoneyField
-                    label="Valor da tarifa"
-                    value={field.value}
-                    onChange={field.onChange}
-                    error={errors.rate?.message}
-                  />
-                )}
-              />
-            </Col>
-            <Col md={6} lg={4}>
-              <Controller
-                control={control}
-                name="ratePeriod"
-                render={({ field }) => (
-                  <SelectField
-                    label="Período da tarifa"
-                    value={field.value}
-                    options={labelOptions(LABEL_MAPS.ratePeriod)}
-                    onChange={field.onChange}
-                    error={errors.ratePeriod?.message}
-                  />
-                )}
-              />
-            </Col>
           </Row>
 
           <Box className="space-y-4 border-t pt-6">
@@ -376,7 +343,7 @@ export function VehicleForm({
   );
 }
 
-const FORM_FIELDS = 11;
+const FORM_FIELDS = 9;
 
 export function VehicleFormSkeleton() {
   return (

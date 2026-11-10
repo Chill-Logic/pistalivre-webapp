@@ -1,4 +1,3 @@
-import type { RatePeriod } from "@/types/rental";
 import type { DocumentFile } from "@/types/document";
 
 export type VehicleStatus = "AVAILABLE" | "RENTED" | "MAINTENANCE" | "INACTIVE";
@@ -42,9 +41,6 @@ export type Vehicle = {
 
 export type VehicleDetail = Vehicle & {
   documents: DocumentFile[];
-  /** Legacy tariff, still required by the vehicle form (price lives on Rental). */
-  rate: number;
-  ratePeriod: RatePeriod;
   /** Fixed costs ("Custos fixos", VEHICLE scope) linked to this vehicle. */
   suppliers?: VehicleSupplierLink[];
 };
@@ -121,8 +117,6 @@ export type VehicleInput = {
   color: string | null;
   chassis: string;
   renavam: string;
-  rate: number;
-  ratePeriod: RatePeriod;
   /** null = the company. */
   titleHolderPartnerId: string | null;
   /** null = the company. */

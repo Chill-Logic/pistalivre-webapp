@@ -5,7 +5,6 @@ const MIN_YEAR = 1900;
 const MAX_YEAR = new Date().getFullYear() + 1;
 /** Brazilian VIN: 17 chars, alphanumeric without I, O and Q. */
 const CHASSIS = /^[A-HJ-NPR-Z0-9]{17}$/;
-const RATE_PERIODS = ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"] as const;
 
 /** null = the company; "" = "Parceiro" chosen but no partner picked yet. */
 const partyField = z
@@ -46,16 +45,6 @@ export const vehicleFormSchema = z.object({
       (value) => /^\d{9,11}$/.test(value),
       "Renavam inválido (9 a 11 dígitos)",
     ),
-  rate: z
-    .number({ invalid_type_error: "Informe o valor" })
-    .nullable()
-    .refine(
-      (value) => value !== null && value > 0,
-      "Valor deve ser maior que zero",
-    ),
-  ratePeriod: z.enum(RATE_PERIODS, {
-    errorMap: () => ({ message: "Período inválido" }),
-  }),
   titleHolderPartnerId: partyField,
   ownerPartnerId: partyField,
 });
@@ -73,8 +62,6 @@ export const VEHICLE_FORM_FIELDS = [
   "color",
   "chassis",
   "renavam",
-  "rate",
-  "ratePeriod",
   "titleHolderPartnerId",
   "ownerPartnerId",
 ] as const;
@@ -100,8 +87,6 @@ export function vehicleFormDefaults(
     color: vehicle?.color ?? "",
     chassis: vehicle?.chassis ?? "",
     renavam: vehicle?.renavam ?? "",
-    rate: vehicle?.rate ?? null,
-    ratePeriod: vehicle?.ratePeriod ?? "DAILY",
     titleHolderPartnerId: vehicle
       ? (vehicle.titleHolder?.partnerId ?? null)
       : (prefill?.titleHolderPartnerId ?? null),
@@ -121,8 +106,6 @@ export function toVehicleInput(values: VehicleFormValues): VehicleInput {
     color: values.color || null,
     chassis: values.chassis,
     renavam: values.renavam,
-    rate: values.rate ?? 0,
-    ratePeriod: values.ratePeriod,
     titleHolderPartnerId: values.titleHolderPartnerId || null,
     ownerPartnerId: values.ownerPartnerId || null,
   };
