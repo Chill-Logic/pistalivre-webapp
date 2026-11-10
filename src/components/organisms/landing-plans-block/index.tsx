@@ -36,11 +36,17 @@ export function LandingPlansBlock({ title }: LandingPlansProps) {
                 <Col key={plan.id} md={4}>
                   <Card className="h-full">
                     <CardContent className="space-y-3 pt-6 md:pt-6">
-                      <Box className="flex items-start justify-between gap-2">
-                        <Text size="base" weight="semibold">
+                      {/* The badge never breaks: without room it moves, whole, to
+                          the line below the plan's name. */}
+                      <Box className="flex flex-wrap items-start justify-between gap-2">
+                        <Text size="base" weight="semibold" className="min-w-[8rem] flex-1">
                           {plan.name}
                         </Text>
-                        {plan.ownershipAtEnd && <Badge variant="success">Ao final é seu</Badge>}
+                        {plan.ownershipAtEnd && (
+                          <Badge variant="success" className="shrink-0 whitespace-nowrap">
+                            Ao final é seu
+                          </Badge>
+                        )}
                       </Box>
                       <Text size="2xl" weight="bold" tone="primary">
                         {formatCurrency(plan.rate)} /{ratePeriodSuffix(plan.ratePeriod)}
