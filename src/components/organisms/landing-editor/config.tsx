@@ -105,8 +105,18 @@ export const landingConfig: Config<LandingBlocks> = {
     },
     Planos: {
       label: "Planos",
-      fields: { title: { type: "text", label: "Título" } },
-      defaultProps: { title: "Escolha o seu plano" },
+      fields: {
+        title: { type: "text", label: "Título" },
+        showHighlights: {
+          type: "radio",
+          label: "O que está incluso",
+          options: [
+            { label: "Esconder", value: false },
+            { label: "Mostrar", value: true },
+          ],
+        },
+      },
+      defaultProps: { title: "Escolha o seu plano", showHighlights: false },
       render: (props) => <LandingPlansBlock {...props} />,
     },
     QueroAlugar: {

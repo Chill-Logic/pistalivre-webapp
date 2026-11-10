@@ -12,10 +12,14 @@ import { durationLabel, sortPlans } from "@/helpers/plan";
 import { usePlans } from "@/hooks/api/gestao/plans/usePlans";
 import { formatCurrency } from "@/utils/format";
 
-export type LandingPlansProps = { title: string };
+export type LandingPlansProps = {
+  title: string;
+  /** What each plan includes (off while every plan includes the same). */
+  showHighlights?: boolean;
+};
 
 /** The active plans, live: changing a price in Planos changes it here. */
-export function LandingPlansBlock({ title }: LandingPlansProps) {
+export function LandingPlansBlock({ title, showHighlights = false }: LandingPlansProps) {
   const plans = usePlans();
   const items = sortPlans(plans.data ?? []).filter((plan) => plan.active);
 
@@ -54,7 +58,7 @@ export function LandingPlansBlock({ title }: LandingPlansProps) {
                       <Text size="xs" tone="muted">
                         {durationLabel(plan.durationMonths)}
                       </Text>
-                      {plan.highlights.length > 0 && (
+                      {showHighlights && plan.highlights.length > 0 && (
                         <List className="space-y-1">
                           {plan.highlights.map((highlight) => (
                             <ListItem key={highlight} className="flex items-start gap-2">
