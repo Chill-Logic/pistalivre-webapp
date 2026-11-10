@@ -28,7 +28,8 @@ export function LandingEditorPage() {
   };
 
   return (
-    <Box className="-m-4 h-[calc(100dvh-3.5rem)] overflow-hidden md:-m-6">
+    // The editor's library only has a light UI: keep the light palette here.
+    <Box className="theme-light -m-4 h-[calc(100dvh-3.5rem)] overflow-hidden bg-background text-foreground md:-m-6">
       <Puck
         config={landingConfig}
         data={draft}

@@ -1,4 +1,5 @@
 import type { Config, Data } from "@puckeditor/core";
+import { Box } from "@/components/atoms/box";
 import { LandingCatalogBlock, type LandingCatalogProps } from "@/components/organisms/landing-catalog-block";
 import { LandingFaqBlock, type LandingFaqProps } from "@/components/organisms/landing-faq-block";
 import { LandingHeroBlock, type LandingHeroProps } from "@/components/organisms/landing-hero-block";
@@ -21,6 +22,10 @@ export const landingConfig: Config<LandingBlocks> = {
   root: {
     fields: { title: { type: "text", label: "Título da página (aba do navegador)" } },
     defaultProps: { title: "Pista Livre · aluguel de veículos" },
+    // The landing is light-only (the brand page), whatever the app's theme.
+    render: ({ children }) => (
+      <Box className="theme-light min-h-full bg-background text-foreground">{children}</Box>
+    ),
   },
   categories: {
     conteudo: { title: "Conteúdo", components: ["Destaque", "QueroAlugar", "Perguntas"] },
