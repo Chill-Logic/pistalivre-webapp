@@ -209,7 +209,9 @@ function DebtPaymentForm({
   const [paidAt, setPaidAt] = useState(() =>
     suggestedDay(initial, todayInBrasilia()),
   );
-  const [surcharge, setSurcharge] = useState<number | null>(null);
+  // Typed by hand; until then the surcharge follows the amount (below).
+  const [typedSurcharge, setTypedSurcharge] = useState<number | null>(null);
+  const [surchargeTyped, setSurchargeTyped] = useState(false);
   const [discount, setDiscount] = useState<number | null>(null);
   const [barcode, setBarcode] = useState("");
   const [notes, setNotes] = useState("");
@@ -218,6 +220,20 @@ function DebtPaymentForm({
 
   const current =
     openInstallments.find((item) => String(item.number) === selected) ?? null;
+
+  // Paying an installment with more than it asks for is the late fee: the
+  // excess fills "Multa/juros pagos" (it does not amortize). Splitting the
+  // typed amount, in cents; the balance itself is still the server's.
+  const excess =
+    current && amount
+      ? Math.max(0, Math.round(amount * 100) - Math.round(current.due * 100)) /
+        100
+      : 0;
+  const surcharge = surchargeTyped
+    ? typedSurcharge
+    : excess > 0
+      ? excess
+      : null;
 
   // "Fica faltando X": the balance after this payment, by the server.
   const preview = useDebtPaymentPreview(
@@ -238,6 +254,8 @@ function DebtPaymentForm({
       openInstallments.find((item) => String(item.number) === value) ?? null;
     setAmount(next ? next.due : debt.balance.outstanding);
     setPaidAt(suggestedDay(next, todayInBrasilia()));
+    setSurchargeTyped(false);
+    setTypedSurcharge(null);
     setErrors({});
   };
 
@@ -383,7 +401,7 @@ function DebtPaymentForm({
                   O boleto é de {formatCurrency(boleto.amount)} e a parcela é de{" "}
                   {formatCurrency(current.due)}
                   {boleto.amount > current.due
-                    ? ". A diferença costuma ser multa/juros do atraso: informe-a em “Multa/juros pagos”."
+                    ? ". A diferença entrou em “Multa/juros pagos”: confira."
                     : ". Confira se é o boleto certo."}
                 </Alert>
               )}
@@ -415,7 +433,11 @@ function DebtPaymentForm({
             <MoneyField
               label="Multa/juros pagos"
               value={surcharge}
-              onChange={setSurcharge}
+              onChange={(value) => {
+                setTypedSurcharge(value);
+                setSurchargeTyped(true);
+                setErrors({});
+              }}
               error={errors.surcharge}
             />
           </Col>
@@ -427,6 +449,14 @@ function DebtPaymentForm({
               error={errors.discount}
             />
           </Col>
+          {!surchargeTyped && excess > 0 && current && (
+            <Col>
+              <Text size="xs" tone="muted">
+                {formatCurrency(excess)} acima da parcela (
+                {formatCurrency(current.due)}) entraram como multa/juros.
+              </Text>
+            </Col>
+          )}
           {after && (
             <Col aria-live="polite">
               {after.exceeds ? (
