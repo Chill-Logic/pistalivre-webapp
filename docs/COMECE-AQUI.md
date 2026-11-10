@@ -68,6 +68,12 @@ curtas entre ferramentas e nos relatórios de subagentes.
   `pistalivrelocacoes.com.br` o app só mostra a página publicada (`IS_LANDING_HOST`, sem service worker); em outros
   hosts ela fica em `/site`. O Next serve a raiz com título/descrição da página publicada e os arquivos do SPA por
   rewrite (`SPA_LANDING_URL`). **Backend antes do front.**
+- **Preencher pelo documento (no ar desde 2026-11-10 11:40: backend `1975b1f`, webapp `a759283`):** no veículo novo,
+  "Tirar foto" (câmera, só no celular) ou "Escolher arquivo" (galeria/PDF) do CRLV. `POST /vehicles/read-document`
+  lê com o `claude-haiku-5-5` (effort low, saída estruturada, ~US$ 0,001 por foto) usando a chave da integração; só
+  com a IA na **Anthropic** (`form-options.readDocument`). Confere placa e os dígitos do Renavam e do chassi
+  ("Confira…" no campo), casa o modelo com o catálogo e acha o titular (empresa, parceiro ou aviso). Não grava nada.
+  O QR do CRLV-e **não serve**: é binário assinado (ECDSA), feito para o app Vio. Primeiro teste real foi em prod.
 - **Catálogo de veículos (2026-11-09, local):** Veículos › Catálogo (`/gestao/veiculos/catalogo`): cada modelo + ano com
   imagem (upload, PNG de preferência, ou link https), descrição, ativo; unidades e cores vêm da frota; "Na frota, fora do
   catálogo" adiciona com um toque. **O veículo nasce do catálogo**: o formulário escolhe "Modelo (do catálogo)" (marca,
