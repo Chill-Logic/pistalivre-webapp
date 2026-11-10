@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, matchPath, useLocation } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Text } from "@/components/atoms/text";
 import { TooltipWhenCollapsed } from "@/components/molecules/tooltip-when-collapsed";
@@ -23,10 +23,10 @@ export function NavLink({
   onNavigate,
 }: NavLinkProps) {
   const Icon = item.icon;
-  const isActive = useIsActiveRoute(
-    item.to,
-    item.exact || item.to === ROUTES.dashboard,
-  );
+  const { pathname } = useLocation();
+  const isActive =
+    useIsActiveRoute(item.to, item.exact || item.to === ROUTES.dashboard) &&
+    !(item.except ?? []).some((path) => matchPath({ path, end: false }, pathname));
 
   return (
     <TooltipWhenCollapsed collapsed={collapsed} label={item.label}>

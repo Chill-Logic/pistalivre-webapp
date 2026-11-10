@@ -21,7 +21,7 @@ export function CatalogCard({ item, actions }: { item: CatalogItem; actions: Rea
   return (
     <Card className="flex h-full flex-col overflow-hidden">
       <VehicleShowcase src={src} alt={`${item.brandName} ${item.modelName} ${item.year}${variant ? ` ${variant.color}` : ""}`} />
-      <CardContent className="flex flex-1 flex-col gap-3 pt-4">
+      <CardContent className="flex flex-1 flex-col gap-3 pt-4 md:pt-5">
         <Box className="flex items-start justify-between gap-2">
           <Box className="min-w-0">
             <Text size="xs" tone="muted">
@@ -97,7 +97,7 @@ export function CatalogCardSkeleton() {
   return (
     <Card className="overflow-hidden">
       <Skeleton className="aspect-[4/3] rounded-none" />
-      <CardContent className="space-y-3 pt-4">
+      <CardContent className="space-y-3 pt-4 md:pt-5">
         <Skeleton shape="text" className="w-20 text-xs" />
         <Skeleton shape="text" className="w-40 text-base" />
         <Skeleton shape="text" className="w-48 text-xs" />

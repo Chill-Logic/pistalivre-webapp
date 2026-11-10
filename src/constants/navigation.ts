@@ -2,6 +2,7 @@ import {
   Building2,
   Car,
   BriefcaseBusiness,
+  LayoutGrid,
   ClipboardCheck,
   FileSignature,
   FileText,
@@ -32,6 +33,8 @@ export type NavItem = {
   adminOnly?: boolean;
   /** Active only on this exact path (an area's home). */
   exact?: boolean;
+  /** Paths under `to` that belong to another item (not active here). */
+  except?: string[];
 };
 
 const DASHBOARD: NavItem = {
@@ -39,7 +42,17 @@ const DASHBOARD: NavItem = {
   to: ROUTES.dashboard,
   icon: LayoutDashboard,
 };
-const VEHICLES: NavItem = { label: "Veículos", to: ROUTES.vehicles, icon: Car };
+const VEHICLES: NavItem = {
+  label: "Veículos",
+  to: ROUTES.vehicles,
+  icon: Car,
+  except: [ROUTES.vehicleCatalog],
+};
+const CATALOG: NavItem = {
+  label: "Catálogo",
+  to: ROUTES.vehicleCatalog,
+  icon: LayoutGrid,
+};
 const CUSTOMERS: NavItem = {
   label: "Clientes",
   to: ROUTES.customers,
@@ -66,6 +79,7 @@ export const MAIN_NAV: NavItem[] = [DASHBOARD, VEHICLES, RENTALS, CUSTOMERS];
 export const SIDEBAR_NAV: NavItem[] = [
   DASHBOARD,
   VEHICLES,
+  CATALOG,
   CUSTOMERS,
   { label: "CRM", to: ROUTES.crm, icon: Megaphone },
   { label: "Planos", to: ROUTES.plans, icon: Tags },

@@ -6,14 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/car
 import { Col, Row } from "@/components/atoms/grid";
 import { List, ListItem } from "@/components/atoms/list";
 import { Text } from "@/components/atoms/text";
-import { BackLink } from "@/components/molecules/back-link";
 import { CatalogCard, CatalogCardSkeleton } from "@/components/molecules/catalog-card";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { PageHeader } from "@/components/molecules/page-header";
 import { CatalogItemDialog } from "@/components/organisms/catalog-item-dialog";
 import { QueryBoundary } from "@/components/organisms/query-boundary";
-import { ROUTES } from "@/constants/routes";
 import { useCatalog } from "@/hooks/api/gestao/catalog/useCatalog";
 import { useCatalogWrites } from "@/hooks/api/gestao/catalog/useCatalogWrites";
 import type { CatalogFleet, CatalogItem } from "@/types/catalog";
@@ -67,7 +65,6 @@ export function VehicleCatalogPage() {
 
   return (
     <Box className="space-y-6">
-      <BackLink to={ROUTES.vehicles} label="Veículos" />
       <PageHeader
         title="Catálogo"
         actions={

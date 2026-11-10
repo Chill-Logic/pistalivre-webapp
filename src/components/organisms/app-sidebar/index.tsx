@@ -28,7 +28,7 @@ export function AppSidebar() {
       <Box className="flex h-14 shrink-0 items-center justify-center px-3">
         <Logo size={isCollapsed ? "sm" : "xl"} />
       </Box>
-      <Box className="flex-1 overflow-y-auto overflow-x-hidden p-3">
+      <Box className="scrollbar-quiet flex-1 overflow-y-auto overflow-x-hidden p-3">
         <SidebarNav items={navItems} collapsed={isCollapsed} />
       </Box>
       <SidebarCollapseToggle />

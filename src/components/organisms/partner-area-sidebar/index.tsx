@@ -33,7 +33,7 @@ export function PartnerAreaSidebar() {
           <Logo size={isCollapsed ? "sm" : "xl"} />
         </Link>
       </Box>
-      <Box className="flex-1 overflow-y-auto overflow-x-hidden p-3">
+      <Box className="scrollbar-quiet flex-1 overflow-y-auto overflow-x-hidden p-3">
         <SidebarNav items={PARTNER_NAV_ITEMS} collapsed={isCollapsed} />
       </Box>
       <SidebarCollapseToggle />
