@@ -61,7 +61,7 @@ export function SwatchPicker({ label, value, onChange, taken = [], error, disabl
               onClick={() => onChange(paint)}
               style={{ backgroundColor: paint.hex }}
               className={cn(
-                "size-8 rounded-full hover:opacity-90 disabled:opacity-30",
+                "h-8 w-8 rounded-full p-0 hover:opacity-90 disabled:opacity-30 md:h-8 md:w-8",
                 active && "ring-2 ring-primary ring-offset-2 ring-offset-background",
               )}
             >

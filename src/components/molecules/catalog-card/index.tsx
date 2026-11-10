@@ -62,7 +62,7 @@ export function CatalogCard({ item, actions }: { item: CatalogItem; actions: Rea
                       onClick={() => setPicked(entry.id)}
                       style={{ backgroundColor: entry.swatch ?? undefined }}
                       className={cn(
-                        "size-7 rounded-full",
+                        "h-6 w-6 rounded-full p-0 md:h-6 md:w-6",
                         active && "ring-2 ring-primary ring-offset-2 ring-offset-background",
                       )}
                     />
