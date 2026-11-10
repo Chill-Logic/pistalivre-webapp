@@ -80,6 +80,7 @@ export function SupplierDetailPage() {
               <SupplierVehiclesCard
                 supplierId={supplier.data.id}
                 baseAmount={supplier.data.monthlyAmount}
+                currency={supplier.data.currency}
                 links={supplier.data.vehicles}
               />
             ) : null

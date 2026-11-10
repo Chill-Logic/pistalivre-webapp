@@ -1,4 +1,6 @@
+import type { Conversion, Currency, ExpensePaymentMethod } from "@/types/currency";
 import type { DocumentFile } from "@/types/document";
+import type { PaymentCardRef } from "@/types/payment-card";
 import type { SupplierBilling, SupplierScope } from "@/types/supplier";
 
 /** What happened to a month's bill. PARTIAL only on a debt installment. */
@@ -29,8 +31,17 @@ export type MonthItem = {
     installments: number;
   } | null;
   description: string;
-  /** What the cost predicts (null when nothing does). */
+  /** Currency of the bill (a debt installment is always BRL). */
+  currency: Currency;
+  /** What the cost predicts, in reais (null when nothing does, or no rate yet). */
   expected: number | null;
+  /** The prediction in `currency` (null when BRL). */
+  expectedForeign: number | null;
+  /** The rate behind `expected` (null when BRL). */
+  conversion: Conversion | null;
+  /** The record's, else the cost's (null = not told). */
+  paymentMethod: ExpensePaymentMethod | null;
+  paymentCard: PaymentCardRef | null;
   dueDate: string | null;
   status: MonthItemStatus;
   /** Recorded amount, or the cash paid for the installment (late fee included). */
@@ -44,6 +55,10 @@ export type MonthItem = {
   expense: {
     id: string;
     notes: string | null;
+    /** The value in the bill's currency (null when BRL). */
+    foreignAmount: number | null;
+    /** Reais per unit that actually left (null when BRL). */
+    exchangeRate: number | null;
     createdByName: string | null;
     updatedAt: string;
     documentCount: number;
@@ -75,7 +90,13 @@ export type Expense = {
   vehicle: ExpenseVehicle | null;
   month: string;
   description: string | null;
+  /** In reais (what left the cash). */
   amount: number;
+  currency: Currency;
+  foreignAmount: number | null;
+  exchangeRate: number | null;
+  paymentMethod: ExpensePaymentMethod | null;
+  paymentCard: PaymentCardRef | null;
   status: ExpenseStatus;
   paidAt: string | null;
   notes: string | null;
@@ -91,9 +112,16 @@ export type ExpenseInput = {
   vehicleId?: string | null;
   month: string;
   description?: string | null;
+  /** In reais (what left the cash). */
   amount: number;
   status: ExpenseStatus;
   /** yyyy-mm-dd, only when PAID. */
   paidAt?: string | null;
   notes?: string | null;
+  /** Fixed cost: ignored (the cost's). */
+  currency?: Currency;
+  /** The value in `currency` (required when it isn't BRL). */
+  foreignAmount?: number | null;
+  paymentMethod?: ExpensePaymentMethod | null;
+  paymentCardId?: string | null;
 };

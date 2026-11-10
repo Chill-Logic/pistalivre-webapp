@@ -156,6 +156,14 @@ export const queryKeys = {
     all: ["ai-usage"] as const,
     summary: (month: string) => [...queryKeys.aiUsage.all, "summary", month] as const,
   },
+  paymentCards: {
+    all: ["payment-cards"] as const,
+  },
+  exchangeRates: {
+    all: ["exchange-rates"] as const,
+    quote: (params: Record<string, string | number | null>) =>
+      [...queryKeys.exchangeRates.all, "quote", params] as const,
+  },
   expenses: {
     all: ["expenses"] as const,
     month: (month: string) => [...queryKeys.expenses.all, "month", month] as const,

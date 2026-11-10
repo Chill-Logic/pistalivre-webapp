@@ -22,7 +22,8 @@ import {
 import { toApiError } from "@/helpers/api-error";
 import { useVehicleSupplierLinks } from "@/hooks/api/gestao/vehicles/useVehicleSupplierLinks";
 import { useSupplierOptions } from "@/hooks/ui/useRemoteOptions";
-import { formatCurrency } from "@/utils/format";
+import { moneyIn } from "@/helpers/currency";
+import type { Currency } from "@/types/currency";
 
 type Errors = { supplierId?: string; monthlyAmount?: string; form?: string };
 
@@ -47,12 +48,14 @@ export function VehicleSupplierDialog({
   const [errors, setErrors] = useState<Errors>({});
   const { save } = useVehicleSupplierLinks(vehicleId);
   const picker = useSupplierOptions({ scope: "VEHICLE" });
+  // Remembered: the picker's page changes as the search changes.
+  const [pickedCurrency, setPickedCurrency] = useState<Currency>("BRL");
   const options = picker.items
     .filter((supplier) => !linkedSupplierIds.includes(supplier.id))
     .map((supplier) => ({
       value: supplier.id,
       label: supplier.name,
-      detail: `${formatCurrency(supplier.monthlyAmount)}/mês (base)${
+      detail: `${moneyIn(supplier.monthlyAmount, supplier.currency)}/mês (base)${
         supplier.active ? "" : " · inativo"
       }`,
     }));
@@ -63,6 +66,7 @@ export function VehicleSupplierDialog({
     if (!next) return;
     setPicked(null);
     setAmount(null);
+    setPickedCurrency("BRL");
     setErrors({});
     picker.setSearch("");
   };
@@ -122,9 +126,9 @@ export function VehicleSupplierDialog({
             onSearchChange={picker.setSearch}
             onChange={(option) => {
               setPicked(option);
-              const base = picker.items.find(
-                (supplier) => supplier.id === option.value,
-              )?.monthlyAmount;
+              const supplier = picker.items.find((item) => item.id === option.value);
+              if (supplier) setPickedCurrency(supplier.currency);
+              const base = supplier?.monthlyAmount;
               if (amount === null && base !== undefined) setAmount(base);
               setErrors((current) => ({ ...current, supplierId: undefined }));
             }}
@@ -137,6 +141,7 @@ export function VehicleSupplierDialog({
             value={amount}
             onChange={setAmount}
             error={errors.monthlyAmount}
+            currency={pickedCurrency}
           />
           {errors.form && <Alert>{errors.form}</Alert>}
           <DialogFooter>

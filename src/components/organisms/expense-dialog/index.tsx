@@ -27,9 +27,12 @@ import {
 import { SelectField } from "@/components/molecules/select-field";
 import { TextareaField } from "@/components/molecules/textarea-field";
 import { DocumentsCard } from "@/components/organisms/documents-card";
+import { PaymentMethodFields } from "@/components/organisms/payment-method-fields";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { queryKeys } from "@/constants/query-keys";
 import { toApiError } from "@/helpers/api-error";
+import { conversionNote, moneyWithEstimate } from "@/helpers/currency";
+import { useExchangeQuote } from "@/hooks/api/gestao/exchange-rates/useExchangeQuote";
 import { useExpense } from "@/hooks/api/gestao/expenses/useExpense";
 import {
   useDeleteExpense,
@@ -38,10 +41,11 @@ import {
 import { useIdempotencyKey } from "@/hooks/ui/useIdempotencyKey";
 import { useLabels } from "@/hooks/ui/useLabels";
 import { useVehicleOptions } from "@/hooks/ui/useRemoteOptions";
+import type { Currency, ExpensePaymentMethod } from "@/types/currency";
 import type { ExpenseInput, ExpenseStatus, MonthItem } from "@/types/expense";
 import type { SupplierDetail } from "@/types/supplier";
 import { calendarDay, todayInBrasilia } from "@/utils/date";
-import { formatCurrency } from "@/utils/format";
+import { currencySymbol, formatCurrency } from "@/utils/format";
 import {
   addMonths,
   currentMonth,
@@ -72,7 +76,11 @@ type Field =
   | "amount"
   | "status"
   | "paidAt"
-  | "notes";
+  | "notes"
+  | "currency"
+  | "foreignAmount"
+  | "paymentMethod"
+  | "paymentCardId";
 type Errors = Partial<Record<Field, string>> & { form?: string };
 
 type ExpenseDialogProps = {
@@ -106,7 +114,28 @@ export function ExpenseDialog({ target, trigger }: ExpenseDialogProps) {
   );
 }
 
-function initialState(target: ExpenseDialogTarget) {
+type FormState = {
+  month: string;
+  vehicleId: string;
+  description: string;
+  status: ExpenseStatus;
+  /** In reais (what left the cash). */
+  amount: number | null;
+  paidAt: string;
+  notes: string;
+  currency: Currency;
+  /** In `currency` (only when it isn't BRL). */
+  foreignAmount: number | null;
+  paymentMethod: ExpensePaymentMethod | null;
+  paymentCardId: string | null;
+  /**
+   * The reais were typed (or recorded): today's quote no longer fills them.
+   * A new foreign bill starts false, so the server's estimate shows up.
+   */
+  amountTouched: boolean;
+};
+
+function initialState(target: ExpenseDialogTarget): FormState {
   const today = todayInBrasilia();
   if (target.kind === "item") {
     const { item } = target;
@@ -118,6 +147,11 @@ function initialState(target: ExpenseDialogTarget) {
       amount: item.amount ?? item.expected,
       paidAt: item.paidAt ? calendarDay(item.paidAt) : today,
       notes: item.expense?.notes ?? "",
+      currency: item.currency,
+      foreignAmount: item.expense?.foreignAmount ?? item.expectedForeign,
+      paymentMethod: item.paymentMethod,
+      paymentCardId: item.paymentCard?.id ?? null,
+      amountTouched: Boolean(item.expense),
     };
   }
   const month =
@@ -125,20 +159,28 @@ function initialState(target: ExpenseDialogTarget) {
   const supplier = target.kind === "supplierMonth" ? target.supplier : null;
   const perVehicle = supplier?.billing === "PER_VEHICLE";
   const firstVehicle = perVehicle ? supplier?.vehicles[0] : undefined;
+  // The cost's amount is in its currency; the reais come from the quote.
+  const costAmount = supplier
+    ? perVehicle
+      ? (firstVehicle?.monthlyAmount ?? null)
+      : supplier.scope === "COMPANY"
+        ? supplier.monthlyAmount
+        : supplier.vehiclesMonthlyTotal
+    : null;
+  const foreign = supplier ? supplier.currency !== "BRL" : false;
   return {
     month,
     vehicleId: firstVehicle?.vehicle.id ?? "",
     description: "",
-    status: "PAID" as ExpenseStatus,
-    amount: supplier
-      ? perVehicle
-        ? (firstVehicle?.monthlyAmount ?? null)
-        : supplier.scope === "COMPANY"
-          ? supplier.monthlyAmount
-          : supplier.vehiclesMonthlyTotal
-      : null,
+    status: "PAID",
+    amount: foreign ? null : costAmount,
     paidAt: today,
     notes: "",
+    currency: supplier?.currency ?? "BRL",
+    foreignAmount: foreign ? costAmount : null,
+    paymentMethod: supplier?.paymentMethod ?? null,
+    paymentCardId: supplier?.paymentCard?.id ?? null,
+    amountTouched: false,
   };
 }
 
@@ -173,6 +215,18 @@ function ExpenseForm({
   const perVehicle = supplier?.billing === "PER_VEHICLE";
 
   const [state, setState] = useState(() => initialState(target));
+  const isForeign = state.currency !== "BRL";
+  const quote = useExchangeQuote({
+    currency: state.currency,
+    amount: state.foreignAmount,
+    paymentMethod: state.paymentMethod,
+    paymentCardId: state.paymentCardId,
+  });
+  // Until the reais are typed, they follow today's quote (server math).
+  const amount =
+    isForeign && !state.amountTouched && quote.data?.brl != null
+      ? quote.data.brl
+      : state.amount;
   const [picked, setPicked] = useState<RemoteOption | null>(null);
   const [receipts, setReceipts] = useState<File[]>([]);
   const [errors, setErrors] = useState<Errors>({});
@@ -199,8 +253,11 @@ function ExpenseForm({
     if (isOneOff && !state.description.trim()) {
       next.description = "Diga o que foi a despesa";
     }
-    if (state.status !== "WAIVED" && (state.amount === null || state.amount < 0)) {
+    if (state.status !== "WAIVED" && (amount === null || amount < 0)) {
       next.amount = "Informe o valor";
+    }
+    if (isForeign && state.status !== "WAIVED" && state.foreignAmount === null) {
+      next.foreignAmount = "Informe o valor";
     }
     if (state.status === "PAID") {
       if (!state.paidAt) next.paidAt = "Informe o dia do pagamento";
@@ -216,10 +273,14 @@ function ExpenseForm({
       vehicleId: (isOneOff ? (picked?.value ?? state.vehicleId) : state.vehicleId) || null,
       month: state.month,
       description: isOneOff ? state.description.trim() : null,
-      amount: state.amount ?? 0,
+      amount: amount ?? 0,
       status: state.status,
       paidAt: state.status === "PAID" ? state.paidAt : null,
       notes: state.notes.trim() || null,
+      currency: state.currency,
+      foreignAmount: isForeign ? state.foreignAmount : null,
+      paymentMethod: state.paymentMethod,
+      paymentCardId: state.paymentCardId,
     };
     onBusyChange(true);
     save.mutate(
@@ -254,7 +315,12 @@ function ExpenseForm({
   const context = [
     item && formatMonth(item.month),
     item?.vehicle?.plate,
-    item?.expected != null && `previsto ${formatCurrency(item.expected)}`,
+    item?.expected != null &&
+      `previsto ${
+        item.expectedForeign != null
+          ? moneyWithEstimate(item.expectedForeign, item.currency, item.expected)
+          : formatCurrency(item.expected)
+      }`,
   ].filter(Boolean);
 
   return (
@@ -309,7 +375,10 @@ function ExpenseForm({
                 onChange={(value) => {
                   set("vehicleId", value);
                   const link = supplier.vehicles.find((l) => l.vehicle.id === value);
-                  if (link) set("amount", link.monthlyAmount);
+                  if (link && isForeign) {
+                    set("foreignAmount", link.monthlyAmount);
+                    set("amountTouched", false);
+                  } else if (link) set("amount", link.monthlyAmount);
                 }}
                 error={errors.vehicleId}
                 disabled={pending}
@@ -349,16 +418,71 @@ function ExpenseForm({
               disabled={pending}
             />
           </Col>
-          {state.status !== "WAIVED" && (
+          {isOneOff && (
             <Col md={6}>
-              <MoneyField
-                label={state.status === "PAID" ? "Valor pago" : "Valor da conta"}
-                value={state.amount}
-                onChange={(value) => set("amount", value)}
-                error={errors.amount}
+              <SelectField
+                label="Moeda"
+                value={state.currency}
+                options={options(LABEL_MAPS.currency)}
+                onChange={(value) => {
+                  set("currency", value as Currency);
+                  set("amountTouched", false);
+                }}
+                error={errors.currency}
+                disabled={pending}
               />
             </Col>
           )}
+          {state.status !== "WAIVED" && isForeign && (
+            <Col md={6}>
+              <MoneyField
+                label={`Valor em ${currencySymbol(state.currency)}`}
+                value={state.foreignAmount}
+                onChange={(value) => {
+                  set("foreignAmount", value);
+                  set("amountTouched", false);
+                }}
+                error={errors.foreignAmount}
+                currency={state.currency}
+              />
+            </Col>
+          )}
+          {state.status !== "WAIVED" && (
+            <Col md={6}>
+              <MoneyField
+                label={
+                  isForeign
+                    ? "Valor em R$ (o que saiu)"
+                    : state.status === "PAID"
+                      ? "Valor pago"
+                      : "Valor da conta"
+                }
+                value={amount}
+                onChange={(value) => {
+                  set("amount", value);
+                  set("amountTouched", true);
+                }}
+                error={errors.amount}
+                hint={
+                  isForeign
+                    ? state.amountTouched
+                      ? "Como veio na fatura."
+                      : quote.data?.conversion
+                        ? `${conversionNote(quote.data.conversion)}. Ajuste pelo valor da fatura.`
+                        : "Estimativa pela cotação do dia. Ajuste pelo valor da fatura."
+                    : undefined
+                }
+              />
+            </Col>
+          )}
+          <PaymentMethodFields
+            method={state.paymentMethod}
+            cardId={state.paymentCardId}
+            onMethodChange={(value) => set("paymentMethod", value)}
+            onCardChange={(value) => set("paymentCardId", value)}
+            errors={errors}
+            disabled={pending}
+          />
           {state.status === "PAID" && (
             <Col md={6}>
               <DateField

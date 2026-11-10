@@ -17,14 +17,17 @@ import { SupplierPropagateDialog } from "@/components/organisms/supplier-propaga
 import { SupplierVehicleDialog } from "@/components/organisms/supplier-vehicle-dialog";
 import { routeTo } from "@/constants/routes";
 import { useSupplierVehicles } from "@/hooks/api/gestao/suppliers/useSupplierVehicles";
+import { CostAmount } from "@/components/molecules/cost-amount";
+import type { Currency } from "@/types/currency";
 import type { SupplierVehicleLink } from "@/types/supplier";
-import { formatCurrency } from "@/utils/format";
 import { formatPlate } from "@/utils/plate";
 
 type SupplierVehiclesCardProps = {
   supplierId: string;
   /** The supplier's base amount: suggested for new links and propagation. */
   baseAmount: number;
+  /** The supplier's currency (the links' amounts are in it). */
+  currency: Currency;
   links: SupplierVehicleLink[];
 };
 
@@ -35,6 +38,7 @@ type SupplierVehiclesCardProps = {
 export function SupplierVehiclesCard({
   supplierId,
   baseAmount,
+  currency,
   links,
 }: SupplierVehiclesCardProps) {
   const { unlink } = useSupplierVehicles(supplierId);
@@ -49,6 +53,7 @@ export function SupplierVehiclesCard({
             <SupplierPropagateDialog
               supplierId={supplierId}
               defaultAmount={baseAmount}
+              currency={currency}
               links={links}
               trigger={
                 <Button variant="outline" size="sm">
@@ -61,6 +66,7 @@ export function SupplierVehiclesCard({
           <SupplierVehicleDialog
             supplierId={supplierId}
             defaultAmount={baseAmount}
+            currency={currency}
             linkedVehicleIds={linkedIds}
             trigger={
               <Button size="sm">
@@ -95,16 +101,17 @@ export function SupplierVehiclesCard({
                   </Box>
                   <Box className="flex shrink-0 items-center gap-1">
                     {!link.active && <Badge variant="outline">Inativo</Badge>}
-                    <Text weight="semibold" className="mr-1 tabular-nums">
-                      {formatCurrency(link.monthlyAmount)}
-                      <Text inline size="xs" tone="muted" weight="normal">
-                        {" "}
-                        / mês
-                      </Text>
-                    </Text>
+                    <CostAmount
+                      amount={link.monthlyAmount}
+                      currency={currency}
+                      brl={link.monthlyAmountBrl}
+                      suffix="/ mês"
+                      className="mr-1 text-right font-semibold"
+                    />
                     <SupplierVehicleDialog
                       supplierId={supplierId}
                       defaultAmount={baseAmount}
+                      currency={currency}
                       linkedVehicleIds={linkedIds}
                       vehicle={{
                         id: link.vehicle.id,

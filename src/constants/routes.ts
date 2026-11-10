@@ -117,6 +117,7 @@ export const ROUTES = {
   debtEdit: `${GESTAO}/financeiro/debitos/:id/editar`,
   financeStatement: `${GESTAO}/financeiro/extrato`,
   financeBills: `${GESTAO}/financeiro/contas`,
+  financeCards: `${GESTAO}/financeiro/cartoes`,
   portal: PORTAL || "/",
   portalLogin: `${PORTAL}/entrar`,
   /** Public (no login): lead capture and the questionnaire. */

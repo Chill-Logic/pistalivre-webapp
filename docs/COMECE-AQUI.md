@@ -74,6 +74,14 @@ curtas entre ferramentas e nos relatórios de subagentes.
   com a IA na **Anthropic** (`form-options.readDocument`). Confere placa e os dígitos do Renavam e do chassi
   ("Confira…" no campo), casa o modelo com o catálogo e acha o titular (empresa, parceiro ou aviso). Não grava nada.
   O QR do CRLV-e **não serve**: é binário assinado (ECDSA), feito para o app Vio. Primeiro teste real foi em prod.
+- **Moeda, forma de pagamento e cartões (2026-11-10, local, ainda não publicado):** custo fixo e despesa avulsa em
+  **R$, US$ ou €**. O servidor converte pela PTAX do dia (AwesomeAPI de reserva, guardada no banco) **+ o acréscimo do
+  cartão** (IOF + spread) quando é pago com cartão; o front só mostra (`CostAmount`, `helpers/currency`) e pede
+  `GET /exchange-rates/quote` para preencher o "Valor em R$" do lançamento, que o dono corrige pela fatura (fica o R$
+  que saiu). **Financeiro › Cartões** (`/gestao/financeiro/cartoes`): nome, final, da empresa ou de alguém da equipe,
+  acréscimo internacional; usado não exclui, inativa. "Forma de pagamento" + "Cartão" (`PaymentMethodFields`) no custo
+  e no lançamento (sem informar no lançamento = a do custo). Backend `2dfb12f`/`b5718dd`/`18871ec` com migration
+  aditiva. **Backend antes do front.**
 - **Categorias (2026-11-10):** Frota › **Categorias** (`/gestao/veiculos/categorias`): criar, renomear e excluir
   (só sem veículos), por tipo. Os nomes devem ser a **ESPÉCIE do CRLV** (Passageiro, Carga…): a leitura do documento
   escolhe tipo e categoria por ela (Street era um engano, vira Passageiro). O `seed-config` não recria mais as

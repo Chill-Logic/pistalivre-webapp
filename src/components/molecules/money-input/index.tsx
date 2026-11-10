@@ -1,5 +1,6 @@
 import { Input } from "@/components/atoms/input";
 import { cn } from "@/utils/cn";
+import { currencySymbol } from "@/utils/format";
 import { formatMoneyInput, parseMoneyInput } from "@/utils/money";
 
 type MoneyInputProps = {
@@ -8,6 +9,8 @@ type MoneyInputProps = {
   value: number | null;
   onChange: (value: number | null) => void;
   className?: string;
+  /** ISO code of the amount (default BRL): only changes the symbol. */
+  currency?: string;
 };
 
 /**
@@ -19,12 +22,13 @@ export function MoneyInput({
   value,
   onChange,
   className,
+  currency = "BRL",
 }: MoneyInputProps) {
   return (
     <Input
       aria-label={label}
       inputMode="numeric"
-      value={`R$ ${formatMoneyInput(value) || "0,00"}`}
+      value={`${currencySymbol(currency)} ${formatMoneyInput(value) || "0,00"}`}
       onChange={(event) => onChange(parseMoneyInput(event.target.value))}
       className={cn("h-8 w-[6.5rem] px-2 text-right tabular-nums md:h-8", className)}
     />

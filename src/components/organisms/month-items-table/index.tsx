@@ -16,6 +16,8 @@ import { MonthItemAction } from "@/components/organisms/month-item-action";
 import {
   monthItemDetail,
   monthItemHref,
+  monthItemAmountForeign,
+  monthItemExpectedForeign,
   monthItemOutcome,
 } from "@/helpers/month-item";
 import { useLabels } from "@/hooks/ui/useLabels";
@@ -35,6 +37,8 @@ export function MonthItemsTable({ items }: { items: MonthItem[] }) {
           const href = monthItemHref(item);
           const detail = monthItemDetail(item, label);
           const outcome = monthItemOutcome(item);
+          const expectedForeign = monthItemExpectedForeign(item);
+          const amountForeign = monthItemAmountForeign(item);
           return (
             <TableRow key={item.key}>
               <TableCell className="w-[34%] whitespace-normal">
@@ -51,10 +55,24 @@ export function MonthItemsTable({ items }: { items: MonthItem[] }) {
                 {item.dueDate ? formatCalendarDate(item.dueDate) : "—"}
               </TableCell>
               <TableCell className="text-right tabular-nums">
-                {item.expected != null ? formatCurrency(item.expected) : "—"}
+                {item.expected != null
+                  ? formatCurrency(item.expected)
+                  : item.expectedForeign != null
+                    ? "sem cotação"
+                    : "—"}
+                {expectedForeign && (
+                  <Text size="xs" tone="muted">
+                    {expectedForeign}
+                  </Text>
+                )}
               </TableCell>
               <TableCell className="text-right tabular-nums">
                 {item.amount != null ? formatCurrency(item.amount) : "—"}
+                {amountForeign && (
+                  <Text size="xs" tone="muted">
+                    {amountForeign}
+                  </Text>
+                )}
               </TableCell>
               <TableCell className="min-w-48 whitespace-normal">
                 <Box className="space-y-1">

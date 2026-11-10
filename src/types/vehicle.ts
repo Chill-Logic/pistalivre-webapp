@@ -1,3 +1,4 @@
+import type { Currency } from "@/types/currency";
 import type { DocumentFile } from "@/types/document";
 
 export type VehicleStatus = "AVAILABLE" | "RENTED" | "MAINTENANCE" | "INACTIVE";
@@ -49,7 +50,11 @@ export type VehicleDetail = Vehicle & {
 export type VehicleSupplierLink = {
   linkId: string;
   supplier: Ref;
+  /** In `currency` (the cost's). */
   monthlyAmount: number;
+  currency: Currency;
+  /** In reais (null = no rate yet). */
+  monthlyAmountBrl: number | null;
   active: boolean;
 };
 

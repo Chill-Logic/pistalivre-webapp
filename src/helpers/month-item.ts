@@ -1,5 +1,7 @@
 import { LABEL_MAPS, type LabelMapName } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
+import { moneyIn } from "@/helpers/currency";
+import { paymentText } from "@/helpers/payment-card";
 import type { MonthItem } from "@/types/expense";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
@@ -12,12 +14,13 @@ export function monthItemHref(item: MonthItem): string | null {
   return null;
 }
 
-/** Line under the name: vehicle, installment, kind of debt. */
+/** Line under the name: vehicle, installment, kind of debt, how it's paid. */
 export function monthItemDetail(item: MonthItem, label: Label): string {
   return [
     item.debt &&
       `Parcela ${item.debt.installment} de ${item.debt.installments} · ${label(LABEL_MAPS.debtKind, item.debt.kind)}`,
     item.vehicle && `${item.vehicle.plate} · ${item.vehicle.label}`,
+    paymentText(item, label),
   ]
     .filter(Boolean)
     .join(" · ");
@@ -38,6 +41,19 @@ export function monthItemOutcome(item: MonthItem): string {
     item.expense?.createdByName && `por ${item.expense.createdByName}`,
   ];
   return parts.filter(Boolean).join(" · ");
+}
+
+/** The prediction in the bill's currency ("US$ 20,00"), null in reais. */
+export function monthItemExpectedForeign(item: MonthItem): string | null {
+  if (item.currency === "BRL" || item.expectedForeign == null) return null;
+  return moneyIn(item.expectedForeign, item.currency);
+}
+
+/** What was recorded in the bill's currency ("US$ 20,00"), null in reais. */
+export function monthItemAmountForeign(item: MonthItem): string | null {
+  const foreign = item.expense?.foreignAmount;
+  if (item.currency === "BRL" || foreign == null) return null;
+  return moneyIn(foreign, item.currency);
 }
 
 export type MonthItemGroup = { key: string; title: string; items: MonthItem[] };

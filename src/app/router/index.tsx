@@ -37,6 +37,7 @@ import {
   IntegrationsPermissionsPage,
   IntegrationsSectionPage,
   FinanceBillsPage,
+  FinanceCardsPage,
   FinanceDebtsPage,
   FinancePage,
   FinanceSectionPage,
@@ -346,6 +347,7 @@ const gestaoRoutes: RouteObject[] = [
               FinanceBillsPage.preload,
               FinanceDebtsPage.preload,
               FinanceStatementPage.preload,
+              FinanceCardsPage.preload,
             ]}
           />
         ),
@@ -354,6 +356,7 @@ const gestaoRoutes: RouteObject[] = [
           { path: ROUTES.financeStatement, element: <FinanceStatementPage /> },
           { path: ROUTES.financeDebts, element: <FinanceDebtsPage /> },
           { path: ROUTES.financeBills, element: <FinanceBillsPage /> },
+          { path: ROUTES.financeCards, element: <FinanceCardsPage /> },
         ],
       },
       { path: ROUTES.debtNew, element: <DebtNewPage /> },

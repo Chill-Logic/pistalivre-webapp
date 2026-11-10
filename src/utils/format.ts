@@ -7,6 +7,32 @@ const currency = new Intl.NumberFormat("pt-BR", {
 
 const integer = new Intl.NumberFormat("pt-BR");
 
+const MONEY_FORMATS = new Map<string, Intl.NumberFormat>();
+
+/** US$ 20,00 / € 10,00 / R$ 1.234,56 (`currency` = ISO code). */
+export function formatMoney(value: number, currencyCode: string) {
+  let format = MONEY_FORMATS.get(currencyCode);
+  if (!format) {
+    format = new Intl.NumberFormat("pt-BR", { style: "currency", currency: currencyCode });
+    MONEY_FORMATS.set(currencyCode, format);
+  }
+  return format.format(value);
+}
+
+/** An exchange rate: R$ 5,5840. */
+export function formatRate(value: number) {
+  return `R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 4, maximumFractionDigits: 4 })}`;
+}
+
+/** The symbol alone: "R$", "US$", "€". */
+export function currencySymbol(currencyCode: string) {
+  return (
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: currencyCode })
+      .formatToParts(0)
+      .find((part) => part.type === "currency")?.value ?? currencyCode
+  );
+}
+
 /** R$ 1.234,56 */
 export function formatCurrency(value: number) {
   return currency.format(value);

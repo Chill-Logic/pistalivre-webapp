@@ -14,6 +14,7 @@ import { CheckboxField } from "@/components/molecules/checkbox-field";
 import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { SelectField } from "@/components/molecules/select-field";
+import { PaymentMethodFields } from "@/components/organisms/payment-method-fields";
 import {
   NONE,
   SUPPLIER_FORM_FIELDS,
@@ -24,9 +25,12 @@ import {
   type SupplierFormValues,
 } from "./schema";
 import { LABEL_MAPS } from "@/constants/label-maps";
+import { conversionNote, brlEstimate } from "@/helpers/currency";
 import { applyApiErrors } from "@/helpers/form";
+import { useExchangeQuote } from "@/hooks/api/gestao/exchange-rates/useExchangeQuote";
 import { useSaveSupplier } from "@/hooks/api/gestao/suppliers/useSaveSupplier";
 import { useLabels } from "@/hooks/ui/useLabels";
+import type { ExpensePaymentMethod } from "@/types/currency";
 import type { SupplierDetail } from "@/types/supplier";
 import { addMonths, currentMonth, formatMonth, monthsBetween } from "@/utils/month";
 
@@ -76,6 +80,26 @@ export function SupplierForm({
     defaultValues: supplierFormDefaults(supplier),
   });
   const isVehicle = watch("scope") === "VEHICLE";
+  const currency = watch("currency");
+  const paymentMethod = watch("paymentMethod");
+  const paymentCardId = watch("paymentCardId");
+  const method =
+    paymentMethod === NONE ? null : (paymentMethod as ExpensePaymentMethod);
+  // The estimate in reais comes from the server (today's rate + card).
+  const quote = useExchangeQuote({
+    currency,
+    amount: watch("monthlyAmount"),
+    paymentMethod: method,
+    paymentCardId: paymentCardId === NONE ? null : paymentCardId,
+  });
+  const estimate =
+    currency === "BRL"
+      ? undefined
+      : quote.data
+        ? `${brlEstimate(quote.data.brl)}${
+            quote.data.conversion ? ` · ${conversionNote(quote.data.conversion)}` : ""
+          }`
+        : "O valor em reais sai da cotação do dia.";
   const now = currentMonth();
   const startOptions = monthOptions(
     addMonths(now, -36),
@@ -131,6 +155,21 @@ export function SupplierForm({
             <Col md={6} lg={3}>
               <Controller
                 control={control}
+                name="currency"
+                render={({ field }) => (
+                  <SelectField
+                    label="Moeda"
+                    value={field.value}
+                    options={options(LABEL_MAPS.currency)}
+                    onChange={field.onChange}
+                    error={errors.currency?.message}
+                  />
+                )}
+              />
+            </Col>
+            <Col md={6} lg={3}>
+              <Controller
+                control={control}
                 name="monthlyAmount"
                 render={({ field }) => (
                   <MoneyField
@@ -138,6 +177,8 @@ export function SupplierForm({
                     value={field.value}
                     onChange={field.onChange}
                     error={errors.monthlyAmount?.message}
+                    currency={currency}
+                    hint={estimate}
                   />
                 )}
               />
@@ -204,6 +245,29 @@ export function SupplierForm({
                 )}
               />
             </Col>
+            <Controller
+              control={control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <Controller
+                  control={control}
+                  name="paymentCardId"
+                  render={({ field: card }) => (
+                    <PaymentMethodFields
+                      cols={{ md: 6, lg: 3 }}
+                      method={field.value === NONE ? null : (field.value as ExpensePaymentMethod)}
+                      cardId={card.value === NONE ? null : card.value}
+                      onMethodChange={(value) => field.onChange(value ?? NONE)}
+                      onCardChange={(value) => card.onChange(value ?? NONE)}
+                      errors={{
+                        paymentMethod: errors.paymentMethod?.message,
+                        paymentCardId: errors.paymentCardId?.message,
+                      }}
+                    />
+                  )}
+                />
+              )}
+            />
             <Col>
               <Controller
                 control={control}
@@ -223,6 +287,9 @@ export function SupplierForm({
           <Alert variant="info" role="note">
             {isVehicle
               ? "Por veículo, o valor acima é o padrão para novos veículos: o que conta é o valor de cada veículo vinculado. "
+              : ""}
+            {currency !== "BRL"
+              ? "Em outra moeda, a projeção e as contas usam a cotação do dia (mais o acréscimo do cartão, se for pago com cartão); ao registrar o pagamento, vale o que saiu em reais. "
               : ""}
             Desde o mês em “Desde”, o custo aparece todo mês em Financeiro ›
             Contas do mês para registrar o pagamento.
@@ -251,7 +318,7 @@ export function SupplierFormSkeleton() {
     <Card>
       <CardContent className="space-y-6 pt-4 md:pt-6">
         <Row className="gap-y-4">
-          {([6, 3, 3, 3, 3, 3, 3] as const).map((lg, index) => (
+          {([6, 3, 3, 3, 3, 3, 3, 3, 3] as const).map((lg, index) => (
             <Col key={index} md={6} lg={lg} className="space-y-2">
               <Skeleton shape="text" className="w-20 text-sm" />
               <Skeleton className="h-11 md:h-9" />

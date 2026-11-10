@@ -1,4 +1,6 @@
+import type { Conversion, Currency, ExpensePaymentMethod } from "@/types/currency";
 import type { DocumentFile } from "@/types/document";
+import type { PaymentCardRef } from "@/types/payment-card";
 
 /** COMPANY = fixed cost of the operation; VEHICLE = per-vehicle base cost. */
 export type SupplierScope = "COMPANY" | "VEHICLE";
@@ -10,8 +12,15 @@ export type SupplierListItem = {
   id: string;
   name: string;
   scope: SupplierScope;
-  /** Base monthly amount (for VEHICLE, each link may override it). */
+  /** Base monthly amount, in `currency` (for VEHICLE, each link may override it). */
   monthlyAmount: number;
+  /** `monthlyAmount` in reais (null = no rate yet). */
+  monthlyAmountBrl: number | null;
+  currency: Currency;
+  /** Today's rate + the card's surcharge (null when BRL). */
+  conversion: Conversion | null;
+  paymentMethod: ExpensePaymentMethod | null;
+  paymentCard: PaymentCardRef | null;
   active: boolean;
   billing: SupplierBilling;
   /** Due day (1–31) when known. */
@@ -25,24 +34,35 @@ export type SupplierListItem = {
 };
 
 /** List row: + the real monthly weight (VEHICLE = sum of the links). */
-export type SupplierListRow = SupplierListItem & { currentMonthly: number };
+export type SupplierListRow = SupplierListItem & {
+  /** In `currency`. */
+  currentMonthly: number;
+  /** In reais (null = no rate yet). */
+  currentMonthlyBrl: number | null;
+};
 
 export type SupplierVehicleLink = {
   linkId: string;
   vehicle: { id: string; plate: string; label: string };
-  /** The amount PER vehicle — the one the projection uses. */
+  /** The amount PER vehicle (in the cost's currency) — the one the projection uses. */
   monthlyAmount: number;
+  monthlyAmountBrl: number | null;
   active: boolean;
   billing: SupplierBilling;
   dueDay: number | null;
   startsOn: string | null;
   endsOn: string | null;
+  currency: Currency;
+  paymentMethod: ExpensePaymentMethod | null;
+  /** Only by card. */
+  paymentCardId: string | null;
 };
 
 export type SupplierDetail = SupplierListItem & {
   updatedAt: string;
   vehicles: SupplierVehicleLink[];
   vehiclesMonthlyTotal: number;
+  vehiclesMonthlyTotalBrl: number | null;
   documents: DocumentFile[];
 };
 

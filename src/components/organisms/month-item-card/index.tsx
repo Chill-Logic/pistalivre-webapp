@@ -8,6 +8,8 @@ import { MonthItemAction } from "@/components/organisms/month-item-action";
 import {
   monthItemDetail,
   monthItemHref,
+  monthItemAmountForeign,
+  monthItemExpectedForeign,
   monthItemOutcome,
 } from "@/helpers/month-item";
 import { useLabels } from "@/hooks/ui/useLabels";
@@ -21,6 +23,8 @@ export function MonthItemCard({ item }: { item: MonthItem }) {
   const detail = monthItemDetail(item, label);
   const outcome = monthItemOutcome(item);
   const value = item.amount ?? item.expected;
+  const foreign =
+    item.amount != null ? monthItemAmountForeign(item) : monthItemExpectedForeign(item);
 
   return (
     <Box className="flex items-start gap-3 py-3">
@@ -38,6 +42,12 @@ export function MonthItemCard({ item }: { item: MonthItem }) {
           {value != null && (
             <Text inline size="sm" weight="medium" className="tabular-nums">
               {formatCurrency(value)}
+              {foreign && (
+                <Text inline size="xs" tone="muted" weight="normal">
+                  {" "}
+                  ({foreign})
+                </Text>
+              )}
             </Text>
           )}
           {item.dueDate && (

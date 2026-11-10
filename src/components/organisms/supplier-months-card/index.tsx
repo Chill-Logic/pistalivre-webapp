@@ -10,7 +10,11 @@ import { ExpenseStatusBadge } from "@/components/molecules/expense-status-badge"
 import { ExpenseDialog } from "@/components/organisms/expense-dialog";
 import { MonthItemAction } from "@/components/organisms/month-item-action";
 import { QueryError } from "@/components/organisms/query-error";
-import { monthItemOutcome } from "@/helpers/month-item";
+import {
+  monthItemAmountForeign,
+  monthItemExpectedForeign,
+  monthItemOutcome,
+} from "@/helpers/month-item";
 import { useSupplierMonths } from "@/hooks/api/gestao/expenses/useSupplierMonths";
 import type { MonthItem, SupplierMonth } from "@/types/expense";
 import type { SupplierDetail } from "@/types/supplier";
@@ -118,6 +122,8 @@ function SupplierMonthRow({ month }: { month: SupplierMonth }) {
 function SupplierMonthItem({ item }: { item: MonthItem }) {
   const value = item.amount ?? item.expected;
   const outcome = monthItemOutcome(item);
+  const foreign =
+    item.amount != null ? monthItemAmountForeign(item) : monthItemExpectedForeign(item);
   return (
     <Box className="flex items-center gap-3">
       <Box className="min-w-0 flex-1 space-y-1">
@@ -131,6 +137,12 @@ function SupplierMonthItem({ item }: { item: MonthItem }) {
           {value != null && (
             <Text inline size="sm" className="tabular-nums">
               {formatCurrency(value)}
+              {foreign && (
+                <Text inline size="xs" tone="muted">
+                  {" "}
+                  ({foreign})
+                </Text>
+              )}
             </Text>
           )}
           {item.dueDate && item.status === "OPEN" && (

@@ -8,7 +8,9 @@ import { InfoItem } from "@/components/molecules/info-item";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { SupplierDetail } from "@/types/supplier";
-import { formatCurrency, formatDateTime } from "@/utils/format";
+import { conversionNote, moneyWithEstimate } from "@/helpers/currency";
+import { paymentText } from "@/helpers/payment-card";
+import { formatDateTime } from "@/utils/format";
 import { formatMonth } from "@/utils/month";
 
 export function SupplierSummary({ supplier }: { supplier: SupplierDetail }) {
@@ -35,11 +37,23 @@ export function SupplierSummary({ supplier }: { supplier: SupplierDetail }) {
             md={4}
             label={isVehicle ? "Valor padrão / mês" : "Valor / mês"}
           >
-            {formatCurrency(supplier.monthlyAmount)}
+            {moneyWithEstimate(supplier.monthlyAmount, supplier.currency, supplier.monthlyAmountBrl)}
           </InfoItem>
           {isVehicle && (
             <InfoItem span={6} md={4} label="Total dos veículos / mês">
-              {formatCurrency(supplier.vehiclesMonthlyTotal)}
+              {moneyWithEstimate(
+                supplier.vehiclesMonthlyTotal,
+                supplier.currency,
+                supplier.vehiclesMonthlyTotalBrl,
+              )}
+            </InfoItem>
+          )}
+          <InfoItem span={6} md={4} label="Forma de pagamento">
+            {paymentText(supplier, label) ?? "Não informada"}
+          </InfoItem>
+          {supplier.conversion && (
+            <InfoItem md={8} label="Conversão">
+              {conversionNote(supplier.conversion)}
             </InfoItem>
           )}
           {isVehicle && (
@@ -71,7 +85,7 @@ export function SupplierSummarySkeleton() {
       </CardHeader>
       <CardContent>
         <Row className="gap-y-4">
-          {[0, 1, 2, 3, 4, 5].map((index) => (
+          {[0, 1, 2, 3, 4, 5, 6].map((index) => (
             <Col key={index} span={6} md={4} className="space-y-2">
               <Skeleton shape="text" className="w-16 text-xs" />
               <Skeleton shape="text" className="w-24 text-sm" />

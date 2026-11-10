@@ -9,7 +9,8 @@ import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { SupplierListRow } from "@/types/supplier";
-import { formatCurrency } from "@/utils/format";
+import { CostAmount } from "@/components/molecules/cost-amount";
+import { paymentText } from "@/helpers/payment-card";
 import { pluralize } from "@/utils/text";
 
 export function SupplierCard({ supplier }: { supplier: SupplierListRow }) {
@@ -19,6 +20,7 @@ export function SupplierCard({ supplier }: { supplier: SupplierListRow }) {
     label(LABEL_MAPS.supplierScope, supplier.scope),
     supplier.scope === "VEHICLE" &&
       pluralize(supplier.vehicleCount, "veículo", "veículos"),
+    paymentText(supplier, label),
   ].filter(Boolean);
 
   return (
@@ -38,13 +40,12 @@ export function SupplierCard({ supplier }: { supplier: SupplierListRow }) {
           <Text size="xs" tone="muted">
             {details.join(" · ")}
           </Text>
-          <Text weight="medium" className="tabular-nums">
-            {formatCurrency(supplier.currentMonthly)}
-            <Text inline size="xs" tone="muted" weight="normal">
-              {" "}
-              / mês
-            </Text>
-          </Text>
+          <CostAmount
+            amount={supplier.currentMonthly}
+            currency={supplier.currency}
+            brl={supplier.currentMonthlyBrl}
+            suffix="/ mês"
+          />
         </Box>
         <ChevronRight
           className="size-4 shrink-0 text-muted-foreground"

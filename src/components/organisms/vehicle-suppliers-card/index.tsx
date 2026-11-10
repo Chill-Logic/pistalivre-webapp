@@ -12,6 +12,7 @@ import { Text } from "@/components/atoms/text";
 import { CollapsibleCard } from "@/components/molecules/collapsible-card";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { MoneyInput } from "@/components/molecules/money-input";
+import { brlEstimate } from "@/helpers/currency";
 import { TextLink } from "@/components/molecules/text-link";
 import { VehicleSupplierDialog } from "@/components/organisms/vehicle-supplier-dialog";
 import { routeTo } from "@/constants/routes";
@@ -109,10 +110,16 @@ function VehicleSupplierRow({
           label={`Valor por mês de ${name}`}
           value={amount}
           onChange={setAmount}
+          currency={link.currency}
           className="h-9 w-32 md:h-9"
         />
         <Text size="xs" tone="muted" className="mr-1">
           / mês
+          {link.currency !== "BRL" && !changed && (
+            <Text inline size="xs" tone="muted" className="block">
+              {brlEstimate(link.monthlyAmountBrl)}
+            </Text>
+          )}
         </Text>
         <Button
           size="sm"

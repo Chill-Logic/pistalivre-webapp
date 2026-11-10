@@ -164,6 +164,10 @@ export const FinanceBillsPage = lazyPage(
   () => import("@/pages/gestao/finance-bills"),
   "FinanceBillsPage",
 );
+export const FinanceCardsPage = lazyPage(
+  () => import("@/pages/gestao/finance-cards"),
+  "FinanceCardsPage",
+);
 export const FinanceDebtsPage = lazyPage(
   () => import("@/pages/gestao/finance-debts"),
   "FinanceDebtsPage",

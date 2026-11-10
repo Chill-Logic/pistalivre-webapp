@@ -19,13 +19,16 @@ import { MoneyField } from "@/components/molecules/money-field";
 import { toApiError } from "@/helpers/api-error";
 import { useSupplierVehicles } from "@/hooks/api/gestao/suppliers/useSupplierVehicles";
 import type { SupplierVehicleLink } from "@/types/supplier";
-import { formatCurrency } from "@/utils/format";
+import { moneyIn } from "@/helpers/currency";
+import type { Currency } from "@/types/currency";
 import { formatPlate } from "@/utils/plate";
 
 type SupplierPropagateDialogProps = {
   supplierId: string;
   trigger: ReactNode;
   defaultAmount: number;
+  /** The supplier's currency (the amounts are in it). */
+  currency: Currency;
   links: SupplierVehicleLink[];
 };
 
@@ -34,6 +37,7 @@ export function SupplierPropagateDialog({
   supplierId,
   trigger,
   defaultAmount,
+  currency,
   links,
 }: SupplierPropagateDialogProps) {
   const [open, setOpen] = useState(false);
@@ -112,6 +116,7 @@ export function SupplierPropagateDialog({
             value={amount}
             onChange={setAmount}
             error={errors.monthlyAmount}
+            currency={currency}
           />
           <Box className="space-y-2">
             <Box className="flex items-center justify-between gap-2">
@@ -138,7 +143,7 @@ export function SupplierPropagateDialog({
                 <CheckboxField
                   key={link.linkId}
                   label={formatPlate(link.vehicle.plate)}
-                  hint={`${link.vehicle.label} · hoje ${formatCurrency(link.monthlyAmount)} / mês`}
+                  hint={`${link.vehicle.label} · hoje ${moneyIn(link.monthlyAmount, currency)} / mês`}
                   checked={selected.includes(link.vehicle.id)}
                   onChange={(checked) => toggle(link.vehicle.id, checked)}
                 />

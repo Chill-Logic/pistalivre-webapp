@@ -14,6 +14,7 @@ import {
 import { Form } from "@/components/atoms/form";
 import { Spinner } from "@/components/atoms/spinner";
 import { MoneyField } from "@/components/molecules/money-field";
+import type { Currency } from "@/types/currency";
 import {
   RemoteCombobox,
   type RemoteOption,
@@ -27,6 +28,8 @@ type SupplierVehicleDialogProps = {
   trigger: ReactNode;
   /** Suggested amount for a new link (the supplier's base amount). */
   defaultAmount: number;
+  /** The supplier's currency (the amount is in it). */
+  currency: Currency;
   /** Already linked: hidden from the picker. */
   linkedVehicleIds: string[];
   /** Editing the amount of this linked vehicle (no picker). */
@@ -41,6 +44,7 @@ export function SupplierVehicleDialog({
   supplierId,
   trigger,
   defaultAmount,
+  currency,
   linkedVehicleIds,
   vehicle,
 }: SupplierVehicleDialogProps) {
@@ -133,6 +137,7 @@ export function SupplierVehicleDialog({
             value={amount}
             onChange={setAmount}
             error={errors.monthlyAmount}
+            currency={currency}
           />
           {errors.form && <Alert>{errors.form}</Alert>}
           <DialogFooter>

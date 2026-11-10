@@ -11,7 +11,8 @@ import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { SupplierListRow } from "@/types/supplier";
-import { formatCurrency } from "@/utils/format";
+import { CostAmount } from "@/components/molecules/cost-amount";
+import { paymentText } from "@/helpers/payment-card";
 
 type SupplierTableProps = {
   suppliers: SupplierListRow[] | undefined;
@@ -47,13 +48,22 @@ export function SupplierTable({
       {
         header: "Valor / mês",
         cell: (supplier) => (
-          <Text inline size={null} className="tabular-nums">
-            {formatCurrency(supplier.currentMonthly)}
-          </Text>
+          <CostAmount
+            amount={supplier.currentMonthly}
+            currency={supplier.currency}
+            brl={supplier.currentMonthlyBrl}
+            className="font-normal"
+          />
         ),
         className: "whitespace-nowrap",
         align: "right",
         skeleton: "w-24",
+      },
+      {
+        header: "Pagamento",
+        cell: (supplier) => paymentText(supplier, label) ?? "—",
+        className: "max-w-56 truncate",
+        skeleton: "w-28",
       },
       {
         header: "Veículos",

@@ -7,4 +7,5 @@ export const FINANCE_TABS: SectionTab[] = [
   { label: "Contas do mês", to: ROUTES.financeBills },
   { label: "Débitos", to: ROUTES.financeDebts },
   { label: "Extrato", to: ROUTES.financeStatement },
+  { label: "Cartões", to: ROUTES.financeCards },
 ];
