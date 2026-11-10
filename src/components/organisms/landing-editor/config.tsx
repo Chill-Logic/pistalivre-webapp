@@ -1,13 +1,31 @@
-import type { Config, Data } from "@puckeditor/core";
+import type { Config, Data, Slot } from "@puckeditor/core";
 import { Box } from "@/components/atoms/box";
 import { LandingCatalogBlock, type LandingCatalogProps } from "@/components/organisms/landing-catalog-block";
-import { CATALOG_NOT_FOUND } from "@/constants/landing";
 import { LandingFaqBlock, type LandingFaqProps } from "@/components/organisms/landing-faq-block";
 import { LandingHeroBlock, type LandingHeroProps } from "@/components/organisms/landing-hero-block";
 import { LandingLeadCtaBlock, type LandingLeadCtaProps } from "@/components/organisms/landing-lead-cta-block";
 import { LandingPlansBlock, type LandingPlansProps } from "@/components/organisms/landing-plans-block";
+import { LandingColumnsBlock, type LandingColumnsProps } from "@/components/organisms/landing-columns-block";
+import { LandingFeatureBlock, type LandingFeatureProps } from "@/components/organisms/landing-feature-block";
+import { LandingSectionBlock, type LandingSectionProps } from "@/components/organisms/landing-section-block";
+import { LandingTextBlock, type LandingTextProps } from "@/components/organisms/landing-text-block";
+import { FEATURE_ICONS } from "@/constants/landing-icons";
+import { sectionStyleFields, widthField } from "./fields";
+
+/** Blocks holding others store their children as data (`Slot`). */
+type SectionData = Omit<LandingSectionProps, "content"> & { content: Slot };
+type ColumnsData = Omit<LandingColumnsProps, "col1" | "col2" | "col3" | "col4"> & {
+  col1: Slot;
+  col2: Slot;
+  col3: Slot;
+  col4: Slot;
+};
 
 type LandingBlocks = {
+  Secao: SectionData;
+  Colunas: ColumnsData;
+  Texto: LandingTextProps;
+  Vantagem: LandingFeatureProps;
   Destaque: LandingHeroProps;
   Catalogo: LandingCatalogProps;
   Planos: LandingPlansProps;
@@ -29,10 +47,101 @@ export const landingConfig: Config<LandingBlocks> = {
     ),
   },
   categories: {
-    conteudo: { title: "Conteúdo", components: ["Destaque", "QueroAlugar", "Perguntas"] },
+    layout: { title: "Layout", components: ["Secao", "Colunas"] },
+    conteudo: {
+      title: "Conteúdo",
+      components: ["Destaque", "Texto", "Vantagem", "QueroAlugar", "Perguntas"],
+    },
     sistema: { title: "Do sistema", components: ["Catalogo", "Planos"] },
   },
   components: {
+    Secao: {
+      label: "Seção",
+      fields: {
+        ...sectionStyleFields,
+        width: widthField,
+        content: { type: "slot" },
+      },
+      defaultProps: { background: "muted", spacing: "md", width: "normal", backgroundImage: "", content: [] },
+      render: (props) => <LandingSectionBlock {...props} />,
+    },
+    Colunas: {
+      label: "Colunas",
+      fields: {
+        columns: {
+          type: "radio",
+          label: "Colunas",
+          options: [
+            { label: "2", value: 2 },
+            { label: "3", value: 3 },
+            { label: "4", value: 4 },
+          ],
+        },
+        gap: {
+          type: "radio",
+          label: "Espaço entre linhas (celular)",
+          options: [
+            { label: "Pequeno", value: "sm" },
+            { label: "Médio", value: "md" },
+            { label: "Grande", value: "lg" },
+          ],
+        },
+        align: {
+          type: "radio",
+          label: "Alinhamento vertical",
+          options: [
+            { label: "Topo", value: "start" },
+            { label: "Centro", value: "center" },
+          ],
+        },
+        col1: { type: "slot" },
+        col2: { type: "slot" },
+        col3: { type: "slot" },
+        col4: { type: "slot" },
+      },
+      defaultProps: { columns: 3, gap: "md", align: "start", col1: [], col2: [], col3: [], col4: [] },
+      render: (props) => <LandingColumnsBlock {...props} />,
+    },
+    Texto: {
+      label: "Texto",
+      fields: {
+        eyebrow: { type: "text", label: "Linha acima (opcional)" },
+        title: { type: "text", label: "Título" },
+        text: { type: "textarea", label: "Texto" },
+        align: {
+          type: "radio",
+          label: "Alinhamento",
+          options: [
+            { label: "Esquerda", value: "left" },
+            { label: "Centro", value: "center" },
+          ],
+        },
+      },
+      defaultProps: { eyebrow: "", title: "Título da seção", text: "Um parágrafo curto.", align: "center" },
+      render: (props) => <LandingTextBlock {...props} />,
+    },
+    Vantagem: {
+      label: "Vantagem",
+      fields: {
+        icon: {
+          type: "select",
+          label: "Ícone",
+          options: Object.entries(FEATURE_ICONS).map(([value, { label }]) => ({ label, value })),
+        },
+        title: { type: "text", label: "Título" },
+        text: { type: "textarea", label: "Texto" },
+        style: {
+          type: "radio",
+          label: "Estilo",
+          options: [
+            { label: "Cartão", value: "card" },
+            { label: "Simples", value: "plain" },
+          ],
+        },
+      },
+      defaultProps: { icon: "check", title: "Vantagem", text: "Uma frase sobre ela.", style: "card" },
+      render: (props) => <LandingFeatureBlock {...props} />,
+    },
     Destaque: {
       label: "Destaque",
       fields: {
@@ -88,18 +197,16 @@ export const landingConfig: Config<LandingBlocks> = {
             { label: "Mostrar", value: true },
           ],
         },
-        notFoundTitle: { type: "text", label: "\"Não encontrou?\": título (vazio esconde)" },
-        notFoundText: { type: "textarea", label: "\"Não encontrou?\": texto" },
-        notFoundButton: { type: "text", label: "\"Não encontrou?\": botão" },
+        ...sectionStyleFields,
       },
       defaultProps: {
         title: "Nossa frota",
         onlyAvailable: false,
         max: 6,
         showAvailability: false,
-        notFoundTitle: CATALOG_NOT_FOUND.title,
-        notFoundText: CATALOG_NOT_FOUND.text,
-        notFoundButton: CATALOG_NOT_FOUND.button,
+        background: "white",
+        spacing: "md",
+        backgroundImage: "",
       },
       render: (props) => <LandingCatalogBlock {...props} />,
     },
@@ -115,8 +222,15 @@ export const landingConfig: Config<LandingBlocks> = {
             { label: "Mostrar", value: true },
           ],
         },
+        ...sectionStyleFields,
       },
-      defaultProps: { title: "Escolha o seu plano", showHighlights: false },
+      defaultProps: {
+        title: "Escolha o seu plano",
+        showHighlights: false,
+        background: "muted",
+        spacing: "md",
+        backgroundImage: "",
+      },
       render: (props) => <LandingPlansBlock {...props} />,
     },
     QueroAlugar: {
@@ -133,12 +247,16 @@ export const landingConfig: Config<LandingBlocks> = {
             { label: "Só o botão", value: "button" },
           ],
         },
+        ...sectionStyleFields,
       },
       defaultProps: {
         title: "Pronto para começar?",
         text: "Deixe seu contato e responda algumas perguntas rápidas: leva 2 minutos.",
         buttonLabel: "Quero alugar",
         mode: "inline",
+        background: "brand",
+        spacing: "lg",
+        backgroundImage: "",
       },
       render: (props) => <LandingLeadCtaBlock {...props} />,
     },
@@ -156,29 +274,80 @@ export const landingConfig: Config<LandingBlocks> = {
             answer: { type: "textarea", label: "Resposta" },
           },
         },
+        ...sectionStyleFields,
       },
-      defaultProps: { title: "Perguntas frequentes", items: [] },
+      defaultProps: { title: "Perguntas frequentes", items: [], background: "white", spacing: "md", backgroundImage: "" },
       render: (props) => <LandingFaqBlock {...props} />,
     },
   },
 };
 
-/** First draft: the five blocks, already in place. */
+const feature = (id: string, icon: string, title: string, text: string) => ({
+  type: "Vantagem",
+  props: { id, icon, title, text, style: "card" },
+});
+
+/**
+ * First draft: hero, why us (a section with three advantages in columns),
+ * the catalogue, the plans, the form on the brand red and the FAQ. Bands
+ * alternate backgrounds, so the page is not one long white sheet.
+ */
 export const LANDING_INITIAL_DATA: Data = {
   root: { props: {} },
   content: [
-    { type: "Destaque", props: { id: "destaque-1", ...landingConfig.components.Destaque.defaultProps } },
-    { type: "Catalogo", props: { id: "catalogo-1", ...landingConfig.components.Catalogo.defaultProps } },
-    { type: "Planos", props: { id: "planos-1", ...landingConfig.components.Planos.defaultProps } },
+    { type: "Destaque", props: { id: "destaque-1", ...landingConfig.components.Destaque.defaultProps, align: "center" } },
+    {
+      type: "Secao",
+      props: {
+        id: "secao-vantagens",
+        background: "white",
+        spacing: "lg",
+        width: "normal",
+        backgroundImage: "",
+        content: [
+          {
+            type: "Texto",
+            props: {
+              id: "texto-vantagens",
+              eyebrow: "Por que a Pista Livre",
+              title: "Você roda, a gente cuida do resto",
+              text: "Locação pensada para quem trabalha com o veículo todo dia.",
+              align: "center",
+            },
+          },
+          {
+            type: "Colunas",
+            props: {
+              id: "colunas-vantagens",
+              columns: 3,
+              gap: "md",
+              align: "start",
+              col1: [feature("v1", "wrench", "Manutenção em dia", "Revisões e trocas de óleo no plano, sem surpresa no fim do mês.")],
+              col2: [feature("v2", "wallet", "Pagamento que cabe", "Semanal ou mensal, por pix ou boleto, do jeito que você recebe.")],
+              col3: [feature("v3", "headset", "Gente de verdade", "Atendimento pelo WhatsApp, com quem conhece a sua locação.")],
+              col4: [],
+            },
+          },
+        ],
+      },
+    },
+    {
+      type: "Catalogo",
+      props: { id: "catalogo-1", ...landingConfig.components.Catalogo.defaultProps, background: "muted" },
+    },
+    { type: "Planos", props: { id: "planos-1", ...landingConfig.components.Planos.defaultProps, background: "white" } },
     { type: "QueroAlugar", props: { id: "quero-alugar-1", ...landingConfig.components.QueroAlugar.defaultProps } },
     {
       type: "Perguntas",
       props: {
         id: "perguntas-1",
         title: "Perguntas frequentes",
+        background: "muted",
+        spacing: "md",
+        backgroundImage: "",
         items: [
           { question: "Preciso ter CNH?", answer: "Sim, CNH válida na categoria do veículo." },
-          { question: "A manutenção está inclusa?", answer: "Depende do plano: os itens inclusos aparecem em cada um." },
+          { question: "A manutenção está inclusa?", answer: "Revisões e trocas de óleo estão no plano; o restante a gente combina na locação." },
           { question: "Como pago?", answer: "Por pix ou boleto, na recorrência do seu plano." },
         ],
       },

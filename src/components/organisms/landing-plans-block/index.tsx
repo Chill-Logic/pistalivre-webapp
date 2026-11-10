@@ -3,6 +3,8 @@ import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Card, CardContent } from "@/components/atoms/card";
 import { Col, Row } from "@/components/atoms/grid";
+import { LandingSectionShell } from "@/components/molecules/landing-section-shell";
+import type { LandingSectionStyle } from "@/types/landing";
 import { Heading } from "@/components/atoms/heading";
 import { List, ListItem } from "@/components/atoms/list";
 import { Skeleton } from "@/components/atoms/skeleton";
@@ -12,20 +14,26 @@ import { durationLabel, sortPlans } from "@/helpers/plan";
 import { usePlans } from "@/hooks/api/gestao/plans/usePlans";
 import { formatCurrency } from "@/utils/format";
 
-export type LandingPlansProps = {
+export type LandingPlansProps = LandingSectionStyle & {
   title: string;
   /** What each plan includes (off while every plan includes the same). */
   showHighlights?: boolean;
 };
 
 /** The active plans, live: changing a price in Planos changes it here. */
-export function LandingPlansBlock({ title, showHighlights = false }: LandingPlansProps) {
+export function LandingPlansBlock({
+  title,
+  showHighlights = false,
+  background = "muted",
+  spacing,
+  backgroundImage,
+}: LandingPlansProps) {
   const plans = usePlans();
   const items = sortPlans(plans.data ?? []).filter((plan) => plan.active);
 
   return (
-    <Box className="bg-muted/40 px-4 py-12 md:px-10">
-      <Box className="mx-auto max-w-6xl space-y-6">
+    <LandingSectionShell background={background} spacing={spacing} imageUrl={backgroundImage}>
+      <Box className="space-y-6">
         <Heading level={2} className="text-center text-2xl md:text-3xl">
           {title}
         </Heading>
@@ -74,6 +82,6 @@ export function LandingPlansBlock({ title, showHighlights = false }: LandingPlan
               ))}
         </Row>
       </Box>
-    </Box>
+    </LandingSectionShell>
   );
 }

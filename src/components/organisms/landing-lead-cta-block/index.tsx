@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { ExternalLink } from "@/components/atoms/external-link";
+import { LandingSectionShell } from "@/components/molecules/landing-section-shell";
+import type { LandingSectionStyle } from "@/types/landing";
 import { Heading } from "@/components/atoms/heading";
 import { Text } from "@/components/atoms/text";
 import { LeadStartForm, LeadStartFormSkeleton } from "@/components/organisms/lead-start-form";
@@ -9,7 +11,7 @@ import { QuestionnaireFlow } from "@/components/organisms/questionnaire-flow";
 import { LEAD_CAPTURE_URL } from "@/constants/landing";
 import { useLeadForm } from "@/hooks/api/cliente/public-lead/useLeadForm";
 
-export type LandingLeadCtaProps = {
+export type LandingLeadCtaProps = LandingSectionStyle & {
   title: string;
   text: string;
   buttonLabel: string;
@@ -22,14 +24,23 @@ export type LandingLeadCtaProps = {
  * questionnaire's steps in the same place (no new navigation). Or only a
  * button to app.cliente…/quero-alugar.
  */
-export function LandingLeadCtaBlock({ title, text, buttonLabel, mode = "inline" }: LandingLeadCtaProps) {
+export function LandingLeadCtaBlock({
+  title,
+  text,
+  buttonLabel,
+  mode = "inline",
+  background = "brand",
+  spacing,
+  backgroundImage,
+}: LandingLeadCtaProps) {
   const form = useLeadForm();
   // undefined = not sent yet; null = sent (the honeypot caught a bot, or no session).
   const [token, setToken] = useState<string | null | undefined>(undefined);
 
   return (
-    <Box className="px-4 py-12 md:px-10">
-      <Box className="mx-auto max-w-2xl space-y-6 rounded-2xl border bg-card p-6 shadow-sm md:p-8">
+    <LandingSectionShell background={background} spacing={spacing} width="narrow" imageUrl={backgroundImage}>
+      {/* The form card stays light on any background: it is where people type. */}
+      <Box className="theme-light mx-auto max-w-2xl space-y-6 rounded-2xl border bg-card p-6 text-foreground shadow-xl md:p-8">
         {token === undefined && (
           <Box className="space-y-2 text-center">
             <Heading level={2} className="text-2xl md:text-3xl">
@@ -69,6 +80,6 @@ export function LandingLeadCtaBlock({ title, text, buttonLabel, mode = "inline" 
           <LeadStartFormSkeleton />
         )}
       </Box>
-    </Box>
+    </LandingSectionShell>
   );
 }
