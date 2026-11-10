@@ -155,7 +155,10 @@ export function DueChangeDialog({ billing }: { billing: RentalBilling }) {
                 <SelectField
                   label="Vence toda"
                   value={weekday}
-                  options={options(LABEL_MAPS.weekday)}
+                  // No Sunday: it would fall due on Monday anyway.
+                  options={options(LABEL_MAPS.weekday).filter(
+                    (option) => option.value !== "0",
+                  )}
                   placeholder="Dia da semana"
                   onChange={(value) => {
                     setWeekday(value);
