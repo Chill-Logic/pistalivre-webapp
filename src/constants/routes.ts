@@ -108,6 +108,10 @@ export const ROUTES = {
   financeBills: `${GESTAO}/financeiro/contas`,
   portal: PORTAL || "/",
   portalLogin: `${PORTAL}/entrar`,
+  /** Public (no login): lead capture and the questionnaire. */
+  portalLeadCapture: `${PORTAL}/quero-alugar`,
+  portalQuestionnaireStart: `${PORTAL}/questionario`,
+  portalQuestionnaire: `${PORTAL}/questionario/:token`,
   portalRental: `${PORTAL}/locacoes/:id`,
   portalInspectionNew: `${PORTAL}/locacoes/:id/vistorias/nova`,
   portalRentalStatement: `${PORTAL}/locacoes/:id/extrato`,
@@ -196,6 +200,8 @@ export const routeTo = {
   proposal: (id: string) => `${ROUTES.proposals}/${id}`,
   signature: (id: string) => `${ROUTES.signatures}/${id}`,
   portalRental: (id: string) => `${PORTAL}/locacoes/${id}`,
+  portalQuestionnaire: (token: string) =>
+    `${PORTAL}/questionario/${encodeURIComponent(token)}`,
   portalRentalStatement: (id: string) => `${PORTAL}/locacoes/${id}/extrato`,
   portalInspectionNew: (id: string) =>
     `${PORTAL}/locacoes/${id}/vistorias/nova`,

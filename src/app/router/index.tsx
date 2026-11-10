@@ -18,6 +18,9 @@ import {
   RentalNewPage,
   CustomerNewPage,
   CustomerLoginPage,
+  LeadCapturePage,
+  QuestionnairePage,
+  QuestionnaireStartPage,
   CustomersPage,
   DashboardPage,
   DebtDetailPage,
@@ -140,6 +143,10 @@ const partnerRoutes: RouteObject[] = [
 ];
 
 const portalRoutes: RouteObject[] = [
+  // Public, logged in or not: lead capture and the questionnaire.
+  { path: ROUTES.portalLeadCapture, element: <LeadCapturePage /> },
+  { path: ROUTES.portalQuestionnaireStart, element: <QuestionnaireStartPage /> },
+  { path: ROUTES.portalQuestionnaire, element: <QuestionnairePage /> },
   {
     element: <RedirectIfAuthenticated realm="cliente" />,
     children: [{ path: ROUTES.portalLogin, element: <CustomerLoginPage /> }],

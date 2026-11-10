@@ -58,6 +58,11 @@ curtas entre ferramentas e nos relatórios de subagentes.
   - **Volta real no dev (2026-11-09):** parceiro "Investidor Teste QA" (`investidor.qa.20261109@teste.dev` /
     `investidorqa123`), contrato PAR-RJUE36QC (investimento, 50% do faturamento, quinzenal) com a QAT9C11:
     v1 recusada, v2 retirada, v3 aceita, ativo, pedido de assinatura em rascunho (nada enviado ao Clicksign).
+- **Quero alugar e questionário no SPA (2026-11-09, local):** telas públicas do domínio do cliente, sem login:
+  `app.cliente…/quero-alugar` (contato + "Responder agora"), `/questionario` (entrada por link de campanha) e
+  `/questionario/:token` (perfil → planos → cadastro → WhatsApp). Atribuição first-touch no cookie `pl_ft` e last-touch
+  da URL (`helpers/attribution`). API em `/api/v1/public/*`; o Next redireciona os endereços antigos. Template
+  `PublicLayout`. Testado de ponta a ponta no dev (lead "Teste QA Questionário"). **Backend antes do front.**
 - **Contas do mês (no ar desde 2026-11-09 10:27):** Financeiro › Contas do mês (`/gestao/financeiro/contas?mes=`)
   junta custos fixos, parcelas de dívidas e avulsas do mês, com os meses anteriores em aberto. Registrar = pago (dia,
   valor, comprovante), em aberto ou sem cobrança, inclusive retroativo; parcela paga pelo diálogo da dívida. O custo

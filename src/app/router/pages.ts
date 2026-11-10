@@ -52,6 +52,18 @@ export const CustomerLoginPage = lazyPage(
   () => import("@/pages/cliente/login"),
   "CustomerLoginPage",
 );
+export const LeadCapturePage = lazyPage(
+  () => import("@/pages/cliente/lead-capture"),
+  "LeadCapturePage",
+);
+export const QuestionnaireStartPage = lazyPage(
+  () => import("@/pages/cliente/questionnaire-start"),
+  "QuestionnaireStartPage",
+);
+export const QuestionnairePage = lazyPage(
+  () => import("@/pages/cliente/questionnaire"),
+  "QuestionnairePage",
+);
 export const PortalHomePage = lazyPage(
   () => import("@/pages/cliente/home"),
   "PortalHomePage",

@@ -63,6 +63,12 @@ export const queryKeys = {
     detail: (id: string) =>
       [...queryKeys.inspections.all, "detail", id] as const,
   },
+  publicLead: {
+    all: ["public-lead"] as const,
+    form: () => [...queryKeys.publicLead.all, "form"] as const,
+    questionnaire: (token: string) =>
+      [...queryKeys.publicLead.all, "questionnaire", token] as const,
+  },
   portal: {
     all: ["portal"] as const,
     rentals: () => [...queryKeys.portal.all, "rentals"] as const,
