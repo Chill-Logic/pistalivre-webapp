@@ -58,7 +58,7 @@ export function PublicLandingPage() {
         <Logo size="hero" />
         <Heading className="text-3xl md:text-4xl">{site.data?.company.name ?? "Pista Livre"}</Heading>
         <Text size="lg" className="text-white/85">
-          Aluguel de motos e veículos para quem trabalha com aplicativo.
+          Aluguel de veículos para quem trabalha com aplicativo.
         </Text>
         <Button asChild size="lg" variant="secondary">
           <ExternalLink href={LEAD_CAPTURE_URL} className="text-foreground hover:no-underline">

@@ -25,6 +25,6 @@ export function landingMeta(data: Data | null | undefined) {
     title: props.title?.trim() || "Pista Livre",
     description:
       props.description?.trim() ||
-      "Aluguel de motos e veículos para quem trabalha com aplicativo.",
+      "Aluguel de veículos para quem trabalha com aplicativo.",
   };
 }

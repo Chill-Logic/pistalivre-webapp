@@ -45,7 +45,7 @@ export const landingConfig: Config<LandingBlocks> = {
     },
     defaultProps: {
       title: "Pista Livre · aluguel de veículos",
-      description: "Aluguel de motos e veículos para quem trabalha com aplicativo: planos semanais e mensais, manutenção inclusa.",
+      description: "Aluguel de veículos para quem trabalha com aplicativo: planos semanais e mensais, manutenção inclusa.",
     },
     // The landing is light-only (the brand page), whatever the app's theme.
     render: ({ children }) => (
