@@ -98,5 +98,13 @@ export default defineConfig({
       },
     },
   },
-  server: { host: true, port: 5173 },
+  server: {
+    host: true,
+    port: 5173,
+    // POC on another port: same-origin /api through Vite (the dev API only
+    // accepts CORS from :5173). Set POC_API_PROXY=http://localhost:3000.
+    ...(process.env.POC_API_PROXY
+      ? { proxy: { "/api": { target: process.env.POC_API_PROXY, changeOrigin: true } } }
+      : {}),
+  },
 });

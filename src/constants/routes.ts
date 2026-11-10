@@ -100,6 +100,9 @@ export const ROUTES = {
   partnerEdit: `${GESTAO}/parceiros/:id/editar`,
   partnerContract: `${GESTAO}/parceiros/contratos/:id`,
   partnerContractDocument: `${GESTAO}/parceiros/contratos/:id/documento`,
+  /** POC: landing editor (pistalivrelocacoes.com.br), draft only. */
+  landingEditor: `${GESTAO}/landing`,
+  landingPreview: `${GESTAO}/landing/previa`,
   finance: `${GESTAO}/financeiro`,
   financeDebts: `${GESTAO}/financeiro/debitos`,
   debtNew: `${GESTAO}/financeiro/debitos/nova`,

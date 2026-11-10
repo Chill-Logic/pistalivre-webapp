@@ -1,5 +1,13 @@
 import { lazyPage } from "@/helpers/lazy-page";
 
+export const LandingEditorPage = lazyPage(
+  () => import("@/pages/gestao/landing-editor"),
+  "LandingEditorPage",
+);
+export const LandingPreviewPage = lazyPage(
+  () => import("@/pages/gestao/landing-preview"),
+  "LandingPreviewPage",
+);
 export const DashboardPage = lazyPage(
   () => import("@/pages/gestao/dashboard"),
   "DashboardPage",
