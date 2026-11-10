@@ -7,6 +7,7 @@ import type {
   VehicleDetail,
   VehicleFilters,
   VehicleStatus,
+  VehicleDocumentResult,
   VehicleFormOptions,
   VehicleInput,
   VehicleType,
@@ -44,6 +45,16 @@ export const vehiclesService = {
   },
   async update(id: string, input: VehicleInput) {
     const { data } = await http.put<VehicleWrite>(`/vehicles/${id}`, input);
+    return data;
+  },
+  /** The CRLV (photo or PDF) read by the AI: prefills the form, saves nothing. */
+  async readDocument(file: File) {
+    const form = new FormData();
+    form.append("file", file);
+    const { data } = await http.post<VehicleDocumentResult>(
+      "/vehicles/read-document",
+      form,
+    );
     return data;
   },
   async listTypes() {

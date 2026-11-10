@@ -1,6 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import {
+  Controller,
+  useForm,
+  type FieldPath,
+  type PathValue,
+} from "react-hook-form";
 import { Link } from "react-router-dom";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
@@ -15,6 +20,7 @@ import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { SelectField } from "@/components/molecules/select-field";
 import { TextLink } from "@/components/molecules/text-link";
+import { VehicleDocumentReader } from "@/components/organisms/vehicle-document-reader";
 import { VehiclePartyField } from "@/components/organisms/vehicle-party-field";
 import {
   toVehicleInput,
@@ -28,12 +34,17 @@ import {
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { ROUTES } from "@/constants/routes";
 import { applyApiErrors } from "@/helpers/form";
-import { categoryOptions, typeSlugOfCategory } from "@/helpers/vehicle-form";
+import {
+  categoryOptions,
+  DOCUMENT_REVIEW_HINTS,
+  typeSlugOfCategory,
+} from "@/helpers/vehicle-form";
 import { useCatalog } from "@/hooks/api/gestao/catalog/useCatalog";
 import { useSaveVehicle } from "@/hooks/api/gestao/vehicles/useSaveVehicle";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type {
   VehicleDetail,
+  VehicleDocumentResult,
   VehicleFormOptions,
   VehicleWrite,
 } from "@/types/vehicle";
@@ -71,6 +82,7 @@ export function VehicleForm({
     handleSubmit,
     setValue,
     setError,
+    trigger,
     watch,
     formState: { errors },
   } = useForm<VehicleFormInput, unknown, VehicleFormValues>({
@@ -108,6 +120,40 @@ export function VehicleForm({
     label: `${item.brandName} ${item.modelName} ${item.year}`,
   }));
 
+  // The CRLV read by the AI: fills what was read (never blanks a typed field)
+  // and points at what to compare with the paper.
+  const fillFromDocument = ({ fields, review, titleHolder }: VehicleDocumentResult) => {
+    const filled: FieldPath<VehicleFormInput>[] = [];
+    const fill = <K extends FieldPath<VehicleFormInput>>(
+      name: K,
+      value: PathValue<VehicleFormInput, K>,
+    ) => {
+      setValue(name, value, { shouldDirty: true });
+      filled.push(name);
+    };
+    if (fields.plate) fill("plate", fields.plate);
+    if (fields.renavam) fill("renavam", fields.renavam);
+    if (fields.chassis) fill("chassis", fields.chassis);
+    if (fields.color) fill("color", fields.color);
+    if (fields.catalogItemId) {
+      fill("brand", fields.brand);
+      fill("model", fields.model);
+      fill("year", String(fields.year));
+    }
+    if (titleHolder?.kind === "company") fill("titleHolderPartnerId", null);
+    if (titleHolder?.kind === "partner") {
+      fill("titleHolderPartnerId", titleHolder.partnerId);
+    }
+    // Validate first, then flag: a validation after would clear the hints.
+    void trigger(filled).then(() => {
+      for (const field of ["plate", "renavam", "chassis"] as const) {
+        if (review.includes(field) && fields[field]) {
+          setError(field, { message: DOCUMENT_REVIEW_HINTS[field] });
+        }
+      }
+    });
+  };
+
   const onSubmit = handleSubmit((values) => {
     setFormError(null);
     save.mutate(toVehicleInput(values), {
@@ -125,6 +171,12 @@ export function VehicleForm({
     <Card>
       <CardContent className="pt-4 md:pt-6">
         <Form onSubmit={onSubmit} noValidate className="space-y-6">
+          {!vehicle && options.readDocument && (
+            <VehicleDocumentReader
+              onRead={fillFromDocument}
+              disabled={save.isPending}
+            />
+          )}
           <Row className="gap-y-4">
             <Col md={6} lg={4}>
               <FormField

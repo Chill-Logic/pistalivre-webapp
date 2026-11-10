@@ -63,6 +63,45 @@ export type VehicleFormOptions = {
   brands: Ref[];
   models: (Ref & { brandId: string })[];
   years: number[];
+  /** "Preencher pelo documento" is available (AI integration on Anthropic). */
+  readDocument: boolean;
+};
+
+/** Fields worth comparing with the paper after the AI read it. */
+export type VehicleDocumentReview =
+  | "plate"
+  | "renavam"
+  | "chassis"
+  | "model"
+  | "year";
+
+/** Who is on the document: the company, a registered partner, or neither. */
+export type VehicleDocumentHolder =
+  | { kind: "company" }
+  | { kind: "partner"; partnerId: string; name: string }
+  | { kind: "unknown"; name: string; document: string };
+
+/** Answer of POST /vehicles/read-document: nothing saved, the form prefills. */
+export type VehicleDocumentResult = {
+  /** Empty string = not read. */
+  fields: {
+    plate: string;
+    renavam: string;
+    chassis: string;
+    color: string;
+    catalogItemId: string | null;
+    brand: string;
+    model: string;
+    year: number | null;
+  };
+  /** As printed (shown when the catalogue didn't match). */
+  document: {
+    brandModel: string;
+    manufactureYear: number | null;
+    modelYear: number | null;
+  };
+  titleHolder: VehicleDocumentHolder | null;
+  review: VehicleDocumentReview[];
 };
 
 /** Body of POST/PUT /vehicles. Brand and model go by NAME (find-or-create). */
