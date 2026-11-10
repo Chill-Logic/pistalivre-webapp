@@ -1,5 +1,8 @@
 import {
+  Banknote,
   Building2,
+  CalendarDays,
+  Scale,
   CarFront,
   ClipboardList,
   Landmark,
@@ -68,11 +71,6 @@ const RENTALS: NavItem = {
   to: ROUTES.rentals,
   icon: FileSignature,
 };
-const FINANCE: NavItem = {
-  label: "Financeiro",
-  to: ROUTES.finance,
-  icon: Wallet,
-};
 
 /**
  * Mobile bottom bar: four daily destinations; the fifth slot is "Menu", which
@@ -132,7 +130,11 @@ export const SIDEBAR_NAV: NavEntry[] = [
     label: "Financeiro",
     icon: Landmark,
     items: [
-      FINANCE,
+      // The finance tabs, one by one: no "Financeiro › Financeiro".
+      { label: "Visão geral", to: ROUTES.finance, icon: Wallet, exact: true },
+      { label: "Contas do mês", to: ROUTES.financeBills, icon: CalendarDays },
+      { label: "Débitos", to: ROUTES.financeDebts, icon: Scale },
+      { label: "Extrato", to: ROUTES.financeStatement, icon: Banknote },
       { label: "Custos fixos", to: ROUTES.suppliers, icon: Receipt },
       { label: "Projeções", to: ROUTES.projections, icon: TrendingUp },
       { label: "Parceiros", to: ROUTES.partners, icon: BriefcaseBusiness },
