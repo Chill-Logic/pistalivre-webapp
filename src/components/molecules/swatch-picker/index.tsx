@@ -2,76 +2,79 @@ import { Check } from "lucide-react";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Label } from "@/components/atoms/label";
-import { FormField } from "@/components/molecules/form-field";
+import { Text } from "@/components/atoms/text";
 import { cn } from "@/utils/cn";
 
-/** Common vehicle paints, as a starting point (any #rrggbb is accepted). */
-const PRESETS = [
-  { hex: "#f5f5f5", name: "Branco" },
-  { hex: "#111111", name: "Preto" },
+/**
+ * Vehicle paints, name and swatch together: tapping one sets both, so the
+ * name is always written the same way (and matches the fleet's colour).
+ */
+export const PAINTS = [
+  { hex: "#f5f5f5", name: "Branca" },
+  { hex: "#111111", name: "Preta" },
   { hex: "#9ca3af", name: "Prata" },
   { hex: "#4b5563", name: "Cinza" },
-  { hex: "#d81e1e", name: "Vermelho" },
+  { hex: "#d81e1e", name: "Vermelha" },
   { hex: "#1d4ed8", name: "Azul" },
-  { hex: "#facc15", name: "Amarelo" },
+  { hex: "#facc15", name: "Amarela" },
   { hex: "#16a34a", name: "Verde" },
   { hex: "#ea580c", name: "Laranja" },
   { hex: "#78350f", name: "Marrom" },
-];
+] as const;
+
+export type Paint = (typeof PAINTS)[number];
+
+const LIGHT = new Set(["#f5f5f5", "#facc15", "#9ca3af"]);
 
 type SwatchPickerProps = {
   label: string;
-  /** #rrggbb or "". */
+  /** The chosen paint's name, or "". */
   value: string;
-  onChange: (value: string) => void;
+  onChange: (paint: Paint) => void;
+  /** Names already taken (shown, not choosable). */
+  taken?: string[];
   error?: string;
   disabled?: boolean;
 };
 
-/** The colour of a swatch: a palette to tap, or the hex code typed. */
-export function SwatchPicker({ label, value, onChange, error, disabled }: SwatchPickerProps) {
+/** Pick a paint by its swatch (no typing: no misspelt colour). */
+export function SwatchPicker({ label, value, onChange, taken = [], error, disabled }: SwatchPickerProps) {
+  const isTaken = (name: string) => taken.some((t) => t.toLowerCase() === name.toLowerCase());
   return (
     <Box className="space-y-2">
       <Label>{label}</Label>
       <Box className="flex flex-wrap gap-2" role="radiogroup" aria-label={label}>
-        {PRESETS.map((preset) => {
-          const active = value.toLowerCase() === preset.hex;
+        {PAINTS.map((paint) => {
+          const active = value === paint.name;
+          const used = isTaken(paint.name);
           return (
             <Button
-              key={preset.hex}
+              key={paint.name}
               type="button"
               size="icon"
               variant="outline"
               role="radio"
               aria-checked={active}
-              aria-label={preset.name}
-              title={preset.name}
-              disabled={disabled}
-              onClick={() => onChange(preset.hex)}
-              style={{ backgroundColor: preset.hex }}
+              aria-label={used ? `${paint.name} (já cadastrada)` : paint.name}
+              title={used ? `${paint.name} (já cadastrada)` : paint.name}
+              disabled={disabled || used}
+              onClick={() => onChange(paint)}
+              style={{ backgroundColor: paint.hex }}
               className={cn(
-                "size-8 rounded-full hover:opacity-90",
+                "size-8 rounded-full hover:opacity-90 disabled:opacity-30",
                 active && "ring-2 ring-primary ring-offset-2 ring-offset-background",
               )}
             >
               {active && (
-                <Check
-                  className={cn("size-4", ["#f5f5f5", "#facc15", "#9ca3af"].includes(preset.hex) ? "text-black" : "text-white")}
-                />
+                <Check className={cn("size-4", LIGHT.has(paint.hex) ? "text-black" : "text-white")} />
               )}
             </Button>
           );
         })}
       </Box>
-      <FormField
-        label="Código da cor (opcional)"
-        placeholder="#d81e1e"
-        maxLength={7}
-        value={value}
-        onChange={(event) => onChange(event.target.value.trim())}
-        error={error}
-        disabled={disabled}
-      />
+      <Text size="xs" tone={error ? "destructive" : "muted"}>
+        {error ?? (value || "Toque na cor")}
+      </Text>
     </Box>
   );
 }

@@ -10,7 +10,6 @@ import { List, ListItem } from "@/components/atoms/list";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
-import { CreatableCombobox } from "@/components/molecules/creatable-combobox";
 import { FilePicker } from "@/components/molecules/file-picker";
 import { FormField } from "@/components/molecules/form-field";
 import { SegmentedField } from "@/components/molecules/segmented-field";
@@ -26,7 +25,7 @@ const IMAGE_MODES = [
   { value: "link", label: "Usar um link" },
 ];
 
-type Errors = Partial<Record<"color" | "swatch" | "imageUrl" | "file" | "form", string>>;
+type Errors = Partial<Record<"color" | "imageUrl" | "file" | "form", string>>;
 
 /**
  * The colours of a catalogue item: the same model + year in each paint, each
@@ -41,22 +40,15 @@ export function CatalogVariantsEditor({ item }: { item: CatalogItem }) {
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<Errors>({});
 
-  // The fleet's colours not yet here: the likely next ones.
-  const suggestions = (item.fleet?.colors ?? [])
-    .map((c) => c.color)
-    .filter((name) => name !== "Sem cor")
-    .filter((name) => !item.variants.some((v) => v.color.toLowerCase() === name.toLowerCase()));
-
   const onAdd = () => {
     const next: Errors = {};
-    if (!color.trim()) next.color = "Informe a cor";
-    if (swatch && !/^#[0-9a-fA-F]{6}$/.test(swatch)) next.swatch = "Use o formato #rrggbb";
+    if (!color) next.color = "Escolha a cor";
     setErrors(next);
     if (Object.keys(next).length) return;
     add.mutate(
       {
         input: {
-          color: color.trim(),
+          color,
           swatch: swatch || null,
           imageUrl: mode === "link" ? imageUrl.trim() || null : null,
         },
@@ -73,8 +65,7 @@ export function CatalogVariantsEditor({ item }: { item: CatalogItem }) {
           const apiError = toApiError(error);
           const fields = apiError.fields ?? {};
           setErrors({
-            color: fields.color,
-            swatch: fields.swatch,
+            color: fields.color ?? fields.swatch,
             imageUrl: fields.imageUrl,
             file: fields.file,
             form: Object.keys(fields).length ? undefined : apiError.message,
@@ -158,22 +149,15 @@ export function CatalogVariantsEditor({ item }: { item: CatalogItem }) {
       )}
 
       <Box className="space-y-3 rounded-md border border-dashed p-3">
-        <CreatableCombobox
+        <SwatchPicker
           label="Nova cor"
           value={color}
-          options={suggestions.map((name) => ({ value: name, label: name }))}
-          onChange={setColor}
-          placeholder="Ex.: Vermelha"
-          searchPlaceholder="Buscar ou digitar…"
-          createLabel="Usar"
+          onChange={(paint) => {
+            setColor(paint.name);
+            setSwatch(paint.hex);
+          }}
+          taken={item.variants.map((variant) => variant.color)}
           error={errors.color}
-          disabled={add.isPending}
-        />
-        <SwatchPicker
-          label="Amostra"
-          value={swatch}
-          onChange={setSwatch}
-          error={errors.swatch}
           disabled={add.isPending}
         />
         <SegmentedField
