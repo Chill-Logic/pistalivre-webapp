@@ -27,7 +27,10 @@ export function monthItemDetail(item: MonthItem, label: Label): string {
 export function monthItemOutcome(item: MonthItem): string {
   const parts = [
     item.status === "PAID" && item.paidAt && `Pago em ${formatCalendarDate(item.paidAt)}`,
-    item.status === "PARTIAL" && item.amount != null && `${formatCurrency(item.amount)} pagos`,
+    item.status === "PARTIAL" &&
+      item.amount != null &&
+      `${formatCurrency(item.amount)} pagos${item.paidAt ? ` até ${formatCalendarDate(item.paidAt)}` : ""}`,
+    item.surcharge != null && `${formatCurrency(item.surcharge)} de multa/juros`,
     item.status === "OPEN" &&
       item.expense &&
       item.amount != null &&

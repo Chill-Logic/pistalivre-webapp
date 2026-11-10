@@ -33,8 +33,12 @@ export type MonthItem = {
   expected: number | null;
   dueDate: string | null;
   status: MonthItemStatus;
-  /** Recorded amount, or what was paid of the installment. */
+  /** Recorded amount, or the cash paid for the installment (late fee included). */
   amount: number | null;
+  /** Installment only: the late fee inside `amount` (null = none). */
+  surcharge: number | null;
+  /** Installment only: how much of it is paid off. */
+  covered: number | null;
   paidAt: string | null;
   /** The record behind it (null = nothing recorded yet). */
   expense: {

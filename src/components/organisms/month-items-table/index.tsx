@@ -37,7 +37,7 @@ export function MonthItemsTable({ items }: { items: MonthItem[] }) {
           const outcome = monthItemOutcome(item);
           return (
             <TableRow key={item.key}>
-              <TableCell className="w-[34%]">
+              <TableCell className="w-[34%] whitespace-normal">
                 <Text weight="medium" className="break-words">
                   {href ? <TextLink to={href}>{item.description}</TextLink> : item.description}
                 </Text>
@@ -56,11 +56,11 @@ export function MonthItemsTable({ items }: { items: MonthItem[] }) {
               <TableCell className="text-right tabular-nums">
                 {item.amount != null ? formatCurrency(item.amount) : "—"}
               </TableCell>
-              <TableCell>
+              <TableCell className="min-w-48 whitespace-normal">
                 <Box className="space-y-1">
                   <ExpenseStatusBadge status={item.status} />
                   {(outcome || (item.expense?.documentCount ?? 0) > 0) && (
-                    <Text size="xs" tone="muted" className="flex items-center gap-1">
+                    <Text size="xs" tone="muted" className="flex flex-wrap items-center gap-1">
                       {outcome}
                       {item.expense && item.expense.documentCount > 0 && (
                         <>
