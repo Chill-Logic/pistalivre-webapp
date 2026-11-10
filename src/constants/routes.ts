@@ -31,6 +31,7 @@ export const ROUTES = {
   dashboard: GESTAO || "/",
   vehicles: `${GESTAO}/veiculos`,
   vehicleNew: `${GESTAO}/veiculos/novo`,
+  vehicleCatalog: `${GESTAO}/veiculos/catalogo`,
   vehicleDetail: `${GESTAO}/veiculos/:id`,
   vehicleEdit: `${GESTAO}/veiculos/:id/editar`,
   inspectionNew: `${GESTAO}/veiculos/:id/vistorias/nova`,

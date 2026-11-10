@@ -1,0 +1,88 @@
+import { CarFront } from "lucide-react";
+import type { ReactNode } from "react";
+import { Badge } from "@/components/atoms/badge";
+import { Box } from "@/components/atoms/box";
+import { Card, CardContent } from "@/components/atoms/card";
+import { Image } from "@/components/atoms/image";
+import { Skeleton } from "@/components/atoms/skeleton";
+import { Text } from "@/components/atoms/text";
+import type { CatalogItem } from "@/types/catalog";
+import { pluralize } from "@/utils/text";
+
+/** One model + year of the catalogue: picture, text and what the fleet has. */
+export function CatalogCard({ item, actions }: { item: CatalogItem; actions: ReactNode }) {
+  const fleet = item.fleet;
+  return (
+    <Card className="flex h-full flex-col overflow-hidden">
+      <Box className="flex aspect-[4/3] items-center justify-center bg-muted/40 p-4">
+        {item.imageSrc ? (
+          <Image
+            src={item.imageSrc}
+            alt={`${item.brandName} ${item.modelName} ${item.year}`}
+            loading="lazy"
+            className="max-h-full max-w-full object-contain"
+          />
+        ) : (
+          <Box className="flex flex-col items-center gap-1 text-muted-foreground">
+            <CarFront className="size-10" aria-hidden />
+            <Text size="xs" tone="muted">
+              Sem imagem
+            </Text>
+          </Box>
+        )}
+      </Box>
+      <CardContent className="flex flex-1 flex-col gap-3 pt-4">
+        <Box className="flex items-start justify-between gap-2">
+          <Box className="min-w-0">
+            <Text size="xs" tone="muted">
+              {item.brandName}
+            </Text>
+            <Text weight="semibold" size="base">
+              {item.modelName} {item.year}
+            </Text>
+          </Box>
+          {!item.active && <Badge className="shrink-0">Inativo</Badge>}
+        </Box>
+        {item.description && (
+          <Text tone="muted" className="line-clamp-2">
+            {item.description}
+          </Text>
+        )}
+        <Box className="mt-auto space-y-2">
+          <Text size="xs" tone="muted">
+            {fleet
+              ? `${pluralize(fleet.units, "unidade", "unidades")} na frota · ${fleet.available} ${fleet.available === 1 ? "disponível" : "disponíveis"}`
+              : "Nenhuma unidade na frota"}
+          </Text>
+          {fleet && fleet.colors.length > 0 && (
+            <Box className="flex flex-wrap gap-1.5">
+              {fleet.colors.map((color) => (
+                <Badge key={color.color} variant="outline" className="font-normal">
+                  {color.color} · {color.units}
+                </Badge>
+              ))}
+            </Box>
+          )}
+          <Box className="flex gap-2 pt-1">{actions}</Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function CatalogCardSkeleton() {
+  return (
+    <Card className="overflow-hidden">
+      <Skeleton className="aspect-[4/3] rounded-none" />
+      <CardContent className="space-y-3 pt-4">
+        <Skeleton shape="text" className="w-20 text-xs" />
+        <Skeleton shape="text" className="w-40 text-base" />
+        <Skeleton shape="text" className="w-48 text-xs" />
+        <Box className="flex gap-2">
+          <Skeleton className="h-9 w-20" />
+          <Skeleton className="h-9 w-20" />
+        </Box>
+      </CardContent>
+    </Card>
+  );
+}

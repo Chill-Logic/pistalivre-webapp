@@ -88,6 +88,10 @@ export const PortalInspectionNewPage = lazyPage(
   () => import("@/pages/cliente/inspection-new"),
   "PortalInspectionNewPage",
 );
+export const VehicleCatalogPage = lazyPage(
+  () => import("@/pages/gestao/vehicle-catalog"),
+  "VehicleCatalogPage",
+);
 export const VehicleNewPage = lazyPage(
   () => import("@/pages/gestao/vehicle-new"),
   "VehicleNewPage",

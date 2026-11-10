@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { LayoutGrid, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -29,6 +29,12 @@ export function VehiclesPage() {
         actions={
           <>
             <ViewToggle view={view} onChange={setView} />
+            <Button asChild variant="outline">
+              <Link to={ROUTES.vehicleCatalog}>
+                <LayoutGrid />
+                Catálogo
+              </Link>
+            </Button>
             <Button asChild>
               <Link to={ROUTES.vehicleNew}>
                 <Plus />

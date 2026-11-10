@@ -11,10 +11,10 @@ import { Col, Row } from "@/components/atoms/grid";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
-import { CreatableCombobox } from "@/components/molecules/creatable-combobox";
 import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { SelectField } from "@/components/molecules/select-field";
+import { TextLink } from "@/components/molecules/text-link";
 import { VehiclePartyField } from "@/components/organisms/vehicle-party-field";
 import {
   toVehicleInput,
@@ -26,14 +26,10 @@ import {
   type VehiclePartiesPrefill,
 } from "./schema";
 import { LABEL_MAPS } from "@/constants/label-maps";
+import { ROUTES } from "@/constants/routes";
 import { applyApiErrors } from "@/helpers/form";
-import {
-  brandOptions,
-  categoryOptions,
-  modelOptions,
-  typeSlugOfCategory,
-  yearOptions,
-} from "@/helpers/vehicle-form";
+import { categoryOptions, typeSlugOfCategory } from "@/helpers/vehicle-form";
+import { useCatalog } from "@/hooks/api/gestao/catalog/useCatalog";
 import { useSaveVehicle } from "@/hooks/api/gestao/vehicles/useSaveVehicle";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type {
@@ -88,6 +84,29 @@ export function VehicleForm({
 
   const typeSlug = watch("typeSlug");
   const brand = watch("brand");
+  const model = watch("model");
+  const year = watch("year");
+
+  // The model comes from the catalogue: active items (+ the one this vehicle
+  // already is, even if inactivated since).
+  const catalog = useCatalog();
+  const sameText = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+  const catalogItems = (catalog.data?.items ?? []).filter(
+    (item) =>
+      item.active ||
+      (vehicle && item.modelId === vehicle.model.id && item.year === vehicle.year),
+  );
+  const catalogChoice =
+    catalogItems.find(
+      (item) =>
+        sameText(item.brandName, brand) &&
+        sameText(item.modelName, model) &&
+        String(item.year) === year,
+    )?.id ?? "";
+  const catalogOptions = catalogItems.map((item) => ({
+    value: item.id,
+    label: `${item.brandName} ${item.modelName} ${item.year}`,
+  }));
 
   const onSubmit = handleSubmit((values) => {
     setFormError(null);
@@ -157,58 +176,29 @@ export function VehicleForm({
                 )}
               />
             </Col>
-            <Col md={6} lg={4}>
-              <Controller
-                control={control}
-                name="brand"
-                render={({ field }) => (
-                  <CreatableCombobox
-                    label="Marca"
-                    value={field.value}
-                    options={brandOptions(options)}
-                    onChange={(next) => {
-                      field.onChange(next);
-                      // Models are per brand.
-                      if (next !== brand) setValue("model", "");
-                    }}
-                    error={errors.brand?.message}
-                  />
-                )}
-              />
-            </Col>
-            <Col md={6} lg={4}>
-              <Controller
-                control={control}
-                name="model"
-                render={({ field }) => (
-                  <CreatableCombobox
-                    label="Modelo"
-                    value={field.value}
-                    options={modelOptions(options, brand)}
-                    onChange={field.onChange}
-                    placeholder={brand ? "Selecione" : "Escolha a marca antes"}
-                    disabled={!brand}
-                    error={errors.model?.message}
-                  />
-                )}
-              />
-            </Col>
-            <Col md={6} lg={4}>
-              <Controller
-                control={control}
-                name="year"
-                render={({ field }) => (
-                  <CreatableCombobox
-                    label="Ano"
-                    value={field.value}
-                    options={yearOptions(options)}
-                    onChange={field.onChange}
-                    searchPlaceholder="Buscar ou digitar ano…"
-                    numeric
-                    error={errors.year?.message}
-                  />
-                )}
-              />
+            <Col md={6} lg={8}>
+              <Box className="space-y-1">
+                <SelectField
+                  label="Modelo (do catálogo)"
+                  value={catalogChoice}
+                  options={catalogOptions}
+                  onChange={(id) => {
+                    const item = catalog.data?.items.find((entry) => entry.id === id);
+                    if (!item) return;
+                    setValue("brand", item.brandName, { shouldValidate: true });
+                    setValue("model", item.modelName, { shouldValidate: true });
+                    setValue("year", String(item.year), { shouldValidate: true });
+                  }}
+                  placeholder={catalog.isPending ? "Carregando o catálogo…" : "Escolha o modelo e ano"}
+                  disabled={catalog.isPending}
+                  error={errors.brand?.message ?? errors.model?.message ?? errors.year?.message}
+                />
+                <Text size="xs" tone="muted">
+                  Não está na lista?{" "}
+                  <TextLink to={ROUTES.vehicleCatalog}>Cadastre no catálogo</TextLink>{" "}
+                  primeiro.
+                </Text>
+              </Box>
             </Col>
             <Col md={6} lg={4}>
               <FormField

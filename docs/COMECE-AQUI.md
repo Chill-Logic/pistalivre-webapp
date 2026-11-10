@@ -58,6 +58,11 @@ curtas entre ferramentas e nos relatórios de subagentes.
   - **Volta real no dev (2026-11-09):** parceiro "Investidor Teste QA" (`investidor.qa.20261109@teste.dev` /
     `investidorqa123`), contrato PAR-RJUE36QC (investimento, 50% do faturamento, quinzenal) com a QAT9C11:
     v1 recusada, v2 retirada, v3 aceita, ativo, pedido de assinatura em rascunho (nada enviado ao Clicksign).
+- **Catálogo de veículos (2026-11-09, local):** Veículos › Catálogo (`/gestao/veiculos/catalogo`): cada modelo + ano com
+  imagem (upload, PNG de preferência, ou link https), descrição, ativo; unidades e cores vêm da frota; "Na frota, fora do
+  catálogo" adiciona com um toque. **O veículo nasce do catálogo**: o formulário escolhe "Modelo (do catálogo)" (marca,
+  modelo e ano juntos) e o backend recusa modelo + ano fora dele. Marca/modelo novos nascem no catálogo. Landing pública
+  do catálogo: depois (a imagem já tem rota pública). **Backend antes do front.**
 - **Quero alugar e questionário no SPA (2026-11-09, local):** telas públicas do domínio do cliente, sem login:
   `app.cliente…/quero-alugar` (contato + "Responder agora"), `/questionario` (entrada por link de campanha) e
   `/questionario/:token` (perfil → planos → cadastro → WhatsApp). Atribuição first-touch no cookie `pl_ft` e last-touch
