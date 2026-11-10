@@ -11,7 +11,7 @@ import {
 import { Text } from "@/components/atoms/text";
 import { NavLink } from "@/components/molecules/nav-link";
 import type { NavGroup as NavGroupEntry } from "@/constants/navigation";
-import { useIsAnyRouteActive } from "@/hooks/ui/useIsAnyRouteActive";
+import { useActiveNavItem } from "@/hooks/ui/useActiveNavItem";
 import { useRememberedToggle } from "@/hooks/ui/useRememberedToggle";
 import { cn } from "@/utils/cn";
 
@@ -23,7 +23,8 @@ type NavGroupProps = {
 
 /**
  * A collapsible section of the sidebar. Remembers whether it was left open;
- * the one holding the current page is always open. On the icon-only sidebar
+ * the one holding the current page opens with it and, closed by hand, shows
+ * that page in its header ("Frota › Catálogo"). On the icon-only sidebar
  * it becomes one icon that opens its items beside it.
  */
 export function NavGroup({
@@ -33,12 +34,17 @@ export function NavGroup({
 }: NavGroupProps) {
   const id = useId();
   const Icon = group.icon;
-  const current = useIsAnyRouteActive(group.items);
+  const activeItem = useActiveNavItem(group.items);
+  const current = activeItem !== undefined;
   const [rememberedOpen, toggleRemembered] = useRememberedToggle(
     `nav:${group.label}`,
     false,
   );
-  const open = current || rememberedOpen;
+  // Closed on the page it holds: keyed by that page, so going to another
+  // one of its items (or coming back later) opens it again.
+  const [closedOn, setClosedOn] = useState<string | null>(null);
+  const closedHere = current && closedOn === activeItem.to;
+  const open = current ? !closedHere : rememberedOpen;
 
   // Icon-only sidebar: the items open on hover (and on tap). Closing waits a
   // moment, so the pointer can travel from the icon to the list.
@@ -115,18 +121,23 @@ export function NavGroup({
         variant="ghost"
         aria-expanded={open}
         aria-controls={id}
-        // The group of the current page stays open: nothing to toggle there.
-        onClick={() => !current && toggleRemembered()}
+        onClick={() =>
+          current
+            ? setClosedOn(closedHere ? null : activeItem.to)
+            : toggleRemembered()
+        }
         className={cn(
           "h-11 w-full justify-start gap-3 px-3 text-sm font-medium md:h-9",
-          current
-            ? "text-foreground"
-            : "text-muted-foreground hover:text-foreground",
+          closedHere
+            ? "bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary"
+            : current
+              ? "text-foreground"
+              : "text-muted-foreground hover:text-foreground",
         )}
       >
         <Icon className="!size-5 shrink-0" aria-hidden />
-        <Text inline size={null} className="flex-1 text-left">
-          {group.label}
+        <Text inline size={null} truncate className="flex-1 text-left">
+          {closedHere ? `${group.label} › ${activeItem.label}` : group.label}
         </Text>
         <ChevronDown
           aria-hidden
