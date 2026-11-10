@@ -55,12 +55,17 @@ const VEHICLES: NavItem = {
   label: "Veículos",
   to: ROUTES.vehicles,
   icon: Car,
-  except: [ROUTES.vehicleCatalog],
+  except: [ROUTES.vehicleCatalog, ROUTES.vehicleCategories],
 };
 const CATALOG: NavItem = {
   label: "Catálogo",
   to: ROUTES.vehicleCatalog,
   icon: LayoutGrid,
+};
+const CATEGORIES: NavItem = {
+  label: "Categorias",
+  to: ROUTES.vehicleCategories,
+  icon: Tags,
 };
 const CUSTOMERS: NavItem = {
   label: "Clientes",
@@ -104,6 +109,7 @@ export const SIDEBAR_NAV: NavEntry[] = [
     items: [
       VEHICLES,
       CATALOG,
+      CATEGORIES,
       { label: "Vistorias", to: ROUTES.inspections, icon: ClipboardCheck },
       { label: "Manutenções", to: ROUTES.maintenances, icon: Wrench },
     ],

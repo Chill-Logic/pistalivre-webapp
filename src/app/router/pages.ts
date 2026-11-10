@@ -104,6 +104,10 @@ export const VehicleCatalogPage = lazyPage(
   () => import("@/pages/gestao/vehicle-catalog"),
   "VehicleCatalogPage",
 );
+export const VehicleCategoriesPage = lazyPage(
+  () => import("@/pages/gestao/vehicle-categories"),
+  "VehicleCategoriesPage",
+);
 export const VehicleNewPage = lazyPage(
   () => import("@/pages/gestao/vehicle-new"),
   "VehicleNewPage",

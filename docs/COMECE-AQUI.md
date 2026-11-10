@@ -74,6 +74,10 @@ curtas entre ferramentas e nos relatórios de subagentes.
   com a IA na **Anthropic** (`form-options.readDocument`). Confere placa e os dígitos do Renavam e do chassi
   ("Confira…" no campo), casa o modelo com o catálogo e acha o titular (empresa, parceiro ou aviso). Não grava nada.
   O QR do CRLV-e **não serve**: é binário assinado (ECDSA), feito para o app Vio. Primeiro teste real foi em prod.
+- **Categorias (2026-11-10):** Frota › **Categorias** (`/gestao/veiculos/categorias`): criar, renomear e excluir
+  (só sem veículos), por tipo. Os nomes devem ser a **ESPÉCIE do CRLV** (Passageiro, Carga…): a leitura do documento
+  escolhe tipo e categoria por ela (Street era um engano, vira Passageiro). O `seed-config` não recria mais as
+  categorias a cada deploy.
 - **Catálogo de veículos (2026-11-09, local):** Veículos › Catálogo (`/gestao/veiculos/catalogo`): cada modelo + ano com
   imagem (upload, PNG de preferência, ou link https), descrição, ativo; unidades e cores vêm da frota; "Na frota, fora do
   catálogo" adiciona com um toque. **O veículo nasce do catálogo**: o formulário escolhe "Modelo (do catálogo)" (marca,

@@ -66,6 +66,9 @@ export const queryKeys = {
   catalog: {
     all: ["catalog"] as const,
   },
+  categories: {
+    all: ["categories"] as const,
+  },
   landing: {
     all: ["landing"] as const,
     page: () => [...queryKeys.landing.all, "page"] as const,

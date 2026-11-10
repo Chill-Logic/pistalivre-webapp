@@ -38,6 +38,7 @@ export const ROUTES = {
   vehicles: `${GESTAO}/veiculos`,
   vehicleNew: `${GESTAO}/veiculos/novo`,
   vehicleCatalog: `${GESTAO}/veiculos/catalogo`,
+  vehicleCategories: `${GESTAO}/veiculos/categorias`,
   vehicleDetail: `${GESTAO}/veiculos/:id`,
   vehicleEdit: `${GESTAO}/veiculos/:id/editar`,
   inspectionNew: `${GESTAO}/veiculos/:id/vistorias/nova`,
