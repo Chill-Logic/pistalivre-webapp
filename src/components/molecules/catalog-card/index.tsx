@@ -1,12 +1,11 @@
-import { CarFront } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Card, CardContent } from "@/components/atoms/card";
-import { Image } from "@/components/atoms/image";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
+import { VehicleShowcase } from "@/components/molecules/vehicle-showcase";
 import type { CatalogItem } from "@/types/catalog";
 import { cn } from "@/utils/cn";
 import { pluralize } from "@/utils/text";
@@ -21,23 +20,7 @@ export function CatalogCard({ item, actions }: { item: CatalogItem; actions: Rea
   const src = (picked ? variant?.imageSrc : null) ?? item.coverSrc;
   return (
     <Card className="flex h-full flex-col overflow-hidden">
-      <Box className="flex aspect-[4/3] items-center justify-center bg-muted/40 p-4">
-        {src ? (
-          <Image
-            src={src}
-            alt={`${item.brandName} ${item.modelName} ${item.year}`}
-            loading="lazy"
-            className="max-h-full max-w-full object-contain"
-          />
-        ) : (
-          <Box className="flex flex-col items-center gap-1 text-muted-foreground">
-            <CarFront className="size-10" aria-hidden />
-            <Text size="xs" tone="muted">
-              Sem imagem
-            </Text>
-          </Box>
-        )}
-      </Box>
+      <VehicleShowcase src={src} alt={`${item.brandName} ${item.modelName} ${item.year}${variant ? ` ${variant.color}` : ""}`} />
       <CardContent className="flex flex-1 flex-col gap-3 pt-4">
         <Box className="flex items-start justify-between gap-2">
           <Box className="min-w-0">

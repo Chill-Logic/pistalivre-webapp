@@ -14,8 +14,10 @@ import { FilePicker } from "@/components/molecules/file-picker";
 import { FormField } from "@/components/molecules/form-field";
 import { SegmentedField } from "@/components/molecules/segmented-field";
 import { SwatchPicker } from "@/components/molecules/swatch-picker";
+import { VehicleShowcase } from "@/components/molecules/vehicle-showcase";
 import { toApiError } from "@/helpers/api-error";
 import { useCatalogVariants } from "@/hooks/api/gestao/catalog/useCatalogVariants";
+import { useObjectUrl } from "@/hooks/ui/useObjectUrl";
 import type { CatalogItem } from "@/types/catalog";
 import { pluralize } from "@/utils/text";
 
@@ -39,6 +41,10 @@ export function CatalogVariantsEditor({ item }: { item: CatalogItem }) {
   const [imageUrl, setImageUrl] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<Errors>({});
+  const filePreview = useObjectUrl(files[0] ?? null);
+  // What this colour will look like, before adding (catches a wrong file).
+  const preview =
+    mode === "upload" ? filePreview : imageUrl.trim().startsWith("https://") ? imageUrl.trim() : null;
 
   const onAdd = () => {
     const next: Errors = {};
@@ -192,6 +198,14 @@ export function CatalogVariantsEditor({ item }: { item: CatalogItem }) {
             onChange={(event) => setImageUrl(event.target.value)}
             error={errors.imageUrl}
             disabled={add.isPending}
+          />
+        )}
+        {preview && (
+          <VehicleShowcase
+            src={preview}
+            alt={`Prévia${color ? ` da cor ${color}` : ""}`}
+            caption={color ? `Prévia · ${color}` : "Prévia · escolha a cor"}
+            className="rounded-md border"
           />
         )}
         {errors.form && <Alert>{errors.form}</Alert>}

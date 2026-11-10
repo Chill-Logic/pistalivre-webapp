@@ -13,7 +13,6 @@ import {
 } from "@/components/atoms/dialog";
 import { Form } from "@/components/atoms/form";
 import { Col, Row } from "@/components/atoms/grid";
-import { Image } from "@/components/atoms/image";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { CheckboxField } from "@/components/molecules/checkbox-field";
@@ -23,6 +22,7 @@ import { FormField } from "@/components/molecules/form-field";
 import { SegmentedField } from "@/components/molecules/segmented-field";
 import { CreatableCombobox } from "@/components/molecules/creatable-combobox";
 import { TextareaField } from "@/components/molecules/textarea-field";
+import { VehicleShowcase } from "@/components/molecules/vehicle-showcase";
 import { toApiError } from "@/helpers/api-error";
 import { useCatalog } from "@/hooks/api/gestao/catalog/useCatalog";
 import { useCatalogWrites } from "@/hooks/api/gestao/catalog/useCatalogWrites";
@@ -252,9 +252,7 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
             />
           )}
           {shownImage && (
-            <Box className="flex justify-center rounded-md border bg-muted/40 p-3">
-              <Image src={shownImage} alt="Prévia da imagem" className="max-h-40 object-contain" />
-            </Box>
+            <VehicleShowcase src={shownImage} alt="Prévia da imagem principal" className="rounded-md border" />
           )}
           <CheckboxField
             label="Ativo"
