@@ -125,11 +125,20 @@ export const landingConfig: Config<LandingBlocks> = {
         title: { type: "text", label: "Título" },
         text: { type: "textarea", label: "Texto" },
         buttonLabel: { type: "text", label: "Texto do botão" },
+        mode: {
+          type: "radio",
+          label: "Como abre",
+          options: [
+            { label: "Formulário na página", value: "inline" },
+            { label: "Só o botão", value: "button" },
+          ],
+        },
       },
       defaultProps: {
         title: "Pronto para começar?",
-        text: "Deixe seu contato e a gente te chama no WhatsApp.",
+        text: "Deixe seu contato e responda algumas perguntas rápidas: leva 2 minutos.",
         buttonLabel: "Quero alugar",
+        mode: "inline",
       },
       render: (props) => <LandingLeadCtaBlock {...props} />,
     },
