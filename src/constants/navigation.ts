@@ -1,5 +1,10 @@
 import {
   Building2,
+  CarFront,
+  ClipboardList,
+  Landmark,
+  Settings,
+  Target,
   Car,
   BriefcaseBusiness,
   LayoutGrid,
@@ -75,32 +80,74 @@ const FINANCE: NavItem = {
  */
 export const MAIN_NAV: NavItem[] = [DASHBOARD, VEHICLES, RENTALS, CUSTOMERS];
 
-/** Sidebar and drawer: the same items, order and icons as the management app. */
-export const SIDEBAR_NAV: NavItem[] = [
+/** A collapsible section of the sidebar (Frota, Comercial…). */
+export type NavGroup = {
+  label: string;
+  icon: LucideIcon;
+  items: NavItem[];
+};
+
+export type NavEntry = NavItem | NavGroup;
+
+export function isNavGroup(entry: NavEntry): entry is NavGroup {
+  return "items" in entry;
+}
+
+/**
+ * Sidebar and drawer: Painel on top, then the areas, each collapsible (the
+ * list grew too long to scan flat).
+ */
+export const SIDEBAR_NAV: NavEntry[] = [
   DASHBOARD,
-  VEHICLES,
-  CATALOG,
-  CUSTOMERS,
-  { label: "CRM", to: ROUTES.crm, icon: Megaphone },
-  { label: "Planos", to: ROUTES.plans, icon: Tags },
-  { label: "Propostas", to: ROUTES.proposals, icon: Handshake },
-  RENTALS,
-  { label: "Modelos", to: ROUTES.models, icon: ScrollText },
-  { label: "Vistorias", to: ROUTES.inspections, icon: ClipboardCheck },
-  { label: "Manutenções", to: ROUTES.maintenances, icon: Wrench },
-  { label: "Custos fixos", to: ROUTES.suppliers, icon: Receipt },
   {
-    label: "Parceiros",
-    to: ROUTES.partners,
-    icon: BriefcaseBusiness,
+    label: "Frota",
+    icon: CarFront,
+    items: [
+      VEHICLES,
+      CATALOG,
+      { label: "Vistorias", to: ROUTES.inspections, icon: ClipboardCheck },
+      { label: "Manutenções", to: ROUTES.maintenances, icon: Wrench },
+    ],
   },
-  FINANCE,
-  { label: "Projeções", to: ROUTES.projections, icon: TrendingUp },
-  { label: "Reembolsos", to: ROUTES.reimbursements, icon: HandCoins },
-  { label: "Assinaturas", to: ROUTES.signatures, icon: PenLine },
-  { label: "Documentos", to: ROUTES.documents, icon: FileText },
-  { label: "Empresa", to: ROUTES.company, icon: Building2 },
-  { label: "Integrações", to: ROUTES.integrations, icon: Plug },
-  { label: "Usuários", to: ROUTES.users, icon: Users },
-  { label: "Auditoria", to: ROUTES.audit, icon: ShieldCheck, adminOnly: true },
+  {
+    label: "Comercial",
+    icon: Target,
+    items: [
+      { label: "CRM", to: ROUTES.crm, icon: Megaphone },
+      { label: "Propostas", to: ROUTES.proposals, icon: Handshake },
+      { label: "Planos", to: ROUTES.plans, icon: Tags },
+    ],
+  },
+  {
+    label: "Operação",
+    icon: ClipboardList,
+    items: [
+      CUSTOMERS,
+      RENTALS,
+      { label: "Reembolsos", to: ROUTES.reimbursements, icon: HandCoins },
+      { label: "Assinaturas", to: ROUTES.signatures, icon: PenLine },
+    ],
+  },
+  {
+    label: "Financeiro",
+    icon: Landmark,
+    items: [
+      FINANCE,
+      { label: "Custos fixos", to: ROUTES.suppliers, icon: Receipt },
+      { label: "Projeções", to: ROUTES.projections, icon: TrendingUp },
+      { label: "Parceiros", to: ROUTES.partners, icon: BriefcaseBusiness },
+    ],
+  },
+  {
+    label: "Configurações",
+    icon: Settings,
+    items: [
+      { label: "Empresa", to: ROUTES.company, icon: Building2 },
+      { label: "Usuários", to: ROUTES.users, icon: Users },
+      { label: "Integrações", to: ROUTES.integrations, icon: Plug },
+      { label: "Modelos", to: ROUTES.models, icon: ScrollText },
+      { label: "Documentos", to: ROUTES.documents, icon: FileText },
+      { label: "Auditoria", to: ROUTES.audit, icon: ShieldCheck, adminOnly: true },
+    ],
+  },
 ];
