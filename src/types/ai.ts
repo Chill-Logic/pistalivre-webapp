@@ -35,9 +35,25 @@ export type AiMe = {
   grants: AiGrant[];
 };
 
-export type AiChatMode = "contract" | "proposal" | "partner_contract";
+/** `general` = the assistant on any screen (no document open). */
+export type AiChatMode =
+  "contract" | "proposal" | "partner_contract" | "general";
 
-export type AiChatMessage = { role: "user" | "assistant"; content: string };
+export type AiChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+  /** Files sent with that message: the model sees them again. */
+  attachmentIds?: string[];
+};
+
+/** A file sent to the AI chat (POST /ai/attachments). */
+export type AiAttachment = {
+  id: string;
+  fileName: string;
+  contentType: string;
+  size: number;
+  url: string;
+};
 
 export type AiChatStep = { tool: string; title: string; ok: boolean };
 
@@ -54,6 +70,10 @@ export type AiChatInput = {
   draftId?: string;
   /** The draft version the editor shows (409 if it changed since). */
   version?: number;
+  /** Files sent with this message (uploaded first). */
+  attachmentIds?: string[];
+  /** The screen the person is on (mode "general"). */
+  page?: string;
 };
 
 /** A write the agent proposed: nothing happens until the person confirms. */

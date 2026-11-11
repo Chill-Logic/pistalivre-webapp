@@ -11,6 +11,7 @@ import type {
   AiGaps,
   AiMe,
   AiPermissions,
+  AiAttachment,
 } from "@/types/ai";
 
 /**
@@ -20,6 +21,18 @@ import type {
 export const aiService = {
   async me() {
     const { data } = await http.get<AiMe>("/ai/me");
+    return data;
+  },
+  /** A file for the chat (image or PDF): checked by its bytes on the server. */
+  async uploadAttachment(file: File, onProgress?: (fraction: number) => void) {
+    const body = new FormData();
+    body.append("file", file);
+    const { data } = await http.post<AiAttachment>("/ai/attachments", body, {
+      timeout: 120_000,
+      onUploadProgress: (event) => {
+        if (onProgress && event.total) onProgress(event.loaded / event.total);
+      },
+    });
     return data;
   },
   async chat(input: AiChatInput) {

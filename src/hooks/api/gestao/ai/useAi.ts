@@ -29,7 +29,7 @@ export function useAiChat() {
 
 /**
  * "Confirmar" / "Cancelar" on a write the agent proposed. A confirmed write
- * may have changed the CRM: its lists refetch.
+ * may have changed the CRM, the customers or the rentals: their lists refetch.
  */
 export function useAiChatAction() {
   const queryClient = useQueryClient();
@@ -37,7 +37,13 @@ export function useAiChatAction() {
     confirm: useMutation({
       mutationFn: aiService.confirmAction,
       onSuccess: () =>
-        queryClient.invalidateQueries({ queryKey: queryKeys.crm.all }),
+        Promise.all(
+          [
+            queryKeys.crm.all,
+            queryKeys.customers.all,
+            queryKeys.rentals.all,
+          ].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
+        ),
     }),
     cancel: useMutation({ mutationFn: aiService.cancelAction }),
   };

@@ -1,27 +1,62 @@
-import { Check, SendHorizontal, Sparkles, Undo2, X } from "lucide-react";
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import {
+  Check,
+  Paperclip,
+  SendHorizontal,
+  Sparkles,
+  Undo2,
+  Upload,
+  X,
+} from "lucide-react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ClipboardEvent,
+  type Dispatch,
+  type KeyboardEvent,
+  type SetStateAction,
+} from "react";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
+import { DropArea } from "@/components/atoms/drop-area";
+import { FileInput } from "@/components/atoms/file-input";
 import { List, ListItem } from "@/components/atoms/list";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { Textarea } from "@/components/atoms/textarea";
+import { ChatAttachmentChip } from "@/components/molecules/chat-attachment-chip";
 import { AiActionCard } from "@/components/organisms/ai-action-card";
 import { toApiError } from "@/helpers/api-error";
 import { useAiChat } from "@/hooks/api/gestao/ai/useAi";
+import {
+  AI_ATTACHMENT_ACCEPT,
+  useAiAttachments,
+} from "@/hooks/api/gestao/ai/useAiAttachments";
 import type { AiChatAction, AiChatMode, AiChatStep } from "@/types/ai";
 import type { ContractDraftState } from "@/types/contract";
 import { cn } from "@/utils/cn";
 
-type ChatEntry = {
+/** A file as it shows in a sent message. */
+type SentAttachment = {
+  id: string;
+  name: string;
+  isPdf: boolean;
+  previewUrl: string | null;
+};
+
+export type ChatEntry = {
   role: "user" | "assistant";
   content: string;
+  /** Files sent with this (user) message. */
+  attachments?: SentAttachment[];
   steps?: AiChatStep[];
   /** Writes the agent proposed: the person confirms each one. */
   actions?: AiChatAction[];
   /** The document before this answer changed it (Desfazer). */
   before?: string;
+  /** For the agent only (not shown): e.g. the ids a confirmed action created. */
+  note?: string;
 };
 
 const GREETING: Record<AiChatMode, string> = {
@@ -31,13 +66,16 @@ const GREETING: Record<AiChatMode, string> = {
     "Olá! Posso ajustar esta proposta com você: destacar o plano certo, mudar valores, deixar o texto mais direto. Consulto o lead e os planos quando precisar.",
   partner_contract:
     "Olá! Posso montar este contrato de parceria com você: incluir cláusulas, ajustar prazos e a rescisão, explicar a participação e revisar a linguagem. Consulto o contrato, o parceiro e os veículos quando precisar.",
+  general:
+    "Olá! Pergunte sobre locações, clientes, cobranças e a frota. Também posso cadastrar um cliente e a locação a partir das fotos ou PDFs dos documentos: cole (Ctrl+V), arraste para cá ou use o clipe.",
 };
 
 export type AiChatPanelProps = {
   mode: AiChatMode;
-  html: string;
+  /** The open document (absent in mode "general"). */
+  html?: string;
   /** The agent changed the document (or Desfazer): load it in the editor. */
-  onApply: (html: string) => void;
+  onApply?: (html: string) => void;
   suggestions: string[];
   rentalId?: string;
   leadId?: string;
@@ -50,6 +88,10 @@ export type AiChatPanelProps = {
   prepare?: () => Promise<{ html: string; version: number }>;
   /** The draft after the answer (new version): load it in the editor. */
   onDraft?: (draft: ContractDraftState) => void;
+  /** The screen the person is on (mode "general"): context for the agent. */
+  page?: string;
+  /** Keeps the conversation outside the panel (it survives closing a sheet). */
+  conversation?: [ChatEntry[], Dispatch<SetStateAction<ChatEntry[]>>];
   className?: string;
 };
 
@@ -64,7 +106,7 @@ export type AiChatPanelProps = {
  */
 export function AiChatPanel({
   mode,
-  html,
+  html = "",
   onApply,
   suggestions,
   rentalId,
@@ -74,13 +116,19 @@ export function AiChatPanel({
   draftId,
   prepare,
   onDraft,
+  page,
+  conversation,
   className,
 }: AiChatPanelProps) {
   const chat = useAiChat();
-  const [entries, setEntries] = useState<ChatEntry[]>([]);
+  const own = useState<ChatEntry[]>([]);
+  const [entries, setEntries] = conversation ?? own;
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const attachments = useAiAttachments();
+  const picker = useRef<HTMLInputElement>(null);
   const bottom = useRef<HTMLDivElement>(null);
+  const blocked = chat.isPending || Boolean(disabledReason);
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -88,11 +136,34 @@ export function AiChatPanel({
 
   const send = (text: string) => {
     const message = text.trim();
-    if (!message || chat.isPending || disabledReason) return;
+    if (blocked || attachments.uploading) return;
+    if (!message && attachments.readyCount === 0) return;
     setError(null);
     setDraft("");
-    const history = entries.map(({ role, content }) => ({ role, content }));
-    setEntries((current) => [...current, { role: "user", content: message }]);
+    const files = attachments.take().map((item) => ({
+      id: item.uploaded!.id,
+      name: item.name,
+      isPdf: item.isPdf,
+      previewUrl: item.previewUrl,
+    }));
+    const history = entries.map(
+      ({ role, content, attachments: sent, note }) => ({
+        role,
+        content: note
+          ? `${content}
+${note}`
+          : content,
+        ...(sent?.length ? { attachmentIds: sent.map((file) => file.id) } : {}),
+      }),
+    );
+    setEntries((current) => [
+      ...current,
+      {
+        role: "user",
+        content: message || "Veja os anexos.",
+        ...(files.length ? { attachments: files } : {}),
+      },
+    ]);
     const before = html;
     const ready = prepare ? prepare() : Promise.resolve({ html, version: 0 });
     ready
@@ -106,6 +177,10 @@ export function AiChatPanel({
           ...(leadId ? { leadId } : {}),
           ...(partnerContractId ? { partnerContractId } : {}),
           ...(draftId ? { draftId, version: saved.version } : {}),
+          ...(files.length
+            ? { attachmentIds: files.map((file) => file.id) }
+            : {}),
+          ...(page ? { page } : {}),
         }),
       )
       .then(
@@ -121,10 +196,19 @@ export function AiChatPanel({
             },
           ]);
           if (answer.draft && onDraft) onDraft(answer.draft);
-          else if (answer.changed) onApply(answer.html);
+          else if (answer.changed) onApply?.(answer.html);
         },
         (failure) => setError(toApiError(failure).message),
       );
+  };
+
+  // Ctrl+V of a screenshot or of files copied in the file explorer: they
+  // attach; any text that comes along still pastes into the field.
+  const onPaste = (event: ClipboardEvent<HTMLTextAreaElement>) => {
+    const files = Array.from(event.clipboardData.files);
+    if (files.length === 0) return;
+    if (!event.clipboardData.getData("text/plain")) event.preventDefault();
+    attachments.add(files);
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -135,7 +219,20 @@ export function AiChatPanel({
   };
 
   return (
-    <Box className={cn("flex min-h-0 flex-col", className)}>
+    <DropArea
+      onFiles={attachments.add}
+      disabled={blocked}
+      className={cn("flex min-h-0 flex-col", className)}
+      overlay={
+        <Box className="flex flex-col items-center gap-2 text-primary">
+          <Upload className="size-6" aria-hidden />
+          <Text weight="semibold">Solte para anexar</Text>
+          <Text size="xs" tone="muted">
+            Imagens (JPG, PNG, WebP) ou PDF
+          </Text>
+        </Box>
+      }
+    >
       <Box className="flex items-center gap-2 border-b px-4 py-3">
         <Sparkles className="size-4 text-primary" aria-hidden />
         <Text weight="semibold">Assistente de IA</Text>
@@ -187,10 +284,21 @@ export function AiChatPanel({
               )}
             >
               {entry.role === "user" ? (
-                <Box className="max-w-[85%] rounded-2xl rounded-br-sm bg-primary/10 px-3 py-2">
-                  <Text size="sm" className="whitespace-pre-wrap break-words">
-                    {entry.content}
-                  </Text>
+                <Box className="flex max-w-[85%] flex-col items-end gap-1.5">
+                  {entry.attachments?.map((file) => (
+                    <ChatAttachmentChip
+                      key={file.id}
+                      name={file.name}
+                      isPdf={file.isPdf}
+                      previewUrl={file.previewUrl}
+                      status="ready"
+                    />
+                  ))}
+                  <Box className="rounded-2xl rounded-br-sm bg-primary/10 px-3 py-2">
+                    <Text size="sm" className="whitespace-pre-wrap break-words">
+                      {entry.content}
+                    </Text>
+                  </Box>
                 </Box>
               ) : (
                 <Box className="max-w-[92%] space-y-2 rounded-2xl rounded-bl-sm border bg-card px-3 py-2">
@@ -220,7 +328,20 @@ export function AiChatPanel({
                     </List>
                   )}
                   {entry.actions?.map((action) => (
-                    <AiActionCard key={action.id} action={action} />
+                    <AiActionCard
+                      key={action.id}
+                      action={action}
+                      onDone={(outcome) =>
+                        setEntries((current) => [
+                          ...current,
+                          {
+                            role: "assistant",
+                            content: `Feito: ${outcome.summary}.`,
+                            note: `[Resultado da ação confirmada: ${JSON.stringify(outcome.result)}]`,
+                          },
+                        ])
+                      }
+                    />
                   ))}
                   {entry.before !== undefined && (
                     <Box className="flex items-center justify-between gap-2 border-t pt-2">
@@ -232,7 +353,7 @@ export function AiChatPanel({
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          onApply(entry.before as string);
+                          onApply?.(entry.before as string);
                           setEntries((current) =>
                             current.map((e, i) =>
                               i === index ? { ...e, before: undefined } : e,
@@ -264,16 +385,63 @@ export function AiChatPanel({
       </Box>
 
       <Box className="space-y-2 border-t px-4 py-3">
+        {attachments.items.length > 0 && (
+          <Box className="flex flex-wrap gap-1.5">
+            {attachments.items.map((item) => (
+              <ChatAttachmentChip
+                key={item.key}
+                name={item.name}
+                isPdf={item.isPdf}
+                previewUrl={item.previewUrl}
+                status={item.status}
+                progress={item.progress}
+                error={item.error}
+                onRemove={() => attachments.remove(item.key)}
+              />
+            ))}
+          </Box>
+        )}
+        {attachments.notice && (
+          <Text size="xs" tone="muted">
+            {attachments.notice}
+          </Text>
+        )}
         <Box className="flex items-end gap-2">
+          <FileInput
+            ref={picker}
+            accept={AI_ATTACHMENT_ACCEPT}
+            multiple
+            onChange={(event) => {
+              attachments.add(Array.from(event.target.files ?? []));
+              event.target.value = "";
+            }}
+          />
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className="shrink-0"
+            aria-label="Anexar imagem ou PDF"
+            title="Anexar imagem ou PDF (ou cole com Ctrl+V, ou arraste para cá)"
+            onClick={() => picker.current?.click()}
+            disabled={blocked}
+          >
+            <Paperclip />
+          </Button>
           <Textarea
             aria-label="Mensagem para a IA"
-            placeholder="Peça um ajuste…"
+            placeholder={
+              mode === "general"
+                ? "Pergunte ou envie documentos…"
+                : "Peça um ajuste…"
+            }
             rows={2}
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={onKeyDown}
+            onPaste={onPaste}
             className="min-h-11 resize-none"
-            disabled={chat.isPending || Boolean(disabledReason)}
+            disabled={blocked}
           />
           <Button
             type="button"
@@ -281,16 +449,20 @@ export function AiChatPanel({
             aria-label="Enviar"
             onClick={() => send(draft)}
             disabled={
-              chat.isPending || !draft.trim() || Boolean(disabledReason)
+              blocked ||
+              attachments.uploading ||
+              (!draft.trim() && attachments.readyCount === 0)
             }
           >
             <SendHorizontal />
           </Button>
         </Box>
         <Text size="xs" tone="muted" className="text-center">
-          A IA pode errar: revise o documento antes de salvar.
+          {mode === "general"
+            ? "A IA pode errar: confira os dados antes de confirmar."
+            : "A IA pode errar: revise o documento antes de salvar."}
         </Text>
       </Box>
-    </Box>
+    </DropArea>
   );
 }

@@ -25,7 +25,14 @@ const fieldValue = (value: unknown) =>
  * Nothing happens until "Confirmar" (the server runs it once, if the tool is
  * still granted and it hasn't expired).
  */
-export function AiActionCard({ action }: { action: AiChatAction }) {
+export function AiActionCard({
+  action,
+  onDone,
+}: {
+  action: AiChatAction;
+  /** Confirmed and run: what it did (the chat tells the agent, e.g. the new ids). */
+  onDone?: (outcome: { summary: string; result: unknown }) => void;
+}) {
   const { confirm, cancel } = useAiChatAction();
   const [decision, setDecision] = useState<Decision>("pending");
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +45,12 @@ export function AiActionCard({ action }: { action: AiChatAction }) {
     setError(null);
     const mutation = kind === "confirm" ? confirm : cancel;
     mutation.mutate(action.id, {
-      onSuccess: () => setDecision(kind === "confirm" ? "done" : "cancelled"),
+      onSuccess: (data) => {
+        setDecision(kind === "confirm" ? "done" : "cancelled");
+        if (kind === "confirm" && data) {
+          onDone?.({ summary: data.summary, result: data.result });
+        }
+      },
       onError: (failure) => setError(toApiError(failure).message),
     });
   };
