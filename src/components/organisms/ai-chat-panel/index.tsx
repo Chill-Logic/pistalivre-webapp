@@ -413,10 +413,6 @@ ${note}`
                       options={[
                         {
                           label: "Sim, me mostra",
-                          hint:
-                            entry.sources.length > 1
-                              ? `Passo pelas ${entry.sources.length} telas, destacando cada parte.`
-                              : "Vou até a tela e destaco a parte.",
                           primary: true,
                           onSelect: () => {
                             setSourcesChoice(index, "shown");
