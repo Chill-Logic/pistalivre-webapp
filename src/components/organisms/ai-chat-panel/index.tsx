@@ -90,6 +90,8 @@ export type AiChatPanelProps = {
   onDraft?: (draft: ContractDraftState) => void;
   /** The screen the person is on (mode "general"): context for the agent. */
   page?: string;
+  /** Shows a close (X) in the header: the floating window. */
+  onClose?: () => void;
   /** Keeps the conversation outside the panel (it survives closing a sheet). */
   conversation?: [ChatEntry[], Dispatch<SetStateAction<ChatEntry[]>>];
   className?: string;
@@ -118,6 +120,7 @@ export function AiChatPanel({
   onDraft,
   page,
   conversation,
+  onClose,
   className,
 }: AiChatPanelProps) {
   const chat = useAiChat();
@@ -235,7 +238,21 @@ ${note}`
     >
       <Box className="flex items-center gap-2 border-b px-4 py-3">
         <Sparkles className="size-4 text-primary" aria-hidden />
-        <Text weight="semibold">Assistente de IA</Text>
+        <Text weight="semibold" className="flex-1">
+          Assistente de IA
+        </Text>
+        {onClose && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="-my-1 size-8"
+            aria-label="Fechar o assistente"
+            onClick={onClose}
+          >
+            <X />
+          </Button>
+        )}
       </Box>
 
       <Box

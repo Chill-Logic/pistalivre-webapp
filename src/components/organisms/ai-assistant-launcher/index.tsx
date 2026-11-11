@@ -1,7 +1,8 @@
-import { Sparkles } from "lucide-react";
-import { useState } from "react";
+import { Sparkles, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/atoms/button";
+import { Card } from "@/components/atoms/card";
 import {
   Sheet,
   SheetContent,
@@ -16,6 +17,7 @@ import { DESKTOP_MEDIA_QUERY } from "@/constants/layout";
 import { useAiChatAvailable } from "@/hooks/api/gestao/ai/useAi";
 import { useAiDockPresent } from "@/hooks/ui/useAiDockPresence";
 import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
+import { cn } from "@/utils/cn";
 
 /** Starting points: what the assistant does outside an editor. */
 const GENERAL_SUGGESTIONS = [
@@ -26,11 +28,12 @@ const GENERAL_SUGGESTIONS = [
 ];
 
 /**
- * The AI assistant on every management screen: a floating button that opens
- * the chat (side panel on the desktop, bottom sheet on the phone). It knows
- * the screen the person is on, takes photos and PDFs (paste, drop, clip) and
- * keeps the conversation while closed. Hidden when the AI isn't available to
- * the person, and while an editor shows its own assistant.
+ * The AI assistant on every management screen. On the desktop it FLOATS: a
+ * window in the corner, over the page but not blocking it (no overlay — the
+ * person keeps using the screen while talking). On the phone it's a bottom
+ * sheet. It knows the screen the person is on, takes photos and PDFs (paste,
+ * drop, clip) and keeps the conversation while closed. Hidden when the AI
+ * isn't available to the person, and while an editor shows its own assistant.
  */
 export function AiAssistantLauncher() {
   const available = useAiChatAvailable();
@@ -40,39 +43,79 @@ export function AiAssistantLauncher() {
   const [open, setOpen] = useState(false);
   const conversation = useState<ChatEntry[]>([]);
 
+  // Esc closes the floating window (the sheet handles its own).
+  useEffect(() => {
+    if (!open || !isDesktop) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, isDesktop]);
+
   if (!available || docked) return null;
+
+  const panel = (
+    <AiChatPanel
+      mode="general"
+      suggestions={GENERAL_SUGGESTIONS}
+      page={pathname}
+      conversation={conversation}
+      onClose={isDesktop ? () => setOpen(false) : undefined}
+      className="h-full"
+    />
+  );
+
+  const launcher = (
+    <Button
+      type="button"
+      size="icon"
+      aria-label={open ? "Fechar o assistente de IA" : "Assistente de IA"}
+      aria-expanded={open}
+      title="Assistente de IA"
+      onClick={() => setOpen((value) => !value)}
+      className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-4 z-40 size-12 rounded-full shadow-lg md:bottom-6 md:right-6"
+    >
+      {open && isDesktop ? (
+        <X className="size-5" />
+      ) : (
+        <Sparkles className="size-5" />
+      )}
+    </Button>
+  );
+
+  if (isDesktop) {
+    return (
+      <>
+        {launcher}
+        {open && (
+          <Card
+            role="dialog"
+            aria-label="Assistente de IA"
+            className={cn(
+              "fixed bottom-24 right-6 z-40 flex h-[min(640px,calc(100dvh-8rem))] w-[400px] flex-col overflow-hidden rounded-2xl shadow-2xl",
+              "origin-bottom-right duration-200 animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 motion-reduce:animate-none",
+            )}
+          >
+            {panel}
+          </Card>
+        )}
+      </>
+    );
+  }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <Button
-        type="button"
-        size="icon"
-        aria-label="Assistente de IA"
-        title="Assistente de IA"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-4 z-30 size-12 rounded-full shadow-lg md:bottom-6 md:right-6"
-      >
-        <Sparkles className="size-5" />
-      </Button>
+      {launcher}
       <SheetContent
-        side={isDesktop ? "right" : "bottom"}
-        className={
-          isDesktop
-            ? "flex w-full flex-col p-0 sm:max-w-md"
-            : "flex h-[85dvh] flex-col p-0 pb-safe-b"
-        }
+        side="bottom"
+        className="flex h-[85dvh] flex-col p-0 pb-safe-b"
       >
         <SheetTitle className="sr-only">Assistente de IA</SheetTitle>
         <SheetDescription className="sr-only">
           Pergunte sobre o sistema ou envie documentos para cadastrar.
         </SheetDescription>
-        <AiChatPanel
-          mode="general"
-          suggestions={GENERAL_SUGGESTIONS}
-          page={pathname}
-          conversation={conversation}
-          className="h-full"
-        />
+        {panel}
       </SheetContent>
     </Sheet>
   );
