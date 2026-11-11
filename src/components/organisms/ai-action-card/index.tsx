@@ -1,28 +1,24 @@
-import {
-  Check,
-  CircleSlash,
-  MousePointerClick,
-  ShieldCheck,
-} from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
-import { Button } from "@/components/atoms/button";
 import {
   DescriptionDetails,
   DescriptionList,
   DescriptionTerm,
 } from "@/components/atoms/description-list";
-import { Spinner } from "@/components/atoms/spinner";
-import { Text } from "@/components/atoms/text";
+import {
+  ChoicePrompt,
+  type ChoiceOption,
+} from "@/components/molecules/choice-prompt";
 import { toApiError } from "@/helpers/api-error";
 import { ROUTES } from "@/constants/routes";
 import { useAiChatAction } from "@/hooks/api/gestao/ai/useAi";
 import { aiChatEvents } from "@/hooks/ui/useAiGuide";
 import type { AiChatAction } from "@/types/ai";
 
-type Decision = "pending" | "done" | "cancelled" | "screen";
+type Decision = "pending" | "filling" | "done" | "cancelled" | "screen";
 
 /** The system's form for each proposal kind ("Preencher na tela"). */
 const FORM_ROUTE = {
@@ -73,7 +69,6 @@ export function AiActionCard({
     });
   };
   const [error, setError] = useState<string | null>(null);
-  const busy = confirm.isPending || cancel.isPending;
   const fields = Object.entries(action.details).filter(
     ([, value]) => value !== null && value !== undefined && value !== "",
   );
@@ -92,80 +87,75 @@ export function AiActionCard({
     });
   };
 
+  const details =
+    fields.length > 0 ? (
+      <DescriptionList className="space-y-1 rounded-lg border bg-card px-3 py-2">
+        {fields.map(([key, value]) => (
+          <Box key={key}>
+            <DescriptionTerm>{key}</DescriptionTerm>
+            <DescriptionDetails>{fieldValue(value)}</DescriptionDetails>
+          </Box>
+        ))}
+      </DescriptionList>
+    ) : null;
+
+  const answered =
+    decision === "done"
+      ? "Você confirmou daqui: feito."
+      : decision === "screen"
+        ? "Você preencheu e salvou pela tela: feito."
+        : decision === "cancelled"
+          ? "Você cancelou: nada foi alterado."
+          : undefined;
+
+  const options: ChoiceOption[] = [
+    ...(action.form
+      ? [
+          {
+            label:
+              decision === "filling"
+                ? "Abrir o formulário de novo"
+                : "Preencher na tela e eu salvo",
+            hint: "Abre o formulário do sistema e preenche campo por campo, mostrando de onde veio cada dado.",
+            primary: true,
+            onSelect: () => {
+              setDecision("filling");
+              fillOnScreen();
+            },
+          },
+        ]
+      : []),
+    {
+      label: action.form ? "Confirmar daqui" : "Confirmar",
+      hint: "Grava agora, sem abrir o formulário.",
+      primary: !action.form,
+      pending: confirm.isPending,
+      onSelect: () => decide("confirm"),
+    },
+    {
+      label: "Cancelar",
+      hint: "Nada é gravado.",
+      pending: cancel.isPending,
+      onSelect: () => decide("cancel"),
+    },
+  ];
+
   return (
-    <Box className="space-y-2 rounded-lg border border-primary/30 bg-primary/5 p-3">
-      <Text size="sm" weight="medium" className="flex items-center gap-1.5">
-        <ShieldCheck className="size-4 text-primary" aria-hidden />
-        {action.title}
-      </Text>
-      <Text size="sm">{action.summary}</Text>
-      {fields.length > 0 && (
-        <DescriptionList className="space-y-1">
-          {fields.map(([key, value]) => (
-            <Box key={key}>
-              <DescriptionTerm>{key}</DescriptionTerm>
-              <DescriptionDetails>{fieldValue(value)}</DescriptionDetails>
-            </Box>
-          ))}
-        </DescriptionList>
-      )}
-      {error && <Alert>{error}</Alert>}
-      {decision === "pending" ? (
-        <Box className="flex flex-wrap justify-end gap-2 pt-1">
-          {action.form && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="mr-auto"
-              title="Abre o formulário do sistema e preenche campo por campo, mostrando de onde veio cada dado"
-              onClick={fillOnScreen}
-              disabled={busy}
-            >
-              <MousePointerClick />
-              Preencher na tela
-            </Button>
-          )}
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => decide("cancel")}
-            disabled={busy}
-          >
-            {cancel.isPending && <Spinner />}
-            Cancelar
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => decide("confirm")}
-            disabled={busy}
-          >
-            {confirm.isPending && (
-              <Spinner className="text-primary-foreground" />
-            )}
-            Confirmar
-          </Button>
-        </Box>
-      ) : (
-        <Text
-          size="xs"
-          tone="muted"
-          className="flex items-center gap-1.5 border-t pt-2"
-        >
-          {decision === "done" || decision === "screen" ? (
-            <Check className="size-3 text-success" aria-hidden />
-          ) : (
-            <CircleSlash className="size-3" aria-hidden />
-          )}
-          {decision === "done"
-            ? "Feito"
-            : decision === "screen"
-              ? "Feito pela tela"
-              : "Cancelada: nada foi alterado"}
-        </Text>
-      )}
-    </Box>
+    <ChoicePrompt
+      icon={<ShieldCheck className="size-5" />}
+      title={action.summary}
+      subtitle={action.title}
+      question={
+        decision === "filling"
+          ? "O formulário está aberto: salve lá, ou decida daqui."
+          : "Como você quer fazer?"
+      }
+      options={options}
+      answered={answered}
+      autoFocus
+      error={error ? <Alert>{error}</Alert> : null}
+    >
+      {details}
+    </ChoicePrompt>
   );
 }

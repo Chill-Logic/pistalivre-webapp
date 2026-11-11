@@ -28,6 +28,16 @@ function routeOf(source: AiUiSource): string | null {
       return ROUTES.finance;
     case "plans":
       return ROUTES.plans;
+    case "finance_bills":
+      return ROUTES.financeBills;
+    case "finance_statement":
+      return ROUTES.financeStatement;
+    case "finance_debts":
+      return ROUTES.financeDebts;
+    case "debt":
+      return source.id ? routeTo.debt(source.id) : null;
+    case "ai_usage":
+      return ROUTES.aiUsage;
   }
 }
 
@@ -60,4 +70,13 @@ export function fulfilledEntry(event: AiChatEvent): ChatEntry {
     content: `Feito pela tela: ${event.summary}.`,
     note: `[A pessoa salvou pelo formulário do sistema. Resultado: ${JSON.stringify(event.result)}]`,
   };
+}
+
+/** "Saldos no Financeiro e mais 2 telas": what the tour would show, in one line. */
+export function sourcesSummary(sources: AiUiSource[]): string {
+  const [first, ...rest] = sources;
+  if (!first) return "";
+  return rest.length === 0
+    ? first.label
+    : `${first.label} e mais ${rest.length} ${rest.length === 1 ? "tela" : "telas"}`;
 }

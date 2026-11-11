@@ -189,7 +189,12 @@ export type AiUiSource = {
     | "dashboard"
     | "finance"
     | "plans"
-    | "contract_draft";
+    | "contract_draft"
+    | "finance_bills"
+    | "finance_statement"
+    | "finance_debts"
+    | "debt"
+    | "ai_usage";
   id?: string;
   /** The section's `data-ai-anchor` on that screen. */
   section?: string;

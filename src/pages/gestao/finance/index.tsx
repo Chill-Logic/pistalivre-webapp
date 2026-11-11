@@ -53,7 +53,11 @@ export function FinancePage() {
             label="Carregando saldos…"
             skeleton={<FinanceBalancesSkeleton />}
           >
-            {(data) => <FinanceBalances balances={data} />}
+            {(data) => (
+              <AiAnchor id="balances">
+                <FinanceBalances balances={data} />
+              </AiAnchor>
+            )}
           </QueryBoundary>
         }
         toCollect={

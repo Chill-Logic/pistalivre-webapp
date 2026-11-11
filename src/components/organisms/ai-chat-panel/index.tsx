@@ -25,8 +25,10 @@ import { FileInput } from "@/components/atoms/file-input";
 import { List, ListItem } from "@/components/atoms/list";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
+import { ChatMarkdown } from "@/components/atoms/chat-markdown";
 import { Textarea } from "@/components/atoms/textarea";
 import { ChatAttachmentChip } from "@/components/molecules/chat-attachment-chip";
+import { ChoicePrompt } from "@/components/molecules/choice-prompt";
 import { AiActionCard } from "@/components/organisms/ai-action-card";
 import { toApiError } from "@/helpers/api-error";
 import { useAiChat } from "@/hooks/api/gestao/ai/useAi";
@@ -34,7 +36,11 @@ import {
   AI_ATTACHMENT_ACCEPT,
   useAiAttachments,
 } from "@/hooks/api/gestao/ai/useAiAttachments";
-import { fulfilledEntry, sourcesToTour } from "@/helpers/ai-guide";
+import {
+  fulfilledEntry,
+  sourcesSummary,
+  sourcesToTour,
+} from "@/helpers/ai-guide";
 import { aiChatEvents, aiGuide } from "@/hooks/ui/useAiGuide";
 import type {
   AiChatAction,
@@ -67,6 +73,8 @@ export type ChatEntry = {
   note?: string;
   /** Where on the app the data of this answer lives ("Mostrar onde vi isso"). */
   sources?: AiUiSource[];
+  /** What the person answered to "Quer ver de onde tirei isso?". */
+  sourcesChoice?: "shown" | "skipped";
 };
 
 const GREETING: Record<AiChatMode, string> = {
@@ -155,6 +163,13 @@ export function AiChatPanel({
       }
     });
   }, [conversation, setEntries]);
+
+  const setSourcesChoice = (index: number, choice: "shown" | "skipped") =>
+    setEntries((current) =>
+      current.map((e, i) =>
+        i === index ? { ...e, sourcesChoice: choice } : e,
+      ),
+    );
 
   const showSources = (sources: AiUiSource[]) => {
     const tour = sourcesToTour(sources);
@@ -350,9 +365,7 @@ ${note}`
                 </Box>
               ) : (
                 <Box className="max-w-[92%] space-y-2 rounded-2xl rounded-bl-sm border bg-card px-3 py-2">
-                  <Text size="sm" className="whitespace-pre-wrap break-words">
-                    {entry.content}
-                  </Text>
+                  <ChatMarkdown text={entry.content} />
                   {entry.steps && entry.steps.length > 0 && (
                     <List className="space-y-0.5">
                       {entry.steps.map((step, i) => (
@@ -393,19 +406,61 @@ ${note}`
                     />
                   ))}
                   {entry.sources && entry.sources.length > 0 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-auto w-full justify-start whitespace-normal py-1.5 text-left"
-                      onClick={() => showSources(entry.sources ?? [])}
-                    >
-                      <MapPin />
-                      Mostrar onde vi isso
-                      {entry.sources.length > 1
-                        ? ` (${entry.sources.length} telas)`
-                        : ""}
-                    </Button>
+                    <ChoicePrompt
+                      icon={<MapPin className="size-5" />}
+                      title="Quer ver de onde tirei isso?"
+                      subtitle={sourcesSummary(entry.sources)}
+                      options={[
+                        {
+                          label: "Sim, me mostra",
+                          hint:
+                            entry.sources.length > 1
+                              ? `Passo pelas ${entry.sources.length} telas, destacando cada parte.`
+                              : "Vou até a tela e destaco a parte.",
+                          primary: true,
+                          onSelect: () => {
+                            setSourcesChoice(index, "shown");
+                            showSources(entry.sources ?? []);
+                          },
+                        },
+                        {
+                          label: "Agora não",
+                          onSelect: () => setSourcesChoice(index, "skipped"),
+                        },
+                      ]}
+                      answered={
+                        entry.sourcesChoice === "shown" ? (
+                          <>
+                            Você viu as telas.{" "}
+                            <Button
+                              type="button"
+                              variant="link"
+                              size="sm"
+                              className="h-auto p-0 text-xs"
+                              onClick={() => showSources(entry.sources ?? [])}
+                            >
+                              Mostrar de novo
+                            </Button>
+                          </>
+                        ) : entry.sourcesChoice === "skipped" ? (
+                          <>
+                            Você preferiu não ver agora.{" "}
+                            <Button
+                              type="button"
+                              variant="link"
+                              size="sm"
+                              className="h-auto p-0 text-xs"
+                              onClick={() => showSources(entry.sources ?? [])}
+                            >
+                              Mostrar
+                            </Button>
+                          </>
+                        ) : undefined
+                      }
+                      autoFocus={
+                        index === entries.length - 1 && !entry.actions?.length
+                      }
+                    />
                   )}
                   {entry.before !== undefined && (
                     <Box className="flex items-center justify-between gap-2 border-t pt-2">
