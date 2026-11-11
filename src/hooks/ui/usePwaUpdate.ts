@@ -1,8 +1,37 @@
 import { useRegisterSW } from "virtual:pwa-register/react";
+import { router } from "@/app/router";
 
-const UPDATE_CHECK_INTERVAL = 60 * 60_000;
+/** Periodic check while the app stays open. */
+const UPDATE_CHECK_INTERVAL = 5 * 60_000;
+/** Navigations in a row (or focus + navigation) check once. */
+const MIN_CHECK_GAP_MS = 30_000;
 /** Time for the waiting worker to activate before reloading by hand. */
 const RELOAD_FALLBACK_MS = 2_500;
+
+/**
+ * Looks for a new version on load/reload, on every navigation, when the app
+ * comes back to the screen (switching back to it on the phone) and every 5
+ * minutes — at most once every 30 s, and never offline.
+ */
+function watchForUpdates(registration: ServiceWorkerRegistration) {
+  let last = 0;
+  const check = () => {
+    if (navigator.onLine === false) return;
+    const now = Date.now();
+    if (now - last < MIN_CHECK_GAP_MS) return;
+    last = now;
+    registration.update().catch(() => undefined);
+  };
+  check();
+  setInterval(check, UPDATE_CHECK_INTERVAL);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") check();
+  });
+  window.addEventListener("focus", check);
+  router.subscribe((state) => {
+    if (state.navigation.state === "idle") check();
+  });
+}
 
 /**
  * Service worker lifecycle. `registerType: "prompt"` means a new version waits
@@ -14,8 +43,7 @@ export function usePwaUpdate() {
     updateServiceWorker,
   } = useRegisterSW({
     onRegisteredSW(_url, registration) {
-      if (!registration) return;
-      setInterval(() => registration.update(), UPDATE_CHECK_INTERVAL);
+      if (registration) watchForUpdates(registration);
     },
   });
 
