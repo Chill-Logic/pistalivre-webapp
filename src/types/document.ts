@@ -78,3 +78,10 @@ export type DocumentUpdateInput = {
   /** Replaces the bytes (multipart). Refused (409) under signature. */
   file?: File;
 };
+
+/** One photo of a gallery (carousel/thumbnails); `file` null = not sent. */
+export type GalleryPhoto = {
+  key: string;
+  label: string;
+  file: FileLink | null;
+};

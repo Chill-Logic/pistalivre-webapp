@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-/** A temporary URL to preview a local file; revoked when it changes. */
-export function useObjectUrl(file: File | null | undefined) {
+/** A temporary URL to preview a local file or blob; revoked when it changes. */
+export function useObjectUrl(file: Blob | null | undefined) {
   const [url, setUrl] = useState<string | null>(null);
   useEffect(() => {
     if (!file) {

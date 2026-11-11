@@ -209,6 +209,9 @@ export const queryKeys = {
     proposalVariables: () =>
       [...queryKeys.templates.all, "proposal-variables"] as const,
   },
+  /** Outside `documents`: a file's bytes never change, so a document
+   *  invalidation must not download every image again. */
+  fileBlob: (url: string) => ["file-blob", url] as const,
   documents: {
     all: ["documents"] as const,
     tree: (path: string) => [...queryKeys.documents.all, "tree", path] as const,
