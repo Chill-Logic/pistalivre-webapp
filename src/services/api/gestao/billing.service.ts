@@ -2,6 +2,7 @@ import { http } from "@/services/http/client";
 import type {
   AutoBillingInput,
   AutoBillingResult,
+  FirstChargePreview,
   BillingPeriod,
   DueChangeInput,
   DueChangePreview,
@@ -34,6 +35,13 @@ export const billingService = {
       `/rentals/${rentalId}/auto-billing`,
       input,
       idempotent(key),
+    );
+    return data;
+  },
+  async previewFirstCharge(rentalId: string, firstDueDate: string) {
+    const { data } = await http.get<FirstChargePreview>(
+      `/rentals/${rentalId}/auto-billing/first-charge`,
+      { params: { firstDueDate } },
     );
     return data;
   },

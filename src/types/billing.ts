@@ -131,6 +131,20 @@ export type AutoBillingInput = {
   enabled: boolean;
   channel?: "asaas" | "manual";
   firstDueDate?: string;
+  /** PRORATED = só os dias do início da locação ao vencimento. */
+  firstChargeAmount?: "FULL" | "PRORATED";
+};
+
+/** A 1ª cobrança inteira × proporcional (null = não cabe proporcional). */
+export type FirstChargePreview = {
+  full: number;
+  prorated: {
+    amount: number;
+    from: string;
+    through: string;
+    days: number;
+    cycleDays: number;
+  } | null;
 };
 
 export type AutoBillingResult = {

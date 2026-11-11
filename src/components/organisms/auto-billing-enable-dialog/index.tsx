@@ -15,19 +15,22 @@ import { Form } from "@/components/atoms/form";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { DateField } from "@/components/molecules/date-field";
+import { SegmentedField } from "@/components/molecules/segmented-field";
 import { SelectField } from "@/components/molecules/select-field";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { rentSeriesHint } from "@/helpers/billing";
 import { toApiError } from "@/helpers/api-error";
 import { moneyErrorMessage } from "@/helpers/money-errors";
 import { useSetAutoBilling } from "@/hooks/api/gestao/rentals/useBillingMutations";
+import { useFirstChargePreview } from "@/hooks/api/gestao/rentals/useFirstChargePreview";
 import { useIdempotencyKey } from "@/hooks/ui/useIdempotencyKey";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { RentalBilling } from "@/types/billing";
-import { calendarDay } from "@/utils/date";
-import { formatCurrency } from "@/utils/format";
+import { calendarDay, isDayString } from "@/utils/date";
+import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
 type Channel = RentalBilling["autoBilling"]["channel"];
+type FirstAmount = "FULL" | "PRORATED";
 
 const CHANNEL_OPTIONS = [
   { value: "asaas", label: "Pelo Asaas (pix/boleto com fatura)" },
@@ -50,6 +53,14 @@ export function AutoBillingEnableDialog({
   const [open, setOpen] = useState(false);
   const [channel, setChannel] = useState<Channel>(autoBilling.channel);
   const [firstDueDate, setFirstDueDate] = useState("");
+  const [firstAmount, setFirstAmount] = useState<FirstAmount>("PRORATED");
+  const preview = useFirstChargePreview(
+    billing.rentalId,
+    open && isDayString(firstDueDate) ? firstDueDate : null,
+  );
+  const prorated = isDayString(firstDueDate)
+    ? (preview.data?.prorated ?? null)
+    : null;
   const [errors, setErrors] = useState<{
     firstDueDate?: string;
     form?: string;
@@ -60,6 +71,7 @@ export function AutoBillingEnableDialog({
     setOpen(next);
     if (!next) return;
     setChannel(autoBilling.channel);
+    setFirstAmount("PRORATED");
     setFirstDueDate(
       autoBilling.nextDueDate ? calendarDay(autoBilling.nextDueDate) : "",
     );
@@ -73,7 +85,15 @@ export function AutoBillingEnableDialog({
       return;
     }
     setAutoBilling.mutate(
-      { key: idempotency.key, input: { enabled: true, channel, firstDueDate } },
+      {
+        key: idempotency.key,
+        input: {
+          enabled: true,
+          channel,
+          firstDueDate,
+          firstChargeAmount: prorated ? firstAmount : "FULL",
+        },
+      },
       {
         onSuccess: () => {
           idempotency.renew();
@@ -127,6 +147,31 @@ export function AutoBillingEnableDialog({
             }}
             error={errors.firstDueDate}
           />
+          {prorated && preview.data && (
+            <>
+              <SegmentedField
+                label="Valor da primeira cobrança"
+                value={firstAmount}
+                onChange={(value) => setFirstAmount(value as FirstAmount)}
+                disabled={setAutoBilling.isPending}
+                options={[
+                  {
+                    value: "PRORATED",
+                    label: `Proporcional · ${formatCurrency(prorated.amount)}`,
+                  },
+                  {
+                    value: "FULL",
+                    label: `Inteiro · ${formatCurrency(preview.data.full)}`,
+                  },
+                ]}
+              />
+              <Text size="xs" tone="muted">
+                {firstAmount === "PRORATED"
+                  ? `${prorated.days} de ${prorated.cycleDays} dias: de ${formatCalendarDate(prorated.from)} a ${formatCalendarDate(prorated.through)}.`
+                  : "Cobra o ciclo inteiro, mesmo a locação tendo começado depois."}
+              </Text>
+            </>
+          )}
           <Text size="xs" tone="muted">
             {rentSeriesHint(billing.ratePeriod)}
             {autoBilling.nextAmount != null &&
