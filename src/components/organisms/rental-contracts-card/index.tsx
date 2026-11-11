@@ -1,5 +1,5 @@
 import { FilePlus2, FileText, Signature, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -9,6 +9,7 @@ import { Text } from "@/components/atoms/text";
 import { CollapsibleCard } from "@/components/molecules/collapsible-card";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { DocumentItem } from "@/components/molecules/document-item";
+import { ContractSignatureStart } from "@/components/organisms/contract-signature-start";
 import { DocumentEditDialog } from "@/components/organisms/document-edit-dialog";
 import { ManageDocumentActions } from "@/components/organisms/documents-card";
 import { QueryError } from "@/components/organisms/query-error";
@@ -31,6 +32,37 @@ import { formatDate } from "@/utils/format";
  * under `rentals.all`.
  */
 const INVALIDATE = queryKeys.rentals.all;
+
+/** A PDF can go to signature when it has no live request (a refused or cancelled one can be redone). */
+const canStartSignature = (document: DocumentFile | null) =>
+  Boolean(document) &&
+  (!document?.signature ||
+    ["REFUSED", "CANCELED"].includes(document.signature.status));
+
+/** The row and, below it, the clear way to start the signature. */
+function WithSignatureStart({
+  rental,
+  document,
+  retroactive,
+  children,
+}: {
+  rental: RentalDetail;
+  document: DocumentFile | null;
+  retroactive: boolean;
+  children: ReactNode;
+}) {
+  if (retroactive || !document || !canStartSignature(document)) {
+    return <>{children}</>;
+  }
+  return (
+    <Box>
+      {children}
+      <Box className="flex justify-end pb-3">
+        <ContractSignatureStart rental={rental} document={document} />
+      </Box>
+    </Box>
+  );
+}
 
 /**
  * "Contratos" of a rental, as in the management app: the generated contracts
@@ -82,24 +114,34 @@ export function RentalContractsCard({ rental }: { rental: RentalDetail }) {
         </Text>
       ) : (
         <Box className="divide-y">
-          {contracts.data.map((contract) => (
-            <ContractRow
-              key={contract.id}
-              contract={contract}
-              document={
-                contract.document
-                  ? (byId.get(contract.document.id) ?? contract.document)
-                  : null
-              }
-              owner={owner}
-            />
-          ))}
+          {contracts.data.map((contract) => {
+            const document = contract.document
+              ? (byId.get(contract.document.id) ?? contract.document)
+              : null;
+            return (
+              <WithSignatureStart
+                key={contract.id}
+                rental={rental}
+                document={document}
+                retroactive={retroactive}
+              >
+                <ContractRow
+                  contract={contract}
+                  document={document}
+                  owner={owner}
+                />
+              </WithSignatureStart>
+            );
+          })}
           {contractDocuments.map((document) => (
-            <ContractDocumentRow
+            <WithSignatureStart
               key={document.id}
+              rental={rental}
               document={document}
-              owner={owner}
-            />
+              retroactive={retroactive}
+            >
+              <ContractDocumentRow document={document} owner={owner} />
+            </WithSignatureStart>
           ))}
         </Box>
       )}
