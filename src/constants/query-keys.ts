@@ -28,6 +28,11 @@ export const queryKeys = {
   vehicleTypes: {
     all: ["vehicle-types"] as const,
   },
+  /** Contract texts under review, saved on the server (editor + chat + MCP). */
+  contractDrafts: {
+    all: ["contract-drafts"] as const,
+    detail: (id: string) => ["contract-drafts", id] as const,
+  },
   rentals: {
     all: ["rentals"] as const,
     list: (filters: RentalFilters) =>
@@ -145,16 +150,20 @@ export const queryKeys = {
   ai: {
     all: ["ai"] as const,
     me: () => [...queryKeys.ai.all, "me"] as const,
-    consent: (query: string) => [...queryKeys.ai.all, "consent", query] as const,
+    consent: (query: string) =>
+      [...queryKeys.ai.all, "consent", query] as const,
     permissions: () => [...queryKeys.ai.all, "permissions"] as const,
     clients: () => [...queryKeys.ai.all, "clients"] as const,
     audit: () => [...queryKeys.ai.all, "audit"] as const,
-    auditEntry: (id: string) => [...queryKeys.ai.all, "audit-entry", id] as const,
-    gaps: (de: string, ate: string) => [...queryKeys.ai.all, "gaps", de, ate] as const,
+    auditEntry: (id: string) =>
+      [...queryKeys.ai.all, "audit-entry", id] as const,
+    gaps: (de: string, ate: string) =>
+      [...queryKeys.ai.all, "gaps", de, ate] as const,
   },
   aiUsage: {
     all: ["ai-usage"] as const,
-    summary: (month: string) => [...queryKeys.aiUsage.all, "summary", month] as const,
+    summary: (month: string) =>
+      [...queryKeys.aiUsage.all, "summary", month] as const,
   },
   paymentCards: {
     all: ["payment-cards"] as const,
@@ -166,7 +175,8 @@ export const queryKeys = {
   },
   expenses: {
     all: ["expenses"] as const,
-    month: (month: string) => [...queryKeys.expenses.all, "month", month] as const,
+    month: (month: string) =>
+      [...queryKeys.expenses.all, "month", month] as const,
     detail: (id: string) => [...queryKeys.expenses.all, "detail", id] as const,
   },
   crm: {

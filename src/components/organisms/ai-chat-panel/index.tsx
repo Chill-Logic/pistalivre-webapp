@@ -11,6 +11,7 @@ import { AiActionCard } from "@/components/organisms/ai-action-card";
 import { toApiError } from "@/helpers/api-error";
 import { useAiChat } from "@/hooks/api/gestao/ai/useAi";
 import type { AiChatAction, AiChatMode, AiChatStep } from "@/types/ai";
+import type { ContractDraftState } from "@/types/contract";
 import { cn } from "@/utils/cn";
 
 type ChatEntry = {
@@ -43,13 +44,21 @@ export type AiChatPanelProps = {
   partnerContractId?: string;
   /** Why the assistant can't work yet (e.g. no preview to edit). */
   disabledReason?: string;
+  /** A draft saved on the server: the chat edits it there (and saves). */
+  draftId?: string;
+  /** Saves what the editor has before asking; resolves with the saved text and version. */
+  prepare?: () => Promise<{ html: string; version: number }>;
+  /** The draft after the answer (new version): load it in the editor. */
+  onDraft?: (draft: ContractDraftState) => void;
   className?: string;
 };
 
 /**
  * The editor's AI assistant: a conversation with an agent that reads the
- * system's data and edits the open draft with the person's tools. The draft is
- * never saved — the person reviews and saves. Each answer lists what the agent
+ * system's data and edits the open draft with the person's tools. A rental
+ * contract is a draft saved on the server (`draftId`): the chat's changes are
+ * saved there too; other documents are never saved — the person reviews and
+ * saves. Each answer lists what the agent
  * did; a change to the document can be undone; a write it proposed waits for
  * "Confirmar".
  */
@@ -62,6 +71,9 @@ export function AiChatPanel({
   leadId,
   partnerContractId,
   disabledReason,
+  draftId,
+  prepare,
+  onDraft,
   className,
 }: AiChatPanelProps) {
   const chat = useAiChat();
@@ -82,18 +94,22 @@ export function AiChatPanel({
     const history = entries.map(({ role, content }) => ({ role, content }));
     setEntries((current) => [...current, { role: "user", content: message }]);
     const before = html;
-    chat.mutate(
-      {
-        mode,
-        html,
-        history,
-        message,
-        ...(rentalId ? { rentalId } : {}),
-        ...(leadId ? { leadId } : {}),
-        ...(partnerContractId ? { partnerContractId } : {}),
-      },
-      {
-        onSuccess: (answer) => {
+    const ready = prepare ? prepare() : Promise.resolve({ html, version: 0 });
+    ready
+      .then((saved) =>
+        chat.mutateAsync({
+          mode,
+          html: saved.html,
+          history,
+          message,
+          ...(rentalId ? { rentalId } : {}),
+          ...(leadId ? { leadId } : {}),
+          ...(partnerContractId ? { partnerContractId } : {}),
+          ...(draftId ? { draftId, version: saved.version } : {}),
+        }),
+      )
+      .then(
+        (answer) => {
           setEntries((current) => [
             ...current,
             {
@@ -104,11 +120,11 @@ export function AiChatPanel({
               before: answer.changed ? before : undefined,
             },
           ]);
-          if (answer.changed) onApply(answer.html);
+          if (answer.draft && onDraft) onDraft(answer.draft);
+          else if (answer.changed) onApply(answer.html);
         },
-        onError: (failure) => setError(toApiError(failure).message),
-      },
-    );
+        (failure) => setError(toApiError(failure).message),
+      );
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {

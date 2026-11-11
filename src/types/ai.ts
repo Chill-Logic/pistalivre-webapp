@@ -1,3 +1,5 @@
+import type { ContractDraftState } from "@/types/contract";
+
 /** An AI tool as the screens list it. */
 /** read = looks at data; draft = edits the open document; write = changes data after the person confirms. */
 export type AiToolKind = "read" | "draft" | "write";
@@ -48,6 +50,10 @@ export type AiChatInput = {
   leadId?: string;
   /** mode "partner_contract": the partner contract whose PDF is being made. */
   partnerContractId?: string;
+  /** A rental contract saved on the server: the chat saves its changes there. */
+  draftId?: string;
+  /** The draft version the editor shows (409 if it changed since). */
+  version?: number;
 };
 
 /** A write the agent proposed: nothing happens until the person confirms. */
@@ -68,6 +74,8 @@ export type AiChatResponse = {
   steps: AiChatStep[];
   actions: AiChatAction[];
   stopReason: "ok" | "refusal" | "max_tokens" | "max_steps";
+  /** With `draftId`: the saved draft after this answer (new version). */
+  draft?: ContractDraftState | null;
 };
 
 /** GET /oauth/consent — the consent screen. */

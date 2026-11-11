@@ -31,8 +31,25 @@ export type LicenseInput = {
 };
 
 /** The template merged with the rental, for the editor. Nothing saved. */
-export type ContractDraft = {
+/** Who made a draft's last change. */
+export type ContractDraftVia = "editor" | "chat" | "mcp" | "template";
+
+/**
+ * The contract text under review, saved on the server: the editor, the chat
+ * and MCP clients edit the same text. `version` goes up on each save.
+ */
+export type ContractDraftState = {
+  id: string;
+  rentalId: string;
+  templateId: string;
   html: string;
+  version: number;
+  updatedVia: ContractDraftVia;
+  updatedAt: string;
+  canUndo: boolean;
+};
+
+export type ContractDraft = ContractDraftState & {
   cnh: LicenseStatus;
   aiEnabled: boolean;
 };

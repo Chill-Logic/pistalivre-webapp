@@ -248,10 +248,10 @@ export function RentalContractNewPage() {
                     </TextLink>
                   </Text>
                   <ContractEditor
-                    key={templateId}
+                    key={draft.data.id}
                     rentalId={id}
                     templateId={templateId}
-                    initialHtml={draft.data.html}
+                    draft={draft.data}
                     aiEnabled={draft.data.aiEnabled}
                     cancelTo={rentalUrl}
                     onSaved={() => navigate(rentalUrl, { replace: true })}

@@ -33,6 +33,8 @@ export const REALTIME_INVALIDATIONS: Record<
     queryKeys.dashboard.all,
     queryKeys.portal.all,
   ],
+  /** Someone (another tab, the chat, an MCP client) changed a contract under review. */
+  "contract_draft.updated": [queryKeys.contractDrafts.all],
   "invoice.updated": [
     queryKeys.rentals.all,
     queryKeys.customers.all,
