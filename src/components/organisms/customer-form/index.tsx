@@ -29,6 +29,7 @@ import { applyApiErrors } from "@/helpers/form";
 import { useCepLookup } from "@/hooks/api/comum/useCepLookup";
 import { useCustomerDocumentReadEnabled } from "@/hooks/api/gestao/customers/useCustomerDocumentReader";
 import { useSaveCustomer } from "@/hooks/api/gestao/customers/useSaveCustomer";
+import { useAiFormFill, type AiFillStep } from "@/hooks/ui/useAiFormFill";
 import { customersService } from "@/services/api/gestao/customers.service";
 import { documentsService } from "@/services/api/gestao/documents.service";
 import type { CustomerDetail, CustomerDocumentResult } from "@/types/customer";
@@ -119,6 +120,54 @@ export function CustomerForm({
     });
   };
 
+  // "Preencher na tela" from the chat: field by field, with where each came from.
+  const aiFill = useAiFormFill("customer", ({ values, origins }) => {
+    const text = (key: string) =>
+      typeof values[key] === "string" && values[key] ? String(values[key]) : "";
+    const steps: AiFillStep[] = [];
+    const add = (
+      name: keyof CustomerFormValues,
+      label: string,
+      value: string,
+      origin = origins[name],
+    ) => {
+      if (!value) return;
+      steps.push({
+        label,
+        origin,
+        apply: () =>
+          setValue(name, value, { shouldDirty: true, shouldValidate: true }),
+      });
+    };
+    add("name", "Nome", text("name"));
+    add(
+      "document",
+      "CPF",
+      text("document") && maskCpf(onlyDigits(text("document"))),
+    );
+    add("rg", "RG", text("rg") && maskRg(text("rg")));
+    add("email", "E-mail", text("email"));
+    add(
+      "phone",
+      "Telefone",
+      text("phone") && maskPhone(onlyDigits(text("phone"))),
+    );
+    add(
+      "birthDate",
+      "Nascimento",
+      text("birthDate") && dayToBrDate(text("birthDate").slice(0, 10)),
+    );
+    add("profession", "Profissão", text("profession"));
+    add("zip", "CEP", text("zip") && maskCep(onlyDigits(text("zip"))));
+    add("addressLine", "Logradouro", text("addressLine"));
+    add("addressNumber", "Número", text("addressNumber"));
+    add("complement", "Complemento", text("complement"));
+    add("neighborhood", "Bairro", text("neighborhood"));
+    add("city", "Cidade", text("city"));
+    add("state", "UF", text("state"));
+    return steps;
+  });
+
   /** The form fills with what the document had (the person checks before saving). */
   const fillFromDocument = (result: CustomerDocumentResult, file: File) => {
     const { fields } = result;
@@ -183,6 +232,8 @@ export function CustomerForm({
       { ...toCustomerInput(values), ...(leadId ? { leadId } : {}) },
       {
         onSuccess: async (result) => {
+          // Came from the chat: the CNH and the chat's files are saved by it.
+          if (aiFill.active) await aiFill.fulfill(result.customer.id);
           if (customer || (!readDocuments.length && !license)) {
             onSaved(result.customer);
             return;

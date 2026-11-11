@@ -55,6 +55,15 @@ export const aiService = {
     }>(`/ai/actions/${id}/confirm`);
     return data;
   },
+  /** Saved through the system's form ("Preencher na tela"): the action is done. */
+  async fulfillAction(id: string, recordId: string) {
+    const { data } = await http.post<{
+      id: string;
+      summary: string;
+      result: unknown;
+    }>(`/ai/actions/${id}/fulfilled`, { recordId });
+    return data;
+  },
   async cancelAction(id: string) {
     await http.post(`/ai/actions/${id}/cancel`);
   },

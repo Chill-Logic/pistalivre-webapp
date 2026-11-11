@@ -4,6 +4,7 @@ import { Box } from "@/components/atoms/box";
 import { Main } from "@/components/atoms/landmarks";
 import { OfflineBanner } from "@/components/molecules/offline-banner";
 import { AiAssistantLauncher } from "@/components/organisms/ai-assistant-launcher";
+import { AiSpotlight } from "@/components/organisms/ai-spotlight";
 import { AppHeader } from "@/components/organisms/app-header";
 import { AppSidebar } from "@/components/organisms/app-sidebar";
 import { BottomNav } from "@/components/organisms/bottom-nav";
@@ -48,7 +49,12 @@ export function AppShell({ user }: AppShellProps) {
         </Main>
       </Box>
       <BottomNav user={user} />
-      {user.kind === "user" && <AiAssistantLauncher />}
+      {user.kind === "user" && (
+        <>
+          <AiAssistantLauncher />
+          <AiSpotlight />
+        </>
+      )}
     </Box>
   );
 }

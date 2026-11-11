@@ -1,3 +1,4 @@
+import { AiAnchor } from "@/components/atoms/ai-anchor";
 import { Pencil, Users } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
@@ -126,7 +127,11 @@ export function CustomerDetailPage() {
         ))}
       {customer.data && (
         <CustomerDetailLayout
-          summary={<CustomerSummary customer={customer.data} />}
+          summary={
+            <AiAnchor id="summary">
+              <CustomerSummary customer={customer.data} />
+            </AiAnchor>
+          }
           license={<CustomerLicenseCard customer={customer.data} />}
           contact={<CustomerContactCard customer={customer.data} />}
           rentals={<CustomerRentals rentals={customer.data.rentals} />}

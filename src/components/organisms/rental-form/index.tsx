@@ -31,6 +31,7 @@ import { LABEL_MAPS } from "@/constants/label-maps";
 import { applyApiErrors } from "@/helpers/form";
 import { useSaveRental } from "@/hooks/api/gestao/rentals/useSaveRental";
 import { useLabels } from "@/hooks/ui/useLabels";
+import { useAiFormFill, type AiFillStep } from "@/hooks/ui/useAiFormFill";
 import {
   useCustomerOptions,
   useVehicleOptions,
@@ -84,10 +85,85 @@ export function RentalForm({ rental, cancelTo, onSaved }: RentalFormProps) {
   );
   const weekdays = options(LABEL_MAPS.weekday);
 
+  // "Preencher na tela" from the chat: field by field, with where each came from.
+  const aiFill = useAiFormFill("rental", ({ values: v, origins }) => {
+    const steps: AiFillStep[] = [];
+    const set = (
+      name: keyof RentalFormValues,
+      value: RentalFormValues[keyof RentalFormValues],
+    ) =>
+      setValue(name, value as never, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    const add = (
+      label: string,
+      field: string,
+      present: unknown,
+      apply: () => void,
+    ) => {
+      if (present === null || present === undefined || present === "") return;
+      steps.push({ label, origin: origins[field], apply });
+    };
+    add("Cliente", "customerId", v.customerId, () => {
+      set("customerId", String(v.customerId));
+      set("customerLabel", String(v.customerLabel ?? ""));
+    });
+    add("Veículo", "vehicleId", v.vehicleId, () => {
+      set("vehicleId", String(v.vehicleId));
+      set("vehicleLabel", String(v.vehicleLabel ?? ""));
+    });
+    add("Início", "startDate", v.startDate, () =>
+      set("startDate", String(v.startDate)),
+    );
+    add("Fim (opcional)", "endDate", v.endDate, () =>
+      set("endDate", String(v.endDate)),
+    );
+    add("Valor", "rate", v.rate, () => set("rate", Number(v.rate)));
+    add("Periodicidade", "ratePeriod", v.ratePeriod, () =>
+      set("ratePeriod", String(v.ratePeriod) as RentalFormValues["ratePeriod"]),
+    );
+    add("Forma de pagamento", "paymentMethod", v.paymentMethod, () =>
+      set("paymentMethod", String(v.paymentMethod)),
+    );
+    add("Dia de cobrança", "paymentWeekday", v.paymentWeekday, () =>
+      set("paymentWeekday", String(v.paymentWeekday)),
+    );
+    add("Tipo de caução", "cautionType", v.cautionType, () =>
+      set(
+        "cautionType",
+        String(v.cautionType) as RentalFormValues["cautionType"],
+      ),
+    );
+    add("Valor total da caução", "cautionType", v.cautionTotal, () =>
+      set("cautionTotal", Number(v.cautionTotal)),
+    );
+    add(
+      "Valor da parcela semanal",
+      "cautionType",
+      v.cautionInstallmentValue,
+      () => set("cautionInstallmentValue", Number(v.cautionInstallmentValue)),
+    );
+    add("Dia da semana", "cautionType", v.cautionWeekday, () =>
+      set("cautionWeekday", String(v.cautionWeekday)),
+    );
+    if (typeof v.notes === "string" && v.notes) {
+      steps.push({
+        label: "Observações",
+        origin: origins.notes,
+        apply: () => set("notes", String(v.notes)),
+      });
+    }
+    return steps;
+  });
+
   const onSubmit = handleSubmit((values) => {
     setFormError(null);
     save.mutate(toRentalInput(values, isNew), {
-      onSuccess: onSaved,
+      onSuccess: async (saved) => {
+        if (aiFill.active) await aiFill.fulfill(saved.id);
+        onSaved(saved);
+      },
       onError: (error) =>
         setFormError(applyApiErrors(error, setError, RENTAL_FORM_FIELDS)),
     });

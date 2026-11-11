@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AiAnchor } from "@/components/atoms/ai-anchor";
 import { Box } from "@/components/atoms/box";
 import { Col, Row } from "@/components/atoms/grid";
 import { WIDE_MEDIA_QUERY } from "@/constants/layout";
@@ -53,6 +54,14 @@ export function RentalDetailLayout({
   signatures,
 }: RentalDetailLayoutProps) {
   const wide = useMediaQuery(WIDE_MEDIA_QUERY);
+  // Sections the assistant can point at ("Mostrar onde vi isso").
+  const anchored = (id: string, node: ReactNode) =>
+    node ? <AiAnchor id={id}>{node}</AiAnchor> : node;
+  summary = anchored("summary", summary);
+  charges = anchored("charges", charges);
+  reconciliation = anchored("reconciliation", reconciliation);
+  caution = anchored("caution", caution);
+  billing = anchored("billing", billing);
 
   if (wide) {
     return (

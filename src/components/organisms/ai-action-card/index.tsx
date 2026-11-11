@@ -1,5 +1,11 @@
-import { Check, CircleSlash, ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import {
+  Check,
+  CircleSlash,
+  MousePointerClick,
+  ShieldCheck,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -11,10 +17,18 @@ import {
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { toApiError } from "@/helpers/api-error";
+import { ROUTES } from "@/constants/routes";
 import { useAiChatAction } from "@/hooks/api/gestao/ai/useAi";
+import { aiChatEvents } from "@/hooks/ui/useAiGuide";
 import type { AiChatAction } from "@/types/ai";
 
-type Decision = "pending" | "done" | "cancelled";
+type Decision = "pending" | "done" | "cancelled" | "screen";
+
+/** The system's form for each proposal kind ("Preencher na tela"). */
+const FORM_ROUTE = {
+  customer: ROUTES.customerNew,
+  rental: ROUTES.rentalNew,
+} as const;
 
 /** The server sends ready labels ("Veículo desejado"); values as plain text. */
 const fieldValue = (value: unknown) =>
@@ -28,13 +42,36 @@ const fieldValue = (value: unknown) =>
 export function AiActionCard({
   action,
   onDone,
+  onNavigate,
 }: {
   action: AiChatAction;
   /** Confirmed and run: what it did (the chat tells the agent, e.g. the new ids). */
   onDone?: (outcome: { summary: string; result: unknown }) => void;
+  /** Before leaving for the form (the phone closes the chat sheet). */
+  onNavigate?: () => void;
 }) {
   const { confirm, cancel } = useAiChatAction();
+  const navigate = useNavigate();
   const [decision, setDecision] = useState<Decision>("pending");
+
+  // Saved through the form ("Preencher na tela"): no confirming twice.
+  useEffect(
+    () =>
+      aiChatEvents.subscribe((event) => {
+        if (event.type === "fulfilled" && event.actionId === action.id) {
+          setDecision("screen");
+        }
+      }),
+    [action.id],
+  );
+
+  const fillOnScreen = () => {
+    if (!action.form) return;
+    onNavigate?.();
+    navigate(FORM_ROUTE[action.form.kind], {
+      state: { aiFill: { actionId: action.id, form: action.form } },
+    });
+  };
   const [error, setError] = useState<string | null>(null);
   const busy = confirm.isPending || cancel.isPending;
   const fields = Object.entries(action.details).filter(
@@ -74,7 +111,21 @@ export function AiActionCard({
       )}
       {error && <Alert>{error}</Alert>}
       {decision === "pending" ? (
-        <Box className="flex justify-end gap-2 pt-1">
+        <Box className="flex flex-wrap justify-end gap-2 pt-1">
+          {action.form && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mr-auto"
+              title="Abre o formulário do sistema e preenche campo por campo, mostrando de onde veio cada dado"
+              onClick={fillOnScreen}
+              disabled={busy}
+            >
+              <MousePointerClick />
+              Preencher na tela
+            </Button>
+          )}
           <Button
             type="button"
             variant="ghost"
@@ -103,12 +154,16 @@ export function AiActionCard({
           tone="muted"
           className="flex items-center gap-1.5 border-t pt-2"
         >
-          {decision === "done" ? (
+          {decision === "done" || decision === "screen" ? (
             <Check className="size-3 text-success" aria-hidden />
           ) : (
             <CircleSlash className="size-3" aria-hidden />
           )}
-          {decision === "done" ? "Feito" : "Cancelada: nada foi alterado"}
+          {decision === "done"
+            ? "Feito"
+            : decision === "screen"
+              ? "Feito pela tela"
+              : "Cancelada: nada foi alterado"}
         </Text>
       )}
     </Box>

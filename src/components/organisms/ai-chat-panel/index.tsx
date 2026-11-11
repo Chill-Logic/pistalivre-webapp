@@ -1,5 +1,6 @@
 import {
   Check,
+  MapPin,
   Paperclip,
   SendHorizontal,
   Sparkles,
@@ -33,7 +34,14 @@ import {
   AI_ATTACHMENT_ACCEPT,
   useAiAttachments,
 } from "@/hooks/api/gestao/ai/useAiAttachments";
-import type { AiChatAction, AiChatMode, AiChatStep } from "@/types/ai";
+import { fulfilledEntry, sourcesToTour } from "@/helpers/ai-guide";
+import { aiChatEvents, aiGuide } from "@/hooks/ui/useAiGuide";
+import type {
+  AiChatAction,
+  AiChatMode,
+  AiChatStep,
+  AiUiSource,
+} from "@/types/ai";
 import type { ContractDraftState } from "@/types/contract";
 import { cn } from "@/utils/cn";
 
@@ -57,6 +65,8 @@ export type ChatEntry = {
   before?: string;
   /** For the agent only (not shown): e.g. the ids a confirmed action created. */
   note?: string;
+  /** Where on the app the data of this answer lives ("Mostrar onde vi isso"). */
+  sources?: AiUiSource[];
 };
 
 const GREETING: Record<AiChatMode, string> = {
@@ -92,6 +102,8 @@ export type AiChatPanelProps = {
   page?: string;
   /** Shows a close (X) in the header: the floating window. */
   onClose?: () => void;
+  /** The chat is about to take the person somewhere (the phone closes the sheet). */
+  onNavigate?: () => void;
   /** Keeps the conversation outside the panel (it survives closing a sheet). */
   conversation?: [ChatEntry[], Dispatch<SetStateAction<ChatEntry[]>>];
   className?: string;
@@ -121,6 +133,7 @@ export function AiChatPanel({
   page,
   conversation,
   onClose,
+  onNavigate,
   className,
 }: AiChatPanelProps) {
   const chat = useAiChat();
@@ -132,6 +145,23 @@ export function AiChatPanel({
   const picker = useRef<HTMLInputElement>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const blocked = chat.isPending || Boolean(disabledReason);
+
+  // A conversation kept outside (the floating assistant) hears these where it lives.
+  useEffect(() => {
+    if (conversation) return;
+    return aiChatEvents.subscribe((event) => {
+      if (event.type === "fulfilled") {
+        setEntries((current) => [...current, fulfilledEntry(event)]);
+      }
+    });
+  }, [conversation, setEntries]);
+
+  const showSources = (sources: AiUiSource[]) => {
+    const tour = sourcesToTour(sources);
+    if (tour.length === 0) return;
+    onNavigate?.();
+    aiGuide.tour(tour);
+  };
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -195,6 +225,7 @@ ${note}`
               content: answer.reply,
               steps: answer.steps,
               actions: answer.actions,
+              sources: answer.sources,
               before: answer.changed ? before : undefined,
             },
           ]);
@@ -348,6 +379,7 @@ ${note}`
                     <AiActionCard
                       key={action.id}
                       action={action}
+                      onNavigate={onNavigate}
                       onDone={(outcome) =>
                         setEntries((current) => [
                           ...current,
@@ -360,6 +392,21 @@ ${note}`
                       }
                     />
                   ))}
+                  {entry.sources && entry.sources.length > 0 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-auto w-full justify-start whitespace-normal py-1.5 text-left"
+                      onClick={() => showSources(entry.sources ?? [])}
+                    >
+                      <MapPin />
+                      Mostrar onde vi isso
+                      {entry.sources.length > 1
+                        ? ` (${entry.sources.length} telas)`
+                        : ""}
+                    </Button>
+                  )}
                   {entry.before !== undefined && (
                     <Box className="flex items-center justify-between gap-2 border-t pt-2">
                       <Text size="xs" tone="muted">

@@ -1,3 +1,4 @@
+import { AiAnchor } from "@/components/atoms/ai-anchor";
 import { Box } from "@/components/atoms/box";
 import {
   DelinquencySummary,
@@ -61,7 +62,11 @@ export function FinancePage() {
             label="Carregando o que há a receber…"
             skeleton={<ToCollectTimelineSkeleton />}
           >
-            {(data) => <ToCollectTimeline toCollect={data} />}
+            {(data) => (
+              <AiAnchor id="to-collect">
+                <ToCollectTimeline toCollect={data} />
+              </AiAnchor>
+            )}
           </QueryBoundary>
         }
         delinquency={
@@ -70,7 +75,11 @@ export function FinancePage() {
             label="Carregando inadimplência…"
             skeleton={<DelinquencySummarySkeleton />}
           >
-            {(data) => <DelinquencySummary delinquency={data} />}
+            {(data) => (
+              <AiAnchor id="delinquency">
+                <DelinquencySummary delinquency={data} />
+              </AiAnchor>
+            )}
           </QueryBoundary>
         }
         transfers={

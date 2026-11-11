@@ -86,6 +86,8 @@ export type AiChatAction = {
   /** Label → value, labels ready from the server. */
   details: Record<string, unknown>;
   expiresAt: string;
+  /** Present when the system has a form for it ("Preencher na tela"). */
+  form?: AiProposalForm;
 };
 
 export type AiChatResponse = {
@@ -97,6 +99,8 @@ export type AiChatResponse = {
   stopReason: "ok" | "refusal" | "max_tokens" | "max_steps";
   /** With `draftId`: the saved draft after this answer (new version). */
   draft?: ContractDraftState | null;
+  /** Where on the app each data the agent read lives ("Mostrar onde vi isso"). */
+  sources?: AiUiSource[];
 };
 
 /** GET /oauth/consent — the consent screen. */
@@ -172,4 +176,31 @@ export type AiAuditFilters = {
   ok: string;
   de: string;
   ate: string;
+};
+
+/** A place on the app where a data the agent read lives. */
+export type AiUiSource = {
+  screen:
+    | "rental"
+    | "customer"
+    | "lead"
+    | "maintenance"
+    | "inspection"
+    | "dashboard"
+    | "finance"
+    | "plans"
+    | "contract_draft";
+  id?: string;
+  /** The section's `data-ai-anchor` on that screen. */
+  section?: string;
+  params?: Record<string, string>;
+  label: string;
+  hint: string;
+};
+
+/** "Preencher na tela": the form, its values and where each came from. */
+export type AiProposalForm = {
+  kind: "customer" | "rental";
+  values: Record<string, unknown>;
+  origins: Record<string, string>;
 };

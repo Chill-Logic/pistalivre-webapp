@@ -13,9 +13,11 @@ import {
   AiChatPanel,
   type ChatEntry,
 } from "@/components/organisms/ai-chat-panel";
+import { fulfilledEntry } from "@/helpers/ai-guide";
 import { DESKTOP_MEDIA_QUERY } from "@/constants/layout";
 import { useAiChatAvailable } from "@/hooks/api/gestao/ai/useAi";
 import { useAiDockPresent } from "@/hooks/ui/useAiDockPresence";
+import { aiChatEvents, useAiGuideSpot } from "@/hooks/ui/useAiGuide";
 import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 import { cn } from "@/utils/cn";
 
@@ -41,7 +43,22 @@ export function AiAssistantLauncher() {
   const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
+  // While the guide points at the screen, the window steps aside (it would
+  // cover the very field being shown) and comes back when it ends.
+  const guiding = useAiGuideSpot() !== null;
   const conversation = useState<ChatEntry[]>([]);
+  const setEntries = conversation[1];
+
+  // A proposal saved through its form: recorded even with the chat closed.
+  useEffect(
+    () =>
+      aiChatEvents.subscribe((event) => {
+        if (event.type === "fulfilled") {
+          setEntries((current) => [...current, fulfilledEntry(event)]);
+        }
+      }),
+    [setEntries],
+  );
 
   // Esc closes the floating window (the sheet handles its own).
   useEffect(() => {
@@ -62,6 +79,8 @@ export function AiAssistantLauncher() {
       page={pathname}
       conversation={conversation}
       onClose={isDesktop ? () => setOpen(false) : undefined}
+      // The phone's sheet covers the screen: it closes to show the way.
+      onNavigate={isDesktop ? undefined : () => setOpen(false)}
       className="h-full"
     />
   );
@@ -94,6 +113,7 @@ export function AiAssistantLauncher() {
             aria-label="Assistente de IA"
             className={cn(
               "fixed bottom-24 right-6 z-40 flex h-[min(640px,calc(100dvh-8rem))] w-[400px] flex-col overflow-hidden rounded-2xl shadow-2xl",
+              guiding && "hidden",
               "origin-bottom-right duration-200 animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 motion-reduce:animate-none",
             )}
           >
