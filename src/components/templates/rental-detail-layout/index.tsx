@@ -62,6 +62,7 @@ export function RentalDetailLayout({
   reconciliation = anchored("reconciliation", reconciliation);
   caution = anchored("caution", caution);
   billing = anchored("billing", billing);
+  contracts = anchored("contracts", contracts);
 
   if (wide) {
     return (
