@@ -1,20 +1,8 @@
-import { CalendarDays } from "lucide-react";
-import { useId, useState } from "react";
-import type { DateRange } from "react-day-picker";
+import { useEffect, useId, useState } from "react";
 import { Box } from "@/components/atoms/box";
-import { Button } from "@/components/atoms/button";
-import { Calendar } from "@/components/atoms/calendar";
 import { Label } from "@/components/atoms/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/atoms/popover";
 import { Text } from "@/components/atoms/text";
-import { DESKTOP_MEDIA_QUERY } from "@/constants/layout";
-import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
-import { formatCalendarDate } from "@/utils/format";
-import { fromDayString, toDayString } from "@/utils/date";
+import { DateInput } from "@/components/molecules/date-input";
 
 type DateRangeFieldProps = {
   label: string;
@@ -27,8 +15,8 @@ type DateRangeFieldProps = {
 };
 
 /**
- * Pick a range in our own calendar (one month on phones, two on desktop).
- * Applies only when both ends are chosen.
+ * A period typed (dd/mm/aaaa, with the mask) or picked in the calendar, one
+ * end at a time. Applies only when both ends are whole dates and in order.
  */
 export function DateRangeField({
   label,
@@ -38,68 +26,56 @@ export function DateRangeField({
   onChange,
 }: DateRangeFieldProps) {
   const id = useId();
-  const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);
-  const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState<DateRange | undefined>();
+  const [from, setFrom] = useState(start);
+  const [to, setTo] = useState(end);
 
-  const selected = draft ?? {
-    from: fromDayString(start),
-    to: fromDayString(end),
-  };
+  // The page changed the period (another filter, a link): follow it.
+  useEffect(() => setFrom(start), [start]);
+  useEffect(() => setTo(end), [end]);
 
-  const handleOpenChange = (next: boolean) => {
-    setOpen(next);
-    if (!next) setDraft(undefined);
-  };
-
-  // First tap starts a NEW range (never stretches the current one); the
-  // second closes it, in whichever order the two days were tapped.
-  const handleDayClick = (day: Date) => {
-    if (!draft?.from || draft.to) {
-      setDraft({ from: day, to: undefined });
-      return;
+  const commit = (nextFrom: string, nextTo: string) => {
+    setFrom(nextFrom);
+    setTo(nextTo);
+    if (nextFrom && nextTo && nextFrom <= nextTo) {
+      if (nextFrom !== start || nextTo !== end) {
+        onChange({ start: nextFrom, end: nextTo });
+      }
     }
-    const [first, last] =
-      day < draft.from ? [day, draft.from] : [draft.from, day];
-    onChange({ start: toDayString(first), end: toDayString(last) });
-    handleOpenChange(false);
   };
+  const reversed = Boolean(from && to && from > to);
 
   return (
     <Box className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
-      <Popover open={open} onOpenChange={handleOpenChange}>
-        <PopoverTrigger asChild>
-          <Button
+      <Box className="flex items-center gap-2">
+        <Box className="min-w-0 flex-1">
+          <DateInput
             id={id}
-            type="button"
-            variant="outline"
-            className="w-full justify-start gap-2 bg-card px-3 text-base font-normal md:text-sm"
-          >
-            <CalendarDays className="text-muted-foreground" />
-            <Text inline size={null} className="tabular-nums">
-              {formatCalendarDate(`${start}T00:00:00Z`)} –{" "}
-              {formatCalendarDate(`${end}T00:00:00Z`)}
-            </Text>
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto">
-          <Calendar
-            mode="range"
-            selected={selected}
-            onSelect={() => undefined}
-            onDayClick={handleDayClick}
-            numberOfMonths={isDesktop ? 2 : 1}
-            defaultMonth={fromDayString(start)}
-            disabled={max ? { after: fromDayString(max) } : undefined}
+            aria-label={`${label}: de`}
+            value={from}
+            max={max}
+            invalid={reversed}
+            onChange={(day) => commit(day, to)}
           />
-          <Text size="xs" tone="muted" className="px-3 pb-3">
-            {draft?.from && !draft.to
-              ? "Agora escolha o último dia."
-              : "Escolha o primeiro e o último dia."}
-          </Text>
-        </PopoverContent>
-      </Popover>
+        </Box>
+        <Text inline tone="muted" aria-hidden>
+          até
+        </Text>
+        <Box className="min-w-0 flex-1">
+          <DateInput
+            aria-label={`${label}: até`}
+            value={to}
+            max={max}
+            invalid={reversed}
+            onChange={(day) => commit(from, day)}
+          />
+        </Box>
+      </Box>
+      {reversed && (
+        <Text size="sm" tone="destructive">
+          A data inicial é depois da final.
+        </Text>
+      )}
     </Box>
   );
 }
