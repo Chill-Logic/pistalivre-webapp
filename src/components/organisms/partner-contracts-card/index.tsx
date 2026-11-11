@@ -1,5 +1,5 @@
 import { ChevronRight, FileText, Plus } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import {
@@ -13,7 +13,6 @@ import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { PartnerContractStatusBadge } from "@/components/molecules/partner-contract-status-badge";
-import { PartnerContractDialog } from "@/components/organisms/partner-contract-dialog";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
 import { contractTerms, currentVehicles } from "@/helpers/partner";
@@ -32,7 +31,6 @@ export function PartnerContractsCard({
   partnerId,
   contracts,
 }: PartnerContractsCardProps) {
-  const navigate = useNavigate();
   const { label } = useLabels();
 
   return (
@@ -47,18 +45,12 @@ export function PartnerContractsCard({
             </Text>
           )}
         </CardTitle>
-        <PartnerContractDialog
-          partnerId={partnerId}
-          onCreated={(contract) =>
-            navigate(routeTo.partnerContract(contract.id))
-          }
-          trigger={
-            <Button size="sm">
-              <Plus />
-              Novo contrato
-            </Button>
-          }
-        />
+        <Button asChild size="sm">
+          <Link to={routeTo.newPartnerContract(partnerId)}>
+            <Plus />
+            Novo contrato
+          </Link>
+        </Button>
       </CardHeader>
       <CardContent>
         {contracts.length === 0 ? (

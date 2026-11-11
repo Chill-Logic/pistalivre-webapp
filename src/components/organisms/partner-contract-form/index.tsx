@@ -1,20 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useState, type ReactNode } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { Alert } from "@/components/atoms/alert";
 import { Button } from "@/components/atoms/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/atoms/dialog";
 import { Form } from "@/components/atoms/form";
 import { Box } from "@/components/atoms/box";
+import { Card, CardContent } from "@/components/atoms/card";
+import { Skeleton } from "@/components/atoms/skeleton";
 import { Col, Row } from "@/components/atoms/grid";
 import { Heading } from "@/components/atoms/heading";
 import { Spinner } from "@/components/atoms/spinner";
@@ -58,61 +51,28 @@ const PAYOUT_DAYS = [
   })),
 ];
 
-type PartnerContractDialogProps = {
+type PartnerContractFormProps = {
   partnerId: string;
   /** Editing this contract's terms (none = a new draft). */
   contract?: PartnerContract;
-  trigger: ReactNode;
-  onCreated?: (contract: PartnerContract) => void;
+  onDone: (contract: PartnerContract) => void;
+  onCancel: () => void;
+  /** Every change of the terms (the calculator beside it follows them). */
+  onTermsChange?: (values: ContractFormValues) => void;
 };
 
 /**
- * The contract's terms. Investment: the contribution (vehicles or money) and the
- * partner's share; management: the company's fee. The payout is always made
- * outside the system.
+ * The contract's terms, as a page section. Investment: the contribution
+ * (vehicles or money) and the partner's share; management: the company's
+ * fee. The payout is always made outside the system.
  */
-export function PartnerContractDialog({
+export function PartnerContractForm({
   partnerId,
   contract,
-  trigger,
-  onCreated,
-}: PartnerContractDialogProps) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl">
-        <DialogTitle>
-          {contract ? `Editar ${contract.code}` : "Novo contrato"}
-        </DialogTitle>
-        <DialogDescription>
-          {contract
-            ? "Os termos do contrato. Mudar um termo retira a proposta que estiver aguardando o parceiro."
-            : "Nasce como rascunho: inclua os veículos, envie a proposta e ative depois do aceite do parceiro."}
-        </DialogDescription>
-        {open && (
-          <ContractForm
-            partnerId={partnerId}
-            contract={contract}
-            onDone={(saved) => {
-              setOpen(false);
-              if (!contract) onCreated?.(saved);
-            }}
-          />
-        )}
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-type ContractFormProps = {
-  partnerId: string;
-  contract?: PartnerContract;
-  onDone: (contract: PartnerContract) => void;
-};
-
-function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
+  onDone,
+  onCancel,
+  onTermsChange,
+}: PartnerContractFormProps) {
   const { options, label } = useLabels();
   const create = useCreatePartnerContract(partnerId);
   const update = useUpdatePartnerContract(contract?.id ?? "");
@@ -132,6 +92,12 @@ function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
     resolver: zodResolver(contractFormSchema),
     defaultValues: contractFormDefaults(contract),
   });
+  const values = useWatch({ control }) as ContractFormValues;
+  const onTermsChangeRef = useRef(onTermsChange);
+  onTermsChangeRef.current = onTermsChange;
+  useEffect(() => {
+    onTermsChangeRef.current?.(values);
+  }, [values]);
   const isInvestment = watch("type") === "INVESTMENT";
   const isCash = watch("contributionType") === "CASH";
   const isMonthly = watch("payoutFrequency") === "MONTHLY";
@@ -433,17 +399,35 @@ function ContractForm({ partnerId, contract, onDone }: ContractFormProps) {
         nada ao parceiro.
       </Alert>
       {formError && <Alert>{formError}</Alert>}
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button type="button" variant="outline" disabled={save.isPending}>
-            Cancelar
-          </Button>
-        </DialogClose>
+      <Box className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={save.isPending}
+        >
+          Cancelar
+        </Button>
         <Button type="submit" disabled={save.isPending}>
           {save.isPending && <Spinner className="text-primary-foreground" />}
           {contract ? "Salvar contrato" : "Criar rascunho"}
         </Button>
-      </DialogFooter>
+      </Box>
     </Form>
+  );
+}
+
+export function PartnerContractFormSkeleton() {
+  return (
+    <Card>
+      <CardContent className="space-y-4 pt-4 md:pt-6">
+        {[0, 1, 2, 3, 4, 5].map((index) => (
+          <Box key={index} className="space-y-2">
+            <Skeleton shape="text" className="w-32 text-sm" />
+            <Skeleton className="h-11 md:h-9" />
+          </Box>
+        ))}
+      </CardContent>
+    </Card>
   );
 }

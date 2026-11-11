@@ -108,6 +108,8 @@ export const ROUTES = {
   partnerDetail: `${GESTAO}/parceiros/:id`,
   partnerEdit: `${GESTAO}/parceiros/:id/editar`,
   partnerContract: `${GESTAO}/parceiros/contratos/:id`,
+  partnerContractNew: `${GESTAO}/parceiros/:id/contratos/novo`,
+  partnerContractEdit: `${GESTAO}/parceiros/contratos/:id/editar`,
   partnerContractDocument: `${GESTAO}/parceiros/contratos/:id/documento`,
   /** POC: landing editor (pistalivrelocacoes.com.br), draft only. */
   landingEditor: `${GESTAO}/site`,
@@ -183,6 +185,9 @@ export const routeTo = {
   partner: (id: string) => `${ROUTES.partners}/${id}`,
   editPartner: (id: string) => `${ROUTES.partners}/${id}/editar`,
   partnerContract: (id: string) => `${ROUTES.partners}/contratos/${id}`,
+  newPartnerContract: (partnerId: string) =>
+    `${ROUTES.partners}/${partnerId}/contratos/novo`,
+  editPartnerContract: (id: string) => `${ROUTES.partners}/contratos/${id}/editar`,
   partnerContractDocument: (id: string) =>
     `${ROUTES.partners}/contratos/${id}/documento`,
   editPlan: (id: string) => `${ROUTES.plans}/${id}/editar`,

@@ -1,12 +1,11 @@
 import { FileText, Pencil } from "lucide-react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { PartnerContractDeleteButton } from "@/components/organisms/partner-contract-delete-button";
-import { PartnerContractDialog } from "@/components/organisms/partner-contract-dialog";
 import {
   PartnerContractDocumentCard,
   PartnerContractDocumentCardSkeleton,
@@ -59,16 +58,12 @@ export function PartnerContractPage() {
         />
         {data?.status === "DRAFT" && (
           <Box className="flex gap-2">
-            <PartnerContractDialog
-              partnerId={data.partner.id}
-              contract={data}
-              trigger={
-                <Button variant="ghost" size="sm">
-                  <Pencil />
-                  Editar
-                </Button>
-              }
-            />
+            <Button asChild variant="ghost" size="sm">
+              <Link to={routeTo.editPartnerContract(data.id)}>
+                <Pencil />
+                Editar
+              </Link>
+            </Button>
             <PartnerContractDeleteButton
               contractId={data.id}
               code={data.code}

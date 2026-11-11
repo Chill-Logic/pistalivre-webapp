@@ -1,3 +1,7 @@
+import type {
+  PartnerSimulation,
+  PartnerSimulationInput,
+} from "@/types/partner-simulation";
 import { rethrowBlobError } from "@/helpers/api-error";
 import { toQueryParams } from "@/helpers/query-params";
 import { http } from "@/services/http/client";
@@ -21,6 +25,14 @@ import type {
 
 /** Partners and their contracts (the whole staff: admins and agents). */
 export const partnersService = {
+  /** The contract calculator: a month of the terms, computed by the server. */
+  async simulateContract(input: PartnerSimulationInput) {
+    const { data } = await http.post<PartnerSimulation>(
+      "/partner-contracts/simulate",
+      input,
+    );
+    return data;
+  },
   async list(filters: PartnerFilters) {
     const { data } = await http.get<Paginated<PartnerListRow>>("/partners", {
       params: toQueryParams(filters),
