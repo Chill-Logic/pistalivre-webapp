@@ -44,6 +44,17 @@ export type AiChatMessage = {
   content: string;
   /** Files sent with that message: the model sees them again. */
   attachmentIds?: string[];
+  /** Assistant turns: the tools that answer used ("[Consultei: …]" for the model). */
+  tools?: string[];
+};
+
+/** A tool call of the chat as it happens (SSE). */
+export type AiChatLiveStep = {
+  id: string;
+  tool: string;
+  title: string;
+  status: "running" | "done";
+  ok?: boolean;
 };
 
 /** A file sent to the AI chat (POST /ai/attachments). */
@@ -194,7 +205,8 @@ export type AiUiSource = {
     | "finance_statement"
     | "finance_debts"
     | "debt"
-    | "ai_usage";
+    | "ai_usage"
+    | "company";
   id?: string;
   /** The section's `data-ai-anchor` on that screen. */
   section?: string;

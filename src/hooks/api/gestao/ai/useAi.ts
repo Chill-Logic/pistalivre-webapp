@@ -9,7 +9,12 @@ import { queryKeys } from "@/constants/query-keys";
 import { errorMessage } from "@/helpers/api-error";
 import { usePagedList } from "@/hooks/ui/usePagedList";
 import { aiService } from "@/services/api/gestao/ai.service";
-import type { AiAuditFilters, AiPermissions } from "@/types/ai";
+import type {
+  AiAuditFilters,
+  AiChatInput,
+  AiChatLiveStep,
+  AiPermissions,
+} from "@/types/ai";
 
 /** What this person may use with the AI and the apps they authorized. */
 export function useAiMe() {
@@ -22,9 +27,17 @@ export function useAiChatAvailable() {
   return Boolean(me.data?.aiEnabled && me.data.chatTools.length > 0);
 }
 
-/** One message to the editor's agent (nothing is saved). */
+/** The chat, live: `onStep` hears each tool as it runs. */
 export function useAiChat() {
-  return useMutation({ mutationFn: aiService.chat });
+  return useMutation({
+    mutationFn: ({
+      input,
+      onStep,
+    }: {
+      input: AiChatInput;
+      onStep: (step: AiChatLiveStep) => void;
+    }) => aiService.chatLive(input, onStep),
+  });
 }
 
 /**

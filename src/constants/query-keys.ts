@@ -229,6 +229,7 @@ export const queryKeys = {
     search: (q: string) => [...queryKeys.documents.all, "search", q] as const,
     categories: (ownerType: string) =>
       [...queryKeys.documents.all, "categories", ownerType] as const,
+    detail: (id: string) => [...queryKeys.documents.all, "detail", id] as const,
   },
   company: {
     all: ["company"] as const,

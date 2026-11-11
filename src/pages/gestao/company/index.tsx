@@ -1,5 +1,6 @@
 import { Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
+import { AiAnchor } from "@/components/atoms/ai-anchor";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { PageHeader } from "@/components/molecules/page-header";
@@ -80,16 +81,22 @@ export function CompanyPage() {
       )}
       {company.data && (
         <CompanyLayout
-          summary={<CompanySummary company={company.data} />}
+          summary={
+            <AiAnchor id="summary">
+              <CompanySummary company={company.data} />
+            </AiAnchor>
+          }
           integrations={integrationsCard}
           documents={
-            <DocumentsCard
-              documents={company.data.documents}
-              manage={{
-                owner: { type: "COMPANY", id: company.data.id },
-                invalidate: queryKeys.company.all,
-              }}
-            />
+            <AiAnchor id="documents">
+              <DocumentsCard
+                documents={company.data.documents}
+                manage={{
+                  owner: { type: "COMPANY", id: company.data.id },
+                  invalidate: queryKeys.company.all,
+                }}
+              />
+            </AiAnchor>
           }
         />
       )}

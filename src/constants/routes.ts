@@ -69,6 +69,7 @@ export const ROUTES = {
   supplierDetail: `${GESTAO}/custos-fixos/:id`,
   supplierEdit: `${GESTAO}/custos-fixos/:id/editar`,
   documents: `${GESTAO}/documentos`,
+  document: `${GESTAO}/documentos/:id`,
   plans: `${GESTAO}/planos`,
   planNew: `${GESTAO}/planos/novo`,
   planEdit: `${GESTAO}/planos/:id/editar`,
@@ -187,7 +188,8 @@ export const routeTo = {
   partnerContract: (id: string) => `${ROUTES.partners}/contratos/${id}`,
   newPartnerContract: (partnerId: string) =>
     `${ROUTES.partners}/${partnerId}/contratos/novo`,
-  editPartnerContract: (id: string) => `${ROUTES.partners}/contratos/${id}/editar`,
+  editPartnerContract: (id: string) =>
+    `${ROUTES.partners}/contratos/${id}/editar`,
   partnerContractDocument: (id: string) =>
     `${ROUTES.partners}/contratos/${id}/documento`,
   editPlan: (id: string) => `${ROUTES.plans}/${id}/editar`,

@@ -60,7 +60,10 @@ export function ChoicePrompt({
   if (answered) {
     return (
       <Box className="flex items-start gap-2 rounded-lg border bg-muted/40 px-3 py-2">
-        <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
+        <Check
+          className="mt-0.5 size-4 shrink-0 text-success-foreground"
+          aria-hidden
+        />
         <Box className="min-w-0 space-y-0.5">
           <Text size="sm" weight="medium">
             {title}

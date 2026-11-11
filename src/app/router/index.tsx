@@ -27,6 +27,7 @@ import {
   DebtEditPage,
   DebtNewPage,
   DocumentsPage,
+  DocumentPage,
   AiConsentPage,
   AiAttachmentsPage,
   PartnerContractNewPage,
@@ -155,7 +156,10 @@ const partnerRoutes: RouteObject[] = [
 const portalRoutes: RouteObject[] = [
   // Public, logged in or not: lead capture and the questionnaire.
   { path: ROUTES.portalLeadCapture, element: <LeadCapturePage /> },
-  { path: ROUTES.portalQuestionnaireStart, element: <QuestionnaireStartPage /> },
+  {
+    path: ROUTES.portalQuestionnaireStart,
+    element: <QuestionnaireStartPage />,
+  },
   { path: ROUTES.portalQuestionnaire, element: <QuestionnairePage /> },
   {
     element: <RedirectIfAuthenticated realm="cliente" />,
@@ -258,6 +262,7 @@ const gestaoRoutes: RouteObject[] = [
       { path: ROUTES.partnerDetail, element: <PartnerDetailPage /> },
       { path: ROUTES.partnerEdit, element: <PartnerEditPage /> },
       { path: ROUTES.documents, element: <DocumentsPage /> },
+      { path: ROUTES.document, element: <DocumentPage /> },
       { path: ROUTES.plans, element: <PlansPage /> },
       { path: ROUTES.planNew, element: <PlanNewPage /> },
       { path: ROUTES.planEdit, element: <PlanEditPage /> },
@@ -325,7 +330,10 @@ const gestaoRoutes: RouteObject[] = [
       { path: ROUTES.aiConsent, element: <AiConsentPage /> },
       { path: ROUTES.aiAttachments, element: <AiAttachmentsPage /> },
       { path: ROUTES.partnerContractNew, element: <PartnerContractNewPage /> },
-      { path: ROUTES.partnerContractEdit, element: <PartnerContractEditPage /> },
+      {
+        path: ROUTES.partnerContractEdit,
+        element: <PartnerContractEditPage />,
+      },
       {
         element: (
           <IntegrationsSectionPage

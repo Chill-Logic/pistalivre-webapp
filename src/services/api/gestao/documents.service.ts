@@ -13,6 +13,13 @@ const UPLOAD_TIMEOUT = 120_000;
 
 /** Documents of any owner: folder browser, kinds, upload, edit, delete. */
 export const documentsService = {
+  /** One file by id (a link from the AI opens it). */
+  async get(id: string) {
+    const { data } = await http.get<
+      DocumentFile & { ownerType: DocumentOwnerType; ownerId: string }
+    >(`/documents/${id}`);
+    return data;
+  },
   async tree(path: string) {
     const { data } = await http.get<DocumentTree>("/documents/tree", {
       params: path ? { path } : undefined,

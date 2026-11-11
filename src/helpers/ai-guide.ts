@@ -38,6 +38,8 @@ function routeOf(source: AiUiSource): string | null {
       return source.id ? routeTo.debt(source.id) : null;
     case "ai_usage":
       return ROUTES.aiUsage;
+    case "company":
+      return ROUTES.company;
   }
 }
 

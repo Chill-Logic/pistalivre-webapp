@@ -1,10 +1,12 @@
 import { toQueryParams } from "@/helpers/query-params";
 import { http } from "@/services/http/client";
+import { eventStreamError, postEventStream } from "@/services/http/sse";
 import type { Paginated } from "@/types/api";
 import type {
   AiAuditEntry,
   AiAuditFilters,
   AiChatInput,
+  AiChatLiveStep,
   AiChatResponse,
   AiClient,
   AiConsent,
@@ -45,6 +47,34 @@ export const aiService = {
   async chat(input: AiChatInput) {
     const { data } = await http.post<AiChatResponse>("/ai/chat", input);
     return data;
+  },
+  /**
+   * The chat, live: `onStep` hears each tool as it starts and ends; the
+   * promise is the same answer as `chat`.
+   */
+  async chatLive(input: AiChatInput, onStep: (step: AiChatLiveStep) => void) {
+    let answer: AiChatResponse | null = null;
+    let failure: Error | null = null;
+    await postEventStream("/ai/chat", input, (raw) => {
+      const event = raw as
+        | ({ type: "tool" } & AiChatLiveStep)
+        | { type: "result"; data: AiChatResponse }
+        | { type: "error"; status: number; data: unknown };
+      if (event.type === "tool") {
+        onStep({
+          id: event.id,
+          tool: event.tool,
+          title: event.title,
+          status: event.status,
+          ok: event.ok,
+        });
+      } else if (event.type === "result") answer = event.data;
+      else if (event.type === "error")
+        failure = eventStreamError(event.status, event.data);
+    });
+    if (failure) throw failure;
+    if (!answer) throw eventStreamError(0, null);
+    return answer as AiChatResponse;
   },
   /** Runs a write the chat proposed ("Confirmar"). */
   async confirmAction(id: string) {

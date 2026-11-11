@@ -44,6 +44,7 @@ import {
 import { aiChatEvents, aiGuide } from "@/hooks/ui/useAiGuide";
 import type {
   AiChatAction,
+  AiChatLiveStep,
   AiChatMode,
   AiChatStep,
   AiUiSource,
@@ -149,6 +150,8 @@ export function AiChatPanel({
   const [entries, setEntries] = conversation ?? own;
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
+  // The tools of the answer being prepared, as they run.
+  const [live, setLive] = useState<AiChatLiveStep[]>([]);
   const attachments = useAiAttachments();
   const picker = useRef<HTMLInputElement>(null);
   const bottom = useRef<HTMLDivElement>(null);
@@ -180,7 +183,7 @@ export function AiChatPanel({
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [entries.length, chat.isPending]);
+  }, [entries.length, chat.isPending, live.length]);
 
   const send = (text: string) => {
     const message = text.trim();
@@ -195,13 +198,20 @@ export function AiChatPanel({
       previewUrl: item.previewUrl,
     }));
     const history = entries.map(
-      ({ role, content, attachments: sent, note }) => ({
+      ({ role, content, attachments: sent, note, steps }) => ({
         role,
         content: note
           ? `${content}
 ${note}`
           : content,
         ...(sent?.length ? { attachmentIds: sent.map((file) => file.id) } : {}),
+        ...(role === "assistant" && !note
+          ? {
+              tools: (steps ?? [])
+                .filter((step) => step.ok)
+                .map((step) => step.title),
+            }
+          : {}),
       }),
     );
     setEntries((current) => [
@@ -213,22 +223,30 @@ ${note}`
       },
     ]);
     const before = html;
+    setLive([]);
     const ready = prepare ? prepare() : Promise.resolve({ html, version: 0 });
     ready
       .then((saved) =>
         chat.mutateAsync({
-          mode,
-          html: saved.html,
-          history,
-          message,
-          ...(rentalId ? { rentalId } : {}),
-          ...(leadId ? { leadId } : {}),
-          ...(partnerContractId ? { partnerContractId } : {}),
-          ...(draftId ? { draftId, version: saved.version } : {}),
-          ...(files.length
-            ? { attachmentIds: files.map((file) => file.id) }
-            : {}),
-          ...(page ? { page } : {}),
+          onStep: (step) =>
+            setLive((current) => [
+              ...current.filter((s) => s.id !== step.id),
+              step,
+            ]),
+          input: {
+            mode,
+            html: saved.html,
+            history,
+            message,
+            ...(rentalId ? { rentalId } : {}),
+            ...(leadId ? { leadId } : {}),
+            ...(partnerContractId ? { partnerContractId } : {}),
+            ...(draftId ? { draftId, version: saved.version } : {}),
+            ...(files.length
+              ? { attachmentIds: files.map((file) => file.id) }
+              : {}),
+            ...(page ? { page } : {}),
+          },
         }),
       )
       .then(
@@ -248,7 +266,8 @@ ${note}`
           else if (answer.changed) onApply?.(answer.html);
         },
         (failure) => setError(toApiError(failure).message),
-      );
+      )
+      .finally(() => setLive([]));
   };
 
   // Ctrl+V of a screenshot or of files copied in the file explorer: they
@@ -372,7 +391,7 @@ ${note}`
                         <ListItem key={i} className="flex items-center gap-1.5">
                           {step.ok ? (
                             <Check
-                              className="size-3 text-success"
+                              className="size-3.5 text-success-foreground"
                               aria-hidden
                             />
                           ) : (
@@ -488,11 +507,38 @@ ${note}`
         </List>
 
         {chat.isPending && (
-          <Box className="flex items-center gap-2">
-            <Spinner />
-            <Text size="sm" tone="muted">
-              Pensando…
-            </Text>
+          <Box className="space-y-1">
+            {live.length > 0 && (
+              <List className="space-y-0.5">
+                {live.map((step) => (
+                  <ListItem key={step.id} className="flex items-center gap-1.5">
+                    {step.status === "running" ? (
+                      <Spinner className="size-3" />
+                    ) : step.ok ? (
+                      <Check
+                        className="size-3.5 text-success-foreground"
+                        aria-hidden
+                      />
+                    ) : (
+                      <X className="size-3 text-destructive" aria-hidden />
+                    )}
+                    <Text inline size="xs" tone="muted">
+                      {step.title}
+                    </Text>
+                  </ListItem>
+                ))}
+              </List>
+            )}
+            <Box className="flex items-center gap-2">
+              <Spinner />
+              <Text size="sm" tone="muted">
+                {live.some((step) => step.status === "running")
+                  ? "Consultando…"
+                  : live.length > 0
+                    ? "Escrevendo a resposta…"
+                    : "Pensando…"}
+              </Text>
+            </Box>
           </Box>
         )}
         {error && <Alert>{error}</Alert>}
