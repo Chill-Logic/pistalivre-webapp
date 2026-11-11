@@ -12,8 +12,7 @@ modelo de negócio e o domínio estão no `CLAUDE.md` do `pista-livre`: **leia o
 React 19 + Vite 6 + TanStack Query 5 + React Router 7 + Tailwind 3 + Radix/shadcn, **mobile first** e
 **PWA** (vite-plugin-pwa, prompt de atualização).
 
-- Dev: `node node_modules/vite/bin/vite.js --host --port 5173 --strictPort`. No WSL, `npm`/`node`/`npx` são
-  funções nvm que travam: use `/home/ojhon/.nvm/versions/node/v22.15.1/bin/{node,npm,npx}`.
+- Dev: `node node_modules/vite/bin/vite.js --host --port 5173 --strictPort`.
 - API: `docker compose up dev` no `pista-livre`, em `:3000`. Login `admin@pistalivre.dev` / `admin123`
   (5 erros = 15 min de bloqueio). Portal: `cliente.teste@pistalivre.dev` / `teste123`.
 - Antes de commitar: `npx tsc -b` + `npx eslint . --max-warnings 0` + o grep de HTML nativo (abaixo).
@@ -81,7 +80,7 @@ duas áreas, como no dev. Cada domínio guarda o seu login (localStorage por ori
 - Projeto criado em 2026-11-08: `csjhonathans-projects/pistalivre-webapp` (conta pessoal, plano Hobby),
   produção em `https://pistalivre-webapp.vercel.app`; `VITE_API_URL` cadastrada em Production e Preview.
   GitHub ligado desde 2026-11-09: **push na `main` publica em produção** (outras branches = prévia). A CLI
-  (`/home/ojhon/.nvm/versions/node/v22.15.1/bin/vercel deploy --prod`, pasta ligada em `.vercel/`) segue valendo.
+  (`vercel deploy --prod`, pasta ligada em `.vercel/`) segue valendo.
 - DNS no **Cloudflare** (o Registro.br só guarda o registro): `CNAME app.gestao`, `CNAME app.cliente` e `CNAME app.parceiro` para
   `460e80aaac8cf57f.vercel-dns-017.com` (o destino que a Vercel deu ao projeto), com a nuvem **cinza** (DNS only) até a Vercel emitir o certificado.
 - No backend: `WEBAPP_ORIGIN=https://app.gestao.pistalivrelocacoes.com.br,https://app.cliente.pistalivrelocacoes.com.br,https://pistalivre-webapp.vercel.app,https://app.parceiro.pistalivrelocacoes.com.br`
