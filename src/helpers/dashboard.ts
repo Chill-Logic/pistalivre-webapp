@@ -20,6 +20,8 @@ const FLEET_ORDER: {
   key: keyof Dashboard["analytics"]["fleet"];
 }[] = [
   { status: "AVAILABLE", key: "available" },
+  { status: "IN_CONTRACTING", key: "inContracting" },
+  { status: "RESERVED", key: "reserved" },
   { status: "RENTED", key: "rented" },
   { status: "MAINTENANCE", key: "maintenance" },
   { status: "INACTIVE", key: "inactive" },
@@ -76,13 +78,25 @@ export function vehiclesWithActivity(dashboard: Dashboard) {
 
 export function fleetItems(dashboard: Dashboard, label: LabelFn): BarItem[] {
   const { fleet } = dashboard.analytics;
-  return FLEET_ORDER.map(({ status, key }) => ({
-    key: status,
-    label: label(LABEL_MAPS.vehicleStatus, status),
-    value: fleet[key],
-    display: String(fleet[key]),
-    color: FLEET_STATUS_COLORS[status],
-  }));
+  return FLEET_ORDER.flatMap(({ status, key }) => {
+    const value = fleet[key];
+    // The new statuses only show when the API sends them and something is in them.
+    if (
+      value === undefined ||
+      (value === 0 && (key === "inContracting" || key === "reserved"))
+    ) {
+      return [];
+    }
+    return [
+      {
+        key: status,
+        label: label(LABEL_MAPS.vehicleStatus, status),
+        value,
+        display: String(value),
+        color: FLEET_STATUS_COLORS[status],
+      },
+    ];
+  });
 }
 
 export function overdueByPurposeItems(

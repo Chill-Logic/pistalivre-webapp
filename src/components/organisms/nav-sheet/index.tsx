@@ -48,7 +48,7 @@ export function NavSheet({ user }: NavSheetProps) {
           <ThemeToggle />
         </Box>
         <Box className="min-h-0 flex-1 overflow-y-auto overscroll-contain border-t px-3 py-2">
-          <SidebarNav items={navItems} onNavigate={closeDrawer} />
+          <SidebarNav items={navItems} onNavigate={closeDrawer} searchable />
         </Box>
         <Box className="shrink-0 border-t px-3 py-2">
           <Button

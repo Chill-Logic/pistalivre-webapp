@@ -16,6 +16,8 @@ export const CHART_COLORS = [
 /** Fleet status is a state palette (reserved), not a categorical one. */
 export const FLEET_STATUS_COLORS: Record<VehicleStatus, string> = {
   AVAILABLE: "#059669",
+  IN_CONTRACTING: "#CA8A04",
+  RESERVED: "#7C3AED",
   RENTED: "#2563EB",
   MAINTENANCE: "#D97706",
   INACTIVE: "#94A3B8",

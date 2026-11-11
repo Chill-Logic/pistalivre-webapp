@@ -1,7 +1,17 @@
 import type { Currency } from "@/types/currency";
 import type { DocumentFile } from "@/types/document";
 
-export type VehicleStatus = "AVAILABLE" | "RENTED" | "MAINTENANCE" | "INACTIVE";
+/**
+ * IN_CONTRACTING / RESERVED: a rental before the signature, without / with a
+ * payment already in (the rental flow sets them; a signed rental = RENTED).
+ */
+export type VehicleStatus =
+  | "AVAILABLE"
+  | "IN_CONTRACTING"
+  | "RESERVED"
+  | "RENTED"
+  | "MAINTENANCE"
+  | "INACTIVE";
 
 type Ref = { id: string; name: string };
 type SluggedRef = Ref & { slug: string };
@@ -70,13 +80,7 @@ export type VehicleFormOptions = {
 
 /** Fields worth comparing with the paper after the AI read it. */
 export type VehicleDocumentReview =
-  | "plate"
-  | "renavam"
-  | "chassis"
-  | "model"
-  | "year"
-  | "type"
-  | "category";
+  "plate" | "renavam" | "chassis" | "model" | "year" | "type" | "category";
 
 /** Who is on the document: the company, a registered partner, or neither. */
 export type VehicleDocumentHolder =

@@ -134,6 +134,7 @@ export const SIDEBAR_NAV: NavEntry[] = [
       RENTALS,
       { label: "Reembolsos", to: ROUTES.reimbursements, icon: HandCoins },
       { label: "Assinaturas", to: ROUTES.signatures, icon: PenLine },
+      { label: "Parceiros", to: ROUTES.partners, icon: BriefcaseBusiness },
     ],
   },
   {
@@ -148,7 +149,6 @@ export const SIDEBAR_NAV: NavEntry[] = [
       { label: "Cartões", to: ROUTES.financeCards, icon: CreditCard },
       { label: "Custos fixos", to: ROUTES.suppliers, icon: Receipt },
       { label: "Projeções", to: ROUTES.projections, icon: TrendingUp },
-      { label: "Parceiros", to: ROUTES.partners, icon: BriefcaseBusiness },
     ],
   },
   {

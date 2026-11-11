@@ -6,6 +6,9 @@ import type { VehicleStatus } from "@/types/vehicle";
  */
 export const VEHICLE_TRANSITIONS: Record<VehicleStatus, VehicleStatus[]> = {
   AVAILABLE: ["RENTED", "MAINTENANCE", "INACTIVE"],
+  // Set by the rental flow; by hand only out to maintenance or back to free.
+  IN_CONTRACTING: ["AVAILABLE", "MAINTENANCE"],
+  RESERVED: ["AVAILABLE", "MAINTENANCE"],
   RENTED: ["AVAILABLE", "MAINTENANCE"],
   MAINTENANCE: ["AVAILABLE", "INACTIVE"],
   INACTIVE: ["AVAILABLE"],

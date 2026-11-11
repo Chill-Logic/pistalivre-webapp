@@ -3,6 +3,9 @@ import type { VehicleStatus } from "@/types/vehicle";
 export type FleetCounts = {
   total: number;
   available: number;
+  /** Older APIs don't send them. */
+  inContracting?: number;
+  reserved?: number;
   rented: number;
   maintenance: number;
   inactive: number;

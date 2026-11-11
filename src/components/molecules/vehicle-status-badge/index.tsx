@@ -6,6 +6,9 @@ import type { VehicleStatus } from "@/types/vehicle";
 
 const STATUS_VARIANT: Record<VehicleStatus, BadgeVariantProps["variant"]> = {
   AVAILABLE: "success",
+  // Deal being closed, nothing paid: a light mark; money in: held (amber).
+  IN_CONTRACTING: "outline",
+  RESERVED: "warning",
   RENTED: "neutral",
   MAINTENANCE: "warning",
   INACTIVE: "outline",
