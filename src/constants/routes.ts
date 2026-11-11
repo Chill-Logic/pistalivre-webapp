@@ -101,6 +101,8 @@ export const ROUTES = {
   audit: `${GESTAO}/auditoria`,
   auditGaps: `${GESTAO}/auditoria/lacunas`,
   aiConsent: `${GESTAO}/autorizar-ia`,
+  /** Files for the AI (an MCP client can't upload them): "Enviar documentos para a IA". */
+  aiAttachments: `${GESTAO}/ia/anexos`,
   partners: `${GESTAO}/parceiros`,
   partnerNew: `${GESTAO}/parceiros/novo`,
   partnerDetail: `${GESTAO}/parceiros/:id`,

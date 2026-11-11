@@ -28,6 +28,7 @@ import {
   DebtNewPage,
   DocumentsPage,
   AiConsentPage,
+  AiAttachmentsPage,
   AiUsagePage,
   AuditGapsPage,
   AuditPage,
@@ -320,6 +321,7 @@ const gestaoRoutes: RouteObject[] = [
         ],
       },
       { path: ROUTES.aiConsent, element: <AiConsentPage /> },
+      { path: ROUTES.aiAttachments, element: <AiAttachmentsPage /> },
       {
         element: (
           <IntegrationsSectionPage

@@ -152,6 +152,10 @@ export const IntegrationsAppsPage = lazyPage(
   () => import("@/pages/gestao/integrations-apps"),
   "IntegrationsAppsPage",
 );
+export const AiAttachmentsPage = lazyPage(
+  () => import("@/pages/gestao/ai-attachments"),
+  "AiAttachmentsPage",
+);
 export const AiConsentPage = lazyPage(
   () => import("@/pages/gestao/ai-consent"),
   "AiConsentPage",

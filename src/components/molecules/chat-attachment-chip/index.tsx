@@ -1,4 +1,4 @@
-import { AlertCircle, FileText, X } from "lucide-react";
+import { AlertCircle, FileText, ImageIcon, X } from "lucide-react";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Image } from "@/components/atoms/image";
@@ -39,10 +39,12 @@ export function ChatAttachmentChip({
       <Box className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted">
         {previewUrl ? (
           <Image src={previewUrl} alt="" className="size-full object-cover" />
+        ) : status === "error" ? (
+          <AlertCircle className="size-5 text-destructive" aria-hidden />
         ) : isPdf ? (
           <FileText className="size-5 text-muted-foreground" aria-hidden />
         ) : (
-          <AlertCircle className="size-5 text-destructive" aria-hidden />
+          <ImageIcon className="size-5 text-muted-foreground" aria-hidden />
         )}
         {status === "uploading" && (
           <Box className="absolute inset-0 flex items-center justify-center bg-background/60">

@@ -5,6 +5,7 @@ import type { LicenseInput, LicenseStatus } from "@/types/contract";
 import type {
   AsaasDirectory,
   CustomerDetail,
+  CustomerDocumentResult,
   CustomerFilters,
   CustomerListItem,
 } from "@/types/customer";
@@ -56,6 +57,24 @@ export const customersService = {
     const { data } = await http.post<CustomerDetail>(
       "/customers/import-from-asaas",
       { asaasCustomerId },
+    );
+    return data;
+  },
+  /** Whether "Preencher pelo documento" is available (AI on Anthropic). */
+  async readDocumentEnabled() {
+    const { data } = await http.get<{ enabled: boolean }>(
+      "/customers/read-document",
+    );
+    return data.enabled;
+  },
+  /** The AI reads a CNH, RG or proof of residence. Saves nothing. */
+  async readDocument(file: File) {
+    const body = new FormData();
+    body.append("file", file);
+    const { data } = await http.post<CustomerDocumentResult>(
+      "/customers/read-document",
+      body,
+      { timeout: 120_000 },
     );
     return data;
   },

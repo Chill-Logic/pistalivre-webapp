@@ -53,6 +53,7 @@ export type AiAttachment = {
   contentType: string;
   size: number;
   url: string;
+  createdAt?: string;
 };
 
 export type AiChatStep = { tool: string; title: string; ok: boolean };

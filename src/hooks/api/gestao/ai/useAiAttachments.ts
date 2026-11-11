@@ -1,12 +1,14 @@
+import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { queryKeys } from "@/constants/query-keys";
 import { toApiError } from "@/helpers/api-error";
+import { shrinkImage } from "@/helpers/image";
 import { aiService } from "@/services/api/gestao/ai.service";
 import type { AiAttachment } from "@/types/ai";
 
 /** Same limits as the server (it checks again, by the bytes). */
 export const AI_ATTACHMENT_ACCEPT =
   "image/jpeg,image/png,image/webp,application/pdf";
-const IMAGE_MAX = 5 * 1024 * 1024;
 const PDF_MAX = 15 * 1024 * 1024;
 export const AI_ATTACHMENTS_PER_MESSAGE = 5;
 
@@ -33,9 +35,8 @@ function rejectReason(file: File): string | null {
   const isPdf = file.type === "application/pdf" || name.endsWith(".pdf");
   const isImage = ["image/jpeg", "image/png", "image/webp"].includes(file.type);
   if (!isPdf && !isImage) return "Só imagem (JPG, PNG, WebP) ou PDF.";
-  if (file.size > (isPdf ? PDF_MAX : IMAGE_MAX)) {
-    return isPdf ? "PDF acima de 15 MB." : "Imagem acima de 5 MB.";
-  }
+  // Images are shrunk before going; only a PDF can be too big.
+  if (isPdf && file.size > PDF_MAX) return "PDF acima de 15 MB.";
   return null;
 }
 
@@ -79,8 +80,13 @@ export function useAiAttachments() {
       };
       setItems((list) => [...list, item]);
       if (reason) return;
-      aiService
-        .uploadAttachment(file, (progress) => patch(key, { progress }))
+      // A phone photo is often over 5 MB: it goes shrunk (the AI reads it as well).
+      shrinkImage(file)
+        .then((ready) =>
+          aiService.uploadAttachment(ready, (progress) =>
+            patch(key, { progress }),
+          ),
+        )
         .then((uploaded) =>
           patch(key, { status: "ready", progress: 1, uploaded }),
         )
@@ -124,4 +130,12 @@ export function useAiAttachments() {
     uploading: items.some((item) => item.status === "uploading"),
     readyCount: items.filter((item) => item.status === "ready").length,
   };
+}
+
+/** The files this person sent to the AI (last 7 days, still unfiled). */
+export function useRecentAiAttachments() {
+  return useQuery({
+    queryKey: queryKeys.ai.attachments(),
+    queryFn: aiService.recentAttachments,
+  });
 }

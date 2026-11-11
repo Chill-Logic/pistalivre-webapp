@@ -100,3 +100,26 @@ export type CustomerFilters = {
   /** "" = all | "pwa" (used or downloaded the app) | "browser". */
   app: "" | "pwa" | "browser";
 };
+
+/** POST /customers/read-document: what the AI read and checks out (nothing saved). */
+export type CustomerDocumentResult = {
+  kind: "cnh" | "rg" | "comprovante" | "outro";
+  fields: {
+    name?: string;
+    document?: string;
+    rg?: string;
+    /** AAAA-MM-DD */
+    birthDate?: string;
+    zip?: string;
+    addressLine?: string;
+    addressNumber?: string;
+    complement?: string;
+    neighborhood?: string;
+    city?: string;
+    state?: string;
+  };
+  license: { number: string; issuedAt: string; validUntil: string } | null;
+  /** What deserves a look (Portuguese, ready to show). */
+  review: string[];
+  existingCustomer: { id: string; name: string } | null;
+};

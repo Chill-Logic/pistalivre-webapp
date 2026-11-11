@@ -35,6 +35,13 @@ export const aiService = {
     });
     return data;
   },
+  /** What this person sent to the AI in the last days, still unfiled. */
+  async recentAttachments() {
+    const { data } = await http.get<{ items: AiAttachment[] }>(
+      "/ai/attachments",
+    );
+    return data.items;
+  },
   async chat(input: AiChatInput) {
     const { data } = await http.post<AiChatResponse>("/ai/chat", input);
     return data;

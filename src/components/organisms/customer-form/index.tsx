@@ -9,11 +9,14 @@ import { Card, CardContent } from "@/components/atoms/card";
 import { Form } from "@/components/atoms/form";
 import { Col, Row } from "@/components/atoms/grid";
 import { Heading } from "@/components/atoms/heading";
+import { List, ListItem } from "@/components/atoms/list";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Spinner } from "@/components/atoms/spinner";
+import { Text } from "@/components/atoms/text";
 import { FormField } from "@/components/molecules/form-field";
 import { MaskedField } from "@/components/molecules/masked-field";
 import { SelectField } from "@/components/molecules/select-field";
+import { CustomerDocumentReader } from "@/components/organisms/customer-document-reader";
 import {
   CUSTOMER_FORM_FIELDS,
   customerFormDefaults,
@@ -24,8 +27,12 @@ import {
 import { MARITAL_STATUSES } from "@/constants/customer";
 import { applyApiErrors } from "@/helpers/form";
 import { useCepLookup } from "@/hooks/api/comum/useCepLookup";
+import { useCustomerDocumentReadEnabled } from "@/hooks/api/gestao/customers/useCustomerDocumentReader";
 import { useSaveCustomer } from "@/hooks/api/gestao/customers/useSaveCustomer";
-import type { CustomerDetail } from "@/types/customer";
+import { customersService } from "@/services/api/gestao/customers.service";
+import { documentsService } from "@/services/api/gestao/documents.service";
+import type { CustomerDetail, CustomerDocumentResult } from "@/types/customer";
+import { dayToBrDate } from "@/utils/date";
 import {
   maskCep,
   maskCpf,
@@ -41,6 +48,16 @@ const MARITAL_OPTIONS = MARITAL_STATUSES.map((status) => ({
 }));
 
 const CONFLICT_FIELDS = { cpf: "document", "e-mail": "email" } as const;
+
+/** Where each read document goes among the customer's documents (category slug). */
+const DOCUMENT_CATEGORY: Record<CustomerDocumentResult["kind"], string> = {
+  cnh: "cnh",
+  rg: "rg",
+  comprovante: "comprovante-de-residencia",
+  outro: "outro",
+};
+
+type ReadDocument = { file: File; kind: CustomerDocumentResult["kind"] };
 
 type CustomerFormProps = {
   customer?: CustomerDetail;
@@ -61,7 +78,17 @@ export function CustomerForm({
 }: CustomerFormProps) {
   const save = useSaveCustomer(customer?.id);
   const cep = useCepLookup();
+  const readEnabled = useCustomerDocumentReadEnabled();
   const [formError, setFormError] = useState<string | null>(null);
+  // Read documents: saved under the new customer (files + CNH) after it's created.
+  const [readDocuments, setReadDocuments] = useState<ReadDocument[]>([]);
+  const [license, setLicense] =
+    useState<CustomerDocumentResult["license"]>(null);
+  const [finishing, setFinishing] = useState(false);
+  const [savedWithIssues, setSavedWithIssues] = useState<{
+    customer: CustomerDetail;
+    issues: string[];
+  } | null>(null);
 
   const {
     control,
@@ -92,12 +119,81 @@ export function CustomerForm({
     });
   };
 
+  /** The form fills with what the document had (the person checks before saving). */
+  const fillFromDocument = (result: CustomerDocumentResult, file: File) => {
+    const { fields } = result;
+    const set = (name: keyof CustomerFormValues, value: string | undefined) => {
+      if (value)
+        setValue(name, value, { shouldDirty: true, shouldValidate: true });
+    };
+    set("name", fields.name);
+    set("document", fields.document && maskCpf(fields.document));
+    set("rg", fields.rg && maskRg(fields.rg));
+    set("birthDate", fields.birthDate && dayToBrDate(fields.birthDate));
+    set("zip", fields.zip && maskCep(fields.zip));
+    set("addressLine", fields.addressLine);
+    set("addressNumber", fields.addressNumber);
+    set("complement", fields.complement);
+    set("neighborhood", fields.neighborhood);
+    set("city", fields.city);
+    set("state", fields.state);
+    if (result.license) setLicense(result.license);
+    if (result.kind !== "outro") {
+      setReadDocuments((list) => [...list, { file, kind: result.kind }]);
+    }
+  };
+
+  /** After creating: the read files go to the customer's documents, the CNH to the record. */
+  const finish = async (saved: CustomerDetail) => {
+    const issues: string[] = [];
+    if (readDocuments.length) {
+      const categories = await documentsService
+        .categories("CUSTOMER")
+        .catch(() => []);
+      for (const { file, kind } of readDocuments) {
+        const category = categories.find(
+          (c) => c.slug === DOCUMENT_CATEGORY[kind],
+        );
+        await documentsService
+          .upload({ type: "CUSTOMER", id: saved.id }, file, category?.id)
+          .catch(() =>
+            issues.push(
+              `O arquivo ${file.name} não foi guardado: anexe em Documentos.`,
+            ),
+          );
+      }
+    }
+    if (license) {
+      await customersService
+        .saveLicense(saved.id, {
+          driverLicense: license.number,
+          issuedAt: license.issuedAt,
+          validUntil: license.validUntil,
+        })
+        .catch(() =>
+          issues.push("A CNH lida não foi salva: informe ao gerar o contrato."),
+        );
+    }
+    return issues;
+  };
+
   const onSubmit = handleSubmit((values) => {
     setFormError(null);
     save.mutate(
       { ...toCustomerInput(values), ...(leadId ? { leadId } : {}) },
       {
-        onSuccess: (result) => onSaved(result.customer),
+        onSuccess: async (result) => {
+          if (customer || (!readDocuments.length && !license)) {
+            onSaved(result.customer);
+            return;
+          }
+          setFinishing(true);
+          const issues = await finish(result.customer);
+          setFinishing(false);
+          if (issues.length)
+            setSavedWithIssues({ customer: result.customer, issues });
+          else onSaved(result.customer);
+        },
         onError: (error) =>
           setFormError(
             applyApiErrors(error, setError, CUSTOMER_FORM_FIELDS, {
@@ -143,6 +239,12 @@ export function CustomerForm({
     <Card>
       <CardContent className="pt-4 md:pt-6">
         <Form onSubmit={onSubmit} noValidate className="space-y-8">
+          {!customer && readEnabled.data && (
+            <CustomerDocumentReader
+              onRead={fillFromDocument}
+              disabled={save.isPending || finishing}
+            />
+          )}
           <Box className="space-y-4">
             <Heading level={2} variant="section">
               Dados pessoais
@@ -312,13 +414,34 @@ export function CustomerForm({
           </Box>
 
           {formError && <Alert>{formError}</Alert>}
+          {savedWithIssues && (
+            <Alert variant="warning" className="space-y-2">
+              <Text size="sm">Cliente cadastrado, mas:</Text>
+              <List className="list-disc space-y-0.5 pl-5">
+                {savedWithIssues.issues.map((issue) => (
+                  <ListItem key={issue}>{issue}</ListItem>
+                ))}
+              </List>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => onSaved(savedWithIssues.customer)}
+              >
+                Ir para o cliente
+              </Button>
+            </Alert>
+          )}
 
           <Box className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button asChild variant="outline">
               <Link to={cancelTo}>Cancelar</Link>
             </Button>
-            <Button type="submit" disabled={save.isPending}>
-              {save.isPending && (
+            <Button
+              type="submit"
+              disabled={save.isPending || finishing || Boolean(savedWithIssues)}
+            >
+              {(save.isPending || finishing) && (
                 <Spinner className="text-primary-foreground" />
               )}
               {customer ? "Salvar alterações" : "Cadastrar cliente"}
