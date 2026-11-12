@@ -1,6 +1,7 @@
 import {
   ArrowUp,
   Check,
+  ChevronRight,
   Circle,
   HelpCircle,
   MapPin,
@@ -92,11 +93,26 @@ export type ChatEntry = {
   sourcesChoice?: "shown" | "skipped";
   /** An action just got done: the chat says "Pode seguir." on its own once. */
   continueAfter?: boolean;
+  /** How long the answer took on screen ("Trabalhou por 6s"). */
+  workedMs?: number;
+  /** The steps of this answer, opened under "Trabalhou por…". */
+  stepsOpen?: boolean;
   /** The AI wasn't sure what was meant: options as buttons. */
   choices?: AiChatChoices | null;
   /** The option the person clicked. */
   chosen?: string;
 };
+
+/** "Trabalhou por 6s" / "Consultou 3 coisas" (older answers have no time). */
+function workedLabel(entry: ChatEntry) {
+  const count = entry.steps?.length ?? 0;
+  if (!entry.workedMs)
+    return `Consultou ${count} ${count === 1 ? "coisa" : "coisas"}`;
+  const seconds = Math.max(1, Math.round(entry.workedMs / 1000));
+  return seconds < 60
+    ? `Trabalhou por ${seconds}s`
+    : `Trabalhou por ${Math.floor(seconds / 60)}min ${seconds % 60}s`;
+}
 
 /** The answer only repeats the options' question: the card says it already. */
 function repeatsQuestion(entry: ChatEntry) {
@@ -188,7 +204,10 @@ export function AiChatPanel({
   const dictation = useSpeechDictation(setDraft);
   const picker = useRef<HTMLInputElement>(null);
   const bottom = useRef<HTMLDivElement>(null);
-  const blocked = chat.isPending || Boolean(disabledReason);
+  // Working = the request is out OR its steps are still being shown (paced).
+  const [pacing, setPacing] = useState(false);
+  const working = chat.isPending || pacing;
+  const blocked = working || Boolean(disabledReason);
 
   // A conversation kept outside (the floating assistant) hears these where it lives.
   useEffect(() => {
@@ -225,7 +244,7 @@ export function AiChatPanel({
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [entries.length, chat.isPending, live.length]);
+  }, [entries.length, working, live.length]);
 
   // After a confirmed (or saved-by-the-form) action, the request goes on:
   // the next step (e.g. the rental, with the customer just created).
@@ -283,7 +302,9 @@ ${note}`
       },
     ]);
     const before = html;
+    const startedAt = Date.now();
     setLive([]);
+    setPacing(true);
     setStatusSeed(String(Math.random()));
     const pacer = createStepPacer((step) =>
       setLive((current) => [...current.filter((s) => s.id !== step.id), step]),
@@ -319,6 +340,7 @@ ${note}`
               role: "assistant",
               content: answer.reply,
               steps: answer.steps,
+              workedMs: Date.now() - startedAt,
               actions: answer.actions,
               sources: answer.sources,
               // An older server sent places only when asked.
@@ -333,7 +355,10 @@ ${note}`
         },
         (failure) => setError(toApiError(failure).message),
       )
-      .finally(() => setLive([]));
+      .finally(() => {
+        setLive([]);
+        setPacing(false);
+      });
   };
 
   // Ctrl+V of a screenshot or of files copied in the file explorer: they
@@ -419,7 +444,7 @@ ${note}`
                     size="sm"
                     className="h-auto whitespace-normal rounded-full py-2"
                     onClick={() => send(suggestion)}
-                    disabled={chat.isPending}
+                    disabled={working}
                   >
                     {suggestion}
                   </Button>
@@ -463,30 +488,62 @@ ${note}`
                 </Box>
               ) : (
                 <Box className="max-w-[92%] space-y-2 rounded-2xl rounded-bl-sm border bg-card px-3 py-2">
+                  {entry.steps && entry.steps.length > 0 && (
+                    <Box className="space-y-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="-ml-2 h-7 gap-1 px-2 text-xs font-normal text-muted-foreground"
+                        aria-expanded={Boolean(entry.stepsOpen)}
+                        onClick={() =>
+                          setEntries((current) =>
+                            current.map((e, i) =>
+                              i === index
+                                ? { ...e, stepsOpen: !e.stepsOpen }
+                                : e,
+                            ),
+                          )
+                        }
+                      >
+                        {workedLabel(entry)}
+                        <ChevronRight
+                          className={cn(
+                            "size-3.5 transition-transform",
+                            entry.stepsOpen && "rotate-90",
+                          )}
+                          aria-hidden
+                        />
+                      </Button>
+                      {entry.stepsOpen && (
+                        <List className="space-y-0.5 border-l pl-3">
+                          {entry.steps.map((step, i) => (
+                            <ListItem
+                              key={i}
+                              className="flex items-center gap-1.5"
+                            >
+                              {step.ok ? (
+                                <Check
+                                  className="size-3.5 text-success-foreground"
+                                  aria-hidden
+                                />
+                              ) : (
+                                <X
+                                  className="size-3 text-destructive"
+                                  aria-hidden
+                                />
+                              )}
+                              <Text inline size="xs" tone="muted">
+                                {step.title}
+                              </Text>
+                            </ListItem>
+                          ))}
+                        </List>
+                      )}
+                    </Box>
+                  )}
                   {!repeatsQuestion(entry) && (
                     <ChatMarkdown text={entry.content} />
-                  )}
-                  {entry.steps && entry.steps.length > 0 && (
-                    <List className="space-y-0.5">
-                      {entry.steps.map((step, i) => (
-                        <ListItem key={i} className="flex items-center gap-1.5">
-                          {step.ok ? (
-                            <Check
-                              className="size-3.5 text-success-foreground"
-                              aria-hidden
-                            />
-                          ) : (
-                            <X
-                              className="size-3 text-destructive"
-                              aria-hidden
-                            />
-                          )}
-                          <Text inline size="xs" tone="muted">
-                            {step.title}
-                          </Text>
-                        </ListItem>
-                      ))}
-                    </List>
                   )}
                   {entry.actions?.map((action) => (
                     <AiActionCard
@@ -610,7 +667,7 @@ ${note}`
           ))}
         </List>
 
-        {chat.isPending && (
+        {working && (
           <Box className="space-y-1">
             {live.length > 0 && (
               <List className="space-y-0.5">
