@@ -488,6 +488,9 @@ ${note}`
                 </Box>
               ) : (
                 <Box className="max-w-[92%] space-y-2 rounded-2xl rounded-bl-sm border bg-card px-3 py-2">
+                  {!repeatsQuestion(entry) && (
+                    <ChatMarkdown text={entry.content} />
+                  )}
                   {entry.steps && entry.steps.length > 0 && (
                     <Box className="space-y-1">
                       <Button
@@ -541,9 +544,6 @@ ${note}`
                         </List>
                       )}
                     </Box>
-                  )}
-                  {!repeatsQuestion(entry) && (
-                    <ChatMarkdown text={entry.content} />
                   )}
                   {entry.actions?.map((action) => (
                     <AiActionCard
