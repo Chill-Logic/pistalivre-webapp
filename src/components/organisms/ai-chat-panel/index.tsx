@@ -1,12 +1,11 @@
 import {
+  ArrowUp,
   Check,
   Circle,
   HelpCircle,
   MapPin,
   Mic,
   Paperclip,
-  Square,
-  SendHorizontal,
   Sparkles,
   Undo2,
   Upload,
@@ -177,6 +176,10 @@ export function AiChatPanel({
   const [error, setError] = useState<string | null>(null);
   // The tools of the answer being prepared, as they run.
   const [live, setLive] = useState<AiChatLiveStep[]>([]);
+  // A few of the starting points, different each time the chat opens.
+  const [shownSuggestions] = useState(() =>
+    [...suggestions].sort(() => Math.random() - 0.5).slice(0, 4),
+  );
   // Picks the status phrases of this answer (other words on the next one).
   const [statusSeed, setStatusSeed] = useState("");
   const attachments = useAiAttachments();
@@ -386,7 +389,7 @@ ${note}`
                 Não sabe por onde começar? Escolha uma opção:
               </Text>
               <Box className="flex flex-col items-end gap-2">
-                {suggestions.map((suggestion) => (
+                {shownSuggestions.map((suggestion) => (
                   <Button
                     key={suggestion}
                     type="button"
@@ -614,74 +617,29 @@ ${note}`
         <Box ref={bottom} />
       </Box>
 
-      <Box className="space-y-2 border-t px-4 py-3">
-        {attachments.items.length > 0 && (
-          <Box className="flex flex-wrap gap-1.5">
-            {attachments.items.map((item) => (
-              <ChatAttachmentChip
-                key={item.key}
-                name={item.name}
-                isPdf={item.isPdf}
-                previewUrl={item.previewUrl}
-                status={item.status}
-                progress={item.progress}
-                error={item.error}
-                onRemove={() => attachments.remove(item.key)}
-              />
-            ))}
-          </Box>
-        )}
-        {attachments.notice && (
-          <Text size="xs" tone="muted">
-            {attachments.notice}
-          </Text>
-        )}
-        <Box className="flex items-end gap-2">
-          <FileInput
-            ref={picker}
-            accept={AI_ATTACHMENT_ACCEPT}
-            multiple
-            onChange={(event) => {
-              attachments.add(Array.from(event.target.files ?? []));
-              event.target.value = "";
-            }}
-          />
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            className="shrink-0"
-            aria-label="Anexar imagem ou PDF"
-            title="Anexar imagem ou PDF (ou cole com Ctrl+V, ou arraste para cá)"
-            onClick={() => picker.current?.click()}
-            disabled={blocked}
-          >
-            <Paperclip />
-          </Button>
-          {dictation.supported && (
-            <Button
-              type="button"
-              size="icon"
-              variant={dictation.listening ? "default" : "ghost"}
-              className="shrink-0"
-              aria-label={dictation.listening ? "Parar o ditado" : "Falar"}
-              aria-pressed={dictation.listening}
-              title={
-                dictation.listening
-                  ? "Parar o ditado"
-                  : "Falar em vez de digitar"
-              }
-              onClick={() =>
-                dictation.listening ? dictation.stop() : dictation.start(draft)
-              }
-              disabled={blocked}
-            >
-              {dictation.listening ? (
-                <Square className="fill-current" />
-              ) : (
-                <Mic />
-              )}
-            </Button>
+      <Box className="space-y-1.5 border-t px-3 pb-2 pt-3">
+        {/* One box, like a chat app: the text on top, the tools under it. */}
+        <Box className="rounded-2xl border bg-card shadow-sm transition-shadow focus-within:ring-1 focus-within:ring-ring">
+          {attachments.items.length > 0 && (
+            <Box className="flex flex-wrap gap-1.5 px-3 pt-3">
+              {attachments.items.map((item) => (
+                <ChatAttachmentChip
+                  key={item.key}
+                  name={item.name}
+                  isPdf={item.isPdf}
+                  previewUrl={item.previewUrl}
+                  status={item.status}
+                  progress={item.progress}
+                  error={item.error}
+                  onRemove={() => attachments.remove(item.key)}
+                />
+              ))}
+            </Box>
+          )}
+          {attachments.notice && (
+            <Text size="xs" tone="muted" className="px-3 pt-2">
+              {attachments.notice}
+            </Text>
           )}
           <Textarea
             aria-label="Mensagem para a IA"
@@ -697,35 +655,88 @@ ${note}`
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={onKeyDown}
             onPaste={onPaste}
-            className="min-h-11 resize-none"
+            className="max-h-40 min-h-12 resize-none border-0 bg-transparent px-3 pt-3 shadow-none focus-visible:ring-0"
             disabled={blocked}
           />
-          <Button
-            type="button"
-            size="icon"
-            aria-label="Enviar"
-            onClick={() => send(draft)}
-            disabled={
-              blocked ||
-              attachments.uploading ||
-              (!draft.trim() && attachments.readyCount === 0)
-            }
-          >
-            <SendHorizontal />
-          </Button>
+          <Box className="flex items-center gap-1 px-2 pb-2">
+            <FileInput
+              ref={picker}
+              accept={AI_ATTACHMENT_ACCEPT}
+              multiple
+              onChange={(event) => {
+                attachments.add(Array.from(event.target.files ?? []));
+                event.target.value = "";
+              }}
+            />
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="size-8 shrink-0 rounded-full text-muted-foreground"
+              aria-label="Anexar imagem ou PDF"
+              title="Anexar imagem ou PDF (ou cole com Ctrl+V, ou arraste para cá)"
+              onClick={() => picker.current?.click()}
+              disabled={blocked}
+            >
+              <Paperclip />
+            </Button>
+            {dictation.listening && (
+              <Text
+                size="xs"
+                className="flex items-center gap-1.5 pl-1 text-primary"
+              >
+                <Circle className="size-2 fill-current" aria-hidden />
+                Ouvindo…
+              </Text>
+            )}
+            <Box className="ml-auto flex items-center gap-1">
+              {dictation.supported && (
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className={cn(
+                    "size-8 shrink-0 rounded-full text-muted-foreground",
+                    dictation.listening &&
+                      "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary",
+                  )}
+                  aria-label={dictation.listening ? "Parar o ditado" : "Falar"}
+                  aria-pressed={dictation.listening}
+                  title={
+                    dictation.listening
+                      ? "Parar o ditado"
+                      : "Falar em vez de digitar"
+                  }
+                  onClick={() =>
+                    dictation.listening
+                      ? dictation.stop()
+                      : dictation.start(draft)
+                  }
+                  disabled={blocked}
+                >
+                  <Mic />
+                </Button>
+              )}
+              <Button
+                type="button"
+                size="icon"
+                className="size-8 shrink-0 rounded-full"
+                aria-label="Enviar"
+                onClick={() => send(draft)}
+                disabled={
+                  blocked ||
+                  attachments.uploading ||
+                  (!draft.trim() && attachments.readyCount === 0)
+                }
+              >
+                <ArrowUp />
+              </Button>
+            </Box>
+          </Box>
         </Box>
-        {dictation.error && (
+        {dictation.error ? (
           <Text size="xs" tone="destructive" className="text-center">
             {dictation.error}
-          </Text>
-        )}
-        {dictation.listening ? (
-          <Text
-            size="xs"
-            className="flex items-center justify-center gap-1.5 text-primary"
-          >
-            <Circle className="size-2 fill-current" aria-hidden />
-            Ouvindo… toque no quadrado para parar.
           </Text>
         ) : (
           <Text size="xs" tone="muted" className="text-center">

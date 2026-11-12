@@ -21,12 +21,24 @@ import { aiChatEvents, useAiGuideSpot } from "@/hooks/ui/useAiGuide";
 import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 import { cn } from "@/utils/cn";
 
-/** Starting points: what the assistant does outside an editor. */
+/** Starting points (4 of them, at random, each time): what the assistant does outside an editor. */
 const GENERAL_SUGGESTIONS = [
   "Cadastrar cliente e locação pelos documentos",
   "Quem está com o aluguel atrasado?",
   "Quais motos estão disponíveis?",
   "Ajustar o contrato de uma locação",
+  "Quanto entrou no caixa este mês?",
+  "Quais cobranças vencem esta semana?",
+  "Quem mais deve para a gente?",
+  "Quais motos estão em manutenção?",
+  "Tem vistoria atrasada?",
+  "Como está o funil de leads?",
+  "Quais locações começaram este mês?",
+  "Qual o resumo financeiro do mês?",
+  "Quais contas da empresa vencem este mês?",
+  "Guardar a CNH de um cliente",
+  "Qual o telefone e o e-mail da empresa?",
+  "Quanto a IA custou este mês?",
 ];
 
 /**
