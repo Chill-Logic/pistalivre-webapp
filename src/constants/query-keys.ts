@@ -90,6 +90,7 @@ export const queryKeys = {
     form: () => [...queryKeys.publicLead.all, "form"] as const,
     questionnaire: (token: string) =>
       [...queryKeys.publicLead.all, "questionnaire", token] as const,
+    preRegistration: () => [...queryKeys.publicLead.all, "pre-registration"] as const,
   },
   portal: {
     all: ["portal"] as const,

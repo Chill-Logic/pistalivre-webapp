@@ -129,6 +129,7 @@ export const ROUTES = {
   portalLeadCapture: `${PORTAL}/quero-alugar`,
   portalQuestionnaireStart: `${PORTAL}/questionario`,
   portalQuestionnaire: `${PORTAL}/questionario/:token`,
+  portalPreRegistration: `${PORTAL}/pre-cadastro`,
   portalRental: `${PORTAL}/locacoes/:id`,
   portalInspectionNew: `${PORTAL}/locacoes/:id/vistorias/nova`,
   portalRentalStatement: `${PORTAL}/locacoes/:id/extrato`,

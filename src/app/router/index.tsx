@@ -19,6 +19,7 @@ import {
   CustomerNewPage,
   CustomerLoginPage,
   LeadCapturePage,
+  PreRegistrationPage,
   QuestionnairePage,
   QuestionnaireStartPage,
   CustomersPage,
@@ -161,6 +162,7 @@ const portalRoutes: RouteObject[] = [
     element: <QuestionnaireStartPage />,
   },
   { path: ROUTES.portalQuestionnaire, element: <QuestionnairePage /> },
+  { path: ROUTES.portalPreRegistration, element: <PreRegistrationPage /> },
   {
     element: <RedirectIfAuthenticated realm="cliente" />,
     children: [{ path: ROUTES.portalLogin, element: <CustomerLoginPage /> }],

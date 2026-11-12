@@ -91,3 +91,18 @@ export type RegistrationInput = {
   driverLicenseValidUntil: string;
   cnhFile: File | null;
 };
+
+/** /pre-cadastro: what the form needs before sending (no login). */
+export type PreRegistrationInfo = {
+  companyName: string;
+  options: { maritalStatus: string[]; defaultNationality: string };
+};
+
+/** The registration with everything the contract needs, plus the documents. */
+export type PreRegistrationInput = RegistrationInput & {
+  proofOfAddressFile: File | null;
+  otherFiles: File[];
+};
+
+/** Where the person came from (campaign link `?ref=`, first and last touch). */
+export type PreRegistrationAttribution = { first: LeadTouch; last: LeadTouch; ref: string };

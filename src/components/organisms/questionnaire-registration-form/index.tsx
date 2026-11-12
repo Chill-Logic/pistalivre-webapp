@@ -17,7 +17,8 @@ import { MaskedField } from "@/components/molecules/masked-field";
 import { SelectField } from "@/components/molecules/select-field";
 import { applyApiErrors } from "@/helpers/form";
 import { useCepLookup } from "@/hooks/api/comum/useCepLookup";
-import type { QuestionnaireState, RegistrationInput } from "@/types/public-lead";
+import { toApiError } from "@/helpers/api-error";
+import type { PreRegistrationInput, QuestionnaireState } from "@/types/public-lead";
 import { isValidCpf } from "@/utils/cpf";
 import { brDateToDay, todayInBrasilia } from "@/utils/date";
 import { maskCep, maskCpf, maskDate, maskPhone, maskRg, onlyDigits } from "@/utils/masks";
@@ -56,27 +57,64 @@ type Values = z.infer<typeof schema>;
 
 const FIELDS = Object.keys(schema.shape) as (keyof Values)[];
 
+/** What the contract prints: required in the pre-registration (the API says the same). */
+const CONTRACT_FIELDS: [keyof Values, string][] = [
+  ["maritalStatus", "Escolha seu estado civil"],
+  ["profession", "Informe sua profissão"],
+  ["zip", "Informe o CEP"],
+  ["addressLine", "Informe a rua"],
+  ["addressNumber", "Informe o número"],
+  ["neighborhood", "Informe o bairro"],
+  ["city", "Informe a cidade"],
+  ["state", "Informe o estado (UF)"],
+  ["driverLicense", "Informe o número da CNH"],
+  ["driverLicenseIssuedAt", "Informe a data de emissão"],
+  ["driverLicenseValidUntil", "Informe a validade"],
+];
+
+const preRegistrationSchema = schema.superRefine((values, ctx) => {
+  for (const [field, message] of CONTRACT_FIELDS) {
+    if (!String(values[field] ?? "").trim()) ctx.addIssue({ code: "custom", path: [field], message });
+  }
+});
+
+const MAX_OTHER_FILES = 3;
+const DOCUMENT_ACCEPT = "application/pdf,image/jpeg,image/png,image/webp";
+
+type FileErrors = Partial<Record<"cnhFile" | "proofOfAddressFile" | "otherFiles", string>>;
+
 type QuestionnaireRegistrationFormProps = {
-  defaults: QuestionnaireState["defaults"];
-  options: QuestionnaireState["options"];
+  /** "pre-registration" (/pre-cadastro): everything the contract needs is required, plus the documents. */
+  variant?: "questionnaire" | "pre-registration";
+  defaults?: QuestionnaireState["defaults"];
+  options: Pick<QuestionnaireState["options"], "maritalStatus" | "defaultNationality">;
   pending: boolean;
+  submitLabel?: string;
   /** Rejects with the API error, shown on the fields it names. */
-  onSubmit: (input: RegistrationInput) => Promise<unknown>;
+  onSubmit: (input: PreRegistrationInput) => Promise<unknown>;
 };
 
 /**
- * Step 3: what the rental contract needs, filled in by the customer. The same
- * checks as the staff's customer form (CPF digit, e-mail); the CEP fills the
- * address. The CNH is optional: complete, it already unlocks the contract.
+ * What the rental contract needs, filled in by the customer. The same checks
+ * as the staff's customer form (CPF digit, e-mail); the CEP fills the address.
+ * In the questionnaire (step 3) the CNH is optional; in the pre-registration
+ * the address, marital status, profession, CNH data and the documents (CNH +
+ * proof of address, up to 3 more) are required.
  */
 export function QuestionnaireRegistrationForm({
-  defaults,
+  variant = "questionnaire",
+  defaults = { name: "", email: "", phone: "" },
   options,
   pending,
+  submitLabel = "Enviar meus dados",
   onSubmit,
 }: QuestionnaireRegistrationFormProps) {
+  const pre = variant === "pre-registration";
   const cep = useCepLookup();
   const [cnh, setCnh] = useState<File[]>([]);
+  const [proof, setProof] = useState<File[]>([]);
+  const [others, setOthers] = useState<File[]>([]);
+  const [fileErrors, setFileErrors] = useState<FileErrors>({});
   const {
     control,
     register,
@@ -85,7 +123,7 @@ export function QuestionnaireRegistrationForm({
     setError,
     formState: { errors },
   } = useForm<Values>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(pre ? preRegistrationSchema : schema),
     defaultValues: {
       name: defaults.name,
       document: "",
@@ -127,19 +165,43 @@ export function QuestionnaireRegistrationForm({
     });
   };
 
-  const submit = handleSubmit(async (values) => {
-    setFormError(null);
-    try {
-      await onSubmit({
-        ...values,
-        birthDate: brDateToDay(values.birthDate) ?? "",
-        cnhFile: cnh[0] ?? null,
-      });
-    } catch (error) {
-      // The API's 422 lands on the field it names; the rest is an alert.
-      setFormError(applyApiErrors(error, setError, FIELDS));
-    }
-  });
+  const missingFiles = (): FileErrors => {
+    if (!pre) return {};
+    const missing: FileErrors = {};
+    if (!cnh.length) missing.cnhFile = "Anexe a foto ou o PDF da CNH";
+    if (!proof.length) missing.proofOfAddressFile = "Anexe o comprovante de residência";
+    if (others.length > MAX_OTHER_FILES) missing.otherFiles = `No máximo ${MAX_OTHER_FILES} arquivos`;
+    return missing;
+  };
+
+  const submit = handleSubmit(
+    async (values) => {
+      setFormError(null);
+      const missing = missingFiles();
+      setFileErrors(missing);
+      if (Object.keys(missing).length) return;
+      try {
+        await onSubmit({
+          ...values,
+          birthDate: brDateToDay(values.birthDate) ?? "",
+          cnhFile: cnh[0] ?? null,
+          proofOfAddressFile: proof[0] ?? null,
+          otherFiles: others,
+        });
+      } catch (error) {
+        // The API's 422 lands on the field it names (files included); the rest is an alert.
+        const fields = toApiError(error).fields ?? {};
+        setFileErrors({
+          cnhFile: fields.cnhFile,
+          proofOfAddressFile: fields.proofOfAddressFile,
+          otherFiles: fields.otherFiles,
+        });
+        setFormError(applyApiErrors(error, setError, FIELDS));
+      }
+    },
+    // Field errors show on the fields; the documents are checked on the same click.
+    () => setFileErrors(missingFiles()),
+  );
 
   const masked = (
     name: keyof Values,
@@ -305,18 +367,30 @@ export function QuestionnaireRegistrationForm({
 
       <Box className="space-y-4">
         <Heading level={2} variant="section">
-          CNH (opcional)
+          {pre ? "CNH" : "CNH (opcional)"}
         </Heading>
         <Text tone="muted">
-          Preencher adianta a emissão do contrato.
+          {pre
+            ? "Foto legível da CNH (frente e verso) ou o PDF da CNH digital, e os dados como estão nela."
+            : "Preencher adianta a emissão do contrato."}
         </Text>
-        <FilePicker
-          label="Foto ou PDF da CNH"
-          accept="application/pdf,image/*"
-          files={cnh}
-          onChange={setCnh}
-          multiple={false}
-        />
+        <Box className="space-y-1">
+          <FilePicker
+            label={pre ? "Anexar a CNH" : "Foto ou PDF da CNH"}
+            accept={pre ? DOCUMENT_ACCEPT : "application/pdf,image/*"}
+            files={cnh}
+            onChange={(files) => {
+              setCnh(files);
+              setFileErrors((current) => ({ ...current, cnhFile: undefined }));
+            }}
+            multiple={false}
+          />
+          {fileErrors.cnhFile && (
+            <Text size="xs" tone="destructive">
+              {fileErrors.cnhFile}
+            </Text>
+          )}
+        </Box>
         <Row className="gap-y-4">
           <Col sm={4}>
             <FormField label="Número da CNH" error={errors.driverLicense?.message} {...register("driverLicense")} />
@@ -330,11 +404,66 @@ export function QuestionnaireRegistrationForm({
         </Row>
       </Box>
 
+      {pre && (
+        <Box className="space-y-4">
+          <Heading level={2} variant="section">
+            Comprovante de residência
+          </Heading>
+          <Text tone="muted">
+            Conta de luz, água, gás, internet ou telefone, de preferência dos últimos 3 meses.
+          </Text>
+          <Box className="space-y-1">
+            <FilePicker
+              label="Anexar o comprovante"
+              accept={DOCUMENT_ACCEPT}
+              files={proof}
+              onChange={(files) => {
+                setProof(files);
+                setFileErrors((current) => ({ ...current, proofOfAddressFile: undefined }));
+              }}
+              multiple={false}
+            />
+            {fileErrors.proofOfAddressFile && (
+              <Text size="xs" tone="destructive">
+                {fileErrors.proofOfAddressFile}
+              </Text>
+            )}
+          </Box>
+        </Box>
+      )}
+
+      {pre && (
+        <Box className="space-y-4">
+          <Heading level={2} variant="section">
+            Outros documentos (opcional)
+          </Heading>
+          <Text tone="muted">
+            Se a gente pediu algo a mais (RG, comprovante de renda…), anexe aqui. Até {MAX_OTHER_FILES} arquivos.
+          </Text>
+          <Box className="space-y-1">
+            <FilePicker
+              label="Anexar documentos"
+              accept={DOCUMENT_ACCEPT}
+              files={others}
+              onChange={(files) => {
+                setOthers(files.slice(0, MAX_OTHER_FILES));
+                setFileErrors((current) => ({ ...current, otherFiles: undefined }));
+              }}
+            />
+            {fileErrors.otherFiles && (
+              <Text size="xs" tone="destructive">
+                {fileErrors.otherFiles}
+              </Text>
+            )}
+          </Box>
+        </Box>
+      )}
+
       {formError && <Alert>{formError}</Alert>}
 
       <Button type="submit" className="w-full" disabled={pending}>
         {pending && <Spinner className="text-primary-foreground" />}
-        Enviar meus dados
+        {submitLabel}
       </Button>
     </Form>
   );
