@@ -62,15 +62,20 @@ export function useSpeechDictation(onText: (text: string) => void) {
       r.continuous = true;
       r.interimResults = true;
       const prefix = base.trim() ? `${base.trimEnd()} ` : "";
-      let finals = "";
       r.onresult = (event) => {
-        let interim = "";
-        for (let i = event.resultIndex; i < event.results.length; i += 1) {
-          const result = event.results[i];
-          if (result.isFinal) finals += result[0].transcript;
-          else interim += result[0].transcript;
+        // Rebuilt from every result each time (never accumulated across
+        // events): Chrome on Android repeats results, and each one may
+        // already carry the previous text ("bem" → "bem maneiro").
+        let text = "";
+        for (let i = 0; i < event.results.length; i += 1) {
+          const piece = event.results[i][0].transcript.trim();
+          if (!piece) continue;
+          const sofar = text.trim().toLowerCase();
+          if (sofar && piece.toLowerCase().startsWith(sofar)) text = piece;
+          else if (!sofar.endsWith(piece.toLowerCase()))
+            text = `${text} ${piece}`;
         }
-        onTextRef.current(`${prefix}${finals}${interim}`.replace(/\s+/g, " "));
+        onTextRef.current(`${prefix}${text.trim()}`);
       };
       r.onerror = (event) => {
         if (event.error !== "no-speech" && event.error !== "aborted") {

@@ -1,8 +1,10 @@
 import {
   Check,
+  Circle,
   MapPin,
   Mic,
   Paperclip,
+  Square,
   SendHorizontal,
   Sparkles,
   Undo2,
@@ -621,7 +623,7 @@ ${note}`
               type="button"
               size="icon"
               variant={dictation.listening ? "default" : "ghost"}
-              className={cn("shrink-0", dictation.listening && "animate-pulse")}
+              className="shrink-0"
               aria-label={dictation.listening ? "Parar o ditado" : "Falar"}
               aria-pressed={dictation.listening}
               title={
@@ -634,7 +636,11 @@ ${note}`
               }
               disabled={blocked}
             >
-              <Mic />
+              {dictation.listening ? (
+                <Square className="fill-current" />
+              ) : (
+                <Mic />
+              )}
             </Button>
           )}
           <Textarea
@@ -673,11 +679,21 @@ ${note}`
             {dictation.error}
           </Text>
         )}
-        <Text size="xs" tone="muted" className="text-center">
-          {mode === "general"
-            ? "A IA pode errar: confira os dados antes de confirmar."
-            : "A IA pode errar: revise o documento antes de salvar."}
-        </Text>
+        {dictation.listening ? (
+          <Text
+            size="xs"
+            className="flex items-center justify-center gap-1.5 text-primary"
+          >
+            <Circle className="size-2 fill-current" aria-hidden />
+            Ouvindo… toque no quadrado para parar.
+          </Text>
+        ) : (
+          <Text size="xs" tone="muted" className="text-center">
+            {mode === "general"
+              ? "A IA pode errar: confira os dados antes de confirmar."
+              : "A IA pode errar: revise o documento antes de salvar."}
+          </Text>
+        )}
       </Box>
     </DropArea>
   );
