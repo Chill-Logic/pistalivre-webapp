@@ -52,6 +52,13 @@ export function useSpeechDictation(onText: (text: string) => void) {
   onTextRef.current = onText;
 
   const stop = useCallback(() => recognition.current?.stop(), []);
+  /** Stops and drops what is still on the way (the message was just sent). */
+  const cancel = useCallback(() => {
+    const r = recognition.current;
+    if (!r) return;
+    r.onresult = null;
+    r.abort();
+  }, []);
 
   const start = useCallback(
     (base: string) => {
@@ -96,5 +103,5 @@ export function useSpeechDictation(onText: (text: string) => void) {
   // Leaving the chat stops the microphone.
   useEffect(() => () => recognition.current?.abort(), []);
 
-  return { supported: Boolean(Ctor), listening, error, start, stop };
+  return { supported: Boolean(Ctor), listening, error, start, stop, cancel };
 }

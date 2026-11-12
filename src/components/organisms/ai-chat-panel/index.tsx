@@ -40,6 +40,7 @@ import {
   useAiAttachments,
 } from "@/hooks/api/gestao/ai/useAiAttachments";
 import { useSpeechDictation } from "@/hooks/ui/useSpeechDictation";
+import { aiStatusText } from "@/helpers/ai-status";
 import {
   fulfilledEntry,
   sourcesSummary,
@@ -216,7 +217,7 @@ export function AiChatPanel({
     if (!message && (auto || attachments.readyCount === 0)) return;
     setError(null);
     if (!auto) {
-      dictation.stop();
+      dictation.cancel();
       setDraft("");
     }
     const files = (auto ? [] : attachments.take()).map((item) => ({
@@ -561,11 +562,7 @@ ${note}`
             <Box className="flex items-center gap-2">
               <Spinner />
               <Text size="sm" tone="muted">
-                {live.some((step) => step.status === "running")
-                  ? "Consultando…"
-                  : live.length > 0
-                    ? "Escrevendo a resposta…"
-                    : "Pensando…"}
+                {aiStatusText(live)}
               </Text>
             </Box>
           </Box>
