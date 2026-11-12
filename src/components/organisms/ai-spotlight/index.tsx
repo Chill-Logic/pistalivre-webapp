@@ -16,8 +16,23 @@ type Rect = { top: number; left: number; width: number; height: number };
 /** Long enough for a page to load its data and render the section. */
 const FIND_TIMEOUT_MS = 10_000;
 const ANCHOR_WAIT_MS = 4_000;
+/** While the page finishes loading (skeletons → data), keep the section centered. */
+const SETTLE_MS = 3_500;
 const PAD = 6;
 const BUBBLE_WIDTH = 320;
+
+/** The element that scrolls the page around `el` (the window's, if none). */
+function scrollerOf(el: Element): Element {
+  for (let node = el.parentElement; node; node = node.parentElement) {
+    const { overflowY } = getComputedStyle(node);
+    if (
+      /(auto|scroll)/.test(overflowY) &&
+      node.scrollHeight > node.clientHeight
+    )
+      return node;
+  }
+  return document.scrollingElement ?? document.documentElement;
+}
 
 const samePath = (route: string, pathname: string) =>
   route.split("?")[0].replace(/\/$/, "") === pathname.replace(/\/$/, "");
@@ -48,6 +63,18 @@ export function AiSpotlight() {
     if (spot.route && !samePath(spot.route, pathname)) return;
     let frame = 0;
     let scrolled = false;
+    // Where the section sits in the page (not on screen): it moves when the
+    // content above it finishes loading — then it's centered again, unless
+    // the person scrolled by hand.
+    let placedAt: number | null = null;
+    let settleUntil = 0;
+    let handScrolled = false;
+    let scroller: Element | null = null;
+    const byHand = () => (handScrolled = true);
+    const handEvents = ["wheel", "touchmove", "keydown"] as const;
+    handEvents.forEach((name) =>
+      window.addEventListener(name, byHand, { passive: true }),
+    );
     const started = Date.now();
     const tick = () => {
       // A section may take a while to load: the fallback only after a bit.
@@ -56,11 +83,23 @@ export function AiSpotlight() {
         Date.now() - started > ANCHOR_WAIT_MS,
       );
       if (el) {
+        const box = el.getBoundingClientRect();
+        scroller ??= scrollerOf(el);
+        const inPage = box.top + scroller.scrollTop;
         if (!scrolled) {
           el.scrollIntoView({ behavior: "smooth", block: "center" });
           scrolled = true;
+          placedAt = inPage;
+          settleUntil = Date.now() + SETTLE_MS;
+        } else if (
+          !handScrolled &&
+          Date.now() < settleUntil &&
+          placedAt !== null &&
+          Math.abs(inPage - placedAt) > 4
+        ) {
+          placedAt = inPage;
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
         }
-        const box = el.getBoundingClientRect();
         setRect((previous) =>
           previous &&
           previous.top === box.top &&
@@ -82,7 +121,10 @@ export function AiSpotlight() {
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      handEvents.forEach((name) => window.removeEventListener(name, byHand));
+    };
   }, [spot, pathname]);
 
   useEffect(() => {
