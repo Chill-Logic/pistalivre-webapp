@@ -43,6 +43,7 @@ import {
 } from "@/hooks/api/gestao/ai/useAiAttachments";
 import { useSpeechDictation } from "@/hooks/ui/useSpeechDictation";
 import { aiStatusText } from "@/helpers/ai-status";
+import { createStepPacer } from "@/helpers/step-pacer";
 import { ASSISTANT_NAME, CAPABILITIES, pickOpening } from "@/helpers/livrinho";
 import { useMe } from "@/hooks/api/comum/session/useMe";
 import { firstName } from "@/utils/format";
@@ -284,15 +285,14 @@ ${note}`
     const before = html;
     setLive([]);
     setStatusSeed(String(Math.random()));
+    const pacer = createStepPacer((step) =>
+      setLive((current) => [...current.filter((s) => s.id !== step.id), step]),
+    );
     const ready = prepare ? prepare() : Promise.resolve({ html, version: 0 });
     ready
       .then((saved) =>
         chat.mutateAsync({
-          onStep: (step) =>
-            setLive((current) => [
-              ...current.filter((s) => s.id !== step.id),
-              step,
-            ]),
+          onStep: pacer.push,
           input: {
             mode,
             html: saved.html,
@@ -309,6 +309,8 @@ ${note}`
           },
         }),
       )
+      // The answer waits for the last step to finish "running" on screen.
+      .then((answer) => pacer.drained().then(() => answer))
       .then(
         (answer) => {
           setEntries((current) => [
