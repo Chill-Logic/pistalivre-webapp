@@ -112,6 +112,8 @@ export type AiChatResponse = {
   draft?: ContractDraftState | null;
   /** Where on the app each data the agent read lives ("Mostrar onde vi isso"). */
   sources?: AiUiSource[];
+  /** The person asked where the data is ("onde acho isso?"): show the card. */
+  offerSources?: boolean;
   /** The AI wasn't sure: its interpretations as buttons (a click sends the text). */
   choices?: AiChatChoices | null;
 };

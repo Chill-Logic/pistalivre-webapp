@@ -80,6 +80,8 @@ export type ChatEntry = {
   note?: string;
   /** Where on the app the data of this answer lives ("Mostrar onde vi isso"). */
   sources?: AiUiSource[];
+  /** The person asked where the data is: the card shows (with this or the last answer's places). */
+  offerSources?: boolean;
   /** What the person answered to "Quer ver de onde tirei isso?". */
   sourcesChoice?: "shown" | "skipped";
   /** An action just got done: the chat says "Pode seguir." on its own once. */
@@ -205,6 +207,15 @@ export function AiChatPanel({
       ),
     );
 
+  /** Where an answer's data lives: its own places, or the last answer's ("onde acho isso?" after it). */
+  const placesOf = (index: number): AiUiSource[] => {
+    for (let i = index; i >= 0; i -= 1) {
+      const places = entries[i].sources;
+      if (entries[i].role === "assistant" && places?.length) return places;
+    }
+    return [];
+  };
+
   const showSources = (sources: AiUiSource[]) => {
     const tour = sourcesToTour(sources);
     if (tour.length === 0) return;
@@ -309,6 +320,9 @@ ${note}`
               steps: answer.steps,
               actions: answer.actions,
               sources: answer.sources,
+              // An older server sent places only when asked.
+              offerSources:
+                answer.offerSources ?? Boolean(answer.sources?.length),
               choices: answer.choices,
               before: answer.changed ? before : undefined,
             },
@@ -478,18 +492,18 @@ ${note}`
                       }
                     />
                   ))}
-                  {entry.sources && entry.sources.length > 0 && (
+                  {entry.offerSources && placesOf(index).length > 0 && (
                     <ChoicePrompt
                       icon={<MapPin className="size-5" />}
                       title="Quer ver de onde tirei isso?"
-                      subtitle={sourcesSummary(entry.sources)}
+                      subtitle={sourcesSummary(placesOf(index))}
                       options={[
                         {
                           label: "Sim, me mostra",
                           primary: true,
                           onSelect: () => {
                             setSourcesChoice(index, "shown");
-                            showSources(entry.sources ?? []);
+                            showSources(placesOf(index));
                           },
                         },
                         {
@@ -506,7 +520,7 @@ ${note}`
                               variant="link"
                               size="sm"
                               className="h-auto p-0 text-xs"
-                              onClick={() => showSources(entry.sources ?? [])}
+                              onClick={() => showSources(placesOf(index))}
                             >
                               Mostrar de novo
                             </Button>
@@ -519,7 +533,7 @@ ${note}`
                               variant="link"
                               size="sm"
                               className="h-auto p-0 text-xs"
-                              onClick={() => showSources(entry.sources ?? [])}
+                              onClick={() => showSources(placesOf(index))}
                             >
                               Mostrar
                             </Button>
