@@ -71,6 +71,7 @@ export function fulfilledEntry(event: AiChatEvent): ChatEntry {
     role: "assistant",
     content: `Feito pela tela: ${event.summary}.`,
     note: `[A pessoa salvou pelo formulário do sistema. Resultado: ${JSON.stringify(event.result)}]`,
+    continueAfter: true,
   };
 }
 

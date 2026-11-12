@@ -158,6 +158,7 @@ export function CustomerForm({
       "Nascimento",
       text("birthDate") && dayToBrDate(text("birthDate").slice(0, 10)),
     );
+    add("maritalStatus", "Estado civil", text("maritalStatus"));
     add("profession", "Profissão", text("profession"));
     add("zip", "CEP", text("zip") && maskCep(onlyDigits(text("zip"))));
     add("addressLine", "Logradouro", text("addressLine"));

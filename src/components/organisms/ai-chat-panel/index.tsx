@@ -76,7 +76,12 @@ export type ChatEntry = {
   sources?: AiUiSource[];
   /** What the person answered to "Quer ver de onde tirei isso?". */
   sourcesChoice?: "shown" | "skipped";
+  /** An action just got done: the chat says "Pode seguir." on its own once. */
+  continueAfter?: boolean;
 };
+
+/** Sent on its own after a confirmed/saved action: the agent goes on with the request. */
+const CONTINUE_MESSAGE = "Pode seguir.";
 
 const GREETING: Record<AiChatMode, string> = {
   contract:
@@ -185,13 +190,28 @@ export function AiChatPanel({
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [entries.length, chat.isPending, live.length]);
 
-  const send = (text: string) => {
+  // After a confirmed (or saved-by-the-form) action, the request goes on:
+  // the next step (e.g. the rental, with the customer just created).
+  const lastEntry = entries[entries.length - 1];
+  useEffect(() => {
+    if (!lastEntry?.continueAfter || blocked) return;
+    setEntries((current) =>
+      current.map((e, i) =>
+        i === current.length - 1 ? { ...e, continueAfter: false } : e,
+      ),
+    );
+    send(CONTINUE_MESSAGE, { auto: true });
+    // Once per done action.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastEntry, blocked]);
+
+  const send = (text: string, { auto = false } = {}) => {
     const message = text.trim();
-    if (blocked || attachments.uploading) return;
-    if (!message && attachments.readyCount === 0) return;
+    if (blocked || (!auto && attachments.uploading)) return;
+    if (!message && (auto || attachments.readyCount === 0)) return;
     setError(null);
-    setDraft("");
-    const files = attachments.take().map((item) => ({
+    if (!auto) setDraft("");
+    const files = (auto ? [] : attachments.take()).map((item) => ({
       id: item.uploaded!.id,
       name: item.name,
       isPdf: item.isPdf,
@@ -419,6 +439,7 @@ ${note}`
                             role: "assistant",
                             content: `Feito: ${outcome.summary}.`,
                             note: `[Resultado da ação confirmada: ${JSON.stringify(outcome.result)}]`,
+                            continueAfter: true,
                           },
                         ])
                       }

@@ -177,6 +177,17 @@ export function RentalForm({ rental, cancelTo, onSaved }: RentalFormProps) {
       label(LABEL_MAPS.weekday, String(v.paymentWeekday)),
     );
     add(
+      "Vencimento",
+      "rentBillingTiming",
+      v.rentBillingTiming,
+      () =>
+        set(
+          "rentBillingTiming",
+          String(v.rentBillingTiming) as RentalFormValues["rentBillingTiming"],
+        ),
+      label(LABEL_MAPS.rentBillingTiming, String(v.rentBillingTiming)),
+    );
+    add(
       "Tipo de caução",
       "cautionType",
       v.cautionType,
