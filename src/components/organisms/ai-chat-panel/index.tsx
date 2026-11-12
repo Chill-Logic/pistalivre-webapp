@@ -1,6 +1,7 @@
 import {
   Check,
   MapPin,
+  Mic,
   Paperclip,
   SendHorizontal,
   Sparkles,
@@ -36,6 +37,7 @@ import {
   AI_ATTACHMENT_ACCEPT,
   useAiAttachments,
 } from "@/hooks/api/gestao/ai/useAiAttachments";
+import { useSpeechDictation } from "@/hooks/ui/useSpeechDictation";
 import {
   fulfilledEntry,
   sourcesSummary,
@@ -158,6 +160,7 @@ export function AiChatPanel({
   // The tools of the answer being prepared, as they run.
   const [live, setLive] = useState<AiChatLiveStep[]>([]);
   const attachments = useAiAttachments();
+  const dictation = useSpeechDictation(setDraft);
   const picker = useRef<HTMLInputElement>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const blocked = chat.isPending || Boolean(disabledReason);
@@ -210,7 +213,10 @@ export function AiChatPanel({
     if (blocked || (!auto && attachments.uploading)) return;
     if (!message && (auto || attachments.readyCount === 0)) return;
     setError(null);
-    if (!auto) setDraft("");
+    if (!auto) {
+      dictation.stop();
+      setDraft("");
+    }
     const files = (auto ? [] : attachments.take()).map((item) => ({
       id: item.uploaded!.id,
       name: item.name,
@@ -610,12 +616,35 @@ ${note}`
           >
             <Paperclip />
           </Button>
+          {dictation.supported && (
+            <Button
+              type="button"
+              size="icon"
+              variant={dictation.listening ? "default" : "ghost"}
+              className={cn("shrink-0", dictation.listening && "animate-pulse")}
+              aria-label={dictation.listening ? "Parar o ditado" : "Falar"}
+              aria-pressed={dictation.listening}
+              title={
+                dictation.listening
+                  ? "Parar o ditado"
+                  : "Falar em vez de digitar"
+              }
+              onClick={() =>
+                dictation.listening ? dictation.stop() : dictation.start(draft)
+              }
+              disabled={blocked}
+            >
+              <Mic />
+            </Button>
+          )}
           <Textarea
             aria-label="Mensagem para a IA"
             placeholder={
-              mode === "general"
-                ? "Pergunte ou envie documentos…"
-                : "Peça um ajuste…"
+              dictation.listening
+                ? "Pode falar…"
+                : mode === "general"
+                  ? "Pergunte ou envie documentos…"
+                  : "Peça um ajuste…"
             }
             rows={2}
             value={draft}
@@ -639,6 +668,11 @@ ${note}`
             <SendHorizontal />
           </Button>
         </Box>
+        {dictation.error && (
+          <Text size="xs" tone="destructive" className="text-center">
+            {dictation.error}
+          </Text>
+        )}
         <Text size="xs" tone="muted" className="text-center">
           {mode === "general"
             ? "A IA pode errar: confira os dados antes de confirmar."
