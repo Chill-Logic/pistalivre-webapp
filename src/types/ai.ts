@@ -112,7 +112,11 @@ export type AiChatResponse = {
   draft?: ContractDraftState | null;
   /** Where on the app each data the agent read lives ("Mostrar onde vi isso"). */
   sources?: AiUiSource[];
+  /** The AI wasn't sure: its interpretations as buttons (a click sends the text). */
+  choices?: AiChatChoices | null;
 };
+
+export type AiChatChoices = { question: string; options: string[] };
 
 /** GET /oauth/consent — the consent screen. */
 export type AiConsent = {

@@ -1,6 +1,7 @@
 import {
   Check,
   Circle,
+  HelpCircle,
   MapPin,
   Mic,
   Paperclip,
@@ -49,6 +50,7 @@ import {
 import { aiChatEvents, aiGuide } from "@/hooks/ui/useAiGuide";
 import type {
   AiChatAction,
+  AiChatChoices,
   AiChatLiveStep,
   AiChatMode,
   AiChatStep,
@@ -83,7 +85,20 @@ export type ChatEntry = {
   sourcesChoice?: "shown" | "skipped";
   /** An action just got done: the chat says "Pode seguir." on its own once. */
   continueAfter?: boolean;
+  /** The AI wasn't sure what was meant: options as buttons. */
+  choices?: AiChatChoices | null;
+  /** The option the person clicked. */
+  chosen?: string;
 };
+
+/** The answer only repeats the options' question: the card says it already. */
+function repeatsQuestion(entry: ChatEntry) {
+  if (!entry.choices) return false;
+  const plain = (text: string) =>
+    text.replace(/[^\p{L}\p{N}]/gu, "").toLowerCase();
+  const reply = plain(entry.content);
+  return !reply || reply === plain(entry.choices.question);
+}
 
 /** Sent on its own after a confirmed/saved action: the agent goes on with the request. */
 const CONTINUE_MESSAGE = "Pode seguir.";
@@ -162,6 +177,8 @@ export function AiChatPanel({
   const [error, setError] = useState<string | null>(null);
   // The tools of the answer being prepared, as they run.
   const [live, setLive] = useState<AiChatLiveStep[]>([]);
+  // Picks the status phrases of this answer (other words on the next one).
+  const [statusSeed, setStatusSeed] = useState("");
   const attachments = useAiAttachments();
   const dictation = useSpeechDictation(setDraft);
   const picker = useRef<HTMLInputElement>(null);
@@ -253,6 +270,7 @@ ${note}`
     ]);
     const before = html;
     setLive([]);
+    setStatusSeed(String(Math.random()));
     const ready = prepare ? prepare() : Promise.resolve({ html, version: 0 });
     ready
       .then((saved) =>
@@ -288,6 +306,7 @@ ${note}`
               steps: answer.steps,
               actions: answer.actions,
               sources: answer.sources,
+              choices: answer.choices,
               before: answer.changed ? before : undefined,
             },
           ]);
@@ -413,7 +432,9 @@ ${note}`
                 </Box>
               ) : (
                 <Box className="max-w-[92%] space-y-2 rounded-2xl rounded-bl-sm border bg-card px-3 py-2">
-                  <ChatMarkdown text={entry.content} />
+                  {!repeatsQuestion(entry) && (
+                    <ChatMarkdown text={entry.content} />
+                  )}
                   {entry.steps && entry.steps.length > 0 && (
                     <List className="space-y-0.5">
                       {entry.steps.map((step, i) => (
@@ -507,6 +528,28 @@ ${note}`
                       }
                     />
                   )}
+                  {entry.choices && (
+                    <ChoicePrompt
+                      icon={<HelpCircle className="size-5" />}
+                      title={entry.choices.question}
+                      options={entry.choices.options.map((option) => ({
+                        label: option,
+                        disabled: blocked && !entry.chosen,
+                        onSelect: () => {
+                          setEntries((current) =>
+                            current.map((e, i) =>
+                              i === index ? { ...e, chosen: option } : e,
+                            ),
+                          );
+                          send(option);
+                        },
+                      }))}
+                      answered={
+                        entry.chosen && `Você escolheu: ${entry.chosen}`
+                      }
+                      autoFocus={index === entries.length - 1}
+                    />
+                  )}
                   {entry.before !== undefined && (
                     <Box className="flex items-center justify-between gap-2 border-t pt-2">
                       <Text size="xs" tone="muted">
@@ -562,7 +605,7 @@ ${note}`
             <Box className="flex items-center gap-2">
               <Spinner />
               <Text size="sm" tone="muted">
-                {aiStatusText(live)}
+                {aiStatusText(live, statusSeed)}
               </Text>
             </Box>
           </Box>
