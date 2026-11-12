@@ -1,4 +1,5 @@
 import { execSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig, type Plugin } from "vite";
@@ -43,6 +44,10 @@ function buildCommit(): string {
   }
 }
 const APP_COMMIT = buildCommit();
+/** major.minor.patch from package.json (bumped on each release). */
+const APP_VERSION: string = JSON.parse(
+  readFileSync(path.resolve(__dirname, "package.json"), "utf8"),
+).version;
 const APP_BUILT_AT = new Date().toISOString();
 
 /** /version.json: `curl` it to know which build is live. */
@@ -54,7 +59,11 @@ function versionFile(): Plugin {
       this.emitFile({
         type: "asset",
         fileName: "version.json",
-        source: JSON.stringify({ commit: APP_COMMIT, builtAt: APP_BUILT_AT }),
+        source: JSON.stringify({
+          appVersion: APP_VERSION,
+          commit: APP_COMMIT,
+          builtAt: APP_BUILT_AT,
+        }),
       });
     },
   };
@@ -109,6 +118,7 @@ export default defineConfig({
     alias: { "@": path.resolve(__dirname, "./src") },
   },
   define: {
+    __APP_VERSION__: JSON.stringify(APP_VERSION),
     __APP_COMMIT__: JSON.stringify(APP_COMMIT),
     __APP_BUILT_AT__: JSON.stringify(APP_BUILT_AT),
   },
