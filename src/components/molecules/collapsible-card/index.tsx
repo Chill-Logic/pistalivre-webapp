@@ -39,7 +39,11 @@ export function CollapsibleCard({
   contentClassName,
   children,
 }: CollapsibleCardProps) {
-  const [open, toggle] = useRememberedToggle(storageKey, defaultOpen);
+  const [open, toggle] = useRememberedToggle(
+    "sections",
+    storageKey,
+    defaultOpen,
+  );
   const contentId = useId();
 
   return (

@@ -1,23 +1,23 @@
 import { useState } from "react";
-import { safeStorage } from "@/helpers/safe-storage";
+import { readToggle, saveToggle, type UiStore } from "@/helpers/ui-state";
 
 /**
  * Open/closed that survives navigation and reloads (per viewer, in this
- * browser). Without a key it is plain state.
+ * browser), kept in the JSON of its store (helpers/ui-state). Without a
+ * name it is plain state.
  */
 export function useRememberedToggle(
-  storageKey: string | undefined,
+  store: UiStore,
+  name: string | undefined,
   initial: boolean,
 ) {
-  const key = storageKey ? `pl:open:${storageKey}` : null;
-  const [open, setOpen] = useState(() => {
-    const saved = key ? safeStorage.get(key) : null;
-    return saved === null ? initial : saved === "1";
-  });
-  const toggle = () =>
-    setOpen((current) => {
-      if (key) safeStorage.set(key, current ? "0" : "1");
-      return !current;
-    });
-  return [open, toggle] as const;
+  const [open, setOpen] = useState(() =>
+    name ? (readToggle(store, name) ?? initial) : initial,
+  );
+  const set = (value: boolean) => {
+    if (name) saveToggle(store, name, value);
+    setOpen(value);
+  };
+  const toggle = () => set(!open);
+  return [open, toggle, set] as const;
 }

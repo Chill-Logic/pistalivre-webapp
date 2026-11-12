@@ -36,8 +36,9 @@ export function NavGroup({
   const Icon = group.icon;
   const activeItem = useActiveNavItem(group.items);
   const current = activeItem !== undefined;
-  const [rememberedOpen, toggleRemembered] = useRememberedToggle(
-    `nav:${group.label}`,
+  const [rememberedOpen, toggleRemembered, setRemembered] = useRememberedToggle(
+    "sidebar",
+    group.label,
     false,
   );
   // Closed on the page it holds: keyed by that page, so going to another
@@ -121,11 +122,13 @@ export function NavGroup({
         variant="ghost"
         aria-expanded={open}
         aria-controls={id}
-        onClick={() =>
-          current
-            ? setClosedOn(closedHere ? null : activeItem.to)
-            : toggleRemembered()
-        }
+        onClick={() => {
+          if (!current) return toggleRemembered();
+          // Closed (or reopened) by hand on its own page: that is also what
+          // it remembers — leaving for another page mustn't reopen it.
+          setClosedOn(closedHere ? null : activeItem.to);
+          setRemembered(closedHere);
+        }}
         className={cn(
           "h-11 w-full justify-start gap-3 px-3 text-sm font-medium md:h-9",
           closedHere
