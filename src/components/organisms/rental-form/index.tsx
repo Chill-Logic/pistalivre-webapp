@@ -37,6 +37,8 @@ import {
   useVehicleOptions,
 } from "@/hooks/ui/useRemoteOptions";
 import type { RentalDetail, RentalRecord } from "@/types/rental";
+import { dayToBrDate } from "@/utils/date";
+import { formatCurrency } from "@/utils/format";
 import { formatPlate } from "@/utils/plate";
 
 type RentalFormProps = {
@@ -49,7 +51,7 @@ type RentalFormProps = {
 export function RentalForm({ rental, cancelTo, onSaved }: RentalFormProps) {
   const isNew = !rental;
   const save = useSaveRental(rental?.id);
-  const { options } = useLabels();
+  const { options, label } = useLabels();
   const customers = useCustomerOptions();
   // Only available vehicles; editing also keeps the rental's current one.
   const vehicles = useVehicleOptions({
@@ -101,56 +103,116 @@ export function RentalForm({ rental, cancelTo, onSaved }: RentalFormProps) {
       field: string,
       present: unknown,
       apply: () => void,
+      value?: string,
     ) => {
       if (present === null || present === undefined || present === "") return;
-      steps.push({ label, origin: origins[field], apply });
+      steps.push({ label, origin: origins[field], apply, value });
     };
-    add("Cliente", "customerId", v.customerId, () => {
-      set("customerId", String(v.customerId));
-      set("customerLabel", String(v.customerLabel ?? ""));
-    });
-    add("Veículo", "vehicleId", v.vehicleId, () => {
-      set("vehicleId", String(v.vehicleId));
-      set("vehicleLabel", String(v.vehicleLabel ?? ""));
-    });
-    add("Início", "startDate", v.startDate, () =>
-      set("startDate", String(v.startDate)),
+    const day = (value: unknown) => dayToBrDate(String(value).slice(0, 10));
+    const money = (value: unknown) => formatCurrency(Number(value));
+    add(
+      "Cliente",
+      "customerId",
+      v.customerId,
+      () => {
+        set("customerId", String(v.customerId));
+        set("customerLabel", String(v.customerLabel ?? ""));
+      },
+      String(v.customerLabel ?? ""),
     );
-    add("Fim (opcional)", "endDate", v.endDate, () =>
-      set("endDate", String(v.endDate)),
+    add(
+      "Veículo",
+      "vehicleId",
+      v.vehicleId,
+      () => {
+        set("vehicleId", String(v.vehicleId));
+        set("vehicleLabel", String(v.vehicleLabel ?? ""));
+      },
+      String(v.vehicleLabel ?? ""),
     );
-    add("Valor", "rate", v.rate, () => set("rate", Number(v.rate)));
-    add("Periodicidade", "ratePeriod", v.ratePeriod, () =>
-      set("ratePeriod", String(v.ratePeriod) as RentalFormValues["ratePeriod"]),
+    add(
+      "Início",
+      "startDate",
+      v.startDate,
+      () => set("startDate", String(v.startDate)),
+      day(v.startDate),
     );
-    add("Forma de pagamento", "paymentMethod", v.paymentMethod, () =>
-      set("paymentMethod", String(v.paymentMethod)),
+    add(
+      "Fim (opcional)",
+      "endDate",
+      v.endDate,
+      () => set("endDate", String(v.endDate)),
+      day(v.endDate),
     );
-    add("Dia de cobrança", "paymentWeekday", v.paymentWeekday, () =>
-      set("paymentWeekday", String(v.paymentWeekday)),
+    add(
+      "Valor",
+      "rate",
+      v.rate,
+      () => set("rate", Number(v.rate)),
+      money(v.rate),
     );
-    add("Tipo de caução", "cautionType", v.cautionType, () =>
-      set(
-        "cautionType",
-        String(v.cautionType) as RentalFormValues["cautionType"],
-      ),
+    add(
+      "Periodicidade",
+      "ratePeriod",
+      v.ratePeriod,
+      () =>
+        set(
+          "ratePeriod",
+          String(v.ratePeriod) as RentalFormValues["ratePeriod"],
+        ),
+      label(LABEL_MAPS.ratePeriod, String(v.ratePeriod)),
     );
-    add("Valor total da caução", "cautionType", v.cautionTotal, () =>
-      set("cautionTotal", Number(v.cautionTotal)),
+    add(
+      "Forma de pagamento",
+      "paymentMethod",
+      v.paymentMethod,
+      () => set("paymentMethod", String(v.paymentMethod)),
+      label(LABEL_MAPS.paymentMethod, String(v.paymentMethod)),
+    );
+    add(
+      "Dia de cobrança",
+      "paymentWeekday",
+      v.paymentWeekday,
+      () => set("paymentWeekday", String(v.paymentWeekday)),
+      label(LABEL_MAPS.weekday, String(v.paymentWeekday)),
+    );
+    add(
+      "Tipo de caução",
+      "cautionType",
+      v.cautionType,
+      () =>
+        set(
+          "cautionType",
+          String(v.cautionType) as RentalFormValues["cautionType"],
+        ),
+      label(LABEL_MAPS.cautionType, String(v.cautionType)),
+    );
+    add(
+      "Valor total da caução",
+      "cautionType",
+      v.cautionTotal,
+      () => set("cautionTotal", Number(v.cautionTotal)),
+      money(v.cautionTotal),
     );
     add(
       "Valor da parcela semanal",
       "cautionType",
       v.cautionInstallmentValue,
       () => set("cautionInstallmentValue", Number(v.cautionInstallmentValue)),
+      money(v.cautionInstallmentValue),
     );
-    add("Dia da semana", "cautionType", v.cautionWeekday, () =>
-      set("cautionWeekday", String(v.cautionWeekday)),
+    add(
+      "Dia da semana",
+      "cautionType",
+      v.cautionWeekday,
+      () => set("cautionWeekday", String(v.cautionWeekday)),
+      label(LABEL_MAPS.weekday, String(v.cautionWeekday)),
     );
     if (typeof v.notes === "string" && v.notes) {
       steps.push({
         label: "Observações",
         origin: origins.notes,
+        value: v.notes,
         apply: () => set("notes", String(v.notes)),
       });
     }

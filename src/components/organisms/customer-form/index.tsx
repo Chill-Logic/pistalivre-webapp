@@ -135,6 +135,7 @@ export function CustomerForm({
       steps.push({
         label,
         origin,
+        value,
         apply: () =>
           setValue(name, value, { shouldDirty: true, shouldValidate: true }),
       });

@@ -11,11 +11,23 @@ export type AiFillStep = {
   label: string;
   /** Where the value came from ("da CNH anexada"); absent = a generic note. */
   origin?: string;
+  /** The value as it will show in the field ("(21) 99876-5432"). */
+  value?: string;
   apply: () => void;
 };
 
 /** What the chat hands to a form ("Preencher na tela"), via the router state. */
 export type AiFillRequest = { actionId: string; form: AiProposalForm };
+
+/** "(21) 99876-5432 · origem: você disse no chat". */
+function fillText(step: AiFillStep) {
+  const origin = step.origin?.trim();
+  if (step.value)
+    return origin ? `${step.value} · origem: ${origin}` : step.value;
+  return origin
+    ? `Origem: ${origin}.`
+    : "Preenchido com o que a IA leu ou você disse no chat.";
+}
 
 const PAUSE_BEFORE = 900;
 const PAUSE_AFTER = 450;
@@ -61,9 +73,7 @@ export function useAiFormFill(
             {
               target: { label: step.label },
               title: step.label,
-              text: step.origin
-                ? `Veio ${step.origin}.`
-                : "Preenchido com o que a IA leu ou você disse no chat.",
+              text: fillText(step),
               step: { index: index + 1, total: steps.length },
               next: { label: "Preencher tudo", run: () => (rushing = true) },
             },
