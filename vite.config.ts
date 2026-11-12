@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import path from "node:path";
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig, type Plugin } from "vite";
@@ -29,6 +30,37 @@ const manifest: Partial<ManifestOptions> = {
 };
 
 /**
+ * The commit being built: Vercel gives it (VERCEL_GIT_COMMIT_SHA); locally,
+ * git. Shown on hover of the signature and served at /version.json.
+ */
+function buildCommit(): string {
+  const fromHost = process.env.VERCEL_GIT_COMMIT_SHA;
+  if (fromHost) return fromHost.slice(0, 7);
+  try {
+    return execSync("git rev-parse --short HEAD").toString().trim();
+  } catch {
+    return "dev";
+  }
+}
+const APP_COMMIT = buildCommit();
+const APP_BUILT_AT = new Date().toISOString();
+
+/** /version.json: `curl` it to know which build is live. */
+function versionFile(): Plugin {
+  return {
+    name: "version-file",
+    apply: "build",
+    generateBundle() {
+      this.emitFile({
+        type: "asset",
+        fileName: "version.json",
+        source: JSON.stringify({ commit: APP_COMMIT, builtAt: APP_BUILT_AT }),
+      });
+    },
+  };
+}
+
+/**
  * One manifest per area, next to the generic one: each domain installs as
  * its own app (src/helpers/pwa-manifest swaps the link). No `id`: each
  * domain is its own origin already, and keeping the default lets an app
@@ -58,6 +90,7 @@ export default defineConfig({
   plugins: [
     react(),
     realmManifests(),
+    versionFile(),
     VitePWA({
       registerType: "prompt",
       includeAssets: ["favicon.ico", "apple-touch-icon-180x180.png"],
@@ -66,13 +99,18 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         // API responses are never cached by the service worker: stale billing
         // data is worse than an offline error. React Query owns the cache.
-        navigateFallbackDenylist: [/^\/api\//],
+        navigateFallbackDenylist: [/^\/api\//, /^\/version\.json$/],
+        globIgnores: ["version.json"],
       },
       devOptions: { enabled: false },
     }),
   ],
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
+  },
+  define: {
+    __APP_COMMIT__: JSON.stringify(APP_COMMIT),
+    __APP_BUILT_AT__: JSON.stringify(APP_BUILT_AT),
   },
   build: {
     rollupOptions: {

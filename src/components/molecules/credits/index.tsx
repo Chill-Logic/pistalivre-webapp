@@ -14,6 +14,7 @@ export function Credits({ className, inverted = false }: CreditsProps) {
   return (
     <Text
       size="xs"
+      title={`Versão ${__APP_COMMIT__} · publicada em ${new Date(__APP_BUILT_AT__).toLocaleString("pt-BR")}`}
       tone={inverted ? undefined : "muted"}
       className={cn(
         "text-balance text-center leading-relaxed",
