@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Main } from "@/components/atoms/landmarks";
+import { Credits } from "@/components/molecules/credits";
 import { OfflineBanner } from "@/components/molecules/offline-banner";
 import { PortalHeader } from "@/components/organisms/portal-header";
 import { PwaInstallInvite } from "@/components/organisms/pwa-install-invite";
@@ -26,6 +27,7 @@ export function PortalShell({ user }: { user: AuthUser }) {
         <Suspense fallback={<PageSkeleton />}>
           <Outlet />
         </Suspense>
+        <Credits className="pt-10" />
       </Main>
     </Box>
   );

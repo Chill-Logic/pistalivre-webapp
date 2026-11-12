@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Aside } from "@/components/atoms/landmarks";
+import { Credits } from "@/components/molecules/credits";
 import { Logo } from "@/components/molecules/logo";
 import { SidebarCollapseToggle } from "@/components/molecules/sidebar-collapse-toggle";
 import { SidebarNav } from "@/components/molecules/sidebar-nav";
@@ -36,6 +37,7 @@ export function PartnerAreaSidebar() {
       <Box className="scrollbar-quiet flex-1 overflow-y-auto overflow-x-hidden p-3">
         <SidebarNav items={PARTNER_NAV_ITEMS} collapsed={isCollapsed} />
       </Box>
+      {!isCollapsed && <Credits className="shrink-0 border-t px-4 py-3" />}
       <SidebarCollapseToggle />
     </Aside>
   );

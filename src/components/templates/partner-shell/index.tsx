@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Main } from "@/components/atoms/landmarks";
+import { Credits } from "@/components/molecules/credits";
 import { OfflineBanner } from "@/components/molecules/offline-banner";
 import { PartnerAreaBottomNav } from "@/components/organisms/partner-area-bottom-nav";
 import { PartnerAreaHeader } from "@/components/organisms/partner-area-header";
@@ -28,6 +29,7 @@ export function PartnerShell({ user }: { user: AuthUser }) {
           <Suspense fallback={<PageSkeleton />}>
             <Outlet />
           </Suspense>
+          <Credits className="pt-10 md:hidden" />
         </Main>
       </Box>
       <PartnerAreaBottomNav />

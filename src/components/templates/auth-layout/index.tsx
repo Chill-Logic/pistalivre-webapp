@@ -4,6 +4,7 @@ import { Heading } from "@/components/atoms/heading";
 import { Main } from "@/components/atoms/landmarks";
 import { Text } from "@/components/atoms/text";
 import { Logo } from "@/components/molecules/logo";
+import { Credits } from "@/components/molecules/credits";
 import { OfflineBanner } from "@/components/molecules/offline-banner";
 
 type AuthLayoutProps = {
@@ -36,6 +37,7 @@ export function AuthLayout({ area, title, children }: AuthLayoutProps) {
           <Box className="w-full max-w-sm space-y-6">
             <Heading>{title}</Heading>
             {children}
+            <Credits className="pt-4" />
           </Box>
         </Main>
       </Box>

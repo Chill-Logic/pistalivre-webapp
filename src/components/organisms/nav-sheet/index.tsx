@@ -9,6 +9,7 @@ import {
 } from "@/components/atoms/sheet";
 import { Text } from "@/components/atoms/text";
 import { SidebarNav } from "@/components/molecules/sidebar-nav";
+import { Credits } from "@/components/molecules/credits";
 import { ThemeToggle } from "@/components/molecules/theme-toggle";
 import { useNavItems } from "@/hooks/ui/useNavItems";
 import { useLogout } from "@/hooks/auth/useLogout";
@@ -62,6 +63,7 @@ export function NavSheet({ user }: NavSheetProps) {
             <LogOut />
             Sair
           </Button>
+          <Credits className="px-3 pb-1 pt-2" />
         </Box>
       </SheetContent>
     </Sheet>
