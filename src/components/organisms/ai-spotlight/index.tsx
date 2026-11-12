@@ -21,17 +21,25 @@ const SETTLE_MS = 3_500;
 const PAD = 6;
 const BUBBLE_WIDTH = 320;
 
-/** The element that scrolls the page around `el` (the window's, if none). */
-function scrollerOf(el: Element): Element {
-  for (let node = el.parentElement; node; node = node.parentElement) {
-    const { overflowY } = getComputedStyle(node);
-    if (
-      /(auto|scroll)/.test(overflowY) &&
-      node.scrollHeight > node.clientHeight
-    )
-      return node;
-  }
-  return document.scrollingElement ?? document.documentElement;
+/** A section taller than the screen goes to the top (its title in view); a small one, to the center. */
+const blockFor = (box: DOMRect): ScrollLogicalPosition =>
+  box.height > window.innerHeight * 0.6 ? "start" : "center";
+
+/**
+ * Is the section away from where the guide put it? (tall: its top near the
+ * top; small: its middle near the middle) — and could the page still move
+ * it there (not stuck at the very top or bottom).
+ */
+function offTarget(box: DOMRect): boolean {
+  const viewport = window.innerHeight;
+  const tall = box.height > viewport * 0.6;
+  const want = tall ? 96 : viewport / 2;
+  const at = tall ? box.top : box.top + box.height / 2;
+  if (Math.abs(at - want) < 48) return false;
+  const page = document.scrollingElement ?? document.documentElement;
+  const canGoDown = page.scrollTop + viewport < page.scrollHeight - 2;
+  const canGoUp = page.scrollTop > 2;
+  return at > want ? canGoDown : canGoUp;
 }
 
 const samePath = (route: string, pathname: string) =>
@@ -63,13 +71,12 @@ export function AiSpotlight() {
     if (spot.route && !samePath(spot.route, pathname)) return;
     let frame = 0;
     let scrolled = false;
-    // Where the section sits in the page (not on screen): it moves when the
-    // content above it finishes loading — then it's centered again, unless
-    // the person scrolled by hand.
-    let placedAt: number | null = null;
+    // While the page finishes loading (skeletons → data, smooth scroll cut
+    // short by the layout changing), keep checking that the section is where
+    // it should be on screen and put it back — unless the person scrolled.
     let settleUntil = 0;
+    let lastScroll = 0;
     let handScrolled = false;
-    let scroller: Element | null = null;
     const byHand = () => (handScrolled = true);
     const handEvents = ["wheel", "touchmove", "keydown"] as const;
     handEvents.forEach((name) =>
@@ -84,21 +91,21 @@ export function AiSpotlight() {
       );
       if (el) {
         const box = el.getBoundingClientRect();
-        scroller ??= scrollerOf(el);
-        const inPage = box.top + scroller.scrollTop;
+        const now = Date.now();
         if (!scrolled) {
-          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          el.scrollIntoView({ behavior: "smooth", block: blockFor(box) });
           scrolled = true;
-          placedAt = inPage;
-          settleUntil = Date.now() + SETTLE_MS;
+          lastScroll = now;
+          settleUntil = now + SETTLE_MS;
         } else if (
           !handScrolled &&
-          Date.now() < settleUntil &&
-          placedAt !== null &&
-          Math.abs(inPage - placedAt) > 4
+          now < settleUntil &&
+          now - lastScroll > 450 &&
+          offTarget(box)
         ) {
-          placedAt = inPage;
-          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          // Instant: a smooth one would be cut short again by the next change.
+          el.scrollIntoView({ behavior: "auto", block: blockFor(box) });
+          lastScroll = now;
         }
         setRect((previous) =>
           previous &&
@@ -143,14 +150,30 @@ export function AiSpotlight() {
   const width = Math.min(BUBBLE_WIDTH, viewportW - 32);
   const below = rect ? rect.top + rect.height + PAD + 12 : 0;
   const placeBelow = rect ? below + 180 < viewportH : true;
+  // No room below nor above (a tall section): the bubble sits inside it, at
+  // the top-right of what is on screen, always visible.
+  const placeAbove = rect ? rect.top - PAD - 12 > 180 : false;
   const bubbleStyle = rect
-    ? {
-        width,
-        left: Math.min(Math.max(16, rect.left), viewportW - width - 16),
-        ...(placeBelow
-          ? { top: below }
-          : { bottom: viewportH - rect.top + PAD + 12 }),
-      }
+    ? placeBelow
+      ? {
+          width,
+          left: Math.min(Math.max(16, rect.left), viewportW - width - 16),
+          top: below,
+        }
+      : placeAbove
+        ? {
+            width,
+            left: Math.min(Math.max(16, rect.left), viewportW - width - 16),
+            bottom: viewportH - rect.top + PAD + 12,
+          }
+        : {
+            width,
+            left: Math.min(
+              Math.max(16, rect.left + rect.width - width - 12),
+              viewportW - width - 16,
+            ),
+            top: Math.max(72, rect.top + 12),
+          }
     : { width, left: (viewportW - width) / 2, bottom: 96 };
 
   return (
