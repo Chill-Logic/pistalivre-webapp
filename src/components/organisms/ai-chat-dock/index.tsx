@@ -46,13 +46,15 @@ export function AiChatDock(props: Omit<AiChatPanelProps, "className">) {
         onClick={() => setOpen(true)}
       >
         <Sparkles />
-        Assistente de IA
+        Livrinho AI
       </Button>
       <SheetContent
         side="bottom"
         className="flex h-[85dvh] flex-col p-0 pb-safe-b"
       >
-        <SheetTitle className="sr-only">Assistente de IA</SheetTitle>
+        <SheetTitle className="sr-only">
+          Livrinho, o assistente de IA
+        </SheetTitle>
         <SheetDescription className="sr-only">
           Converse com a IA para ajustar o documento.
         </SheetDescription>

@@ -21,7 +21,9 @@ import {
   type SetStateAction,
 } from "react";
 import { Alert } from "@/components/atoms/alert";
+import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
+import { Heading } from "@/components/atoms/heading";
 import { Button } from "@/components/atoms/button";
 import { DropArea } from "@/components/atoms/drop-area";
 import { FileInput } from "@/components/atoms/file-input";
@@ -41,6 +43,9 @@ import {
 } from "@/hooks/api/gestao/ai/useAiAttachments";
 import { useSpeechDictation } from "@/hooks/ui/useSpeechDictation";
 import { aiStatusText } from "@/helpers/ai-status";
+import { ASSISTANT_NAME, CAPABILITIES, pickOpening } from "@/helpers/livrinho";
+import { useMe } from "@/hooks/api/comum/session/useMe";
+import { firstName } from "@/utils/format";
 import {
   fulfilledEntry,
   sourcesSummary,
@@ -103,17 +108,6 @@ function repeatsQuestion(entry: ChatEntry) {
 
 /** Sent on its own after a confirmed/saved action: the agent goes on with the request. */
 const CONTINUE_MESSAGE = "Pode seguir.";
-
-const GREETING: Record<AiChatMode, string> = {
-  contract:
-    "Olá! Posso ajustar este contrato com você: trocar valores e prazos, incluir acordos, revisar o texto. Consulto a locação, o cliente e os planos quando precisar.",
-  proposal:
-    "Olá! Posso ajustar esta proposta com você: destacar o plano certo, mudar valores, deixar o texto mais direto. Consulto o lead e os planos quando precisar.",
-  partner_contract:
-    "Olá! Posso montar este contrato de parceria com você: incluir cláusulas, ajustar prazos e a rescisão, explicar a participação e revisar a linguagem. Consulto o contrato, o parceiro e os veículos quando precisar.",
-  general:
-    "Olá! Pergunte sobre locações, clientes, cobranças e a frota. Também posso cadastrar um cliente e a locação a partir das fotos ou PDFs dos documentos: cole (Ctrl+V), arraste para cá ou use o clipe.",
-};
 
 export type AiChatPanelProps = {
   mode: AiChatMode;
@@ -179,6 +173,11 @@ export function AiChatPanel({
   // The tools of the answer being prepared, as they run.
   const [live, setLive] = useState<AiChatLiveStep[]>([]);
   // A few of the starting points, different each time the chat opens.
+  const me = useMe();
+  // The opening line: one at random each time the chat opens.
+  const [opening] = useState(() =>
+    pickOpening(mode, me.data ? firstName(me.data.name) : null),
+  );
   const [shownSuggestions] = useState(() =>
     [...suggestions].sort(() => Math.random() - 0.5).slice(0, 4),
   );
@@ -368,16 +367,18 @@ ${note}`
     >
       <Box className="flex items-center gap-2 border-b px-4 py-3">
         <Sparkles className="size-4 text-primary" aria-hidden />
-        <Text weight="semibold" className="flex-1">
-          Assistente de IA
-        </Text>
+        <Text weight="semibold">{ASSISTANT_NAME}</Text>
+        <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
+          AI
+        </Badge>
+        <Box className="flex-1" />
         {onClose && (
           <Button
             type="button"
             variant="ghost"
             size="icon"
             className="-my-1 size-8"
-            aria-label="Fechar o assistente"
+            aria-label="Fechar o Livrinho"
             onClick={onClose}
           >
             <X />
@@ -389,27 +390,32 @@ ${note}`
         className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4"
         aria-live="polite"
       >
-        <Box className="space-y-3">
-          <Sparkles className="size-5 text-primary" aria-hidden />
-          <Text size="sm">{GREETING[mode]}</Text>
-          {disabledReason && (
-            <Alert variant="info" role="note">
-              {disabledReason}
-            </Alert>
-          )}
-          {entries.length === 0 && !disabledReason && (
-            <>
-              <Text size="sm" tone="muted">
-                Não sabe por onde começar? Escolha uma opção:
-              </Text>
-              <Box className="flex flex-col items-end gap-2">
+        {entries.length === 0 ? (
+          <Box className="flex min-h-full flex-col items-center justify-center gap-3 py-6 text-center">
+            <Sparkles className="size-8 text-primary" aria-hidden />
+            <Heading
+              level={2}
+              variant="title"
+              className="max-w-xs text-balance"
+            >
+              {opening}
+            </Heading>
+            <Text size="sm" tone="muted" className="max-w-sm text-balance">
+              {CAPABILITIES[mode]}
+            </Text>
+            {disabledReason ? (
+              <Alert variant="info" role="note">
+                {disabledReason}
+              </Alert>
+            ) : (
+              <Box className="flex flex-wrap justify-center gap-2 pt-2">
                 {shownSuggestions.map((suggestion) => (
                   <Button
                     key={suggestion}
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="h-auto whitespace-normal rounded-full py-2 text-right"
+                    className="h-auto whitespace-normal rounded-full py-2"
                     onClick={() => send(suggestion)}
                     disabled={chat.isPending}
                   >
@@ -417,9 +423,15 @@ ${note}`
                   </Button>
                 ))}
               </Box>
-            </>
-          )}
-        </Box>
+            )}
+          </Box>
+        ) : (
+          disabledReason && (
+            <Alert variant="info" role="note">
+              {disabledReason}
+            </Alert>
+          )
+        )}
 
         <List className="space-y-3">
           {entries.map((entry, index) => (

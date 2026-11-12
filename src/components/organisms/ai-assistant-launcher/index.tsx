@@ -101,9 +101,9 @@ export function AiAssistantLauncher() {
     <Button
       type="button"
       size="icon"
-      aria-label={open ? "Fechar o assistente de IA" : "Assistente de IA"}
+      aria-label={open ? "Fechar o Livrinho" : "Livrinho, o assistente de IA"}
       aria-expanded={open}
-      title="Assistente de IA"
+      title="Livrinho, o assistente de IA"
       onClick={() => setOpen((value) => !value)}
       className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-4 z-40 size-12 rounded-full shadow-lg md:bottom-6 md:right-6"
     >
@@ -122,7 +122,7 @@ export function AiAssistantLauncher() {
         {open && (
           <Card
             role="dialog"
-            aria-label="Assistente de IA"
+            aria-label="Livrinho, o assistente de IA"
             className={cn(
               "fixed bottom-24 right-6 z-40 flex h-[min(640px,calc(100dvh-8rem))] w-[400px] flex-col overflow-hidden rounded-2xl shadow-2xl",
               guiding && "hidden",
@@ -143,7 +143,9 @@ export function AiAssistantLauncher() {
         side="bottom"
         className="flex h-[85dvh] flex-col p-0 pb-safe-b"
       >
-        <SheetTitle className="sr-only">Assistente de IA</SheetTitle>
+        <SheetTitle className="sr-only">
+          Livrinho, o assistente de IA
+        </SheetTitle>
         <SheetDescription className="sr-only">
           Pergunte sobre o sistema ou envie documentos para cadastrar.
         </SheetDescription>
