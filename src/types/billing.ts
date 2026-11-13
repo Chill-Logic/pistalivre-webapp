@@ -81,6 +81,8 @@ export type RentalBilling = {
   /** yyyy-mm-dd in Brasília. */
   today: string;
   ratePeriod: RatePeriod;
+  /** The weekday agreed for the payment (0 = Sunday), null when not set. */
+  paymentWeekday?: number | null;
   autoBilling: {
     enabled: boolean;
     channel: "asaas" | "manual";

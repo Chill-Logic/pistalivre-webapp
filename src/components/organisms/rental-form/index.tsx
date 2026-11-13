@@ -509,6 +509,12 @@ export function RentalForm({ rental, cancelTo, onSaved }: RentalFormProps) {
                 errors={errors}
                 total={cautionTotal}
                 rowsTotal={rowsTotal}
+                startDate={watch("startDate")}
+                paymentWeekday={
+                  ratePeriod === "WEEKLY" && watch("paymentWeekday") !== ""
+                    ? Number(watch("paymentWeekday"))
+                    : null
+                }
               />
             )}
           </Box>

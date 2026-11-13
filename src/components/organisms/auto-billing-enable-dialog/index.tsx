@@ -26,7 +26,7 @@ import { useFirstChargePreview } from "@/hooks/api/gestao/rentals/useFirstCharge
 import { useIdempotencyKey } from "@/hooks/ui/useIdempotencyKey";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { RentalBilling } from "@/types/billing";
-import { calendarDay, isDayString } from "@/utils/date";
+import { calendarDay, isDayString, weekdayOf } from "@/utils/date";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
 type Channel = RentalBilling["autoBilling"]["channel"];
@@ -147,6 +147,18 @@ export function AutoBillingEnableDialog({
             }}
             error={errors.firstDueDate}
           />
+          {billing.ratePeriod === "WEEKLY" &&
+            billing.paymentWeekday != null &&
+            isDayString(firstDueDate) &&
+            weekdayOf(firstDueDate) !== billing.paymentWeekday && (
+              <Alert variant="warning" role="note">
+                {formatCalendarDate(firstDueDate)} é{" "}
+                {label(LABEL_MAPS.weekday, String(weekdayOf(firstDueDate))).toLowerCase()}
+                , mas a locação combina o pagamento na{" "}
+                {label(LABEL_MAPS.weekday, String(billing.paymentWeekday)).toLowerCase()}
+                . As cobranças seguem de 7 em 7 dias a partir desta data.
+              </Alert>
+            )}
           {prorated && preview.data && (
             <>
               <SegmentedField
