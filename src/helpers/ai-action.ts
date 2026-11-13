@@ -45,3 +45,13 @@ export function aiActionLink(action: AiActionItem): string | null {
   const link = (action.result as { link?: unknown } | null)?.link;
   return typeof link === "string" ? link : null;
 }
+
+/** "12/11, 22:16" (Brasília): enough to place a decision in a 7-day list. */
+export const formatAiActionWhen = (value: string) =>
+  new Date(value).toLocaleString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
