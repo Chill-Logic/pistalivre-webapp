@@ -154,22 +154,45 @@ export function AutoBillingEnableDialog({
                 value={firstAmount}
                 onChange={(value) => setFirstAmount(value as FirstAmount)}
                 disabled={setAutoBilling.isPending}
-                options={[
-                  {
-                    value: "PRORATED",
-                    label: `Proporcional · ${formatCurrency(prorated.amount)}`,
-                  },
-                  {
-                    value: "FULL",
-                    label: `Inteiro · ${formatCurrency(preview.data.full)}`,
-                  },
-                ]}
+                options={
+                  prorated.extended
+                    ? [
+                        {
+                          value: "PRORATED",
+                          label: `Com os dias de antes · ${formatCurrency(prorated.amount)}`,
+                        },
+                        {
+                          value: "FULL",
+                          label: `Só o ciclo · ${formatCurrency(preview.data.full)}`,
+                        },
+                      ]
+                    : [
+                        {
+                          value: "PRORATED",
+                          label: `Proporcional · ${formatCurrency(prorated.amount)}`,
+                        },
+                        {
+                          value: "FULL",
+                          label: `Inteiro · ${formatCurrency(preview.data.full)}`,
+                        },
+                      ]
+                }
               />
-              <Text size="xs" tone="muted">
-                {firstAmount === "PRORATED"
-                  ? `${prorated.days} de ${prorated.cycleDays} dias: de ${formatCalendarDate(prorated.from)} a ${formatCalendarDate(prorated.through)}.`
-                  : "Cobra o ciclo inteiro, mesmo a locação tendo começado depois."}
-              </Text>
+              {prorated.extended && firstAmount === "FULL" && prorated.uncoveredThrough ? (
+                <Alert variant="warning" role="note">
+                  De {formatCalendarDate(prorated.from)} a{" "}
+                  {formatCalendarDate(prorated.uncoveredThrough)} fica sem
+                  cobrança: a automação não volta atrás para cobrar esses dias.
+                </Alert>
+              ) : (
+                <Text size="xs" tone="muted">
+                  {prorated.extended
+                    ? `${prorated.days} dias, de ${formatCalendarDate(prorated.from)} a ${formatCalendarDate(prorated.through)}: o ciclo e os dias desde o início da locação, numa cobrança só.`
+                    : firstAmount === "PRORATED"
+                      ? `${prorated.days} de ${prorated.cycleDays} dias: de ${formatCalendarDate(prorated.from)} a ${formatCalendarDate(prorated.through)}.`
+                      : "Cobra o ciclo inteiro, mesmo a locação tendo começado depois."}
+                </Text>
+              )}
             </>
           )}
           <Text size="xs" tone="muted">

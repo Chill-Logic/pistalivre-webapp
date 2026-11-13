@@ -144,6 +144,10 @@ export type FirstChargePreview = {
     through: string;
     days: number;
     cycleDays: number;
+    /** The piece is longer than a cycle: the 1st charge takes the cycle AND the days before. */
+    extended?: boolean;
+    /** extended: charging only the cycle leaves from the start to this day uncharged. */
+    uncoveredThrough?: string | null;
   } | null;
 };
 
