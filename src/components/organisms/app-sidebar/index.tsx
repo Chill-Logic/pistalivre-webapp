@@ -30,7 +30,7 @@ export function AppSidebar() {
         <Logo size={isCollapsed ? "sm" : "xl"} />
       </Box>
       <Box className="scrollbar-quiet flex-1 overflow-y-auto overflow-x-hidden p-3">
-        <SidebarNav items={navItems} collapsed={isCollapsed} searchable />
+        <SidebarNav items={navItems} collapsed={isCollapsed} />
       </Box>
       {!isCollapsed && <Credits className="shrink-0 border-t px-4 py-3" />}
       <SidebarCollapseToggle />

@@ -7,11 +7,16 @@ import type { StatementFilters } from "@/types/statement";
 import type { InstallmentPlanParams } from "@/types/charge";
 import type { PartnerFilters } from "@/types/partner";
 import type { SupplierFilters } from "@/types/supplier";
+import type { SearchParams } from "@/types/search";
 import type { UserFilters } from "@/types/user";
 import type { VehicleFilters } from "@/types/vehicle";
 
 /** Query key factory: one place to build and invalidate cache keys. */
 export const queryKeys = {
+  search: {
+    all: ["search"] as const,
+    query: (params: SearchParams) => [...queryKeys.search.all, params] as const,
+  },
   auth: {
     all: ["auth"] as const,
     me: () => [...queryKeys.auth.all, "me"] as const,

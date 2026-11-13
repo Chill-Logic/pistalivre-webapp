@@ -9,6 +9,7 @@ import { AppHeader } from "@/components/organisms/app-header";
 import { AppSidebar } from "@/components/organisms/app-sidebar";
 import { BottomNav } from "@/components/organisms/bottom-nav";
 import { PwaInstallInvite } from "@/components/organisms/pwa-install-invite";
+import { SearchPalette } from "@/components/organisms/search-palette";
 import { TopProgressBar } from "@/components/organisms/top-progress-bar";
 import { PageSkeleton } from "@/components/templates/page-skeleton";
 import { usePageTransitionKey } from "@/hooks/ui/usePageTransitionKey";
@@ -53,6 +54,7 @@ export function AppShell({ user }: AppShellProps) {
         <>
           <AiAssistantLauncher />
           <AiSpotlight />
+          <SearchPalette user={user} />
         </>
       )}
     </Box>

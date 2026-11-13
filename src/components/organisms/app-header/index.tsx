@@ -4,6 +4,7 @@ import { Button } from "@/components/atoms/button";
 import { Header } from "@/components/atoms/landmarks";
 import { Text } from "@/components/atoms/text";
 import { Logo } from "@/components/molecules/logo";
+import { SearchTrigger } from "@/components/molecules/search-trigger";
 import { ThemeToggle } from "@/components/molecules/theme-toggle";
 import { PwaOpenInApp } from "@/components/organisms/pwa-open-in-app";
 import { useLogout } from "@/hooks/auth/useLogout";
@@ -26,6 +27,14 @@ export function AppHeader({ user }: AppHeaderProps) {
           {firstName(user.name)}
         </Text>
       </Text>
+      {user.kind === "user" && (
+        <>
+          <Box className="hidden w-72 lg:w-96 md:block">
+            <SearchTrigger />
+          </Box>
+          <SearchTrigger layout="icon" className="md:hidden" />
+        </>
+      )}
       <PwaOpenInApp user={user} />
       <Box className="hidden md:flex">
         <ThemeToggle />

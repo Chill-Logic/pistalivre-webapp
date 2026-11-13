@@ -62,6 +62,8 @@ solicitar, cancelar, confirmar, reenviar, vincular envelope); Projeções (conta
 (acerto, valores no tempo, abonos, descontos, pix recebidos) com escrita (B5). Cobrança avulsa (unitária e
 parcelada), registrar recebimento fora do Asaas, "Sincronizar do Asaas" e NF (locação, cliente e avulsa,
 cancelar, vincular) com escrita (B2/B4).
+Busca universal **Ctrl+K** (`SearchPalette`, 2026-11-12): registros do servidor (`GET /search`) + telas,
+ações e manual; ao criar tela/ação nova, acrescente em `constants/navigation.ts`/`constants/search.ts`.
 
 ## Deploy (Vercel) e domínios
 

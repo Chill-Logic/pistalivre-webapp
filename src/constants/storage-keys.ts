@@ -5,4 +5,6 @@ export const STORAGE_KEYS = {
   sidebarState: "pl:sidebar_state",
   /** JSON: { "rental-contracts": false, … } — the cards that open and close. */
   sectionsState: "pl:sections_state",
+  /** JSON: the last searches of the Ctrl+K, per user (`pl:recent_searches:<userId>`). */
+  recentSearches: "pl:recent_searches",
 } as const;
