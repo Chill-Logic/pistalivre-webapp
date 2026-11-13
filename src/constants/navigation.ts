@@ -1,5 +1,6 @@
 import {
   Banknote,
+  BookOpen,
   BotMessageSquare,
   Building2,
   CalendarDays,
@@ -162,6 +163,7 @@ export const SIDEBAR_NAV: NavEntry[] = [
       { label: "Ações da IA", to: ROUTES.aiActions, icon: BotMessageSquare },
       { label: "Modelos", to: ROUTES.models, icon: ScrollText },
       { label: "Documentos", to: ROUTES.documents, icon: FileText },
+      { label: "Manual", to: ROUTES.manual, icon: BookOpen },
       { label: "Auditoria", to: ROUTES.audit, icon: ShieldCheck, adminOnly: true },
     ],
   },

@@ -105,6 +105,7 @@ export const ROUTES = {
   /** Files for the AI (an MCP client can't upload them): "Enviar documentos para a IA". */
   aiAttachments: `${GESTAO}/ia/anexos`,
   aiActions: `${GESTAO}/ia/acoes`,
+  manual: `${GESTAO}/manual`,
   partners: `${GESTAO}/parceiros`,
   partnerNew: `${GESTAO}/parceiros/novo`,
   partnerDetail: `${GESTAO}/parceiros/:id`,

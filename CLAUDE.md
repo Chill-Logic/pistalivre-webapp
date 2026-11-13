@@ -62,6 +62,10 @@ solicitar, cancelar, confirmar, reenviar, vincular envelope); Projeções (conta
 (acerto, valores no tempo, abonos, descontos, pix recebidos) com escrita (B5). Cobrança avulsa (unitária e
 parcelada), registrar recebimento fora do Asaas, "Sincronizar do Asaas" e NF (locação, cliente e avulsa,
 cancelar, vincular) com escrita (B2/B4).
+Tela **Manual** (`pages/gestao/manual`, 2026-11-13): o manual do backend (`GET /guide`) em estilo documentação —
+índice por capítulo com busca à esquerda (`ManualIndex`), seção com passos numerados à direita (`ManualArticle`),
+`?secao=<id>` endereça cada seção; no celular o índice vira busca + select. No Ctrl+K, resultado do manual abre a
+seção nessa tela. **Funcionalidade nova entra no manual na mesma entrega** (no backend, `system-guide.ts`).
 Busca universal **Ctrl+K** (`SearchPalette`, 2026-11-12): registros do servidor (`GET /search`) + telas,
 ações e manual; ao criar tela/ação nova, acrescente em `constants/navigation.ts`/`constants/search.ts`.
 

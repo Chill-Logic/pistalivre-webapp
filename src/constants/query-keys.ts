@@ -13,6 +13,9 @@ import type { VehicleFilters } from "@/types/vehicle";
 
 /** Query key factory: one place to build and invalidate cache keys. */
 export const queryKeys = {
+  guide: {
+    all: ["guide"] as const,
+  },
   search: {
     all: ["search"] as const,
     query: (params: SearchParams) => [...queryKeys.search.all, params] as const,

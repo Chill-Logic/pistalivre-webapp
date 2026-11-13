@@ -73,6 +73,9 @@ type PaletteSection = { key: string; heading: string; items: PaletteItem[] };
 
 const DEBOUNCE_MS = 150;
 
+/** A section of the manual on the Manual screen. */
+const manualPath = (id: string) => `${ROUTES.manual}?secao=${encodeURIComponent(id)}`;
+
 const QUESTION = /^(como|onde|qual|quais|o que|cad[eê]|posso|d[aá] pra|quero|preciso)(\s|$)/i;
 const isQuestion = (q: string) => QUESTION.test(q.trim());
 
@@ -258,7 +261,8 @@ export function SearchPalette({ user }: SearchPaletteProps) {
           aside: "Manual",
           kind: "Manual",
           text: section.text,
-          run: () => setReading(section),
+          actionLabel: "Abrir no manual",
+          run: () => (isDesktop ? go(manualPath(section.id)) : setReading(section)),
         })),
       });
     }
@@ -327,7 +331,14 @@ export function SearchPalette({ user }: SearchPaletteProps) {
                   Voltar aos resultados
                 </Button>
               </Box>
-              <SearchPreview icon={BookOpen} kind="Manual" title={reading.title} text={reading.text} />
+              <SearchPreview
+                icon={BookOpen}
+                kind="Manual"
+                title={reading.title}
+                text={reading.text}
+                actionLabel="Abrir no manual"
+                onAction={() => go(manualPath(reading.id))}
+              />
             </Box>
           ) : (
             <Box className="flex min-h-0 flex-1">
@@ -424,7 +435,7 @@ export function SearchPalette({ user }: SearchPaletteProps) {
                       subtitle={current.subtitle}
                       details={current.details}
                       text={current.text}
-                      actionLabel={current.text ? "Ler" : current.actionLabel}
+                      actionLabel={current.actionLabel ?? (current.text ? "Ler" : undefined)}
                       onAction={current.run}
                     />
                   ) : (
