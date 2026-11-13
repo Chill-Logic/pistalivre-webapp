@@ -274,8 +274,8 @@ export function PartnerContractCalculator({
     if (key === "maintenance") {
       const pct = terms.maintenanceFeePercent || "0";
       return terms.maintenanceMode === "COST_PLUS_FEE"
-        ? `O proprietário paga o custo + ${pct}%`
-        : `O proprietário paga ${pct}% do custo`;
+        ? `Dono paga a conta + ${pct}%`
+        : `Dono paga ${pct}% da conta`;
     }
     return terms.costs[key] === "PARTNER"
       ? "Sai inteiro do repasse"
@@ -355,7 +355,7 @@ export function PartnerContractCalculator({
                     />
                     {data.maintenanceFee > 0 && (
                       <Line
-                        term={`Manutenção: parte do proprietário (oficina ${formatCurrency(data.maintenanceCost)})`}
+                        term={`Oficina (conta de ${formatCurrency(data.maintenanceCost)})`}
                         value={-data.maintenanceFee}
                       />
                     )}
@@ -397,23 +397,49 @@ export function PartnerContractCalculator({
                   </Text>
                 )}
               </Box>
-              {fixedPayout && other.data && (
-                <Box className="rounded-lg border bg-muted/30 p-3">
-                  <Text size="xs" tone="muted">
-                    {otherMode === "COST_PLUS_FEE"
-                      ? `Se fosse "custo + taxa" (a oficina + ${terms?.maintenanceFeePercent || "0"}%)`
-                      : `Se fosse "parte do custo" (${terms?.maintenanceFeePercent || "0"}% da oficina)`}
+              {fixedPayout &&
+                (data.maintenanceCost === 0 ? (
+                  <Text size="sm" tone="muted">
+                    Para comparar as duas formas de cobrar a oficina, coloque um
+                    valor em “Oficina no mês (simulação)” lá embaixo.
                   </Text>
-                  <Text weight="semibold" className="tabular-nums">
-                    O proprietário receberia{" "}
-                    {formatCurrency(other.data.partnerNet)}
-                    <Text inline size="sm" tone="muted" weight="normal">
-                      {" "}
-                      /mês · a empresa {formatCurrency(other.data.companyNet)}
-                    </Text>
-                  </Text>
-                </Box>
-              )}
+                ) : (
+                  other.data && (
+                    <Box className="space-y-2 rounded-lg border bg-muted/30 p-3">
+                      <Text size="sm" weight="semibold">
+                        Com {formatCurrency(data.maintenanceCost)} de oficina no
+                        mês:
+                      </Text>
+                      {(
+                        [
+                          [input?.maintenanceMode ?? "COST_SHARE", data],
+                          [otherMode, other.data],
+                        ] as const
+                      )
+                        .slice()
+                        .sort(([a], [b]) => (a === "COST_SHARE" ? -1 : b === "COST_SHARE" ? 1 : 0))
+                        .map(([mode, result]) => {
+                          const chosen = mode === (input?.maintenanceMode ?? "COST_SHARE");
+                          const pct = terms?.maintenanceFeePercent || "X";
+                          return (
+                            <Box key={mode} className={cn("text-sm", !chosen && "text-muted-foreground")}>
+                              <Text size="sm" weight={chosen ? "semibold" : "normal"}>
+                                {mode === "COST_SHARE"
+                                  ? `Dono paga ${pct}% da oficina`
+                                  : `Dono paga a oficina + ${pct}%`}
+                                {chosen ? " (a escolhida)" : ""}
+                              </Text>
+                              <Text size="sm" className="tabular-nums">
+                                sai {formatCurrency(result.maintenanceFee)} do repasse · ele recebe{" "}
+                                {formatCurrency(result.partnerNet)} · a empresa fica com{" "}
+                                {formatCurrency(result.companyNet)}
+                              </Text>
+                            </Box>
+                          );
+                        })}
+                    </Box>
+                  )
+                ))}
               <DescriptionList>
                 <Line
                   term="Fica para a empresa"

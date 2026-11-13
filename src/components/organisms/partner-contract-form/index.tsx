@@ -55,11 +55,17 @@ const PAYOUT_MODE_OPTIONS = [
   { value: "FIXED", label: "Repasse fixo por moto" },
 ];
 
-/** Fixed payout: how the month's real maintenance reaches the owner. */
-const MAINTENANCE_MODE_OPTIONS = [
-  { value: "COST_SHARE", label: "Parte do custo" },
-  { value: "COST_PLUS_FEE", label: "Custo + taxa" },
-];
+/**
+ * Fixed payout: how the month's real maintenance reaches the owner, said with
+ * the % typed ("Dono paga 10% da oficina" / "Dono paga a oficina + 10%").
+ */
+function maintenanceModeOptions(percent: string) {
+  const p = percent.trim() || "X";
+  return [
+    { value: "COST_SHARE", label: `Dono paga ${p}% da oficina` },
+    { value: "COST_PLUS_FEE", label: `Dono paga a oficina + ${p}%` },
+  ];
+}
 
 const PAYOUT_DAYS = [
   { value: NO_DAY, label: "Não definido" },
@@ -124,6 +130,7 @@ export function PartnerContractForm({
   const isMonthly = watch("payoutFrequency") === "MONTHLY";
   const isFixed = watch("payoutMode") === "FIXED";
   const costPlusFee = watch("maintenanceMode") === "COST_PLUS_FEE";
+  const maintenanceOptions = maintenanceModeOptions(watch("maintenanceFeePercent") ?? "");
   // Fixed payout: the company does and pays the maintenance (the owner's part
   // follows the rule above); taxes with the owner are paid by them directly.
   const fixedManagement = !isInvestment && isFixed;
@@ -229,16 +236,14 @@ export function PartnerContractForm({
           money(v.fixedPayout),
         );
         add(
-          "Manutenção do mês",
+          "Conta da oficina no repasse",
           "maintenanceMode",
           v.maintenanceMode,
           () => set("maintenanceMode", v.maintenanceMode),
-          pick(MAINTENANCE_MODE_OPTIONS, v.maintenanceMode),
+          pick(maintenanceModeOptions(pct(v.maintenanceFeePercent)), v.maintenanceMode),
         );
         add(
-          v.maintenanceMode === "COST_PLUS_FEE"
-            ? "Taxa sobre o custo (%)"
-            : "Parte do dono (%)",
+          "Percentual da manutenção (%)",
           "maintenanceFeePercent",
           v.maintenanceFeePercent,
           () => set("maintenanceFeePercent", pct(v.maintenanceFeePercent)),
@@ -483,11 +488,7 @@ export function PartnerContractForm({
                 </Col>
                 <Col sm={6}>
                   <FormField
-                    label={
-                      costPlusFee
-                        ? "Taxa sobre o custo (%)"
-                        : "Parte do dono (%)"
-                    }
+                    label="Percentual da manutenção (%)"
                     inputMode="decimal"
                     placeholder="Ex.: 10"
                     error={errors.maintenanceFeePercent?.message}
@@ -500,9 +501,9 @@ export function PartnerContractForm({
                     name="maintenanceMode"
                     render={({ field }) => (
                       <SegmentedField
-                        label="Manutenção do mês"
+                        label="Conta da oficina no repasse"
                         value={field.value}
-                        options={MAINTENANCE_MODE_OPTIONS}
+                        options={maintenanceOptions}
                         onChange={field.onChange}
                         error={errors.maintenanceMode?.message}
                       />
@@ -511,16 +512,15 @@ export function PartnerContractForm({
                 </Col>
                 <Col>
                   <Text size="xs" tone="muted">
-                    O repasse por moto é o teto, proporcional aos dias em que
-                    ela ficou alugada. A empresa faz e paga a manutenção; do
-                    repasse sai{" "}
+                    A empresa leva a moto na oficina e paga a conta. No fim do
+                    mês, do repasse do dono sai{" "}
                     {costPlusFee
-                      ? "o custo da oficina no mês mais a taxa acima"
-                      : "a parte do proprietário no custo da oficina do mês (a empresa arca com o resto)"}
-                    , além do seguro e das despesas marcadas como dele abaixo.
-                    Se os descontos passarem do repasse, a diferença fica para o
-                    próximo. O que o locatário paga acima disso fica com a
-                    empresa.
+                      ? "a conta inteira da oficina, mais o percentual de taxa"
+                      : "só o percentual da conta da oficina; o resto a empresa assume"}
+                    . O seguro também sai do repasse, inteiro. O repasse por
+                    moto é o máximo, proporcional aos dias alugada; se os
+                    descontos passarem dele, a diferença fica para o mês
+                    seguinte.
                   </Text>
                 </Col>
               </>
