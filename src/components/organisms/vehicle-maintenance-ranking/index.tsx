@@ -57,9 +57,17 @@ export function VehicleMaintenanceRanking({
                       <Text weight="semibold" mono>
                         {formatPlate(vehicle.plate)}
                       </Text>
-                      <Text truncate tone="muted" className="min-w-0 flex-1">
+                      {/* Phone: plate + badge on top, the model below (same shape
+                          every row); from sm the model sits between them. */}
+                      <Text
+                        truncate
+                        tone="muted"
+                        className="order-last min-w-0 basis-full sm:order-none sm:basis-auto"
+                      >
                         {vehicle.label}
                       </Text>
+                      {/* Beside the model, not pushed to the edge: the badges have
+                          different widths and never lined up with anything there. */}
                       <VehicleStatusBadge status={vehicle.status} />
                     </Box>
                     <Row as="dl" className="gap-y-2">
