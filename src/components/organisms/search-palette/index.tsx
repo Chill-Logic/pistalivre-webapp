@@ -1,5 +1,5 @@
 import { ArrowLeft, BookOpen, ChevronRight, Clock, Search, X, type LucideIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
@@ -31,6 +31,7 @@ import { urlOnRealmHost } from "@/helpers/host-realm";
 import { searchNav } from "@/helpers/nav-search";
 import {
   clearRecentSearches,
+  forgetSearch,
   highlightTokens,
   readRecentSearches,
   rememberSearch,
@@ -64,6 +65,8 @@ type PaletteItem = {
   text?: string | null;
   actionLabel?: string;
   run: () => void;
+  /** A recent search can be forgotten one by one. */
+  remove?: { label: string; run: () => void };
 };
 
 type PaletteSection = { key: string; heading: string; items: PaletteItem[] };
@@ -91,6 +94,7 @@ export function SearchPalette({ user }: SearchPaletteProps) {
   const { isAdmin } = useUserPermissions();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
+  const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [onlyType, setOnlyType] = useState<{ type: SearchEntityType; label: string } | null>(null);
   const [reading, setReading] = useState<SearchGuideSection | null>(null);
@@ -161,6 +165,14 @@ export function SearchPalette({ user }: SearchPaletteProps) {
             title: r,
             kind: "Busca recente",
             run: () => setQuery(r),
+            remove: {
+              label: `Apagar “${r}” das buscas recentes`,
+              run: () => {
+                setRecent(forgetSearch(user.id, r));
+                // Back to the box: the next keystroke is a search, not lost on the "×".
+                inputRef.current?.focus();
+              },
+            },
           })),
         });
       }
@@ -253,7 +265,7 @@ export function SearchPalette({ user }: SearchPaletteProps) {
     return out;
     // `go`/`actionItem` are stable enough per render; recomputing on their identity would loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, recent, search.data, onlyType, navItems, isAdmin]);
+  }, [query, recent, search.data, onlyType, navItems, isAdmin, user.id]);
 
   const allItems = sections.flatMap((s) => s.items);
   // The list changes under the selection while typing: fall back to the first line.
@@ -278,6 +290,7 @@ export function SearchPalette({ user }: SearchPaletteProps) {
           <Box className="flex items-center gap-1 border-b pr-2 pt-safe-t">
             <Box className="min-w-0 flex-1 [&>div]:border-b-0">
               <CommandInput
+                ref={inputRef}
                 value={query}
                 onValueChange={setQuery}
                 placeholder="Buscar cliente, placa, LOC-, valor, data, tela…"
@@ -321,7 +334,7 @@ export function SearchPalette({ user }: SearchPaletteProps) {
               <Box className="flex min-h-0 min-w-0 flex-1 flex-col md:basis-7/12">
                 <CommandList
                   className={cn(
-                    "max-h-none min-h-0 flex-1 p-2 transition-opacity md:max-h-[60vh]",
+                    "scrollbar-quiet max-h-none min-h-0 flex-1 p-2 transition-opacity md:max-h-[60vh]",
                     waiting && search.data && "opacity-60",
                   )}
                 >
@@ -331,7 +344,7 @@ export function SearchPalette({ user }: SearchPaletteProps) {
                     sections.map((section) => (
                       <CommandGroup key={section.key} heading={section.heading}>
                         {section.items.map((item) => (
-                          <CommandItem key={item.key} value={item.key} onSelect={item.run} className="items-start py-2 md:py-1.5">
+                          <CommandItem key={item.key} value={item.key} onSelect={item.run} className="py-2 md:py-1.5">
                             <SearchResultRow
                               icon={item.icon}
                               title={item.title}
@@ -339,6 +352,8 @@ export function SearchPalette({ user }: SearchPaletteProps) {
                               snippet={item.snippet}
                               tokens={tokens}
                               aside={item.aside}
+                              onRemove={item.remove?.run}
+                              removeLabel={item.remove?.label}
                             />
                           </CommandItem>
                         ))}
@@ -400,7 +415,7 @@ export function SearchPalette({ user }: SearchPaletteProps) {
                 </Box>
               </Box>
               {isDesktop && (
-                <Box className="hidden min-h-0 basis-5/12 overflow-y-auto border-l bg-muted/30 p-5 md:block">
+                <Box className="hidden min-h-0 basis-5/12 flex-col border-l bg-muted/30 p-5 md:flex">
                   {current && typing && !firstLoad ? (
                     <SearchPreview
                       icon={current.icon}

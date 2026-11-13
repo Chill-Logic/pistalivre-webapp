@@ -94,6 +94,13 @@ export function rememberSearch(userId: string, query: string): string[] {
   return next;
 }
 
+/** Forgets one recent search (the "×" on its line). */
+export function forgetSearch(userId: string, query: string): string[] {
+  const next = readRecentSearches(userId).filter((x) => x !== query);
+  safeStorage.set(recentKey(userId), JSON.stringify(next));
+  return next;
+}
+
 export function clearRecentSearches(userId: string) {
   safeStorage.remove(recentKey(userId));
 }
