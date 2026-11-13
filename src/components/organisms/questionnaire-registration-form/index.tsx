@@ -7,6 +7,7 @@ import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Form } from "@/components/atoms/form";
 import { Col, Row } from "@/components/atoms/grid";
+import type { ColSpan } from "@/helpers/grid";
 import { Heading } from "@/components/atoms/heading";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
@@ -110,6 +111,8 @@ export function QuestionnaireRegistrationForm({
   onSubmit,
 }: QuestionnaireRegistrationFormProps) {
   const pre = variant === "pre-registration";
+  /** Desktop width of a field — only in the pre-registration's wide layout (the questionnaire stays narrow). */
+  const lg = (span: ColSpan) => (pre ? { lg: span } : {});
   const cep = useCepLookup();
   const [cnh, setCnh] = useState<File[]>([]);
   const [proof, setProof] = useState<File[]>([]);
@@ -253,7 +256,7 @@ export function QuestionnaireRegistrationForm({
           Seus dados
         </Heading>
         <Row className="gap-y-4">
-          <Col>
+          <Col {...lg(8)}>
             <FormField
               label="Nome completo"
               autoComplete="name"
@@ -261,27 +264,27 @@ export function QuestionnaireRegistrationForm({
               {...register("name")}
             />
           </Col>
-          <Col sm={6}>
+          <Col sm={6} {...lg(4)}>
             {masked("document", "CPF", maskCpf, {
               inputMode: "numeric",
               placeholder: "000.000.000-00",
             })}
           </Col>
-          <Col sm={6}>
+          <Col sm={6} {...lg(4)}>
             {masked("birthDate", "Data de nascimento", maskDate, {
               inputMode: "numeric",
               placeholder: "dd/mm/aaaa",
             })}
           </Col>
-          <Col sm={6}>{masked("rg", "RG (opcional)", maskRg)}</Col>
-          <Col sm={6}>
+          <Col sm={6} {...lg(4)}>{masked("rg", "RG (opcional)", maskRg)}</Col>
+          <Col sm={6} {...lg(4)}>
             <FormField
               label="Nacionalidade"
               error={errors.nationality?.message}
               {...register("nationality")}
             />
           </Col>
-          <Col sm={6}>
+          <Col sm={6} {...lg(4)}>
             <Controller
               control={control}
               name="maritalStatus"
@@ -300,14 +303,14 @@ export function QuestionnaireRegistrationForm({
               )}
             />
           </Col>
-          <Col sm={6}>
+          <Col sm={6} {...lg(8)}>
             <FormField
               label="Profissão"
               error={errors.profession?.message}
               {...register("profession")}
             />
           </Col>
-          <Col sm={6}>
+          <Col sm={6} {...lg(8)}>
             <FormField
               label="E-mail"
               type="email"
@@ -317,7 +320,7 @@ export function QuestionnaireRegistrationForm({
               {...register("email")}
             />
           </Col>
-          <Col sm={6}>
+          <Col sm={6} {...lg(4)}>
             {masked("phone", "Telefone", maskPhone, {
               inputMode: "tel",
               placeholder: "(00) 00000-0000",
@@ -331,29 +334,29 @@ export function QuestionnaireRegistrationForm({
           Endereço
         </Heading>
         <Row className="gap-y-4">
-          <Col sm={6}>
+          <Col sm={6} {...lg(4)}>
             {masked("zip", cep.isPending ? "CEP (buscando…)" : "CEP", maskCep, {
               inputMode: "numeric",
               placeholder: "00000-000",
               after: lookupCep,
             })}
           </Col>
-          <Col sm={6}>
+          <Col sm={6} {...lg(8)}>
             <FormField label="Logradouro" error={errors.addressLine?.message} {...register("addressLine")} />
           </Col>
-          <Col span={6}>
+          <Col span={6} {...lg(3)}>
             <FormField label="Número" error={errors.addressNumber?.message} {...register("addressNumber")} />
           </Col>
-          <Col span={6}>
+          <Col span={6} {...lg(4)}>
             <FormField label="Complemento" error={errors.complement?.message} {...register("complement")} />
           </Col>
-          <Col sm={6}>
+          <Col sm={6} {...lg(5)}>
             <FormField label="Bairro" error={errors.neighborhood?.message} {...register("neighborhood")} />
           </Col>
-          <Col span={8} sm={4}>
+          <Col span={8} sm={4} {...lg(9)}>
             <FormField label="Cidade" error={errors.city?.message} {...register("city")} />
           </Col>
-          <Col span={4} sm={2}>
+          <Col span={4} sm={2} {...lg(3)}>
             <FormField
               label="UF"
               maxLength={2}
@@ -405,7 +408,8 @@ export function QuestionnaireRegistrationForm({
       </Box>
 
       {pre && (
-        <Box className="space-y-4">
+        <Row className="gap-y-8">
+        <Col lg={6} className="space-y-4">
           <Heading level={2} variant="section">
             Comprovante de residência
           </Heading>
@@ -429,11 +433,8 @@ export function QuestionnaireRegistrationForm({
               </Text>
             )}
           </Box>
-        </Box>
-      )}
-
-      {pre && (
-        <Box className="space-y-4">
+        </Col>
+        <Col lg={6} className="space-y-4">
           <Heading level={2} variant="section">
             Outros documentos (opcional)
           </Heading>
@@ -456,12 +457,13 @@ export function QuestionnaireRegistrationForm({
               </Text>
             )}
           </Box>
-        </Box>
+        </Col>
+        </Row>
       )}
 
       {formError && <Alert>{formError}</Alert>}
 
-      <Button type="submit" className="w-full" disabled={pending}>
+      <Button type="submit" size={pre ? "lg" : "default"} className={pre ? "w-full lg:ml-auto lg:flex lg:w-auto lg:min-w-64" : "w-full"} disabled={pending}>
         {pending && <Spinner className="text-primary-foreground" />}
         {submitLabel}
       </Button>

@@ -8,15 +8,18 @@ import { OfflineBanner } from "@/components/molecules/offline-banner";
 type PublicLayoutProps = {
   /** The company's name, under the emblem (blank while it loads). */
   companyName?: string;
+  /** "wide": the desktop uses the width (side panel + form), e.g. /pre-cadastro. */
+  width?: "narrow" | "wide";
   children: ReactNode;
 };
 
 /**
- * Public screens of the customer's domain (/quero-alugar, /questionario): no
- * login, no menu. The brand band of the login on top, then one narrow column,
- * mobile first: most people arrive from a link on the phone.
+ * Public screens of the customer's domain (/quero-alugar, /questionario,
+ * /pre-cadastro): no login, no menu. The brand band of the login on top, then
+ * the content — one column on the phone (most people arrive from a link
+ * there); "wide" pages lay out across the desktop instead of a narrow strip.
  */
-export function PublicLayout({ companyName, children }: PublicLayoutProps) {
+export function PublicLayout({ companyName, width = "narrow", children }: PublicLayoutProps) {
   return (
     <Box className="flex min-h-dvh flex-col bg-background">
       <OfflineBanner />
@@ -27,7 +30,7 @@ export function PublicLayout({ companyName, children }: PublicLayoutProps) {
         </Text>
       </Box>
       <Main className="flex flex-1 justify-center px-4 py-6 md:py-10">
-        <Box className="w-full max-w-lg space-y-6">{children}</Box>
+        <Box className={width === "wide" ? "w-full max-w-6xl space-y-6" : "w-full max-w-lg space-y-6"}>{children}</Box>
       </Main>
     </Box>
   );
