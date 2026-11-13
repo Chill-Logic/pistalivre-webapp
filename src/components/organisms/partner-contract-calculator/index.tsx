@@ -1,5 +1,5 @@
 import { Calculator, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -42,8 +42,24 @@ export type CalculatorTerms = {
   sharePercent: string;
   adminFeePercent: string;
   adminFeeFixed: number | null;
+  payoutMode: "SHARE" | "FIXED";
+  fixedPayout: number | null;
+  maintenanceFeePercent: string;
   payoutFrequency: "WEEKLY" | "BIWEEKLY" | "MONTHLY";
   costs: Record<PartnerCostKey, PartnerCostPayerCode>;
+};
+
+/**
+ * A scenario handed to the calculator from outside (the assistant read the
+ * deal): each change of `key` applies it once; null fields keep what's there.
+ */
+export type CalculatorFill = {
+  key: number;
+  count: number | null;
+  rate: number | null;
+  period: RatePeriod | null;
+  occupancy: number | null;
+  costs: Partial<Record<PartnerCostKey, number | null>>;
 };
 
 type Group = {
@@ -89,9 +105,12 @@ const intOf = (text: string) => {
 export function PartnerContractCalculator({
   terms,
   initialGroups,
+  fill,
   className,
 }: {
   terms: CalculatorTerms | null;
+  /** The assistant's scenario ("Preencher na tela"): applied when its key changes. */
+  fill?: CalculatorFill | null;
   /** The contract's vehicles, grouped by rent (editing): the starting point. */
   initialGroups?: { count: number; rate: number | null; period: RatePeriod }[];
   className?: string;
@@ -117,6 +136,35 @@ export function PartnerContractCalculator({
     fines: null,
   });
 
+  useEffect(() => {
+    if (!fill) return;
+    if (fill.count != null || fill.rate != null || fill.period != null) {
+      setGroups((list) => {
+        const first = list[0];
+        return [
+          {
+            key: first?.key ?? nextKey++,
+            count:
+              fill.count != null ? String(fill.count) : (first?.count ?? "1"),
+            rate: fill.rate ?? first?.rate ?? null,
+            period: fill.period ?? first?.period ?? "WEEKLY",
+          },
+          ...list.slice(1),
+        ];
+      });
+    }
+    if (fill.occupancy != null) setOccupancy(String(fill.occupancy));
+    setCosts((current) => {
+      const next = { ...current };
+      for (const [key, value] of Object.entries(fill.costs)) {
+        if (value != null) next[key as PartnerCostKey] = value;
+      }
+      return next;
+    });
+    // Once per scenario (its key), not on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fill?.key]);
+
   const patchGroup = (key: number, change: Partial<Group>) =>
     setGroups((list) =>
       list.map((g) => (g.key === key ? { ...g, ...change } : g)),
@@ -132,6 +180,10 @@ export function PartnerContractCalculator({
         sharePercent: parsePercentInput(terms.sharePercent ?? "") ?? null,
         adminFeePercent: parsePercentInput(terms.adminFeePercent ?? "") ?? null,
         adminFeeFixed: terms.adminFeeFixed,
+        payoutMode: terms.payoutMode ?? "SHARE",
+        fixedPayout: terms.fixedPayout ?? null,
+        maintenanceFeePercent:
+          parsePercentInput(terms.maintenanceFeePercent ?? "") ?? null,
         payoutFrequency: terms.payoutFrequency,
         costs: terms.costs,
         vehicles: groups.map((g) => ({
@@ -151,13 +203,16 @@ export function PartnerContractCalculator({
     : null;
   const validPercents =
     input !== null &&
-    [input.sharePercent, input.adminFeePercent].every(
-      (n) => n === null || (Number.isFinite(n) && n >= 0 && n <= 100),
-    );
+    [
+      input.sharePercent,
+      input.adminFeePercent,
+      input.maintenanceFeePercent,
+    ].every((n) => n === null || (Number.isFinite(n) && n >= 0 && n <= 100));
   const simulation = usePartnerSimulation(validPercents ? input : null);
   const data = simulation.data;
   const isInvestment = terms?.type === "INVESTMENT";
   const profit = isInvestment && terms?.shareBase === "PROFIT";
+  const fixedPayout = !isInvestment && terms?.payoutMode === "FIXED";
   const payer = (key: PartnerCostKey) =>
     terms ? label(LABEL_MAPS.partnerCostPayer, terms.costs[key]) : "";
 
@@ -202,7 +257,7 @@ export function PartnerContractCalculator({
                     value={-data.costsByPayer.COMPANY}
                   />
                 )}
-                {data.costsByPayer.PARTNER > 0 && (
+                {data.costsByPayer.PARTNER > 0 && !fixedPayout && (
                   <Line
                     term="Despesas do parceiro"
                     value={-data.costsByPayer.PARTNER}
@@ -224,6 +279,25 @@ export function PartnerContractCalculator({
                     }
                     value={data.base}
                   />
+                ) : fixedPayout ? (
+                  <>
+                    <Line
+                      term="Repasse fixo (proporcional aos dias)"
+                      value={data.partnerGross}
+                    />
+                    {data.maintenanceFee > 0 && (
+                      <Line
+                        term="Taxa de manutenção (sai do repasse)"
+                        value={-data.maintenanceFee}
+                      />
+                    )}
+                    {data.costsByPayer.PARTNER > 0 && (
+                      <Line
+                        term="Despesas do proprietário (saem do repasse)"
+                        value={-data.costsByPayer.PARTNER}
+                      />
+                    )}
+                  </>
                 ) : (
                   <Line term="Taxa da empresa" value={data.adminFee} />
                 )}

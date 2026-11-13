@@ -224,7 +224,7 @@ export type AiUiSource = {
 
 /** "Preencher na tela": the form, its values and where each came from. */
 export type AiProposalForm = {
-  kind: "customer" | "rental";
+  kind: "customer" | "rental" | "partnerContract";
   values: Record<string, unknown>;
   origins: Record<string, string>;
 };

@@ -59,6 +59,12 @@ export function contractTerms(
       : "";
     return `${formatPercent(contract.sharePercent)}${base} para o parceiro`;
   }
+  if (contract.payoutMode === "FIXED") {
+    const fee = contract.maintenanceFeePercent
+      ? `, menos ${formatPercent(contract.maintenanceFeePercent)} de manutenção`
+      : "";
+    return `Repasse fixo de ${formatCurrency(contract.fixedPayout ?? 0)} por moto/mês${fee}`;
+  }
   const fee = [
     contract.adminFeePercent !== null &&
       formatPercent(contract.adminFeePercent),
@@ -87,6 +93,9 @@ export function contractInputOf(
     sharePercent: contract.sharePercent,
     adminFeePercent: contract.adminFeePercent,
     adminFeeFixed: contract.adminFeeFixed,
+    payoutMode: contract.payoutMode,
+    fixedPayout: contract.fixedPayout,
+    maintenanceFeePercent: contract.maintenanceFeePercent,
     payoutFrequency: contract.payoutFrequency,
     payoutDay: contract.payoutDay,
     payoutWeekday: contract.payoutWeekday,

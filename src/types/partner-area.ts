@@ -67,6 +67,10 @@ export type PartnerAreaContract = {
   sharePercent: number | null;
   adminFeePercent: number | null;
   adminFeeFixed: number | null;
+  /** Absent in proposals frozen before the fixed payout existed (= SHARE). */
+  payoutMode?: "SHARE" | "FIXED";
+  fixedPayout?: number | null;
+  maintenanceFeePercent?: number | null;
   payoutFrequency: PartnerPayoutFrequency;
   payoutDay: number | null;
   payoutWeekday: number | null;
@@ -89,6 +93,9 @@ export type PartnerAreaTerms = Pick<
   | "sharePercent"
   | "adminFeePercent"
   | "adminFeeFixed"
+  | "payoutMode"
+  | "fixedPayout"
+  | "maintenanceFeePercent"
   | "payoutFrequency"
   | "payoutDay"
   | "payoutWeekday"

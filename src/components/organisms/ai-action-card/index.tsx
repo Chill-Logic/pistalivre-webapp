@@ -13,18 +13,20 @@ import {
   type ChoiceOption,
 } from "@/components/molecules/choice-prompt";
 import { toApiError } from "@/helpers/api-error";
-import { ROUTES } from "@/constants/routes";
+import { ROUTES, routeTo } from "@/constants/routes";
 import { useAiChatAction } from "@/hooks/api/gestao/ai/useAi";
 import { aiChatEvents } from "@/hooks/ui/useAiGuide";
-import type { AiChatAction } from "@/types/ai";
+import type { AiChatAction, AiProposalForm } from "@/types/ai";
 
 type Decision = "pending" | "filling" | "done" | "cancelled" | "screen";
 
 /** The system's form for each proposal kind ("Preencher na tela"). */
-const FORM_ROUTE = {
-  customer: ROUTES.customerNew,
-  rental: ROUTES.rentalNew,
-} as const;
+/** Where each proposal is filled on screen (the partner's contract depends on the partner). */
+const FORM_ROUTE: Record<AiProposalForm["kind"], (form: AiProposalForm) => string> = {
+  customer: () => ROUTES.customerNew,
+  rental: () => ROUTES.rentalNew,
+  partnerContract: (form) => routeTo.newPartnerContract(String(form.values.partnerId ?? "")),
+};
 
 /** The server sends ready labels ("Veículo desejado"); values as plain text. */
 const fieldValue = (value: unknown) =>
@@ -64,7 +66,7 @@ export function AiActionCard({
   const fillOnScreen = () => {
     if (!action.form) return;
     onNavigate?.();
-    navigate(FORM_ROUTE[action.form.kind], {
+    navigate(FORM_ROUTE[action.form.kind](action.form), {
       state: { aiFill: { actionId: action.id, form: action.form } },
     });
   };

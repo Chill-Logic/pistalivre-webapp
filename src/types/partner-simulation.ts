@@ -11,6 +11,9 @@ export type PartnerSimulationInput = {
   sharePercent: number | null;
   adminFeePercent: number | null;
   adminFeeFixed: number | null;
+  payoutMode: "SHARE" | "FIXED";
+  fixedPayout: number | null;
+  maintenanceFeePercent: number | null;
   payoutFrequency: "WEEKLY" | "BIWEEKLY" | "MONTHLY";
   costs: Record<PartnerCostKey, PartnerCostPayerCode>;
   vehicles: { count: number; rate: number; ratePeriod: RatePeriod }[];
@@ -30,6 +33,8 @@ export type PartnerSimulation = {
   costsByPayer: Record<PartnerCostPayerCode, number>;
   base: number;
   adminFee: number;
+  /** Fixed payout: the maintenance fee withheld from it (0 otherwise). */
+  maintenanceFee: number;
   partnerGross: number;
   partnerNet: number;
   companyNet: number;

@@ -84,6 +84,14 @@ export type PartnerContract = {
   sharePercent: number | null;
   adminFeePercent: number | null;
   adminFeeFixed: number | null;
+  /**
+   * Management: SHARE = the company keeps its fee and the owner gets the rest;
+   * FIXED = the owner gets `fixedPayout` per vehicle per month, pro rata of the
+   * days rented, minus `maintenanceFeePercent` of it and their costs.
+   */
+  payoutMode: PartnerPayoutMode;
+  fixedPayout: number | null;
+  maintenanceFeePercent: number | null;
   payoutFrequency: PartnerPayoutFrequency;
   /** Monthly payout: day of the month (1–31). */
   payoutDay: number | null;
@@ -128,6 +136,8 @@ export type PartnerInput = {
  * PATCH replaces the terms (status included, it defaults to DRAFT): always
  * send them all.
  */
+export type PartnerPayoutMode = "SHARE" | "FIXED";
+
 export type PartnerContractInput = {
   type: PartnerContractType;
   status?: PartnerContractStatus;
@@ -138,6 +148,14 @@ export type PartnerContractInput = {
   sharePercent: number | null;
   adminFeePercent: number | null;
   adminFeeFixed: number | null;
+  /**
+   * Management: SHARE = the company keeps its fee and the owner gets the rest;
+   * FIXED = the owner gets `fixedPayout` per vehicle per month, pro rata of the
+   * days rented, minus `maintenanceFeePercent` of it and their costs.
+   */
+  payoutMode: PartnerPayoutMode;
+  fixedPayout: number | null;
+  maintenanceFeePercent: number | null;
   payoutFrequency: PartnerPayoutFrequency;
   payoutDay: number | null;
   payoutWeekday: number | null;

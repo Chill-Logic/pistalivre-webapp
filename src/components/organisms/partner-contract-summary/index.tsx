@@ -77,6 +77,18 @@ export function PartnerContractSummary({
                   ` do ${label(LABEL_MAPS.partnerShareBase, contract.shareBase).toLowerCase()}`}
               </InfoItem>
             </>
+          ) : contract.payoutMode === "FIXED" ? (
+            <>
+              <InfoItem span={6} lg={4} label="Repasse fixo por moto (mês)">
+                {formatCurrency(contract.fixedPayout ?? 0)}
+                {" · proporcional aos dias alugados"}
+              </InfoItem>
+              <InfoItem span={6} lg={4} label="Taxa de manutenção">
+                {contract.maintenanceFeePercent !== null
+                  ? `${formatPercent(contract.maintenanceFeePercent)} do repasse`
+                  : "—"}
+              </InfoItem>
+            </>
           ) : (
             <>
               <InfoItem span={6} lg={4} label="Taxa da empresa (%)">

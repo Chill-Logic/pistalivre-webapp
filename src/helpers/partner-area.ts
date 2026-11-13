@@ -79,6 +79,16 @@ export function contractTerms(contract: PartnerAreaTerms, label: LabelFn) {
         value: `${formatPercent(contract.sharePercent)}${base}`,
       });
     }
+  } else if (contract.payoutMode === "FIXED") {
+    terms.push({
+      label: "Seu repasse",
+      value: `${formatCurrency(contract.fixedPayout ?? 0)} por moto/mês, proporcional aos dias alugados`,
+    });
+    if (contract.maintenanceFeePercent)
+      terms.push({
+        label: "Taxa de manutenção",
+        value: `${formatPercent(contract.maintenanceFeePercent)} do repasse`,
+      });
   } else {
     const fee = [
       contract.adminFeePercent !== null

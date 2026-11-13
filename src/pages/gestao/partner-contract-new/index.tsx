@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/molecules/page-header";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import {
   PartnerContractCalculator,
+  type CalculatorFill,
   type CalculatorTerms,
 } from "@/components/organisms/partner-contract-calculator";
 import {
@@ -28,6 +29,10 @@ export function PartnerContractNewPage() {
   const navigate = useNavigate();
   const partner = usePartner(id);
   const [terms, setTerms] = useState<CalculatorTerms | null>(null);
+  // Livrinho's scenario ("Preencher na tela"): the calculator takes it as is.
+  const [calculatorFill, setCalculatorFill] = useState<CalculatorFill | null>(
+    null,
+  );
   const back = partner.data ? routeTo.partner(id) : ROUTES.partners;
 
   return (
@@ -51,6 +56,7 @@ export function PartnerContractNewPage() {
               <PartnerContractForm
                 partnerId={id}
                 onTermsChange={(values) => setTerms(values as CalculatorTerms)}
+                onCalculatorFill={setCalculatorFill}
                 onCancel={() => navigate(back)}
                 onDone={(contract) =>
                   navigate(routeTo.partnerContract(contract.id), {
@@ -62,7 +68,9 @@ export function PartnerContractNewPage() {
           </Card>
         )
       }
-      calculator={<PartnerContractCalculator terms={terms} />}
+      calculator={
+        <PartnerContractCalculator terms={terms} fill={calculatorFill} />
+      }
     />
   );
 }

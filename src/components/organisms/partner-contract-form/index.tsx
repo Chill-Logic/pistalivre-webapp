@@ -41,7 +41,19 @@ import {
   useUpdatePartnerContract,
 } from "@/hooks/api/gestao/partners/usePartnerContractMutations";
 import { useLabels } from "@/hooks/ui/useLabels";
+import { useAiFormFill, type AiFillStep } from "@/hooks/ui/useAiFormFill";
+import type { CalculatorFill } from "@/components/organisms/partner-contract-calculator";
+import type { RatePeriod } from "@/types/rental";
+import { formatCurrency } from "@/utils/format";
+import { percentInputOf } from "@/utils/percent";
+import { dayToBrDate } from "@/utils/date";
 import type { PartnerContract } from "@/types/partner";
+
+/** How a management contract pays the owner. */
+const PAYOUT_MODE_OPTIONS = [
+  { value: "SHARE", label: "Taxa da empresa" },
+  { value: "FIXED", label: "Repasse fixo por moto" },
+];
 
 const PAYOUT_DAYS = [
   { value: NO_DAY, label: "Não definido" },
@@ -59,6 +71,8 @@ type PartnerContractFormProps = {
   onCancel: () => void;
   /** Every change of the terms (the calculator beside it follows them). */
   onTermsChange?: (values: ContractFormValues) => void;
+  /** The assistant's scenario for the calculator ("Preencher na tela"). */
+  onCalculatorFill?: (fill: CalculatorFill) => void;
 };
 
 /**
@@ -72,6 +86,7 @@ export function PartnerContractForm({
   onDone,
   onCancel,
   onTermsChange,
+  onCalculatorFill,
 }: PartnerContractFormProps) {
   const { options, label } = useLabels();
   const create = useCreatePartnerContract(partnerId);
@@ -101,6 +116,7 @@ export function PartnerContractForm({
   const isInvestment = watch("type") === "INVESTMENT";
   const isCash = watch("contributionType") === "CASH";
   const isMonthly = watch("payoutFrequency") === "MONTHLY";
+  const isFixed = watch("payoutMode") === "FIXED";
   const shareBase = watch("shareBase");
   const profitShare = isProfitShare(watch("type"), shareBase);
   const costHint =
@@ -123,11 +139,190 @@ export function PartnerContractForm({
     }
   };
 
+  // "Preencher na tela" from the chat (Livrinho read the deal): field by field,
+  // each with where it came from, and the calculator gets the scenario last.
+  const aiFill = useAiFormFill("partnerContract", ({ values: v, origins }) => {
+    const steps: AiFillStep[] = [];
+    const set = (name: string, value: unknown) =>
+      setValue(name as keyof ContractFormValues, value as never, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    const add = (
+      fieldLabel: string,
+      field: string,
+      present: unknown,
+      apply: () => void,
+      value?: string,
+    ) => {
+      if (present === null || present === undefined || present === "") return;
+      steps.push({ label: fieldLabel, origin: origins[field], apply, value });
+    };
+    const pct = (n: unknown) => percentInputOf(Number(n));
+    const money = (n: unknown) => formatCurrency(Number(n));
+    const pick = <T extends { value: string; label: string }>(
+      list: T[],
+      code: unknown,
+    ) => list.find((o) => o.value === code)?.label ?? String(code);
+    const investment = v.type === "INVESTMENT";
+
+    add(
+      "Tipo do contrato",
+      "type",
+      v.type,
+      () => set("type", v.type),
+      label(LABEL_MAPS.partnerContractType, String(v.type)),
+    );
+    if (investment) {
+      add(
+        "Aporte",
+        "contributionType",
+        v.contributionType,
+        () => set("contributionType", v.contributionType),
+        label(LABEL_MAPS.partnerContributionType, String(v.contributionType)),
+      );
+      add(
+        "Parte do parceiro sobre o",
+        "shareBase",
+        v.shareBase,
+        () => set("shareBase", v.shareBase),
+        label(LABEL_MAPS.partnerShareBase, String(v.shareBase)),
+      );
+      add(
+        "Valor do aporte",
+        "contributionAmount",
+        v.contributionAmount,
+        () => set("contributionAmount", Number(v.contributionAmount)),
+        money(v.contributionAmount),
+      );
+      add(
+        "Percentual do parceiro (%)",
+        "sharePercent",
+        v.sharePercent,
+        () => set("sharePercent", pct(v.sharePercent)),
+        `${pct(v.sharePercent)}%`,
+      );
+    } else {
+      add(
+        "Forma de repasse",
+        "payoutMode",
+        v.payoutMode,
+        () => set("payoutMode", v.payoutMode),
+        pick(PAYOUT_MODE_OPTIONS, v.payoutMode),
+      );
+      if (v.payoutMode === "FIXED") {
+        add(
+          "Repasse por moto (mês)",
+          "fixedPayout",
+          v.fixedPayout,
+          () => set("fixedPayout", Number(v.fixedPayout)),
+          money(v.fixedPayout),
+        );
+        add(
+          "Taxa de manutenção (% do repasse)",
+          "maintenanceFeePercent",
+          v.maintenanceFeePercent,
+          () => set("maintenanceFeePercent", pct(v.maintenanceFeePercent)),
+          `${pct(v.maintenanceFeePercent)}%`,
+        );
+      } else {
+        add(
+          "Taxa da empresa (%)",
+          "adminFeePercent",
+          v.adminFeePercent,
+          () => set("adminFeePercent", pct(v.adminFeePercent)),
+          `${pct(v.adminFeePercent)}%`,
+        );
+        add(
+          "Taxa fixa por mês (opcional)",
+          "adminFeeFixed",
+          v.adminFeeFixed,
+          () => set("adminFeeFixed", Number(v.adminFeeFixed)),
+          money(v.adminFeeFixed),
+        );
+      }
+    }
+    add(
+      "Início",
+      "startDate",
+      v.startDate,
+      () => set("startDate", String(v.startDate)),
+      dayToBrDate(String(v.startDate)),
+    );
+    add(
+      "Fim (opcional)",
+      "endDate",
+      v.endDate,
+      () => set("endDate", String(v.endDate)),
+      dayToBrDate(String(v.endDate ?? "")),
+    );
+    add(
+      "Recorrência",
+      "payoutFrequency",
+      v.payoutFrequency,
+      () => set("payoutFrequency", v.payoutFrequency),
+      label(LABEL_MAPS.partnerPayoutFrequency, String(v.payoutFrequency)),
+    );
+    add(
+      "Dia do mês",
+      "payoutDay",
+      v.payoutDay,
+      () => set("payoutDay", String(v.payoutDay)),
+      `Dia ${v.payoutDay}`,
+    );
+    add(
+      "Dia da semana",
+      "payoutWeekday",
+      v.payoutWeekday,
+      () => set("payoutWeekday", String(v.payoutWeekday)),
+      label(LABEL_MAPS.weekday, String(v.payoutWeekday)),
+    );
+    const costs = (v.costs ?? {}) as Partial<ContractFormValues["costs"]>;
+    for (const key of PARTNER_COST_KEYS) {
+      add(
+        label(LABEL_MAPS.partnerCost, key),
+        "costs",
+        costs[key],
+        () => {
+          costsTouched.current = true;
+          set(`costs.${key}`, costs[key]);
+        },
+        label(LABEL_MAPS.partnerCostPayer, String(costs[key])),
+      );
+    }
+    add(
+      "Observações (opcional)",
+      "notes",
+      v.notes,
+      () => set("notes", String(v.notes)),
+      "As cláusulas combinadas entram no texto do contrato depois.",
+    );
+    const calc = v.calculator as {
+      count: number | null;
+      rate: number | null;
+      period: RatePeriod | null;
+      occupancy: number | null;
+      costs: CalculatorFill["costs"];
+    } | null;
+    if (calc && onCalculatorFill) {
+      add(
+        "Motos",
+        "calculator",
+        true,
+        () => onCalculatorFill({ key: Date.now(), ...calc }),
+        "O cenário da conversa vai para a calculadora ao lado.",
+      );
+    }
+    return steps;
+  });
+
   const onSubmit = handleSubmit((values) => {
     setFormError(null);
     save.mutate(toContractInput(values, contract), {
-      onSuccess: (saved) => {
+      onSuccess: async (saved) => {
         if (contract) toast.success("Contrato atualizado");
+        // Saved through the screen: the chat's proposal is done (no confirming twice).
+        if (aiFill.active) await aiFill.fulfill(saved.id);
         onDone(saved);
       },
       onError: (error) =>
@@ -236,29 +431,83 @@ export function PartnerContractForm({
           </>
         ) : (
           <>
-            <Col sm={6}>
-              <FormField
-                label="Taxa da empresa (%)"
-                inputMode="decimal"
-                placeholder="Ex.: 15"
-                error={errors.adminFeePercent?.message}
-                {...register("adminFeePercent")}
-              />
-            </Col>
-            <Col sm={6}>
+            <Col>
               <Controller
                 control={control}
-                name="adminFeeFixed"
+                name="payoutMode"
                 render={({ field }) => (
-                  <MoneyField
-                    label="Taxa fixa por mês (opcional)"
+                  <SegmentedField
+                    label="Forma de repasse"
                     value={field.value}
+                    options={PAYOUT_MODE_OPTIONS}
                     onChange={field.onChange}
-                    error={errors.adminFeeFixed?.message}
+                    error={errors.payoutMode?.message}
                   />
                 )}
               />
             </Col>
+            {isFixed ? (
+              <>
+                <Col sm={6}>
+                  <Controller
+                    control={control}
+                    name="fixedPayout"
+                    render={({ field }) => (
+                      <MoneyField
+                        label="Repasse por moto (mês)"
+                        value={field.value}
+                        onChange={field.onChange}
+                        error={errors.fixedPayout?.message}
+                      />
+                    )}
+                  />
+                </Col>
+                <Col sm={6}>
+                  <FormField
+                    label="Taxa de manutenção (% do repasse)"
+                    inputMode="decimal"
+                    placeholder="Ex.: 10"
+                    error={errors.maintenanceFeePercent?.message}
+                    {...register("maintenanceFeePercent")}
+                  />
+                </Col>
+                <Col>
+                  <Text size="xs" tone="muted">
+                    O proprietário recebe o valor por moto proporcional aos dias
+                    em que ela ficou alugada (moto parada recebe proporcional),
+                    menos a taxa de manutenção e as despesas marcadas como dele
+                    abaixo. O que o locatário paga acima disso fica com a
+                    empresa.
+                  </Text>
+                </Col>
+              </>
+            ) : (
+              <>
+                <Col sm={6}>
+                  <FormField
+                    label="Taxa da empresa (%)"
+                    inputMode="decimal"
+                    placeholder="Ex.: 15"
+                    error={errors.adminFeePercent?.message}
+                    {...register("adminFeePercent")}
+                  />
+                </Col>
+                <Col sm={6}>
+                  <Controller
+                    control={control}
+                    name="adminFeeFixed"
+                    render={({ field }) => (
+                      <MoneyField
+                        label="Taxa fixa por mês (opcional)"
+                        value={field.value}
+                        onChange={field.onChange}
+                        error={errors.adminFeeFixed?.message}
+                      />
+                    )}
+                  />
+                </Col>
+              </>
+            )}
           </>
         )}
         <Col sm={6}>

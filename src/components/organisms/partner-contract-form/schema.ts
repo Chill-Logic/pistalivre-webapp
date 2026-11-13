@@ -45,6 +45,9 @@ export const contractFormSchema = z
     sharePercent: percentText,
     adminFeePercent: percentText,
     adminFeeFixed: z.number().nullable(),
+    payoutMode: z.enum(["SHARE", "FIXED"]),
+    fixedPayout: z.number().nullable(),
+    maintenanceFeePercent: percentText,
     payoutFrequency: z.enum(["WEEKLY", "BIWEEKLY", "MONTHLY"], {
       errorMap: () => ({ message: "Escolha a recorrência do repasse" }),
     }),
@@ -87,6 +90,8 @@ export const contractFormSchema = z
           });
         }
       }
+    } else if (c.payoutMode === "FIXED") {
+      if (!c.fixedPayout) issue("fixedPayout", "Informe o repasse por moto");
     } else if (
       parsePercentInput(c.adminFeePercent) === null &&
       c.adminFeeFixed === null
@@ -107,6 +112,9 @@ export const CONTRACT_FORM_FIELDS = [
   "sharePercent",
   "adminFeePercent",
   "adminFeeFixed",
+  "payoutMode",
+  "fixedPayout",
+  "maintenanceFeePercent",
   "payoutFrequency",
   "payoutDay",
   "payoutWeekday",
@@ -133,6 +141,9 @@ export function contractFormDefaults(
     sharePercent: percentInputOf(contract?.sharePercent),
     adminFeePercent: percentInputOf(contract?.adminFeePercent),
     adminFeeFixed: contract?.adminFeeFixed ?? null,
+    payoutMode: contract?.payoutMode ?? "SHARE",
+    fixedPayout: contract?.fixedPayout ?? null,
+    maintenanceFeePercent: percentInputOf(contract?.maintenanceFeePercent),
     payoutFrequency: contract?.payoutFrequency ?? "MONTHLY",
     payoutDay: contract?.payoutDay ? String(contract.payoutDay) : NO_DAY,
     payoutWeekday:
@@ -155,6 +166,8 @@ export function toContractInput(
   const investment = values.type === "INVESTMENT";
   const cash = investment && values.contributionType === "CASH";
   const monthly = values.payoutFrequency === "MONTHLY";
+  // One way of paying the owner at a time: the fixed payout replaces the fee.
+  const fixed = !investment && values.payoutMode === "FIXED";
   return {
     type: values.type,
     ...(contract ? { status: contract.status } : {}),
@@ -167,10 +180,14 @@ export function toContractInput(
       ? ((values.shareBase || null) as PartnerShareBase | null)
       : null,
     sharePercent: investment ? parsePercentInput(values.sharePercent) : null,
-    adminFeePercent: investment
-      ? null
-      : parsePercentInput(values.adminFeePercent),
-    adminFeeFixed: investment ? null : values.adminFeeFixed,
+    adminFeePercent:
+      investment || fixed ? null : parsePercentInput(values.adminFeePercent),
+    adminFeeFixed: investment || fixed ? null : values.adminFeeFixed,
+    payoutMode: fixed ? "FIXED" : "SHARE",
+    fixedPayout: fixed ? values.fixedPayout : null,
+    maintenanceFeePercent: fixed
+      ? parsePercentInput(values.maintenanceFeePercent)
+      : null,
     payoutFrequency: values.payoutFrequency,
     // Only the day that matches the frequency goes (the other is cleared).
     payoutDay:

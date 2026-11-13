@@ -46,10 +46,17 @@ export function useAiFormFill(
 ) {
   const location = useLocation();
   const navigate = useNavigate();
-  const [request] = useState<AiFillRequest | null>(() => {
+  const incoming = (() => {
     const state = location.state as { aiFill?: AiFillRequest } | null;
     return state?.aiFill?.form.kind === kind ? state.aiFill : null;
-  });
+  })();
+  const [request, setRequest] = useState<AiFillRequest | null>(incoming);
+  // "Preencher na tela" while already on this form: same page, new navigation
+  // (new location key) — the form doesn't remount, so pick the request up here.
+  useEffect(() => {
+    if (incoming && incoming.actionId !== request?.actionId) setRequest(incoming);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.key]);
   const planRef = useRef(plan);
   planRef.current = plan;
 
