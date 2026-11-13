@@ -68,7 +68,9 @@ export function PartnerContractWorkspace({
           <Box className={cn(tab !== "contrato" && "hidden")}>{contract}</Box>
         </Col>
         {chat && (
-          <Col lg={4} className="order-1 lg:order-2">
+          // Stretched to the row's height: the chat card sticks while the page scrolls
+          // (a column as tall as the card itself gives "sticky" no room).
+          <Col lg={4} className="order-1 lg:order-2 lg:self-stretch">
             {chat}
           </Col>
         )}
