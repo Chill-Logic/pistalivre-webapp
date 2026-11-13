@@ -41,7 +41,15 @@ export type SettleableCharge = Pick<
  * charging. The original amount/due date stay; the difference shows as
  * shortfall or lateness.
  */
-export function ChargeSettleDialog({ charge }: { charge: SettleableCharge }) {
+type ChargeSettleDialogProps = {
+  charge: SettleableCharge;
+  /** Prefilled from elsewhere (a pix of the bank statement): value and day of the pix. */
+  initial?: { paidValue: number; paidAt: string };
+  /** The button: defaults to an outline "Dar baixa". */
+  trigger?: { label: string; variant?: "default" | "outline" };
+};
+
+export function ChargeSettleDialog({ charge, initial, trigger }: ChargeSettleDialogProps) {
   const settle = useSettleCharge(charge.id, charge.rentalId);
   const idempotency = useIdempotencyKey();
   const atAsaas = charge.channel === "asaas";
@@ -55,8 +63,8 @@ export function ChargeSettleDialog({ charge }: { charge: SettleableCharge }) {
     if (settle.isPending) return;
     setOpen(next);
     if (!next) return;
-    setPaidValue(charge.amounts.amount);
-    setPaidAt(todayInBrasilia());
+    setPaidValue(initial?.paidValue ?? charge.amounts.amount);
+    setPaidAt(initial?.paidAt ?? todayInBrasilia());
     setNotify(false);
     setErrors({});
   };
@@ -104,12 +112,12 @@ export function ChargeSettleDialog({ charge }: { charge: SettleableCharge }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button
-          variant="outline"
+          variant={trigger?.variant ?? "outline"}
           size="sm"
           aria-label={`Dar baixa na cobrança de ${formatCalendarDate(charge.dueDate)}`}
         >
           <HandCoins />
-          Dar baixa
+          {trigger?.label ?? "Dar baixa"}
         </Button>
       </DialogTrigger>
       <DialogContent>

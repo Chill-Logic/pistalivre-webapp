@@ -11,6 +11,10 @@ import {
 import { FinanceSyncButton } from "@/components/organisms/finance-sync-button";
 import { ManualPaymentDialog } from "@/components/organisms/manual-payment-dialog";
 import { QueryBoundary } from "@/components/organisms/query-boundary";
+import {
+  ReconciliationCard,
+  ReconciliationCardSkeleton,
+} from "@/components/organisms/reconciliation-card";
 import { StandaloneChargeDialog } from "@/components/organisms/standalone-charge-dialog";
 import { StandaloneInvoiceDialog } from "@/components/organisms/standalone-invoice-dialog";
 import {
@@ -25,6 +29,7 @@ import { FinanceLayout } from "@/components/templates/finance-layout";
 import { useFinanceBalances } from "@/hooks/api/gestao/finance/useFinanceBalances";
 import { useFinanceDelinquency } from "@/hooks/api/gestao/finance/useFinanceDelinquency";
 import { useFinanceToCollect } from "@/hooks/api/gestao/finance/useFinanceToCollect";
+import { useReconciliationSuggestions } from "@/hooks/api/gestao/reconciliation/useReconciliation";
 import { useTransfers } from "@/hooks/api/gestao/finance/useTransfers";
 
 /**
@@ -37,6 +42,7 @@ export function FinancePage() {
   const toCollect = useFinanceToCollect();
   const delinquency = useFinanceDelinquency();
   const transfers = useTransfers();
+  const reconciliation = useReconciliationSuggestions();
 
   return (
     <Box className="space-y-4 md:space-y-6">
@@ -46,6 +52,17 @@ export function FinancePage() {
         <ManualPaymentDialog />
         <StandaloneChargeDialog />
       </Box>
+      <QueryBoundary
+        query={reconciliation}
+        label="Procurando pix para conciliar…"
+        skeleton={<ReconciliationCardSkeleton />}
+      >
+        {(data) => (
+          <AiAnchor id="reconciliation">
+            <ReconciliationCard view={data} />
+          </AiAnchor>
+        )}
+      </QueryBoundary>
       <FinanceLayout
         balances={
           <QueryBoundary
