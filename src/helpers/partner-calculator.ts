@@ -33,6 +33,7 @@ export function calculatorTermsOf(contract: PartnerContract): CalculatorTerms {
     payoutMode: contract.payoutMode,
     fixedPayout: contract.fixedPayout,
     maintenanceFeePercent: percentInputOf(contract.maintenanceFeePercent),
+    maintenanceMode: contract.maintenanceMode ?? "COST_SHARE",
     payoutFrequency: contract.payoutFrequency,
     costs: contract.costs,
   };

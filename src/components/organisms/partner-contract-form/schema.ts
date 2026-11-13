@@ -48,6 +48,7 @@ export const contractFormSchema = z
     payoutMode: z.enum(["SHARE", "FIXED"]),
     fixedPayout: z.number().nullable(),
     maintenanceFeePercent: percentText,
+    maintenanceMode: z.enum(["COST_SHARE", "COST_PLUS_FEE"]),
     payoutFrequency: z.enum(["WEEKLY", "BIWEEKLY", "MONTHLY"], {
       errorMap: () => ({ message: "Escolha a recorrência do repasse" }),
     }),
@@ -115,6 +116,7 @@ export const CONTRACT_FORM_FIELDS = [
   "payoutMode",
   "fixedPayout",
   "maintenanceFeePercent",
+  "maintenanceMode",
   "payoutFrequency",
   "payoutDay",
   "payoutWeekday",
@@ -144,6 +146,7 @@ export function contractFormDefaults(
     payoutMode: contract?.payoutMode ?? "SHARE",
     fixedPayout: contract?.fixedPayout ?? null,
     maintenanceFeePercent: percentInputOf(contract?.maintenanceFeePercent),
+    maintenanceMode: contract?.maintenanceMode ?? "COST_SHARE",
     payoutFrequency: contract?.payoutFrequency ?? "MONTHLY",
     payoutDay: contract?.payoutDay ? String(contract.payoutDay) : NO_DAY,
     payoutWeekday:
@@ -188,6 +191,7 @@ export function toContractInput(
     maintenanceFeePercent: fixed
       ? parsePercentInput(values.maintenanceFeePercent)
       : null,
+    maintenanceMode: fixed ? values.maintenanceMode : null,
     payoutFrequency: values.payoutFrequency,
     // Only the day that matches the frequency goes (the other is cleared).
     payoutDay:

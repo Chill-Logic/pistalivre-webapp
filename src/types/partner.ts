@@ -87,11 +87,13 @@ export type PartnerContract = {
   /**
    * Management: SHARE = the company keeps its fee and the owner gets the rest;
    * FIXED = the owner gets `fixedPayout` per vehicle per month, pro rata of the
-   * days rented, minus `maintenanceFeePercent` of it and their costs.
+   * days rented (a cap), minus their part of the month's real maintenance
+   * (`maintenanceMode`: X% of the cost, or the cost + X%) and their costs.
    */
   payoutMode: PartnerPayoutMode;
   fixedPayout: number | null;
   maintenanceFeePercent: number | null;
+  maintenanceMode?: PartnerMaintenanceMode | null;
   calculatorScenario?: PartnerCalculatorScenario | null;
   payoutFrequency: PartnerPayoutFrequency;
   /** Monthly payout: day of the month (1–31). */
@@ -138,6 +140,12 @@ export type PartnerInput = {
  * send them all.
  */
 export type PartnerPayoutMode = "SHARE" | "FIXED";
+/**
+ * Fixed payout: how the month's real maintenance reaches the owner —
+ * COST_SHARE = X% of the cost (the company bears the rest); COST_PLUS_FEE =
+ * the whole cost + X%.
+ */
+export type PartnerMaintenanceMode = "COST_SHARE" | "COST_PLUS_FEE";
 
 export type PartnerContractInput = {
   type: PartnerContractType;
@@ -152,11 +160,13 @@ export type PartnerContractInput = {
   /**
    * Management: SHARE = the company keeps its fee and the owner gets the rest;
    * FIXED = the owner gets `fixedPayout` per vehicle per month, pro rata of the
-   * days rented, minus `maintenanceFeePercent` of it and their costs.
+   * days rented (a cap), minus their part of the month's real maintenance
+   * (`maintenanceMode`) and their costs.
    */
   payoutMode: PartnerPayoutMode;
   fixedPayout: number | null;
   maintenanceFeePercent: number | null;
+  maintenanceMode?: PartnerMaintenanceMode | null;
   payoutFrequency: PartnerPayoutFrequency;
   payoutDay: number | null;
   payoutWeekday: number | null;

@@ -84,10 +84,13 @@ export function contractTerms(contract: PartnerAreaTerms, label: LabelFn) {
       label: "Seu repasse",
       value: `${formatCurrency(contract.fixedPayout ?? 0)} por moto/mês, proporcional aos dias alugados`,
     });
-    if (contract.maintenanceFeePercent)
+    if (contract.maintenanceMode === "COST_PLUS_FEE" || contract.maintenanceFeePercent)
       terms.push({
-        label: "Taxa de manutenção",
-        value: `${formatPercent(contract.maintenanceFeePercent)} do repasse`,
+        label: "Manutenção",
+        value:
+          contract.maintenanceMode === "COST_PLUS_FEE"
+            ? `O custo do mês + ${formatPercent(contract.maintenanceFeePercent ?? 0)}, descontado do repasse`
+            : `${formatPercent(contract.maintenanceFeePercent ?? 0)} do custo do mês, descontado do repasse`,
       });
   } else {
     const fee = [

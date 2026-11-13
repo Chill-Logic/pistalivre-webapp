@@ -45,6 +45,8 @@ export type CalculatorTerms = {
   payoutMode: "SHARE" | "FIXED";
   fixedPayout: number | null;
   maintenanceFeePercent: string;
+  /** Fixed payout: X% of the month's maintenance, or the maintenance + X%. */
+  maintenanceMode?: "COST_SHARE" | "COST_PLUS_FEE";
   payoutFrequency: "WEEKLY" | "BIWEEKLY" | "MONTHLY";
   costs: Record<PartnerCostKey, PartnerCostPayerCode>;
 };
@@ -217,6 +219,10 @@ export function PartnerContractCalculator({
         fixedPayout: terms.fixedPayout ?? null,
         maintenanceFeePercent:
           parsePercentInput(terms.maintenanceFeePercent ?? "") ?? null,
+        maintenanceMode:
+          terms.payoutMode === "FIXED"
+            ? (terms.maintenanceMode ?? "COST_SHARE")
+            : null,
         payoutFrequency: terms.payoutFrequency,
         costs: terms.costs,
         vehicles: groups.map((g) => ({
@@ -246,6 +252,35 @@ export function PartnerContractCalculator({
   const isInvestment = terms?.type === "INVESTMENT";
   const profit = isInvestment && terms?.shareBase === "PROFIT";
   const fixedPayout = !isInvestment && terms?.payoutMode === "FIXED";
+  // Fixed payout: the same month under the OTHER maintenance rule, to compare
+  // (Karina wants to simulate both while the contract is made).
+  const otherMode =
+    input?.maintenanceMode === "COST_PLUS_FEE" ? "COST_SHARE" : "COST_PLUS_FEE";
+  const other = usePartnerSimulation(
+    validPercents && fixedPayout && input
+      ? { ...input, maintenanceMode: otherMode }
+      : null,
+  );
+  const visibleCosts = fixedPayout
+    ? COSTS.filter((c) => c.key !== "taxes" && c.key !== "fines")
+    : COSTS;
+  const costLabel = (key: PartnerCostKey, fallback: string) =>
+    fixedPayout && key === "maintenance"
+      ? "Oficina no mês (simulação)"
+      : fallback;
+  const costHint = (key: PartnerCostKey) => {
+    if (!terms) return undefined;
+    if (!fixedPayout) return `Paga: ${payer(key)}`;
+    if (key === "maintenance") {
+      const pct = terms.maintenanceFeePercent || "0";
+      return terms.maintenanceMode === "COST_PLUS_FEE"
+        ? `O proprietário paga o custo + ${pct}%`
+        : `O proprietário paga ${pct}% do custo`;
+    }
+    return terms.costs[key] === "PARTNER"
+      ? "Sai inteiro do repasse"
+      : "Paga: Empresa";
+  };
   const payer = (key: PartnerCostKey) =>
     terms ? label(LABEL_MAPS.partnerCostPayer, terms.costs[key]) : "";
 
@@ -284,7 +319,7 @@ export function PartnerContractCalculator({
                   term={`Aluguel recebido (${data.vehicleCount} motos)`}
                   value={data.revenue}
                 />
-                {data.costsByPayer.COMPANY > 0 && (
+                {data.costsByPayer.COMPANY > 0 && !fixedPayout && (
                   <Line
                     term="Despesas da empresa"
                     value={-data.costsByPayer.COMPANY}
@@ -315,19 +350,19 @@ export function PartnerContractCalculator({
                 ) : fixedPayout ? (
                   <>
                     <Line
-                      term="Repasse fixo (proporcional aos dias)"
+                      term="Repasse (teto proporcional aos dias)"
                       value={data.partnerGross}
                     />
                     {data.maintenanceFee > 0 && (
                       <Line
-                        term="Taxa de manutenção (sai do repasse)"
+                        term={`Manutenção: parte do proprietário (oficina ${formatCurrency(data.maintenanceCost)})`}
                         value={-data.maintenanceFee}
                       />
                     )}
-                    {data.costsByPayer.PARTNER > 0 && (
+                    {data.partnerDeductions > 0 && (
                       <Line
-                        term="Despesas do proprietário (saem do repasse)"
-                        value={-data.costsByPayer.PARTNER}
+                        term="Seguro e despesas do proprietário"
+                        value={-data.partnerDeductions}
                       />
                     )}
                   </>
@@ -354,7 +389,31 @@ export function PartnerContractCalculator({
                     {PAYOUT_LABEL[terms.payoutFrequency]}
                   </Text>
                 )}
+                {data.carryOver > 0 && (
+                  <Text size="sm" tone="muted">
+                    Os descontos passaram do repasse:{" "}
+                    {formatCurrency(data.carryOver)} ficam para abater no
+                    próximo.
+                  </Text>
+                )}
               </Box>
+              {fixedPayout && other.data && (
+                <Box className="rounded-lg border bg-muted/30 p-3">
+                  <Text size="xs" tone="muted">
+                    {otherMode === "COST_PLUS_FEE"
+                      ? `Se fosse "custo + taxa" (a oficina + ${terms?.maintenanceFeePercent || "0"}%)`
+                      : `Se fosse "parte do custo" (${terms?.maintenanceFeePercent || "0"}% da oficina)`}
+                  </Text>
+                  <Text weight="semibold" className="tabular-nums">
+                    O proprietário receberia{" "}
+                    {formatCurrency(other.data.partnerNet)}
+                    <Text inline size="sm" tone="muted" weight="normal">
+                      {" "}
+                      /mês · a empresa {formatCurrency(other.data.companyNet)}
+                    </Text>
+                  </Text>
+                </Box>
+              )}
               <DescriptionList>
                 <Line
                   term="Fica para a empresa"
@@ -466,15 +525,15 @@ export function PartnerContractCalculator({
             Despesas por moto
           </Heading>
           <Row className="gap-y-3">
-            {COSTS.map((cost) => (
+            {visibleCosts.map((cost) => (
               <Col key={cost.key} span={6}>
                 <MoneyField
-                  label={cost.label}
+                  label={costLabel(cost.key, cost.label)}
                   value={costs[cost.key]}
                   onChange={(value) =>
                     setCosts((current) => ({ ...current, [cost.key]: value }))
                   }
-                  hint={terms ? `Paga: ${payer(cost.key)}` : undefined}
+                  hint={costHint(cost.key)}
                 />
               </Col>
             ))}

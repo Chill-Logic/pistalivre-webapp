@@ -60,10 +60,7 @@ export function contractTerms(
     return `${formatPercent(contract.sharePercent)}${base} para o parceiro`;
   }
   if (contract.payoutMode === "FIXED") {
-    const fee = contract.maintenanceFeePercent
-      ? `, menos ${formatPercent(contract.maintenanceFeePercent)} de manutenção`
-      : "";
-    return `Repasse fixo de ${formatCurrency(contract.fixedPayout ?? 0)} por moto/mês${fee}`;
+    return `Repasse de até ${formatCurrency(contract.fixedPayout ?? 0)} por moto/mês${maintenanceRuleSuffix(contract)}`;
   }
   const fee = [
     contract.adminFeePercent !== null &&
@@ -79,6 +76,18 @@ export function contractTerms(
  * The contract as a PATCH body: the API replaces the terms (and a missing
  * status means DRAFT), so a situation change resends everything as it is.
  */
+/** ", menos 10% da manutenção do mês" / ", menos a manutenção do mês + 10%" (fixed payout). */
+export function maintenanceRuleSuffix(contract: {
+  maintenanceFeePercent?: number | null;
+  maintenanceMode?: string | null;
+}) {
+  const pct = contract.maintenanceFeePercent ?? 0;
+  if (contract.maintenanceMode === "COST_PLUS_FEE") {
+    return `, menos a manutenção do mês + ${formatPercent(pct)}`;
+  }
+  return pct ? `, menos ${formatPercent(pct)} da manutenção do mês` : "";
+}
+
 export function contractInputOf(
   contract: PartnerContract,
   changes: Partial<PartnerContractInput> = {},
@@ -96,6 +105,7 @@ export function contractInputOf(
     payoutMode: contract.payoutMode,
     fixedPayout: contract.fixedPayout,
     maintenanceFeePercent: contract.maintenanceFeePercent,
+    maintenanceMode: contract.maintenanceMode ?? null,
     payoutFrequency: contract.payoutFrequency,
     payoutDay: contract.payoutDay,
     payoutWeekday: contract.payoutWeekday,

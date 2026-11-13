@@ -55,6 +55,12 @@ const PAYOUT_MODE_OPTIONS = [
   { value: "FIXED", label: "Repasse fixo por moto" },
 ];
 
+/** Fixed payout: how the month's real maintenance reaches the owner. */
+const MAINTENANCE_MODE_OPTIONS = [
+  { value: "COST_SHARE", label: "Parte do custo" },
+  { value: "COST_PLUS_FEE", label: "Custo + taxa" },
+];
+
 const PAYOUT_DAYS = [
   { value: NO_DAY, label: "Não definido" },
   ...Array.from({ length: 31 }, (_, index) => ({
@@ -117,6 +123,10 @@ export function PartnerContractForm({
   const isCash = watch("contributionType") === "CASH";
   const isMonthly = watch("payoutFrequency") === "MONTHLY";
   const isFixed = watch("payoutMode") === "FIXED";
+  const costPlusFee = watch("maintenanceMode") === "COST_PLUS_FEE";
+  // Fixed payout: the company does and pays the maintenance (the owner's part
+  // follows the rule above); taxes with the owner are paid by them directly.
+  const fixedManagement = !isInvestment && isFixed;
   const shareBase = watch("shareBase");
   const profitShare = isProfitShare(watch("type"), shareBase);
   const costHint =
@@ -219,7 +229,16 @@ export function PartnerContractForm({
           money(v.fixedPayout),
         );
         add(
-          "Taxa de manutenção (% do repasse)",
+          "Manutenção do mês",
+          "maintenanceMode",
+          v.maintenanceMode,
+          () => set("maintenanceMode", v.maintenanceMode),
+          pick(MAINTENANCE_MODE_OPTIONS, v.maintenanceMode),
+        );
+        add(
+          v.maintenanceMode === "COST_PLUS_FEE"
+            ? "Taxa sobre a manutenção (%)"
+            : "Parte do proprietário na manutenção (%)",
           "maintenanceFeePercent",
           v.maintenanceFeePercent,
           () => set("maintenanceFeePercent", pct(v.maintenanceFeePercent)),
@@ -464,7 +483,11 @@ export function PartnerContractForm({
                 </Col>
                 <Col sm={6}>
                   <FormField
-                    label="Taxa de manutenção (% do repasse)"
+                    label={
+                      costPlusFee
+                        ? "Taxa sobre a manutenção (%)"
+                        : "Parte do proprietário na manutenção (%)"
+                    }
                     inputMode="decimal"
                     placeholder="Ex.: 10"
                     error={errors.maintenanceFeePercent?.message}
@@ -472,11 +495,31 @@ export function PartnerContractForm({
                   />
                 </Col>
                 <Col>
+                  <Controller
+                    control={control}
+                    name="maintenanceMode"
+                    render={({ field }) => (
+                      <SegmentedField
+                        label="Manutenção do mês"
+                        value={field.value}
+                        options={MAINTENANCE_MODE_OPTIONS}
+                        onChange={field.onChange}
+                        error={errors.maintenanceMode?.message}
+                      />
+                    )}
+                  />
+                </Col>
+                <Col>
                   <Text size="xs" tone="muted">
-                    O proprietário recebe o valor por moto proporcional aos dias
-                    em que ela ficou alugada (moto parada recebe proporcional),
-                    menos a taxa de manutenção e as despesas marcadas como dele
-                    abaixo. O que o locatário paga acima disso fica com a
+                    O repasse por moto é o teto, proporcional aos dias em que
+                    ela ficou alugada. A empresa faz e paga a manutenção; do
+                    repasse sai{" "}
+                    {costPlusFee
+                      ? "o custo da oficina no mês mais a taxa acima"
+                      : "a parte do proprietário no custo da oficina do mês (a empresa arca com o resto)"}
+                    , além do seguro e das despesas marcadas como dele abaixo.
+                    Se os descontos passarem do repasse, a diferença fica para o
+                    próximo. O que o locatário paga acima disso fica com a
                     empresa.
                   </Text>
                 </Col>
@@ -603,7 +646,15 @@ export function PartnerContractForm({
             Quem paga cada despesa
           </Heading>
           <Box className="space-y-3">
-            {PARTNER_COST_KEYS.map((key) => (
+            {fixedManagement && (
+              <Text size="sm" tone="muted">
+                Manutenção: a empresa faz e paga; o proprietário participa
+                pela regra do repasse acima.
+              </Text>
+            )}
+            {PARTNER_COST_KEYS.filter(
+              (key) => !(fixedManagement && key === "maintenance"),
+            ).map((key) => (
               <Controller
                 key={key}
                 control={control}

@@ -71,6 +71,7 @@ export type PartnerAreaContract = {
   payoutMode?: "SHARE" | "FIXED";
   fixedPayout?: number | null;
   maintenanceFeePercent?: number | null;
+  maintenanceMode?: "COST_SHARE" | "COST_PLUS_FEE" | null;
   payoutFrequency: PartnerPayoutFrequency;
   payoutDay: number | null;
   payoutWeekday: number | null;
@@ -96,6 +97,7 @@ export type PartnerAreaTerms = Pick<
   | "payoutMode"
   | "fixedPayout"
   | "maintenanceFeePercent"
+  | "maintenanceMode"
   | "payoutFrequency"
   | "payoutDay"
   | "payoutWeekday"
