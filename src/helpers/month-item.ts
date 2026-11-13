@@ -26,13 +26,16 @@ export function monthItemDetail(item: MonthItem, label: Label): string {
     .join(" · ");
 }
 
-/** What happened, in words: "Pago em 05/11/2026 · por Ana". */
+/**
+ * What happened, in words: "Registrado em 05/11/2026 · por Ana". The system
+ * only records (the money moves outside it), so it says registered, not paid.
+ */
 export function monthItemOutcome(item: MonthItem): string {
   const parts = [
-    item.status === "PAID" && item.paidAt && `Pago em ${formatCalendarDate(item.paidAt)}`,
+    item.status === "PAID" && item.paidAt && `Registrado em ${formatCalendarDate(item.paidAt)}`,
     item.status === "PARTIAL" &&
       item.amount != null &&
-      `${formatCurrency(item.amount)} pagos${item.paidAt ? ` até ${formatCalendarDate(item.paidAt)}` : ""}`,
+      `${formatCurrency(item.amount)} registrados${item.paidAt ? ` até ${formatCalendarDate(item.paidAt)}` : ""}`,
     item.surcharge != null && `${formatCurrency(item.surcharge)} de multa/juros`,
     item.status === "OPEN" &&
       item.expense &&
