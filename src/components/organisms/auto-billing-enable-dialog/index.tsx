@@ -159,7 +159,7 @@ export function AutoBillingEnableDialog({
                     ? [
                         {
                           value: "PRORATED",
-                          label: `Com os dias de antes · ${formatCurrency(prorated.amount)}`,
+                          label: `${prorated.days} dias · ${formatCurrency(prorated.amount)}`,
                         },
                         {
                           value: "FULL",
