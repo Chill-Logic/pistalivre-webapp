@@ -152,6 +152,7 @@ export const queryKeys = {
     all: ["ai"] as const,
     me: () => [...queryKeys.ai.all, "me"] as const,
     attachments: () => [...queryKeys.ai.all, "attachments"] as const,
+    actions: () => [...queryKeys.ai.all, "actions"] as const,
     consent: (query: string) =>
       [...queryKeys.ai.all, "consent", query] as const,
     permissions: () => [...queryKeys.ai.all, "permissions"] as const,

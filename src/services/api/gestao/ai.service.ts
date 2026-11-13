@@ -3,6 +3,7 @@ import { http } from "@/services/http/client";
 import { eventStreamError, postEventStream } from "@/services/http/sse";
 import type { Paginated } from "@/types/api";
 import type {
+  AiActionsList,
   AiAuditEntry,
   AiAuditFilters,
   AiChatInput,
@@ -96,6 +97,11 @@ export const aiService = {
   },
   async cancelAction(id: string) {
     await http.post(`/ai/actions/${id}/cancel`);
+  },
+  /** "Ações da IA": what's waiting for this person's "sim" (chat or MCP) and what was decided. */
+  async actions() {
+    const { data } = await http.get<AiActionsList>("/ai/actions");
+    return data;
   },
   async revokeGrant(id: string) {
     await http.delete(`/ai/grants/${id}`);

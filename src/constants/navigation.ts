@@ -1,5 +1,6 @@
 import {
   Banknote,
+  BotMessageSquare,
   Building2,
   CalendarDays,
   CreditCard,
@@ -158,6 +159,7 @@ export const SIDEBAR_NAV: NavEntry[] = [
       { label: "Empresa", to: ROUTES.company, icon: Building2 },
       { label: "Usuários", to: ROUTES.users, icon: Users },
       { label: "Integrações", to: ROUTES.integrations, icon: Plug },
+      { label: "Ações da IA", to: ROUTES.aiActions, icon: BotMessageSquare },
       { label: "Modelos", to: ROUTES.models, icon: ScrollText },
       { label: "Documentos", to: ROUTES.documents, icon: FileText },
       { label: "Auditoria", to: ROUTES.audit, icon: ShieldCheck, adminOnly: true },

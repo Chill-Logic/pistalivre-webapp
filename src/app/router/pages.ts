@@ -168,6 +168,10 @@ export const AiAttachmentsPage = lazyPage(
   () => import("@/pages/gestao/ai-attachments"),
   "AiAttachmentsPage",
 );
+export const AiActionsPage = lazyPage(
+  () => import("@/pages/gestao/ai-actions"),
+  "AiActionsPage",
+);
 export const AiConsentPage = lazyPage(
   () => import("@/pages/gestao/ai-consent"),
   "AiConsentPage",

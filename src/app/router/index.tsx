@@ -30,6 +30,7 @@ import {
   DocumentsPage,
   DocumentPage,
   AiConsentPage,
+  AiActionsPage,
   AiAttachmentsPage,
   PartnerContractNewPage,
   PartnerContractEditPage,
@@ -331,6 +332,7 @@ const gestaoRoutes: RouteObject[] = [
       },
       { path: ROUTES.aiConsent, element: <AiConsentPage /> },
       { path: ROUTES.aiAttachments, element: <AiAttachmentsPage /> },
+      { path: ROUTES.aiActions, element: <AiActionsPage /> },
       { path: ROUTES.partnerContractNew, element: <PartnerContractNewPage /> },
       {
         path: ROUTES.partnerContractEdit,

@@ -1,4 +1,5 @@
 import type { ContractDraftState } from "@/types/contract";
+import type { DocumentFile } from "@/types/document";
 
 /** An AI tool as the screens list it. */
 /** read = looks at data; draft = edits the open document; write = changes data after the person confirms. */
@@ -227,3 +228,28 @@ export type AiProposalForm = {
   values: Record<string, unknown>;
   origins: Record<string, string>;
 };
+
+/** Where a proposed write stands ("Ações da IA"). EXPIRED = pending past its 10 min. */
+export type AiActionStatus = "PENDING" | "RUNNING" | "DONE" | "FAILED" | "CANCELLED" | "EXPIRED";
+
+/** A write the AI proposed for this person, from the chat or the MCP. */
+export type AiActionItem = {
+  id: string;
+  tool: string;
+  toolTitle: string;
+  channel: "chat" | "mcp";
+  /** The outside app behind an MCP proposal (e.g. "Claude Code"). */
+  app: string | null;
+  summary: string;
+  /** Label → value, labels ready from the server (null = not informed). */
+  details: Record<string, unknown>;
+  status: AiActionStatus;
+  error: string | null;
+  result: unknown;
+  createdAt: string;
+  expiresAt: string;
+  decidedAt: string | null;
+  files: DocumentFile[];
+};
+
+export type AiActionsList = { pending: AiActionItem[]; recent: AiActionItem[] };
