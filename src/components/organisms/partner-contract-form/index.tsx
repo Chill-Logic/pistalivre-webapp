@@ -237,8 +237,8 @@ export function PartnerContractForm({
         );
         add(
           v.maintenanceMode === "COST_PLUS_FEE"
-            ? "Taxa sobre a manutenção (%)"
-            : "Parte do proprietário na manutenção (%)",
+            ? "Taxa sobre o custo (%)"
+            : "Parte do dono (%)",
           "maintenanceFeePercent",
           v.maintenanceFeePercent,
           () => set("maintenanceFeePercent", pct(v.maintenanceFeePercent)),
@@ -485,8 +485,8 @@ export function PartnerContractForm({
                   <FormField
                     label={
                       costPlusFee
-                        ? "Taxa sobre a manutenção (%)"
-                        : "Parte do proprietário na manutenção (%)"
+                        ? "Taxa sobre o custo (%)"
+                        : "Parte do dono (%)"
                     }
                     inputMode="decimal"
                     placeholder="Ex.: 10"
