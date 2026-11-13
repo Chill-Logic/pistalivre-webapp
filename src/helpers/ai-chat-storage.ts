@@ -50,6 +50,15 @@ export function writeAiChat(userId: string, scope: string, entries: ChatEntry[])
   safeStorage.set(keyOf(userId, scope), JSON.stringify({ savedAt: Date.now(), entries: kept } satisfies Stored));
 }
 
+/**
+ * Carries a conversation to another place (the "Novo contrato" chat goes with
+ * the contract once it's created) and clears the old one.
+ */
+export function moveAiChat(userId: string, from: string, to: string, entries: ChatEntry[]) {
+  writeAiChat(userId, to, entries);
+  safeStorage.remove(keyOf(userId, from));
+}
+
 /** The floating assistant was open in this tab (it reopens after F5). */
 export function readAiChatOpen(): boolean {
   try {

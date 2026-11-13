@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/constants/query-keys";
 import { usePagedList } from "@/hooks/ui/usePagedList";
 import { partnersService } from "@/services/api/gestao/partners.service";
-import type { PartnerFilters } from "@/types/partner";
+import type { PartnerContractInput, PartnerFilters } from "@/types/partner";
 
 /** The list page: pages on the desktop, infinite (10 by 10) on the phone. */
 export function usePartnerList(filters: PartnerFilters, isDesktop: boolean) {
@@ -53,6 +53,24 @@ export function usePartnerContractTextDraft(id: string, enabled: boolean) {
     staleTime: Infinity,
     gcTime: 0,
     refetchOnWindowFocus: false,
+  });
+}
+
+/**
+ * The contract text for terms not saved yet ("Novo contrato" › Contrato).
+ * The caller debounces `input`; the last text stays while the next loads.
+ */
+export function usePartnerContractTextPreview(
+  partnerId: string,
+  input: PartnerContractInput | null,
+  enabled: boolean,
+) {
+  return useQuery({
+    queryKey: queryKeys.partners.contractTextPreview(partnerId, input),
+    queryFn: () => partnersService.contractTextPreview(partnerId, input as PartnerContractInput),
+    enabled: enabled && Boolean(partnerId) && input !== null,
+    placeholderData: keepPreviousData,
+    staleTime: 60_000,
   });
 }
 

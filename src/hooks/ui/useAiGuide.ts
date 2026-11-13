@@ -103,7 +103,8 @@ export function findGuideTarget(
 
 /** Events from the screen back to the chat (a proposal saved through its form). */
 export type AiChatEvent = {
-  type: "fulfilled";
+  /** fulfilled = saved through its form; confirmed = "Confirmar" in a chat. */
+  type: "fulfilled" | "confirmed";
   actionId: string;
   summary: string;
   result: unknown;

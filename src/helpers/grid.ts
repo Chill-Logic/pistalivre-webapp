@@ -7,16 +7,19 @@ export type ColSpans = {
   md?: ColSpan;
   lg?: ColSpan;
   xl?: ColSpan;
+  /** 2xl (1536+): wide screens. */
+  xxl?: ColSpan;
 };
 
 /** `{ span: 12, md: 6 }` → "col-12 col-md-6" (classes from index.css). */
-export function colClasses({ span = 12, sm, md, lg, xl }: ColSpans) {
+export function colClasses({ span = 12, sm, md, lg, xl, xxl }: ColSpans) {
   return [
     `col-${span}`,
     sm && `col-sm-${sm}`,
     md && `col-md-${md}`,
     lg && `col-lg-${lg}`,
     xl && `col-xl-${xl}`,
+    xxl && `col-xxl-${xxl}`,
   ]
     .filter(Boolean)
     .join(" ");

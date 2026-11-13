@@ -40,8 +40,11 @@ type AiDocumentEditorProps = {
   intro: string;
   label: string;
   cancelTo: string;
-  /** The assistant beside the editor (mode, chips, the record it reads). */
-  chat: Omit<AiChatPanelProps, "html" | "onApply" | "className">;
+  /**
+   * The assistant beside the editor (mode, chips, the record it reads). None =
+   * the page shows its own (the partner contract's workspace).
+   */
+  chat?: Omit<AiChatPanelProps, "html" | "onApply" | "className">;
   onPreview: (html: string) => void;
   previewing: boolean;
   onSave: (html: string) => void;
@@ -171,7 +174,7 @@ export function AiDocumentEditor({
     </Card>
   );
 
-  if (!chatAvailable) {
+  if (!chatAvailable || !chat) {
     if (!aside) return editor;
     return (
       <Row className="gap-y-4">

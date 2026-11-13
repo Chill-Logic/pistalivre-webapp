@@ -131,6 +131,17 @@ export const partnersService = {
     );
     return data;
   },
+  /**
+   * The base text for terms NOT saved yet ("Novo contrato" › Contrato):
+   * `html` null while the terms are incomplete (`missing` says what's left).
+   */
+  async contractTextPreview(partnerId: string, input: PartnerContractInput) {
+    const { data } = await http.post<{ html: string | null; missing: string[] }>(
+      `/partners/${partnerId}/contract-text-preview`,
+      input,
+    );
+    return data;
+  },
   /** Saves the calculator's scenario on the contract (a working note). */
   async saveCalculator(id: string, scenario: PartnerCalculatorScenario) {
     const { data } = await http.put<PartnerContract>(

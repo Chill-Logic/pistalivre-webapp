@@ -22,12 +22,13 @@ export function Col({
   md,
   lg,
   xl,
+  xxl,
   className,
   ...props
 }: ColProps) {
   return (
     <Comp
-      className={cn(colClasses({ span, sm, md, lg, xl }), "min-w-0", className)}
+      className={cn(colClasses({ span, sm, md, lg, xl, xxl }), "min-w-0", className)}
       {...(props as object)}
     />
   );

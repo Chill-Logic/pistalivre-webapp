@@ -572,7 +572,7 @@ ${note}`
                       key={action.id}
                       action={action}
                       onNavigate={onNavigate}
-                      onDone={(outcome) =>
+                      onDone={(outcome) => {
                         setEntries((current) => [
                           ...current,
                           {
@@ -581,8 +581,15 @@ ${note}`
                             note: `[Resultado da ação confirmada: ${JSON.stringify(outcome.result)}]`,
                             continueAfter: true,
                           },
-                        ])
-                      }
+                        ]);
+                        // The screen may follow (e.g. the contract just created opens).
+                        aiChatEvents.emit({
+                          type: "confirmed",
+                          actionId: action.id,
+                          summary: outcome.summary,
+                          result: outcome.result,
+                        });
+                      }}
                     />
                   ))}
                   {entry.offerSources && placesOf(index).length > 0 && (

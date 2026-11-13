@@ -1,5 +1,5 @@
 import { Car, FileText, Lock } from "lucide-react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -9,7 +9,7 @@ import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { PageHeader } from "@/components/molecules/page-header";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
-import { PartnerContractEditor } from "@/components/organisms/partner-contract-editor";
+import { PartnerContractWorkbench } from "@/components/organisms/partner-contract-workbench";
 import { QueryError } from "@/components/organisms/query-error";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
@@ -29,7 +29,6 @@ import { formatDateTime } from "@/utils/format";
  */
 export function PartnerContractDocumentPage() {
   const { id = "" } = useParams();
-  const navigate = useNavigate();
   const contract = usePartnerContract(id);
   const isDraft = contract.data?.status === "DRAFT";
   const hasVehicles = contract.data
@@ -47,13 +46,53 @@ export function PartnerContractDocumentPage() {
     ? versions.find((v) => v.id === proposals.data?.acceptedVersionId)
     : undefined;
 
-  return (
-    <Box className="space-y-4">
+  const header = (
+    <Box className="space-y-2">
       <BackLink
         to={contract.data ? contractUrl : ROUTES.partners}
         label={contract.data?.code ?? "Contrato"}
       />
       <PageHeader title="Montar o contrato" />
+    </Box>
+  );
+  const ready = editable && draft.data?.workable && contract.data;
+
+  if (ready && contract.data && draft.data) {
+    return (
+      <PartnerContractWorkbench
+        contract={contract.data}
+        textDraft={draft.data}
+        header={header}
+        notices={
+          <>
+            {!hasVehicles && (
+              <Alert variant="info" role="note" className="flex items-center gap-2">
+                <Car className="size-4 shrink-0" aria-hidden />
+                Ainda sem motos neste contrato: inclua na tela do contrato (ou
+                peça ao Livrinho) antes de enviar.
+              </Alert>
+            )}
+            {pending ? (
+              <Alert variant="info" role="note">
+                A versão {pending.number}, enviada em{" "}
+                {formatDateTime(pending.createdAt)}, está aguardando o parceiro.
+                Enviar de novo a retira e manda esta no lugar.
+              </Alert>
+            ) : accepted ? (
+              <Alert variant="info" role="note">
+                O parceiro já aceitou a versão {accepted.number} com estes
+                termos. Enviar outra pede um novo aceite.
+              </Alert>
+            ) : null}
+          </>
+        }
+      />
+    );
+  }
+
+  return (
+    <Box className="space-y-4">
+      {header}
 
       {(contract.isPending || (editable && draft.isPending)) && (
         <SkeletonRegion label="Montando o contrato…">
@@ -88,14 +127,6 @@ export function PartnerContractDocumentPage() {
         />
       )}
 
-      {isDraft && !hasVehicles && draft.data?.workable && (
-        <Alert variant="info" role="note" className="flex items-center gap-2">
-          <Car className="size-4 shrink-0" aria-hidden />
-          Ainda sem motos neste contrato: inclua na tela do contrato (ou peça ao
-          Livrinho) antes de enviar.
-        </Alert>
-      )}
-
       {editable && draft.isError && (
         <QueryError error={draft.error} onRetry={() => draft.refetch()} />
       )}
@@ -113,32 +144,6 @@ export function PartnerContractDocumentPage() {
         />
       )}
 
-      {editable && draft.data?.workable && contract.data && (
-        <>
-          {pending ? (
-            <Alert variant="info" role="note">
-              A versão {pending.number}, enviada em{" "}
-              {formatDateTime(pending.createdAt)}, está aguardando o parceiro.
-              Enviar de novo a retira e manda esta no lugar.
-            </Alert>
-          ) : accepted ? (
-            <Alert variant="info" role="note">
-              O parceiro já aceitou a versão {accepted.number} com estes termos.
-              Enviar outra pede um novo aceite.
-            </Alert>
-          ) : null}
-          <PartnerContractEditor
-            contract={contract.data}
-            draft={draft.data.draft}
-            aiEnabled={draft.data.aiEnabled}
-            cancelTo={contractUrl}
-            onSent={() => navigate(contractUrl, { replace: true })}
-            onSentToSignature={(signatureId) =>
-              navigate(routeTo.signature(signatureId), { replace: true })
-            }
-          />
-        </>
-      )}
     </Box>
   );
 }
