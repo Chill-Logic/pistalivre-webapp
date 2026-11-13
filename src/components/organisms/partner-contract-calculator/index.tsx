@@ -448,7 +448,8 @@ export function PartnerContractCalculator({
                 />
               </DescriptionList>
               <Text size="xs" tone="muted">
-                Estimativa de um mês: semana = 4,33 por mês; diária = 26 dias
+                Estimativa de um mês: semana = 4,33 por mês (52 semanas no ano;
+                nas Projeções usamos 4, mais conservador); diária = 26 dias
                 (domingo não cobra). O repasse de verdade segue o que os
                 locatários pagarem.
               </Text>

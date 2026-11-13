@@ -60,7 +60,8 @@ export function ProjectionTotalsCard({
         {worstVehicle &&
           ` Manutenção base: ${worstVehicle.plate} gastou ${formatCurrency(worstVehicle.totalCost)} em ${worstVehicle.months} ${worstVehicle.months === 1 ? "mês" : "meses"} (pior caso, conservador).`}{" "}
         Receita contratada, não realizada; moto parada não gera manutenção, só
-        custos fixos.
+        custos fixos. Aluguel semanal conta 4 semanas por mês (conservador: o
+        ano real tem 52 semanas, cerca de 4,33 por mês).
       </Text>
     </Box>
   );
