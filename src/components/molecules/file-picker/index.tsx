@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { FileInput } from "@/components/atoms/file-input";
+import { AttachDropZone } from "@/components/molecules/attach-drop-zone";
 import { List, ListItem } from "@/components/atoms/list";
 import { Text } from "@/components/atoms/text";
 import { formatFileSize } from "@/utils/format";
@@ -21,7 +22,10 @@ type FilePickerProps = {
 const DEFAULT_ACCEPT =
   "application/pdf,image/*,.doc,.docx,.xls,.xlsx,.odt,.ods";
 
-/** "Anexar arquivos" button + the chosen files, each removable. */
+/**
+ * "Anexar arquivos" + the chosen files, each removable. Besides the button,
+ * a file can be dragged onto it or pasted (Ctrl+V), like in the chat.
+ */
 export function FilePicker({
   files,
   onChange,
@@ -31,6 +35,8 @@ export function FilePicker({
   multiple = true,
 }: FilePickerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const add = (picked: File[]) =>
+    onChange(multiple ? [...files, ...picked] : picked.slice(0, 1));
 
   return (
     <Box className="space-y-2">
@@ -39,22 +45,23 @@ export function FilePicker({
         multiple={multiple}
         accept={accept}
         onChange={(event) => {
-          const picked = Array.from(event.target.files ?? []);
-          onChange(multiple ? [...files, ...picked] : picked.slice(0, 1));
+          add(Array.from(event.target.files ?? []));
           // Picking the same file again must fire `change` again.
           event.target.value = "";
         }}
       />
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        disabled={disabled}
-        onClick={() => inputRef.current?.click()}
-      >
-        <Paperclip />
-        {label}
-      </Button>
+      <AttachDropZone onFiles={add} disabled={disabled}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={disabled}
+          onClick={() => inputRef.current?.click()}
+        >
+          <Paperclip />
+          {label}
+        </Button>
+      </AttachDropZone>
       {files.length > 0 && (
         <List className="space-y-1">
           {files.map((file, index) => (

@@ -6,6 +6,7 @@ import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { DropArea } from "@/components/atoms/drop-area";
 import { FileInput } from "@/components/atoms/file-input";
+import { usePasteFiles } from "@/hooks/ui/usePasteFiles";
 import { List, ListItem } from "@/components/atoms/list";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
@@ -67,8 +68,14 @@ export function CustomerDocumentReader({
   const existing = entries.find((e) => e.result.existingCustomer)?.result
     .existingCustomer;
 
+  // Ctrl+V of prints of the documents reads them too.
+  const paste = usePasteFiles(
+    (files) => void readAll(files),
+    !(disabled ?? false),
+  );
   return (
     <DropArea
+      {...paste}
       onFiles={(files) => void readAll(files)}
       disabled={busy}
       className="space-y-3 rounded-md border border-dashed p-3 md:p-4"

@@ -769,6 +769,8 @@ ${note}`
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={onKeyDown}
             onPaste={onPaste}
+            // Its own paste: the page's attach areas (usePasteFiles) leave it alone.
+            data-own-paste
             className="max-h-40 min-h-12 resize-none border-0 bg-transparent px-3 pt-3 shadow-none focus-visible:ring-0"
             disabled={blocked}
           />

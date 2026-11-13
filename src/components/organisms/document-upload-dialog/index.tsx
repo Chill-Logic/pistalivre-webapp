@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/atoms/dialog";
 import { FileInput } from "@/components/atoms/file-input";
+import { AttachDropZone } from "@/components/molecules/attach-drop-zone";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import {
@@ -56,6 +57,16 @@ export function DocumentUploadDialog({
   const [rows, setRows] = useState<Row[]>([]);
   const [sending, setSending] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const addFiles = (picked: File[]) =>
+    setRows((current) => [
+      ...current,
+      ...picked.map((file, index) => ({
+        key: `${Date.now()}-${index}-${file.name}`,
+        file,
+        categoryId: "",
+        state: "idle" as const,
+      })),
+    ]);
   // Fetched with the card (cached), so the kind pickers are there as soon
   // as files are chosen.
   const categories = useDocumentCategories(owner.type);
@@ -118,16 +129,7 @@ export function DocumentUploadDialog({
           multiple
           accept={ACCEPT}
           onChange={(event) => {
-            const picked = Array.from(event.target.files ?? []);
-            setRows((current) => [
-              ...current,
-              ...picked.map((file, index) => ({
-                key: `${Date.now()}-${index}-${file.name}`,
-                file,
-                categoryId: "",
-                state: "idle" as const,
-              })),
-            ]);
+            addFiles(Array.from(event.target.files ?? []));
             event.target.value = "";
           }}
         />
@@ -148,16 +150,18 @@ export function DocumentUploadDialog({
             />
           ))}
         </Box>
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full border-dashed"
-          disabled={sending}
-          onClick={() => inputRef.current?.click()}
-        >
-          <Upload />
-          {rows.length ? "Adicionar mais arquivos" : "Escolher arquivos"}
-        </Button>
+        <AttachDropZone onFiles={addFiles} disabled={sending}>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={sending}
+            onClick={() => inputRef.current?.click()}
+          >
+            <Upload />
+            {rows.length ? "Adicionar mais arquivos" : "Escolher arquivos"}
+          </Button>
+        </AttachDropZone>
         {sending && (
           <Text size="xs" tone="muted" aria-live="polite">
             Enviando {sentCount + 1} de {sentCount + toSend}…

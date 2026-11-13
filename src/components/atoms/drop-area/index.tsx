@@ -9,6 +9,9 @@ type DropAreaProps = {
   disabled?: boolean;
   className?: string;
   children: ReactNode;
+  /** Makes it the area that takes a Ctrl+V (see usePasteFiles). */
+  onPointerEnter?: () => void;
+  onFocusCapture?: () => void;
 };
 
 const hasFiles = (event: DragEvent) =>
@@ -25,6 +28,8 @@ export function DropArea({
   disabled,
   className,
   children,
+  onPointerEnter,
+  onFocusCapture,
 }: DropAreaProps) {
   const depth = useRef(0);
   const [over, setOver] = useState(false);
@@ -37,6 +42,8 @@ export function DropArea({
   return (
     <div
       className={cn("relative", className)}
+      onPointerEnter={onPointerEnter}
+      onFocusCapture={onFocusCapture}
       onDragEnter={(event) => {
         if (disabled || !hasFiles(event)) return;
         event.preventDefault();

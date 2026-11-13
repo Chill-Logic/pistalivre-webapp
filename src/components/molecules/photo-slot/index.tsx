@@ -2,7 +2,9 @@ import { Camera, RefreshCw, X } from "lucide-react";
 import { useRef } from "react";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
+import { DropArea } from "@/components/atoms/drop-area";
 import { FileInput } from "@/components/atoms/file-input";
+import { usePasteFiles } from "@/hooks/ui/usePasteFiles";
 import { Image } from "@/components/atoms/image";
 import { Text } from "@/components/atoms/text";
 import { useObjectUrl } from "@/hooks/ui/useObjectUrl";
@@ -31,75 +33,93 @@ export function PhotoSlot({
 }: PhotoSlotProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const preview = useObjectUrl(file);
+  const takeImage = (files: File[]) => {
+    const image = files.find((f) => f.type.startsWith("image/"));
+    if (image) onChange(image);
+  };
+  // Ctrl+V of a photo goes to the slot under the mouse (or focused).
+  const paste = usePasteFiles(takeImage, !disabled);
 
   return (
-    <Box
-      className={cn(
-        "space-y-2 rounded-md border p-2",
-        error && "border-destructive",
-      )}
-    >
-      <FileInput
-        ref={inputRef}
-        accept="image/*"
-        capture="environment"
-        aria-label={label}
-        onChange={(event) => {
-          onChange(event.target.files?.[0] ?? null);
-          event.target.value = "";
-        }}
-      />
-      <Box className="flex items-center justify-between gap-2">
-        <Text size="sm" weight="medium" className="min-w-0 truncate">
-          {label}
-          {!required && (
-            <Text inline size="xs" tone="muted">
-              {" "}
-              (opcional)
-            </Text>
-          )}
+    <DropArea
+      onFiles={takeImage}
+      disabled={disabled}
+      className="rounded-md"
+      overlay={
+        <Text size="sm" weight="semibold" className="text-primary">
+          Solte a foto
         </Text>
-        {file && (
+      }
+    >
+      <Box
+        {...paste}
+        className={cn(
+          "space-y-2 rounded-md border p-2",
+          error && "border-destructive",
+        )}
+      >
+        <FileInput
+          ref={inputRef}
+          accept="image/*"
+          capture="environment"
+          aria-label={label}
+          onChange={(event) => {
+            onChange(event.target.files?.[0] ?? null);
+            event.target.value = "";
+          }}
+        />
+        <Box className="flex items-center justify-between gap-2">
+          <Text size="sm" weight="medium" className="min-w-0 truncate">
+            {label}
+            {!required && (
+              <Text inline size="xs" tone="muted">
+                {" "}
+                (opcional)
+              </Text>
+            )}
+          </Text>
+          {file && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={`Remover foto: ${label}`}
+              disabled={disabled}
+              onClick={() => onChange(null)}
+            >
+              <X />
+            </Button>
+          )}
+        </Box>
+        {preview ? (
           <Button
             type="button"
             variant="ghost"
-            size="icon"
-            aria-label={`Remover foto: ${label}`}
+            className="relative h-auto w-full overflow-hidden p-0 md:h-auto"
             disabled={disabled}
-            onClick={() => onChange(null)}
+            onClick={() => inputRef.current?.click()}
+            aria-label={`Trocar foto: ${label}`}
           >
-            <X />
+            <Image
+              src={preview}
+              alt={label}
+              className="aspect-[4/3] w-full rounded object-cover"
+            />
+            <RefreshCw className="absolute bottom-2 right-2 size-5 rounded-full bg-background/80 p-1" />
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            className="aspect-[4/3] h-auto w-full flex-col gap-1 border-dashed text-muted-foreground md:h-auto"
+            disabled={disabled}
+            onClick={() => inputRef.current?.click()}
+          >
+            <Camera className="size-6" />
+            Tirar foto
           </Button>
         )}
       </Box>
-      {preview ? (
-        <Button
-          type="button"
-          variant="ghost"
-          className="relative h-auto w-full overflow-hidden p-0 md:h-auto"
-          disabled={disabled}
-          onClick={() => inputRef.current?.click()}
-          aria-label={`Trocar foto: ${label}`}
-        >
-          <Image
-            src={preview}
-            alt={label}
-            className="aspect-[4/3] w-full rounded object-cover"
-          />
-          <RefreshCw className="absolute bottom-2 right-2 size-5 rounded-full bg-background/80 p-1" />
-        </Button>
-      ) : (
-        <Button
-          type="button"
-          variant="outline"
-          className="aspect-[4/3] h-auto w-full flex-col gap-1 border-dashed text-muted-foreground md:h-auto"
-          disabled={disabled}
-          onClick={() => inputRef.current?.click()}
-        >
-          <Camera className="size-6" />
-          Tirar foto
-        </Button>
-      )}
-    </Box>
+    </DropArea>
   );
 }
