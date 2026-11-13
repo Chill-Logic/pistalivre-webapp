@@ -9,16 +9,15 @@ import {
   SheetDescription,
   SheetTitle,
 } from "@/components/atoms/sheet";
-import {
-  AiChatPanel,
-  type ChatEntry,
-} from "@/components/organisms/ai-chat-panel";
+import { AiChatPanel } from "@/components/organisms/ai-chat-panel";
+import { readAiChatOpen, writeAiChatOpen } from "@/helpers/ai-chat-storage";
 import { fulfilledEntry } from "@/helpers/ai-guide";
 import { DESKTOP_MEDIA_QUERY } from "@/constants/layout";
 import { useAiChatAvailable } from "@/hooks/api/gestao/ai/useAi";
 import { useAiDockPresent } from "@/hooks/ui/useAiDockPresence";
 import { aiChatEvents, useAiGuideSpot } from "@/hooks/ui/useAiGuide";
 import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
+import { usePersistedAiChat } from "@/hooks/ui/usePersistedAiChat";
 import { cn } from "@/utils/cn";
 
 /** Starting points (4 of them, at random, each time): what the assistant does outside an editor. */
@@ -54,11 +53,13 @@ export function AiAssistantLauncher() {
   const docked = useAiDockPresent();
   const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);
   const { pathname } = useLocation();
-  const [open, setOpen] = useState(false);
+  // Open before an F5: comes back open, with the conversation.
+  const [open, setOpen] = useState(readAiChatOpen);
+  useEffect(() => writeAiChatOpen(open), [open]);
   // While the guide points at the screen, the window steps aside (it would
   // cover the very field being shown) and comes back when it ends.
   const guiding = useAiGuideSpot() !== null;
-  const conversation = useState<ChatEntry[]>([]);
+  const conversation = usePersistedAiChat("general");
   const setEntries = conversation[1];
 
   // A proposal saved through its form: recorded even with the chat closed.

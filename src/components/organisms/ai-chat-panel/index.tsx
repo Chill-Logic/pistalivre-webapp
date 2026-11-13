@@ -11,6 +11,7 @@ import {
   Undo2,
   Upload,
   X,
+  SquarePen,
 } from "lucide-react";
 import {
   useEffect,
@@ -63,6 +64,7 @@ import type {
   AiUiSource,
 } from "@/types/ai";
 import type { ContractDraftState } from "@/types/contract";
+import { usePersistedAiChat } from "@/hooks/ui/usePersistedAiChat";
 import { cn } from "@/utils/cn";
 
 /** A file as it shows in a sent message. */
@@ -183,7 +185,10 @@ export function AiChatPanel({
   className,
 }: AiChatPanelProps) {
   const chat = useAiChat();
-  const own = useState<ChatEntry[]>([]);
+  // Saved in the browser (survives F5) per document; the floating assistant keeps its own.
+  const own = usePersistedAiChat(
+    `${mode}:${draftId ?? partnerContractId ?? rentalId ?? leadId ?? "new"}`,
+  );
   const [entries, setEntries] = conversation ?? own;
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -399,6 +404,23 @@ ${note}`
           AI
         </Badge>
         <Box className="flex-1" />
+        {entries.length > 0 && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="-my-1 size-8"
+            aria-label="Nova conversa"
+            title="Nova conversa"
+            disabled={working}
+            onClick={() => {
+              setEntries([]);
+              setError(null);
+            }}
+          >
+            <SquarePen />
+          </Button>
+        )}
         {onClose && (
           <Button
             type="button"

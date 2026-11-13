@@ -113,6 +113,8 @@ Documento vivo para a sessão (Claude) que assumir o frontend. Atualize ao passa
 
 - **Manual** (2026-11-13, webapp 1.7.0 + backend 1.10.0): Configurações › Manual (`ROUTES.manual`), no modelo de site de documentação que o dono mandou (Tailwind docs): `useGuide` → `GET /guide`; `ManualIndex` (capítulos em caixa-alta, seção ativa com a barra vermelha à esquerda, busca local sem acento via `utils/guide.ts`), `ManualArticle` (capítulo, título, passos 01/02/03 — cada linha do texto é um passo —, anterior/próximo e "Copiar link"). `?secao=` abre a seção. Celular: busca + select no topo. Ctrl+K: no desktop, Enter num resultado do manual abre a seção na tela; no celular lê no lugar e tem "Abrir no manual".
 
+- **Conversa do Livrinho sobrevive ao F5** (2026-11-13, 1.7.0): `usePersistedAiChat(scope)` guarda a conversa no localStorage por pessoa e lugar (`pl:ai_chat:<userId>:<scope>` — `general` no flutuante, `<mode>:<draftId|contrato|locação>` nos editores), expira em 12 h sem uso, guarda as últimas 60 mensagens e tira as miniaturas `blob:` (morrem com a página). A janela flutuante reabre se estava aberta (sessionStorage). Botão "Nova conversa" (lápis) no cabeçalho do chat.
+
 ## Organização (pedido do dono)
 
 - `pages/`, `hooks/api/` e `services/api/` são divididos **por domínio**: `gestao/`, `cliente/` e `comum/`. Os **componentes são compartilhados** (`components/` único).
