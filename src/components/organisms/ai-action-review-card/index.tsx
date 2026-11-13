@@ -16,44 +16,24 @@ import { InfoItem } from "@/components/molecules/info-item";
 import { SecureImage } from "@/components/molecules/secure-image";
 import { PhotoLightbox } from "@/components/organisms/photo-lightbox";
 import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
-import type { AiActionItem, AiActionStatus } from "@/types/ai";
+import {
+  AI_ACTION_AMOUNT_LABELS as AMOUNT_LABELS,
+  AI_ACTION_STATUS as STATUS,
+  aiActionChannel,
+  aiActionLink,
+  aiActionSummary,
+  formatAiActionValue as show,
+} from "@/helpers/ai-action";
+import type { AiActionItem } from "@/types/ai";
 import type { GalleryPhoto } from "@/types/document";
 import { formatDateTime } from "@/utils/format";
 
 /** Details the server marks as a warning (similar records already in the system). */
 const WARNING_PREFIX = "Atenção";
-/** The amount, shown big next to the title. */
-const AMOUNT_LABELS = ["Custo", "Valor"];
 /** Long texts: full width, at the end. */
 const LONG_LABELS = new Set(["Serviços", "Descrição", "Observações", "Débitos que ele já tem"]);
 /** Already shown as the files themselves. */
 const HIDDEN_LABELS = new Set(["Anexos", "Documentos"]);
-
-const STATUS: Record<AiActionStatus, { label: string; variant: "neutral" | "success" | "warning" | "error" | "outline" }> = {
-  PENDING: { label: "Aguardando você", variant: "warning" },
-  RUNNING: { label: "Executando", variant: "neutral" },
-  DONE: { label: "Feita", variant: "success" },
-  FAILED: { label: "Falhou", variant: "error" },
-  CANCELLED: { label: "Cancelada", variant: "outline" },
-  EXPIRED: { label: "Expirou", variant: "outline" },
-};
-
-const ISO_DAY = /^(\d{4})-(\d{2})-(\d{2})$/;
-
-/** A detail as people read it: calendar days as dd/mm/aaaa. */
-function show(value: unknown): string {
-  if (typeof value === "string") {
-    const day = ISO_DAY.exec(value);
-    return day ? `${day[3]}/${day[2]}/${day[1]}` : value;
-  }
-  if (typeof value === "number") return value.toLocaleString("pt-BR");
-  return JSON.stringify(value);
-}
-
-const resultLink = (result: unknown) => {
-  const link = (result as { link?: unknown } | null)?.link;
-  return typeof link === "string" ? link : null;
-};
 
 type AiActionReviewCardProps = {
   action: AiActionItem;
@@ -92,7 +72,7 @@ export function AiActionReviewCard({ action, onConfirm, onCancel, confirming = f
     [images],
   );
 
-  const link = resultLink(action.result);
+  const link = aiActionLink(action);
   const pending = action.status === "PENDING";
   const busy = confirming || cancelling;
   const hasFiles = action.files.length > 0;
@@ -105,12 +85,10 @@ export function AiActionReviewCard({ action, onConfirm, onCancel, confirming = f
             <Box className="flex flex-wrap items-center gap-2">
               <Badge variant={status.variant}>{status.label}</Badge>
               <Badge variant="outline">{action.toolTitle}</Badge>
-              <Badge variant="outline">
-                {action.channel === "mcp" ? `MCP${action.app ? ` · ${action.app}` : ""}` : "Chat do sistema"}
-              </Badge>
+              <Badge variant="outline">{aiActionChannel(action)}</Badge>
             </Box>
             <Heading level={3} className="text-base leading-snug">
-              {action.summary.replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, "$3/$2/$1")}
+              {aiActionSummary(action)}
             </Heading>
             <Text size="xs" tone="muted">
               Pedida em {formatDateTime(action.createdAt)}

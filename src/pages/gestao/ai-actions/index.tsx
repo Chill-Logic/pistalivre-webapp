@@ -1,10 +1,10 @@
 import { CheckCheck } from "lucide-react";
 import { Box } from "@/components/atoms/box";
 import { Heading } from "@/components/atoms/heading";
-import { Text } from "@/components/atoms/text";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { PageHeader } from "@/components/molecules/page-header";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
+import { AiActionHistory } from "@/components/organisms/ai-action-history";
 import { AiActionReviewCard, AiActionReviewCardSkeleton } from "@/components/organisms/ai-action-review-card";
 import { QueryError } from "@/components/organisms/query-error";
 import { useAiActions } from "@/hooks/api/gestao/ai/useAiActions";
@@ -65,12 +65,7 @@ export function AiActionsPage() {
               <Heading level={2} variant="section">
                 Decididas nos últimos 7 dias
               </Heading>
-              <Text size="sm" tone="muted">
-                O que foi feito, cancelado ou expirou.
-              </Text>
-              {list.data.recent.map((action) => (
-                <AiActionReviewCard key={action.id} action={action} />
-              ))}
+              <AiActionHistory actions={list.data.recent} />
             </Box>
           )}
         </>
