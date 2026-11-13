@@ -5,6 +5,7 @@ import { errorMessage } from "@/helpers/api-error";
 import { openBlobInNewTab } from "@/helpers/files";
 import { partnersService } from "@/services/api/gestao/partners.service";
 import type {
+  PartnerCalculatorScenario,
   PartnerContract,
   PartnerContractDetail,
   PartnerContractInput,
@@ -184,3 +185,32 @@ export function useRequestPartnerProposalSignature(contractId: string) {
     },
   });
 }
+
+/**
+ * "Enviar para assinatura" straight (the deal was closed outside): errors stay
+ * with the editor (422: no vehicle, no offered rent).
+ */
+export function useSendPartnerToSignature(contractId: string) {
+  const refresh = useRefreshProposals(contractId);
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => partnersService.sendToSignature(contractId),
+    onSuccess: ({ version }) => {
+      refresh();
+      queryClient.invalidateQueries({ queryKey: queryKeys.partners.contract(contractId) });
+      toast.success(`Versão ${version.number} enviada para assinatura`);
+    },
+  });
+}
+
+/** Saves the calculator's scenario quietly (it's a working note, saved as typed). */
+export function useSavePartnerCalculator(contractId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (scenario: PartnerCalculatorScenario) =>
+      partnersService.saveCalculator(contractId, scenario),
+    onSuccess: (contract) =>
+      queryClient.setQueryData(queryKeys.partners.contract(contractId), contract),
+  });
+}
+

@@ -11,7 +11,9 @@ import type {
   PartnerContract,
   PartnerContractDetail,
   PartnerContractDocument,
+  PartnerCalculatorScenario,
   PartnerContractDocumentDraft,
+  PartnerContractTextDraft,
   PartnerContractInput,
   PartnerDetail,
   PartnerFilters,
@@ -117,6 +119,36 @@ export const partnersService = {
     const { data } = await http.get<PartnerContractDocument>(
       `/partner-contracts/${id}/document`,
     );
+    return data;
+  },
+  /**
+   * The contract's LIVING text (saved on the server, created from the base
+   * text the first time): the editor, the chat and MCP edit the same text.
+   */
+  async textDraft(id: string) {
+    const { data } = await http.get<PartnerContractTextDraft>(
+      `/partner-contracts/${id}/text-draft`,
+    );
+    return data;
+  },
+  /** Saves the calculator's scenario on the contract (a working note). */
+  async saveCalculator(id: string, scenario: PartnerCalculatorScenario) {
+    const { data } = await http.put<PartnerContract>(
+      `/partner-contracts/${id}/calculator`,
+      scenario,
+    );
+    return data;
+  },
+  /**
+   * "Enviar para assinatura" without the partner's review (closed outside):
+   * the text (the living draft's) and the terms freeze as a version accepted
+   * by the company, and the signature request opens with the partner.
+   */
+  async sendToSignature(id: string) {
+    const { data } = await http.post<{
+      version: PartnerProposalVersion;
+      signatureRequestId: string;
+    }>(`/partner-contracts/${id}/send-to-signature`, {}, { timeout: 120_000 });
     return data;
   },
   /** Base text with the contract's data; nothing saved. */

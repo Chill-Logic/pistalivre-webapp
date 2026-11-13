@@ -59,6 +59,15 @@ type AiDocumentEditorProps = {
    * reloaded live when the chat or an MCP client changes it, undoable.
    */
   draft?: ContractDraftSync;
+  /** A second way out beside the main one (e.g. "Enviar para assinatura"). */
+  extraAction?: {
+    label: string;
+    icon?: ReactNode;
+    onClick: (html: string) => void;
+    busy?: boolean;
+  };
+  /** Shown under the assistant (e.g. the partner contract's calculator). */
+  aside?: ReactNode;
 };
 
 /**
@@ -78,6 +87,8 @@ export function AiDocumentEditor({
   previewing,
   onSave,
   saving,
+  extraAction,
+  aside,
   saveLabel = "Gerar PDF e salvar",
   savingLabel = "Gerando PDF…",
   saveIcon,
@@ -132,6 +143,17 @@ export function AiDocumentEditor({
             {previewing ? <Spinner /> : <Eye />}
             Visualizar PDF
           </Button>
+          {extraAction && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => extraAction.onClick(html)}
+              disabled={saving || extraAction.busy || empty}
+            >
+              {extraAction.busy ? <Spinner /> : extraAction.icon}
+              {extraAction.label}
+            </Button>
+          )}
           <Button
             type="button"
             onClick={() => onSave(html)}
@@ -149,13 +171,24 @@ export function AiDocumentEditor({
     </Card>
   );
 
-  if (!chatAvailable) return editor;
+  if (!chatAvailable) {
+    if (!aside) return editor;
+    return (
+      <Row className="gap-y-4">
+        <Col lg={7}>{editor}</Col>
+        <Col lg={5}>{aside}</Col>
+      </Row>
+    );
+  }
+  // With something under the chat (the calculator), the side column needs room.
+  const side = aside ? 5 : 4;
+  const main = aside ? 7 : 8;
   return (
     <Row className="gap-y-4">
-      <Col lg={8} className="order-2 lg:order-1">
+      <Col lg={main} className="order-2 lg:order-1">
         {editor}
       </Col>
-      <Col lg={4} className="order-1 lg:order-2">
+      <Col lg={side} className="order-1 space-y-4 lg:order-2">
         <AiChatDock
           {...chat}
           html={html}
@@ -164,6 +197,7 @@ export function AiDocumentEditor({
             ? { prepare: draft.flush, draftId: draft.id, onDraft: draft.apply }
             : {})}
         />
+        {aside}
       </Col>
     </Row>
   );

@@ -1,5 +1,5 @@
 import { Calculator, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -49,12 +49,21 @@ export type CalculatorTerms = {
   costs: Record<PartnerCostKey, PartnerCostPayerCode>;
 };
 
+/** The scenario as the calculator holds it (what the page saves on the contract). */
+export type CalculatorScenarioValues = {
+  count: number | null;
+  rate: number | null;
+  period: "DAILY" | "WEEKLY" | "MONTHLY" | null;
+  occupancy: number | null;
+  costs: Partial<Record<PartnerCostKey, number | null>>;
+};
+
 /**
  * A scenario handed to the calculator from outside (the assistant read the
  * deal): each change of `key` applies it once; null fields keep what's there.
  */
 export type CalculatorFill = {
-  key: number;
+  key: number | string;
   count: number | null;
   rate: number | null;
   period: RatePeriod | null;
@@ -106,11 +115,14 @@ export function PartnerContractCalculator({
   terms,
   initialGroups,
   fill,
+  onScenarioChange,
   className,
 }: {
   terms: CalculatorTerms | null;
   /** The assistant's scenario ("Preencher na tela"): applied when its key changes. */
   fill?: CalculatorFill | null;
+  /** The person changed the scenario here (not a fill): the page may save it. */
+  onScenarioChange?: (scenario: CalculatorScenarioValues) => void;
   /** The contract's vehicles, grouped by rent (editing): the starting point. */
   initialGroups?: { count: number; rate: number | null; period: RatePeriod }[];
   className?: string;
@@ -136,8 +148,14 @@ export function PartnerContractCalculator({
     fines: null,
   });
 
+  // Changes that came from a fill (or the first render) are not the person's.
+  const quiet = useRef(true);
+  const onChangeRef = useRef(onScenarioChange);
+  onChangeRef.current = onScenarioChange;
+
   useEffect(() => {
     if (!fill) return;
+    quiet.current = true;
     if (fill.count != null || fill.rate != null || fill.period != null) {
       setGroups((list) => {
         const first = list[0];
@@ -164,6 +182,21 @@ export function PartnerContractCalculator({
     // Once per scenario (its key), not on every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fill?.key]);
+
+  useEffect(() => {
+    if (quiet.current) {
+      quiet.current = false;
+      return;
+    }
+    const first = groups[0];
+    onChangeRef.current?.({
+      count: first ? intOf(first.count) : null,
+      rate: first?.rate ?? null,
+      period: (first?.period ?? null) as CalculatorScenarioValues["period"],
+      occupancy: Math.min(100, intOf(occupancy)),
+      costs: { ...costs },
+    });
+  }, [groups, occupancy, costs]);
 
   const patchGroup = (key: number, change: Partial<Group>) =>
     setGroups((list) =>

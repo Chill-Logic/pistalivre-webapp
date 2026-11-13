@@ -16,16 +16,16 @@ import { isNotFound } from "@/helpers/api-error";
 import { currentVehicles } from "@/helpers/partner";
 import {
   usePartnerContract,
-  usePartnerContractDocumentDraft,
   usePartnerContractProposals,
+  usePartnerContractTextDraft,
 } from "@/hooks/api/gestao/partners/usePartners";
 import { formatDateTime } from "@/utils/format";
 
 /**
- * The text of a partner contract's proposal: the base text merged with its
- * terms and vehicles, the AI assistant beside it, "Visualizar PDF" and
- * "Enviar proposta ao parceiro" (back to the contract). Only a draft with a
- * vehicle: an active contract has its terms locked.
+ * The partner contract as a LIVING DRAFT: its text saved on the server, the
+ * assistant beside it (it adjusts text, terms and calculator as you talk) and
+ * the calculator under the chat, until someone sends it — to the partner's
+ * review or straight to signature. Only a draft: once sent or active, locked.
  */
 export function PartnerContractDocumentPage() {
   const { id = "" } = useParams();
@@ -35,8 +35,10 @@ export function PartnerContractDocumentPage() {
   const hasVehicles = contract.data
     ? currentVehicles(contract.data).length > 0
     : false;
-  const editable = isDraft && hasVehicles;
-  const draft = usePartnerContractDocumentDraft(id, editable);
+  // The living draft is worked on from the start (the assistant can even add
+  // the vehicles); sending asks for them.
+  const editable = isDraft;
+  const draft = usePartnerContractTextDraft(id, editable);
   const proposals = usePartnerContractProposals(editable ? id : "");
   const contractUrl = routeTo.partnerContract(id);
   const versions = proposals.data?.items ?? [];
@@ -51,7 +53,7 @@ export function PartnerContractDocumentPage() {
         to={contract.data ? contractUrl : ROUTES.partners}
         label={contract.data?.code ?? "Contrato"}
       />
-      <PageHeader title="Proposta ao parceiro" />
+      <PageHeader title="Montar o contrato" />
 
       {(contract.isPending || (editable && draft.isPending)) && (
         <SkeletonRegion label="Montando o contrato…">
@@ -86,11 +88,23 @@ export function PartnerContractDocumentPage() {
         />
       )}
 
-      {isDraft && !hasVehicles && (
+      {isDraft && !hasVehicles && draft.data?.workable && (
+        <Alert variant="info" role="note" className="flex items-center gap-2">
+          <Car className="size-4 shrink-0" aria-hidden />
+          Ainda sem motos neste contrato: inclua na tela do contrato (ou peça ao
+          Livrinho) antes de enviar.
+        </Alert>
+      )}
+
+      {editable && draft.isError && (
+        <QueryError error={draft.error} onRetry={() => draft.refetch()} />
+      )}
+
+      {editable && draft.data && !draft.data.workable && (
         <EmptyState
-          icon={Car}
-          title="Inclua os veículos antes"
-          description="O documento descreve os veículos do contrato: inclua ao menos um para montá-lo."
+          icon={Lock}
+          title="Este contrato já saiu daqui"
+          description={draft.data.lockedReason ?? "O texto e os termos não mudam mais."}
           action={
             <Button asChild variant="outline">
               <Link to={contractUrl}>Voltar ao contrato</Link>
@@ -99,11 +113,7 @@ export function PartnerContractDocumentPage() {
         />
       )}
 
-      {editable && draft.isError && (
-        <QueryError error={draft.error} onRetry={() => draft.refetch()} />
-      )}
-
-      {editable && draft.data && (
+      {editable && draft.data?.workable && contract.data && (
         <>
           {pending ? (
             <Alert variant="info" role="note">
@@ -118,11 +128,14 @@ export function PartnerContractDocumentPage() {
             </Alert>
           ) : null}
           <PartnerContractEditor
-            contractId={id}
-            initialHtml={draft.data.html}
+            contract={contract.data}
+            draft={draft.data.draft}
             aiEnabled={draft.data.aiEnabled}
             cancelTo={contractUrl}
             onSent={() => navigate(contractUrl, { replace: true })}
+            onSentToSignature={(signatureId) =>
+              navigate(routeTo.signature(signatureId), { replace: true })
+            }
           />
         </>
       )}

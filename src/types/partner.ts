@@ -92,6 +92,7 @@ export type PartnerContract = {
   payoutMode: PartnerPayoutMode;
   fixedPayout: number | null;
   maintenanceFeePercent: number | null;
+  calculatorScenario?: PartnerCalculatorScenario | null;
   payoutFrequency: PartnerPayoutFrequency;
   /** Monthly payout: day of the month (1–31). */
   payoutDay: number | null;
@@ -188,6 +189,30 @@ export type PartnerContractDocument = {
 };
 
 /** Base text merged with the contract's data, for the editor. */
+/**
+ * The calculator's scenario saved on the contract ("Quanto o parceiro
+ * recebe?"), shared by the screen and the assistant. A working note, not a term.
+ */
+export type PartnerCalculatorScenario = {
+  count: number | null;
+  rate: number | null;
+  period: "DAILY" | "WEEKLY" | "MONTHLY" | null;
+  occupancy: number | null;
+  /** Per vehicle per month (taxes: per year). */
+  costs: Partial<
+    Record<"maintenance" | "insurance" | "tracker" | "taxes" | "fines", number | null>
+  >;
+};
+
+/** GET /partner-contracts/:id/text-draft: the contract's living text. */
+export type PartnerContractTextDraft = {
+  draft: import("@/types/contract").ContractDraftState;
+  aiEnabled: boolean;
+  /** Still a draft with nothing sent: the text and the terms can change. */
+  workable: boolean;
+  lockedReason: string | null;
+};
+
 export type PartnerContractDocumentDraft = {
   html: string;
   /** Whether the AI is configured (the chat also needs the person's tools). */

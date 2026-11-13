@@ -40,8 +40,10 @@ export type ContractDraftVia = "editor" | "chat" | "mcp" | "template";
  */
 export type ContractDraftState = {
   id: string;
-  rentalId: string;
-  templateId: string;
+  /** Owner: a rental's contract (rentalId + templateId) or a partner contract. */
+  rentalId: string | null;
+  templateId: string | null;
+  partnerContractId?: string | null;
   html: string;
   version: number;
   updatedVia: ContractDraftVia;

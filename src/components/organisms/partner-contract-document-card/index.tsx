@@ -22,9 +22,10 @@ import { formatDateTime, formatFileSize } from "@/utils/format";
 /**
  * The contract's PDF — the one of the last proposal sent (each version
  * generates its own). On a draft, "Montar contrato"/"Editar texto" opens the
- * editor with the AI assistant, from where a new version goes to the partner.
- * The server asks for a vehicle, so without one the button explains why it
- * waits. Active or ended: only the PDF.
+ * living draft (text saved on the server) with the AI assistant, which also
+ * adjusts the terms and the calculator; from there it goes to the partner's
+ * review or straight to signature (the vehicles are asked for at sending).
+ * Active or ended: only the PDF.
  */
 export function PartnerContractDocumentCard({
   contract,
@@ -100,28 +101,22 @@ export function PartnerContractDocumentCard({
         ) : (
           <>
             <Text tone="muted">
-              Monte o contrato a partir do texto-base com os dados deste
-              contrato, ajuste com o assistente de IA e envie como proposta: o
-              PDF é gerado a cada versão.
+              Monte o contrato conversando com o Livrinho: ele ajusta o texto,
+              os termos e a calculadora enquanto vocês conversam (tudo fica
+              salvo). Ao final, envie para a revisão do parceiro ou direto para
+              assinatura.
             </Text>
             {!hasVehicles && (
               <Text size="xs" tone="muted">
-                Para montar o documento, inclua ao menos um veículo no contrato.
+                Antes de enviar, inclua ao menos um veículo no contrato.
               </Text>
             )}
-            {hasVehicles ? (
-              <Button asChild className="w-full sm:w-auto">
-                <Link to={editorUrl}>
-                  <FilePlus2 />
-                  Montar contrato
-                </Link>
-              </Button>
-            ) : (
-              <Button className="w-full sm:w-auto" disabled>
+            <Button asChild className="w-full sm:w-auto">
+              <Link to={editorUrl}>
                 <FilePlus2 />
                 Montar contrato
-              </Button>
-            )}
+              </Link>
+            </Button>
           </>
         )}
       </CardContent>

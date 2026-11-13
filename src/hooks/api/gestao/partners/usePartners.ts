@@ -41,6 +41,21 @@ export function usePartnerContractProposals(id: string) {
   });
 }
 
+/**
+ * The contract's living text, opened once per visit: after that the editor
+ * keeps it in step (autosave + realtime), so this query never refetches.
+ */
+export function usePartnerContractTextDraft(id: string, enabled: boolean) {
+  return useQuery({
+    queryKey: queryKeys.partners.contractTextDraft(id),
+    queryFn: () => partnersService.textDraft(id),
+    enabled: enabled && Boolean(id),
+    staleTime: Infinity,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
+  });
+}
+
 /** The editor's starting text: read once per visit (the person edits it). */
 export function usePartnerContractDocumentDraft(id: string, enabled: boolean) {
   return useQuery({
