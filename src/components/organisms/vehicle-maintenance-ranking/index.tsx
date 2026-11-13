@@ -1,5 +1,5 @@
-import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import {
   Card,
@@ -7,12 +7,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/card";
-import { Row } from "@/components/atoms/grid";
 import { List, ListItem } from "@/components/atoms/list";
+import { Meter } from "@/components/atoms/meter";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
-import { InfoItem } from "@/components/molecules/info-item";
 import { VehicleStatusBadge } from "@/components/molecules/vehicle-status-badge";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "@/components/organisms/data-table";
 import { routeTo } from "@/constants/routes";
 import type { VehicleRankingItem } from "@/types/dashboard";
 import {
@@ -30,76 +33,157 @@ type VehicleMaintenanceRankingProps = {
   idleCount: number;
 };
 
+/** A rented vehicle nobody inspected is the thing to look at, not a neutral zero. */
+const missingInspection = (v: VehicleRankingItem) =>
+  v.inspectionCount === 0 && v.status === "RENTED";
+
+const dash = <Text inline tone="muted">—</Text>;
+
+function columns(maxCost: number): DataTableColumn<VehicleRankingItem>[] {
+  return [
+    {
+      header: "Veículo",
+      skeleton: "w-32",
+      cell: (v) => (
+        <Box className="flex items-baseline gap-2">
+          <Text inline weight="semibold" mono>
+            {formatPlate(v.plate)}
+          </Text>
+          <Text inline tone="muted" className="font-normal">
+            {v.label}
+          </Text>
+        </Box>
+      ),
+    },
+    {
+      header: "Situação",
+      skeletonShape: "pill",
+      cell: (v) => <VehicleStatusBadge status={v.status} />,
+    },
+    {
+      header: "Gasto",
+      align: "right",
+      skeleton: "ml-auto w-20",
+      className: "w-44",
+      cell: (v) => (
+        <Box className="space-y-1">
+          <Text inline>{formatCurrency(v.maintenanceCost)}</Text>
+          {maxCost > 0 && (
+            <Meter value={v.maintenanceCost / maxCost} className="ml-auto h-1 w-28" />
+          )}
+        </Box>
+      ),
+    },
+    {
+      header: "Manutenções",
+      align: "right",
+      skeleton: "ml-auto w-8",
+      cell: (v) => (v.maintenanceCount ? v.maintenanceCount : dash),
+    },
+    {
+      header: "Vistorias",
+      align: "right",
+      skeleton: "ml-auto w-8",
+      cell: (v) =>
+        missingInspection(v) ? (
+          <Badge variant="warning">nenhuma</Badge>
+        ) : v.inspectionCount ? (
+          v.inspectionCount
+        ) : (
+          dash
+        ),
+    },
+    {
+      header: "Km atual",
+      align: "right",
+      skeleton: "ml-auto w-16",
+      cell: (v) => (v.currentKm != null ? formatMileage(v.currentKm) : dash),
+    },
+    {
+      header: "Última manutenção",
+      align: "right",
+      skeleton: "ml-auto w-20",
+      cell: (v) =>
+        v.lastMaintenance ? formatCalendarDate(v.lastMaintenance) : dash,
+    },
+  ];
+}
+
+/**
+ * Maintenance per vehicle: a dense table on desktop (one line per vehicle,
+ * numbers aligned, the spend with a bar to compare at a glance) and compact
+ * lines on the phone. A rented vehicle never inspected is flagged.
+ */
 export function VehicleMaintenanceRanking({
   vehicles,
   idleCount,
 }: VehicleMaintenanceRankingProps) {
+  const maxCost = Math.max(0, ...vehicles.map((v) => v.maintenanceCost));
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-base">Manutenção por veículo</CardTitle>
       </CardHeader>
-      <CardContent className="px-0 md:px-0">
+      <CardContent className="space-y-3">
         {vehicles.length === 0 ? (
           <Text tone="muted" className="py-6 text-center">
             Nenhuma manutenção ou vistoria registrada.
           </Text>
         ) : (
-          <List className="divide-y border-t">
-            {vehicles.map((vehicle) => (
-              <ListItem key={vehicle.vehicleId}>
-                <Link
-                  to={routeTo.vehicle(vehicle.vehicleId)}
-                  className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-accent/50 focus-visible:bg-accent/50 focus-visible:outline-none md:px-6"
-                >
-                  <Box className="min-w-0 flex-1 space-y-2">
-                    <Box className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <>
+            <Box className="hidden md:block">
+              <DataTable
+                columns={columns(maxCost)}
+                items={vehicles}
+                rowKey={(v) => v.vehicleId}
+                rowHref={(v) => routeTo.vehicle(v.vehicleId)}
+                isLoading={false}
+                empty={null}
+                loadingLabel="Carregando veículos…"
+              />
+            </Box>
+            <List className="-mx-4 divide-y border-y md:hidden">
+              {vehicles.map((v) => (
+                <ListItem key={v.vehicleId}>
+                  <Link
+                    to={routeTo.vehicle(v.vehicleId)}
+                    className="block space-y-1 px-4 py-3 transition-colors hover:bg-accent/50 focus-visible:bg-accent/50 focus-visible:outline-none"
+                  >
+                    <Box className="flex items-center gap-2">
                       <Text weight="semibold" mono>
-                        {formatPlate(vehicle.plate)}
+                        {formatPlate(v.plate)}
                       </Text>
-                      {/* Phone: plate + badge on top, the model below (same shape
-                          every row); from sm the model sits between them. */}
-                      <Text
-                        truncate
-                        tone="muted"
-                        className="order-last min-w-0 basis-full sm:order-none sm:basis-auto"
-                      >
-                        {vehicle.label}
+                      <VehicleStatusBadge status={v.status} />
+                      <Text weight="medium" className="ml-auto tabular-nums">
+                        {formatCurrency(v.maintenanceCost)}
                       </Text>
-                      {/* Beside the model, not pushed to the edge: the badges have
-                          different widths and never lined up with anything there. */}
-                      <VehicleStatusBadge status={vehicle.status} />
                     </Box>
-                    <Row as="dl" className="gap-y-2">
-                      <InfoItem span={6} md={3} label="Gasto">
-                        {formatCurrency(vehicle.maintenanceCost)}
-                      </InfoItem>
-                      <InfoItem span={6} md={3} label="Manutenções · vistorias">
-                        {vehicle.maintenanceCount} · {vehicle.inspectionCount}
-                      </InfoItem>
-                      <InfoItem span={6} md={3} label="Km atual">
-                        {vehicle.currentKm != null
-                          ? formatMileage(vehicle.currentKm)
-                          : null}
-                      </InfoItem>
-                      <InfoItem span={6} md={3} label="Última manutenção">
-                        {vehicle.lastMaintenance
-                          ? formatCalendarDate(vehicle.lastMaintenance)
-                          : null}
-                      </InfoItem>
-                    </Row>
-                  </Box>
-                  <ChevronRight
-                    className="size-4 shrink-0 text-muted-foreground"
-                    aria-hidden
-                  />
-                </Link>
-              </ListItem>
-            ))}
-          </List>
+                    <Text size="xs" tone="muted" truncate>
+                      {v.label}
+                    </Text>
+                    <Box className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <Text size="xs" tone="muted" className="tabular-nums">
+                        {pluralize(v.maintenanceCount, "manutenção", "manutenções")}
+                        {v.currentKm != null && ` · ${formatMileage(v.currentKm)}`}
+                        {v.lastMaintenance && ` · última ${formatCalendarDate(v.lastMaintenance)}`}
+                      </Text>
+                      {missingInspection(v) ? (
+                        <Badge variant="warning">sem vistoria</Badge>
+                      ) : (
+                        <Text size="xs" tone="muted">
+                          · {pluralize(v.inspectionCount, "vistoria", "vistorias")}
+                        </Text>
+                      )}
+                    </Box>
+                  </Link>
+                </ListItem>
+              ))}
+            </List>
+          </>
         )}
         {idleCount > 0 && vehicles.length > 0 && (
-          <Text size="xs" tone="muted" className="border-t px-4 pt-3 md:px-6">
+          <Text size="xs" tone="muted">
             {pluralize(
               idleCount,
               "veículo sem manutenção nem vistoria fica fora da lista.",
@@ -120,19 +204,29 @@ export function VehicleMaintenanceRankingSkeleton() {
       <CardHeader>
         <Skeleton shape="text" className="w-48 text-base" />
       </CardHeader>
-      <CardContent className="px-0 md:px-0">
-        <Box className="divide-y border-t">
+      <CardContent>
+        <Box className="hidden md:block">
+          <DataTable
+            columns={columns(0)}
+            items={undefined}
+            rowKey={(v) => v.vehicleId}
+            rowHref={() => ""}
+            isLoading
+            empty={null}
+            loadingLabel="Carregando veículos…"
+            skeletonRows={SKELETON_ROWS}
+          />
+        </Box>
+        <Box className="-mx-4 divide-y border-y md:hidden">
           {Array.from({ length: SKELETON_ROWS }, (_, index) => (
-            <Box key={index} className="space-y-3 px-4 py-3 md:px-6">
-              <Box className="flex items-center gap-3">
+            <Box key={index} className="space-y-2 px-4 py-3">
+              <Box className="flex items-center gap-2">
                 <Skeleton shape="text" className="w-20 text-sm" />
-                <Skeleton shape="text" className="w-40 text-sm" />
+                <Skeleton shape="pill" className="h-5 w-16" />
+                <Skeleton shape="text" className="ml-auto w-16 text-sm" />
               </Box>
-              <Box className="flex gap-6">
-                <Skeleton shape="text" className="w-16 text-sm" />
-                <Skeleton shape="text" className="w-16 text-sm" />
-                <Skeleton shape="text" className="w-16 text-sm" />
-              </Box>
+              <Skeleton shape="text" className="w-32 text-xs" />
+              <Skeleton shape="text" className="w-48 text-xs" />
             </Box>
           ))}
         </Box>
