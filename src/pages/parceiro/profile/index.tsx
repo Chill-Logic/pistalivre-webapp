@@ -28,9 +28,10 @@ export function PartnerProfilePage() {
   };
 
   return (
-    <Box className="space-y-4">
-      {/* Desktop: "Perfil" is in the sidebar, no way back needed. */}
-      <Box className="md:hidden">
+    <Box>
+      {/* Desktop: "Perfil" is in the sidebar, no way back needed. The gap
+          lives on the link, so the hidden link leaves no space above the title. */}
+      <Box className="mb-4 md:hidden">
         <BackLink to={ROUTES.partnerArea} label="Meus contratos" />
       </Box>
       <Box className="space-y-6">

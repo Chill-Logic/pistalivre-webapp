@@ -111,12 +111,11 @@ export function PartnerAreaPasswordForm({
           <Box className="flex justify-end">
             <Button
               type="submit"
+              variant="outline"
               disabled={change.isPending}
               className="w-full sm:w-auto"
             >
-              {change.isPending && (
-                <Spinner className="text-primary-foreground" />
-              )}
+              {change.isPending && <Spinner />}
               Trocar senha
             </Button>
           </Box>

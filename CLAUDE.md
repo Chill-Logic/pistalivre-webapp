@@ -17,6 +17,7 @@ React 19 + Vite 6 + TanStack Query 5 + React Router 7 + Tailwind 3 + Radix/shadc
   (5 erros = 15 min de bloqueio). Portal: `cliente.teste@pistalivre.dev` / `teste123`.
   **Login do Claude para testes visuais** (ADMIN, só no banco de dev, criado em 2026-11-13 com aval do dono):
   `claude@dev.com` / `Claude-tdnCSF8O`. Use este, e não o do dono, nos prints e no Puppeteer.
+  Área do parceiro: `parceiro@dev.com.br` / `ParceiroDev-2026` (senha redefinida no dev em 2026-11-14 com aval do dono).
 - Se a API não subir com `ERR_MODULE_NOT_FOUND`, o `node_modules` da imagem ficou velho:
   `docker compose build dev && docker compose up -d -V dev`.
 - Antes de commitar: `npx tsc -b` + `npx eslint . --max-warnings 0` + o grep de HTML nativo (abaixo).
