@@ -6,6 +6,7 @@ import { Text } from "@/components/atoms/text";
 import { Logo } from "@/components/molecules/logo";
 import { SearchTrigger } from "@/components/molecules/search-trigger";
 import { ThemeToggle } from "@/components/molecules/theme-toggle";
+import { NotificationBell } from "@/components/organisms/notification-bell";
 import { PwaOpenInApp } from "@/components/organisms/pwa-open-in-app";
 import { useLogout } from "@/hooks/auth/useLogout";
 import type { AuthUser } from "@/types/auth";
@@ -33,6 +34,7 @@ export function AppHeader({ user }: AppHeaderProps) {
             <SearchTrigger />
           </Box>
           <SearchTrigger layout="icon" className="md:hidden" />
+          <NotificationBell />
         </>
       )}
       <PwaOpenInApp user={user} />

@@ -13,6 +13,12 @@ import type { VehicleFilters } from "@/types/vehicle";
 
 /** Query key factory: one place to build and invalidate cache keys. */
 export const queryKeys = {
+  notifications: {
+    all: ["notifications"] as const,
+    list: () => [...queryKeys.notifications.all, "list"] as const,
+    settings: () => [...queryKeys.notifications.all, "settings"] as const,
+    admin: () => [...queryKeys.notifications.all, "admin"] as const,
+  },
   guide: {
     all: ["guide"] as const,
   },

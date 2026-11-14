@@ -88,6 +88,8 @@ export const REALTIME_INVALIDATIONS: Record<
   "customer.created": [queryKeys.customers.all, queryKeys.dashboard.all],
   "transfer.updated": [queryKeys.finance.all, queryKeys.reimbursements.all],
   "bank.updated": [queryKeys.finance.all],
+  /** A notice for this person (the server sends it only to their room). */
+  "notification.created": [queryKeys.notifications.list()],
   /** The assistant (chat/MCP) changed a partner contract's terms, calculator or vehicles. */
   "partner_contract.updated": [queryKeys.partners.all],
 };

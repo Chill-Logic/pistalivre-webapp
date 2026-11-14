@@ -86,6 +86,12 @@ Tela **Manual** (`pages/gestao/manual`, 2026-11-13): o manual do backend (`GET /
 índice por capítulo com busca à esquerda (`ManualIndex`), seção com passos numerados à direita (`ManualArticle`),
 `?secao=<id>` endereça cada seção; no celular o índice vira busca + select. No Ctrl+K, resultado do manual abre a
 seção nessa tela. **Funcionalidade nova entra no manual na mesma entrega** (no backend, `system-guide.ts`).
+**Notificações** (2026-11-14, 1.14.0): sininho no header da gestão (`NotificationBell`, popover por dia, abrir marca como
+lida e navega com `toAppPath`), tela Configurações › Notificações (`pages/gestao/notification-settings`: o que a
+pessoa quer, push neste aparelho com "Enviar teste" e, para o ADMIN, o que cada grupo pode e o horário do resumo).
+Push: `public/push-sw.js` importado pelo service worker gerado (`workbox.importScripts`), `helpers/push.ts` +
+`usePushDevice` (a permissão só é pedida no clique). Em dev o service worker fica desligado: para testar push,
+`npm run build && npm run preview`. Tempo real por `notification.created` (sala do usuário).
 Busca universal **Ctrl+K** (`SearchPalette`, 2026-11-12): registros do servidor (`GET /search`) + telas,
 ações e manual; ao criar tela/ação nova, acrescente em `constants/navigation.ts`/`constants/search.ts`.
 

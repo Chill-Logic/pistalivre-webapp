@@ -106,6 +106,7 @@ export const ROUTES = {
   aiAttachments: `${GESTAO}/ia/anexos`,
   aiActions: `${GESTAO}/ia/acoes`,
   manual: `${GESTAO}/manual`,
+  notificationSettings: `${GESTAO}/notificacoes`,
   partners: `${GESTAO}/parceiros`,
   partnerNew: `${GESTAO}/parceiros/novo`,
   partnerDetail: `${GESTAO}/parceiros/:id`,

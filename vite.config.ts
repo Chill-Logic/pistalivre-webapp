@@ -106,6 +106,9 @@ export default defineConfig({
       manifest,
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        // Push notifications (public/push-sw.js): shows the notice and opens
+        // the screen on tap. Imported, so the generated worker stays as is.
+        importScripts: ["push-sw.js"],
         // API responses are never cached by the service worker: stale billing
         // data is worse than an offline error. React Query owns the cache.
         navigateFallbackDenylist: [/^\/api\//, /^\/version\.json$/],
