@@ -1,7 +1,7 @@
 {
   "name": "pistalivre-webapp",
   "private": true,
-  "version": "1.12.3",
+  "version": "1.12.4",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
@@ -11,7 +11,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "typecheck": "tsc -b",
-    "pwa:assets": "pwa-assets-generator"
+    "pwa:assets": "pwa-assets-generator",
+    "shots": "node scripts/shots.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.2.5",

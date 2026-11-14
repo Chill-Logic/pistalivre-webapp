@@ -57,6 +57,7 @@ const COLUMNS: DataTableColumn<Vehicle>[] = [
   { header: "Ano", cell: (vehicle) => vehicle.year, skeleton: "w-10" },
   {
     header: "Km",
+    align: "right",
     cell: (vehicle) =>
       vehicle.currentMileage !== null
         ? formatMileage(vehicle.currentMileage)

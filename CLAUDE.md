@@ -12,7 +12,8 @@ modelo de negócio e o domínio estão no `CLAUDE.md` do `pista-livre`: **leia o
 React 19 + Vite 6 + TanStack Query 5 + React Router 7 + Tailwind 3 + Radix/shadcn, **mobile first** e
 **PWA** (vite-plugin-pwa, prompt de atualização).
 
-- Dev: `node node_modules/vite/bin/vite.js --host --port 5173 --strictPort`.
+- Dev: `node node_modules/vite/bin/vite.js --host --port 5173 --strictPort`. O `.env.development.local`
+  (fora do git) aponta o dev para a API local `:3000`; sem ele, o `.env`/`.env.local` mandam para a de **produção**.
 - API: `docker compose up dev` no `pista-livre`, em `:3000`. Login `admin@pistalivre.dev` / `admin123`
   (5 erros = 15 min de bloqueio). Portal: `cliente.teste@pistalivre.dev` / `teste123`.
   **Login do Claude para testes visuais** (ADMIN, só no banco de dev, criado em 2026-11-13 com aval do dono):
@@ -21,8 +22,11 @@ React 19 + Vite 6 + TanStack Query 5 + React Router 7 + Tailwind 3 + Radix/shadc
 - Se a API não subir com `ERR_MODULE_NOT_FOUND`, o `node_modules` da imagem ficou velho:
   `docker compose build dev && docker compose up -d -V dev`.
 - Antes de commitar: `npx tsc -b` + `npx eslint . --max-warnings 0` + o grep de HTML nativo (abaixo).
-- Testes visuais: Puppeteer do `../pista-livre/node_modules/puppeteer`, em 390×844 e 1366×820. **Escrita
-  sempre simulada** (interceptar a request); nunca gravar em dado existente do dev.
+- Testes visuais: **`npm run shots -- [--area gestao|cliente|parceiro] [--theme dark] [--full] [--ai] /caminho…`**
+  (`scripts/shots.mjs`: Puppeteer do `../pista-livre`, 390×844 e 1366×820, escrita bloqueada, saída em `shots/`).
+  No Git Bash, prefixe `MSYS_NO_PATHCONV=1`. `--ai` liga o Livrinho (o dev não tem chave de IA). **Escrita
+  sempre simulada**; nunca gravar em dado existente do dev. Portal com dados: `demo4@demo.pistalivre.dev` / CPF
+  `21508234973` (Paulo Demo, locação ativa). O dev do Next pode cair por memória: `docker compose restart dev`.
 
 ## Regras do dono (inegociáveis)
 

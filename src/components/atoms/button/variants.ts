@@ -5,7 +5,10 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        // Disabled: neutral grey, not a washed-out pink that reads as an error.
+        // The spinner of a pending submit follows the text colour.
+        default:
+          "bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-foreground/10 disabled:text-muted-foreground disabled:opacity-100 disabled:[&_svg]:!text-muted-foreground",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:

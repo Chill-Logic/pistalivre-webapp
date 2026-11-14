@@ -74,14 +74,16 @@ export function ChargeItem({
       </>
     ) : null;
 
-  const details = [
-    label(LABEL_MAPS.paymentMethod, charge.method),
-    `vence ${formatCalendarDate(charge.dueDate)}`,
+  // One sentence instead of fragments joined by dots.
+  const due = [
+    `Vence ${formatCalendarDate(charge.dueDate)} por ${label(LABEL_MAPS.paymentMethod, charge.method)}`,
     charge.referenceDate &&
       `referente a ${formatCalendarDate(charge.referenceDate)}`,
     charge.channel === "manual" && "fora do Asaas",
     charge.settledByReceipt && "baixa pelos pix recebidos",
-  ].filter(Boolean);
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <Box className="space-y-2 py-4">
@@ -91,7 +93,7 @@ export function ChargeItem({
             {title}
           </Text>
           <Text size="xs" tone="muted">
-            {details.join(" · ")}
+            {due}
           </Text>
         </Box>
         <Box className="flex shrink-0 items-start gap-3">

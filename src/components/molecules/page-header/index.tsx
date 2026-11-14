@@ -11,7 +11,7 @@ type PageHeaderProps = {
 export function PageHeader({ title, actions }: PageHeaderProps) {
   return (
     <Box className="flex items-center justify-between gap-3">
-      <Heading className="min-w-0">{title}</Heading>
+      <Heading className="min-w-0 break-words">{title}</Heading>
       {actions && (
         <Box className="flex shrink-0 items-center gap-2">{actions}</Box>
       )}

@@ -78,6 +78,7 @@ export function MaintenanceTable({
     },
     {
       header: "Km",
+      align: "right",
       cell: (item) =>
         item.mileage !== null ? formatMileage(item.mileage) : "—",
       skeleton: "w-16",
@@ -91,6 +92,7 @@ export function MaintenanceTable({
     },
     {
       header: "Valor",
+      align: "right",
       cell: (item) => (item.cost !== null ? formatCurrency(item.cost) : "—"),
       className: "tabular-nums",
       skeleton: "w-16",

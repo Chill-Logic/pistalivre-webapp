@@ -29,3 +29,6 @@ dev-dist
 .vercel
 .env*
 !.env.example
+
+# Prints do npm run shots (scripts/shots.mjs)
+shots/

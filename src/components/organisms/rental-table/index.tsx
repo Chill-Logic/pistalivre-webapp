@@ -54,6 +54,7 @@ export function RentalTable({
     },
     {
       header: "Valor",
+      align: "right",
       cell: (rental) =>
         rateLabel(rental.rate, label(LABEL_MAPS.ratePeriod, rental.ratePeriod)),
       skeleton: "w-32",

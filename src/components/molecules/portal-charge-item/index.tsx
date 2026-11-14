@@ -52,11 +52,10 @@ export function PortalChargeItem({
   const pix =
     !readOnly && charge.open && charge.pix && !pixExpired ? charge.pix : null;
   const invoiceUrl = readOnly ? null : charge.invoiceUrl;
-  const details = [
-    charge.methodLabel,
-    charge.dueDate && `vence ${formatCalendarDate(charge.dueDate)}`,
-    renterChargeMeta(charge.meta),
-  ].filter(Boolean);
+  const due = charge.dueDate
+    ? `Vence ${formatCalendarDate(charge.dueDate)}${charge.methodLabel ? ` por ${charge.methodLabel}` : ""}`
+    : charge.methodLabel;
+  const details = [due, renterChargeMeta(charge.meta)].filter(Boolean);
 
   return (
     <Box className="space-y-2 py-4">
