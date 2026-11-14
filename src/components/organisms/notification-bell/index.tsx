@@ -10,6 +10,7 @@ import {
 } from "@/components/atoms/popover";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
+import { LoadMoreSentinel } from "@/components/molecules/load-more-sentinel";
 import { NotificationItem } from "@/components/molecules/notification-item";
 import { ROUTES } from "@/constants/routes";
 import { toAppPath } from "@/helpers/app-path";
@@ -43,8 +44,8 @@ function groupByDay(items: AppNotification[]) {
 }
 
 /**
- * The bell in the header: unread count, the list by day and "marcar todas
- * como lidas". Opening a notice marks it read and goes to the screen that
+ * The bell in the header: unread count, the list by day (30 at a time, more as
+ * it scrolls to the end) and "marcar todas como lidas". Opening a notice marks it read and goes to the screen that
  * resolves it. New ones arrive live (socket) and every 5 min as a fallback.
  */
 export function NotificationBell() {
@@ -52,8 +53,8 @@ export function NotificationBell() {
   const navigate = useNavigate();
   const notifications = useNotifications();
   const markRead = useMarkNotificationsRead();
-  const unread = notifications.data?.unread ?? 0;
-  const items = notifications.data?.items ?? [];
+  const unread = notifications.data?.pages[0]?.unread ?? 0;
+  const items = notifications.data?.pages.flatMap((page) => page.items) ?? [];
 
   const openNotice = (notification: AppNotification) => {
     if (!notification.readAt) markRead.mutate([notification.id]);
@@ -129,6 +130,15 @@ export function NotificationBell() {
                 </Box>
               </Box>
             ))
+          )}
+          {items.length > 0 && notifications.hasNextPage && (
+            <LoadMoreSentinel
+              loaded={items.length}
+              total={0}
+              hasNextPage={notifications.hasNextPage}
+              isFetchingNextPage={notifications.isFetchingNextPage}
+              onLoadMore={notifications.fetchNextPage}
+            />
           )}
         </Box>
         <Box className="border-t p-1">

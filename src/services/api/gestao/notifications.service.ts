@@ -8,9 +8,11 @@ import type {
 } from "@/types/notification";
 
 export const notificationsService = {
-  /** The person's bell, newest first, with the unread count. */
-  async list(limit = 30) {
-    const { data } = await http.get<NotificationList>("/notifications", { params: { limit } });
+  /** The person's bell, newest first, with the unread count; `before` pages back. */
+  async list(limit = 30, before?: string | null) {
+    const { data } = await http.get<NotificationList>("/notifications", {
+      params: { limit, ...(before ? { before } : {}) },
+    });
     return data;
   },
   /** No ids = all of the person's. */

@@ -1,4 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type InfiniteData,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryKeys } from "@/constants/query-keys";
 import { errorMessage } from "@/helpers/api-error";
@@ -8,11 +14,21 @@ import type {
   NotificationPreferenceInput,
 } from "@/types/notification";
 
-/** The bell. New notices arrive by socket (`notification.created` refreshes it). */
+/** How many notices each page of the bell brings. */
+export const NOTIFICATIONS_PAGE_SIZE = 30;
+
+/**
+ * The bell, 30 at a time (scrolling to the end loads the next ones, by the
+ * oldest createdAt). New notices arrive by socket (`notification.created`
+ * refreshes it); the unread count comes with the first page.
+ */
 export function useNotifications() {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: queryKeys.notifications.list(),
-    queryFn: () => notificationsService.list(),
+    queryFn: ({ pageParam }) => notificationsService.list(NOTIFICATIONS_PAGE_SIZE, pageParam),
+    initialPageParam: null as string | null,
+    getNextPageParam: (last) =>
+      last.items.length < NOTIFICATIONS_PAGE_SIZE ? undefined : last.items[last.items.length - 1]?.createdAt,
     staleTime: 60_000,
     // A missed socket (sleeping laptop, flaky 4G) still catches up.
     refetchInterval: 5 * 60_000,
@@ -27,15 +43,19 @@ export function useMarkNotificationsRead() {
     mutationFn: (ids?: string[]) => notificationsService.markRead(ids),
     onMutate: async (ids) => {
       await queryClient.cancelQueries({ queryKey: key });
-      const previous = queryClient.getQueryData<NotificationList>(key);
+      const previous = queryClient.getQueryData<InfiniteData<NotificationList>>(key);
       if (previous) {
         const now = new Date().toISOString();
-        const items = previous.items.map((n) =>
-          !n.readAt && (!ids || ids.includes(n.id)) ? { ...n, readAt: now } : n,
-        );
-        queryClient.setQueryData<NotificationList>(key, {
-          items,
-          unread: ids ? Math.max(0, previous.unread - ids.length) : 0,
+        const unread = previous.pages[0]?.unread ?? 0;
+        queryClient.setQueryData<InfiniteData<NotificationList>>(key, {
+          ...previous,
+          pages: previous.pages.map((page, index) => ({
+            items: page.items.map((n) =>
+              !n.readAt && (!ids || ids.includes(n.id)) ? { ...n, readAt: now } : n,
+            ),
+            // The count lives on the first page.
+            unread: index === 0 ? (ids ? Math.max(0, unread - ids.length) : 0) : page.unread,
+          })),
         });
       }
       return { previous };
