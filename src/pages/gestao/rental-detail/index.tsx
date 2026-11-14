@@ -25,6 +25,10 @@ import {
   RentalChargesSkeleton,
 } from "@/components/organisms/rental-charges";
 import {
+  EmptySectionsCard,
+  EmptySectionsProvider,
+} from "@/components/organisms/empty-sections";
+import {
   RentalMoneyStrip,
   RentalMoneyStripSkeleton,
 } from "@/components/organisms/rental-money-strip";
@@ -199,49 +203,54 @@ export function RentalDetailPage() {
           <QueryError error={rental.error} onRetry={() => rental.refetch()} />
         ))}
       {rental.data && (
-        <RentalDetailLayout
-          summary={<RentalSummary rental={rental.data} />}
-          money={<RentalMoneyStrip rentalId={rental.data.id} />}
-          status={<RentalStatusCard rental={rental.data} />}
-          billing={<RentalBillingCard rental={rental.data} />}
-          charges={
-            <RentalCharges
-              rentalId={rental.data.id}
-              rate={rental.data.rate}
-              ratePeriod={rental.data.ratePeriod}
-            />
-          }
-          caution={<RentalCautionCard caution={rental.data.caution} />}
-          maintenances={<RelatedMaintenances rentalId={rental.data.id} />}
-          inspections={
-            <RelatedInspections
-              rentalId={rental.data.id}
-              rentalVehicleId={rental.data.vehicle.id}
-            />
-          }
-          signatures={
-            <OwnerSignatures ownerType="RENTAL" ownerId={rental.data.id} />
-          }
-          documents={
-            <DocumentsCard
-              documents={
-                // Contracts have their own card ("Contratos").
-                splitRentalDocuments(rental.data.documents, []).otherDocuments
-              }
-              manage={{
-                owner: { type: "RENTAL", id: rental.data.id },
-                invalidate: queryKeys.rentals.detail(rental.data.id),
-              }}
-            />
-          }
-          contracts={<RentalContractsCard rental={rental.data} />}
-          autoBilling={<RentalAutoBillingCard rentalId={rental.data.id} />}
-          reconciliation={<RentReconciliationCard rentalId={rental.data.id} />}
-          rateSegments={<RateSegmentsCard rentalId={rental.data.id} />}
-          receipts={<RentReceiptsCard rentalId={rental.data.id} />}
-          invoices={<RentalInvoicesCard rentalId={rental.data.id} />}
-          vehicleCrlv={<VehicleCrlvCard vehicleId={rental.data.vehicle.id} />}
-        />
+        <EmptySectionsProvider>
+          <RentalDetailLayout
+            emptySections={<EmptySectionsCard />}
+            summary={<RentalSummary rental={rental.data} />}
+            money={<RentalMoneyStrip rentalId={rental.data.id} />}
+            status={<RentalStatusCard rental={rental.data} />}
+            billing={<RentalBillingCard rental={rental.data} />}
+            charges={
+              <RentalCharges
+                rentalId={rental.data.id}
+                rate={rental.data.rate}
+                ratePeriod={rental.data.ratePeriod}
+              />
+            }
+            caution={<RentalCautionCard caution={rental.data.caution} />}
+            maintenances={<RelatedMaintenances rentalId={rental.data.id} />}
+            inspections={
+              <RelatedInspections
+                rentalId={rental.data.id}
+                rentalVehicleId={rental.data.vehicle.id}
+              />
+            }
+            signatures={
+              <OwnerSignatures ownerType="RENTAL" ownerId={rental.data.id} />
+            }
+            documents={
+              <DocumentsCard
+                documents={
+                  // Contracts have their own card ("Contratos").
+                  splitRentalDocuments(rental.data.documents, []).otherDocuments
+                }
+                manage={{
+                  owner: { type: "RENTAL", id: rental.data.id },
+                  invalidate: queryKeys.rentals.detail(rental.data.id),
+                }}
+              />
+            }
+            contracts={<RentalContractsCard rental={rental.data} />}
+            autoBilling={<RentalAutoBillingCard rentalId={rental.data.id} />}
+            reconciliation={
+              <RentReconciliationCard rentalId={rental.data.id} />
+            }
+            rateSegments={<RateSegmentsCard rentalId={rental.data.id} />}
+            receipts={<RentReceiptsCard rentalId={rental.data.id} />}
+            invoices={<RentalInvoicesCard rentalId={rental.data.id} />}
+            vehicleCrlv={<VehicleCrlvCard vehicleId={rental.data.vehicle.id} />}
+          />
+        </EmptySectionsProvider>
       )}
     </Box>
   );

@@ -267,6 +267,29 @@
   }
 }
 
+/* Every scroll area (page, chat, dialogs, tables): thin, no arrows, a quiet
+   thumb. Windows draws a thick grey bar with arrow buttons by default. */
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--foreground) / 0.18) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: hsl(var(--foreground) / 0.18);
+  }
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+}
+
 /* Quiet scrollbar for side menus: thin, no track, the thumb shows a little at
    rest and a bit more on hover (instead of the browser's chunky default). */
 @layer utilities {

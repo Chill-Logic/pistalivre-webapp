@@ -436,11 +436,13 @@ ${note}`
       </Box>
 
       <Box
-        className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4"
+        className="flex min-h-0 flex-1 flex-col space-y-4 overflow-y-auto px-4 py-4"
         aria-live="polite"
       >
         {entries.length === 0 ? (
-          <Box className="flex min-h-full flex-col items-center justify-center gap-3 py-6 text-center">
+          // flex-1, not min-h-full: with the area's padding, a full-height
+          // welcome was always 32px taller than the box and made it scroll.
+          <Box className="flex flex-1 flex-col items-center justify-center gap-3 py-6 text-center">
             <Sparkles className="size-8 text-primary" aria-hidden />
             <Heading
               level={2}

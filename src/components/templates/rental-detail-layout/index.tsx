@@ -29,6 +29,8 @@ type RentalDetailLayoutProps = {
   vehicleCrlv?: ReactNode;
   /** Signature requests over the rental's PDFs. */
   signatures?: ReactNode;
+  /** "Ainda sem registros": the empty sections, gathered (EmptySectionsCard). */
+  emptySections?: ReactNode;
 };
 
 /**
@@ -55,6 +57,7 @@ export function RentalDetailLayout({
   invoices,
   vehicleCrlv,
   signatures,
+  emptySections,
 }: RentalDetailLayoutProps) {
   const wide = useMediaQuery(WIDE_MEDIA_QUERY);
   // Sections the assistant can point at ("Mostrar onde vi isso").
@@ -84,6 +87,7 @@ export function RentalDetailLayout({
             {inspections}
             {signatures}
             {documents}
+            {emptySections}
           </Box>
         </Col>
         <Col lg={4}>
@@ -117,6 +121,7 @@ export function RentalDetailLayout({
       {vehicleCrlv && <Col>{vehicleCrlv}</Col>}
       {signatures && <Col>{signatures}</Col>}
       <Col>{documents}</Col>
+      {emptySections && <Col>{emptySections}</Col>}
     </Row>
   );
 }

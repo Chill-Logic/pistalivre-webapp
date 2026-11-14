@@ -55,6 +55,10 @@ React 19 + Vite 6 + TanStack Query 5 + React Router 7 + Tailwind 3 + Radix/shadc
   Toast: `toast` do Sonner, desenhado por `components/atoms/toaster` (card neutro, só o ícone colorido,
   embaixo à direita no desktop e no topo no celular); nada de `richColors`/`closeButton`. Row/Col tem
   `-mx-3` fora das camadas do Tailwind: `mx-0` não o anula (para faixa sem calha, use `Box` flex).
+  **Seções vazias agrupadas**: numa página dentro de `EmptySectionsProvider` (locação na gestão e no portal), todo
+  `ListCard`/`CollapsibleCard` vazio vira uma linha do card "Ainda sem registros" (`EmptySectionsCard`), com os
+  botões dele; card feito à mão entra com `useEmptySection` (ex.: `rental-invoices-card`). Barra de rolagem fina e
+  discreta é global (`index.css`).
 - **O sistema NUNCA faz saída de dinheiro** (pix out, transferência, boleto): é sempre por fora.
 - Dinheiro é calculado **no servidor** (multa/juros, projeção): o front nunca reimplementa a conta.
 - `401` desloga; **`403` não** (logado sem permissão).

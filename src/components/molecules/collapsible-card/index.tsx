@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/atoms/card";
 import { Collapse } from "@/components/atoms/collapse";
+import { useEmptySection } from "@/hooks/ui/useEmptySection";
 import { useRememberedToggle } from "@/hooks/ui/useRememberedToggle";
 import { cn } from "@/utils/cn";
 
@@ -46,6 +47,14 @@ export function CollapsibleCard({
     defaultOpen,
   );
   const contentId = useId();
+  // On a page with an "Ainda sem registros" group, an empty section moves there.
+  const { grouped, anchorRef } = useEmptySection({
+    empty: count === 0,
+    title,
+    description: children,
+    actions,
+  });
+  if (grouped) return <Box ref={anchorRef} hidden />;
 
   if (count === 0) {
     return (

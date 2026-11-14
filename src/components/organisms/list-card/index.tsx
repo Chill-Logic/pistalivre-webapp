@@ -8,6 +8,7 @@ import {
 } from "@/components/atoms/card";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
+import { useEmptySection } from "@/hooks/ui/useEmptySection";
 
 type ListCardProps = {
   title: string;
@@ -34,6 +35,15 @@ export function ListCard({
   actions,
   children,
 }: ListCardProps) {
+  // On a page with an "Ainda sem registros" group, an empty list moves there.
+  const { grouped, anchorRef } = useEmptySection({
+    empty: isEmpty && !footer,
+    title,
+    description: empty,
+    actions,
+  });
+  if (grouped) return <Box ref={anchorRef} hidden />;
+
   if (isEmpty && !footer) {
     return (
       <Card>

@@ -18,23 +18,35 @@ import { QueryError } from "@/components/organisms/query-error";
 import { RentalInvoiceDialog } from "@/components/organisms/rental-invoice-dialog";
 import { canCancelInvoice } from "@/helpers/invoice";
 import { useRentalInvoices } from "@/hooks/api/gestao/invoices/useInvoices";
+import { useEmptySection } from "@/hooks/ui/useEmptySection";
 
 const SKELETON_ROWS = 2;
 
 /** NFs of the rental (read-through of Asaas) + "Emitir NF" and cancel. */
 export function RentalInvoicesCard({ rentalId }: { rentalId: string }) {
   const invoices = useRentalInvoices(rentalId);
+  const emitDialog = invoices.data && (
+    <RentalInvoiceDialog
+      rentalId={rentalId}
+      suggestions={invoices.data.suggestions}
+    />
+  );
+  // No NF yet (and Asaas read fine): a line in the page's empty group.
+  const { grouped, anchorRef } = useEmptySection({
+    empty: Boolean(
+      invoices.data && !invoices.data.error && invoices.data.items.length === 0,
+    ),
+    title: "Notas fiscais",
+    description: "Nenhuma nota fiscal emitida.",
+    actions: emitDialog,
+  });
+  if (grouped) return <Box ref={anchorRef} hidden />;
 
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
         <CardTitle className="text-base">Notas fiscais</CardTitle>
-        {invoices.data && (
-          <RentalInvoiceDialog
-            rentalId={rentalId}
-            suggestions={invoices.data.suggestions}
-          />
-        )}
+        {emitDialog}
       </CardHeader>
       <CardContent>
         {invoices.isPending && (
