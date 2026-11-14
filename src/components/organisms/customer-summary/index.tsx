@@ -7,7 +7,7 @@ import { CustomerStatusBadge } from "@/components/molecules/customer-status-badg
 import { InfoItem } from "@/components/molecules/info-item";
 import { pwaUsageText } from "@/helpers/pwa";
 import type { CustomerDetail } from "@/types/customer";
-import { formatCpf } from "@/utils/document";
+import { formatCpf, formatPhone } from "@/utils/document";
 import { ageInYears, todayInBrasilia } from "@/utils/date";
 import { formatCalendarDate, formatDateTime } from "@/utils/format";
 
@@ -30,7 +30,7 @@ export function CustomerSummary({ customer }: { customer: CustomerDetail }) {
             {customer.email}
           </InfoItem>
           <InfoItem md={6} label="Telefone">
-            {customer.phone}
+            {customer.phone && formatPhone(customer.phone)}
           </InfoItem>
           <InfoItem span={6} md={4} label="CPF" mono>
             {formatCpf(customer.document)}

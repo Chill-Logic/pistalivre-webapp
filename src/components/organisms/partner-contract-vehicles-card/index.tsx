@@ -65,7 +65,7 @@ export function PartnerContractVehiclesCard({
             presetVehicleId={includeVehicleId}
             onPresetUsed={onIncludeUsed}
             trigger={
-              <Button size="sm">
+              <Button size="sm" variant="outline">
                 <Plus />
                 Incluir veículo
               </Button>

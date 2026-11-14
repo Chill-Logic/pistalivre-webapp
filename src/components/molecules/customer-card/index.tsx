@@ -8,7 +8,7 @@ import { Text } from "@/components/atoms/text";
 import { CustomerStatusBadge } from "@/components/molecules/customer-status-badge";
 import { routeTo } from "@/constants/routes";
 import type { CustomerListItem } from "@/types/customer";
-import { formatCpf } from "@/utils/document";
+import { formatCpf, formatPhone } from "@/utils/document";
 
 type CustomerCardProps = {
   customer: CustomerListItem;
@@ -18,7 +18,7 @@ type CustomerCardProps = {
 
 export function CustomerCard({ customer, footer }: CustomerCardProps) {
   const location = useLocation();
-  const contact = [customer.phone, customer.email].filter(Boolean).join(" · ");
+  const contact = [customer.phone && formatPhone(customer.phone), customer.email].filter(Boolean).join(" · ");
 
   return (
     <Card className="flex h-full flex-col overflow-hidden">

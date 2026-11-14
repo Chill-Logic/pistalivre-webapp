@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
-export const headingVariants = cva("tracking-tight [font-stretch:88%]", {
+export const headingVariants = cva("[font-stretch:92%]", {
   variants: {
     variant: {
       page: "text-[1.75rem] font-bold leading-tight",

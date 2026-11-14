@@ -45,7 +45,7 @@ export function PartnerContractsCard({
             </Text>
           )}
         </CardTitle>
-        <Button asChild size="sm">
+        <Button asChild size="sm" variant="outline">
           <Link to={routeTo.newPartnerContract(partnerId)}>
             <Plus />
             Novo contrato

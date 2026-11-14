@@ -1,4 +1,3 @@
-import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -53,7 +52,12 @@ export function VehicleStatusCard({
             {statusLabel(status).toLowerCase()}.
           </Text>
         )}
-        <Box className="flex flex-wrap gap-2">
+        {VEHICLE_TRANSITIONS[status].length > 0 && (
+          <Text size="xs" tone="muted">
+            Mudar para
+          </Text>
+        )}
+        <Box className="-mt-2 flex flex-wrap gap-2">
           {VEHICLE_TRANSITIONS[status].map((next) => (
             <ConfirmDialog
               key={next}
@@ -61,7 +65,6 @@ export function VehicleStatusCard({
               onOpenChange={(open) => setTarget(open ? next : null)}
               trigger={
                 <Button variant="outline" size="sm">
-                  <ArrowRight />
                   {statusLabel(next)}
                 </Button>
               }

@@ -9,7 +9,7 @@ import {
 } from "@/components/organisms/data-table";
 import { routeTo } from "@/constants/routes";
 import type { AsaasDirectory, CustomerListItem } from "@/types/customer";
-import { formatCpf } from "@/utils/document";
+import { formatCpf, formatPhone } from "@/utils/document";
 import { formatDateTime } from "@/utils/format";
 
 function columns(
@@ -34,7 +34,7 @@ function columns(
         <>
           <Text truncate>{customer.email}</Text>
           <Text size="xs" tone="muted">
-            {customer.phone ?? "Sem telefone"}
+            {customer.phone ? formatPhone(customer.phone) : "Sem telefone"}
           </Text>
         </>
       ),

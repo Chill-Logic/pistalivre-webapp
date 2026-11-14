@@ -20,7 +20,7 @@ export function DashboardKpis({ dashboard }: { dashboard: Dashboard }) {
 
   return (
     <Row className="gap-y-4">
-      <Col md={4} lg={4}>
+      <Col md={4} lg={3}>
         <StatCard
           label="Saldo consolidado"
           value={balance == null ? "Indisponível" : formatCurrency(balance)}
@@ -28,7 +28,7 @@ export function DashboardKpis({ dashboard }: { dashboard: Dashboard }) {
           hint={balance == null ? undefined : balanceHint(balances)}
         />
       </Col>
-      <Col span={6} md={4} lg={2}>
+      <Col span={6} md={4} lg={3}>
         <StatCard
           label="Vencido em aberto"
           value={formatCurrency(delinquency.overdue.amount)}
@@ -63,10 +63,10 @@ export function DashboardKpis({ dashboard }: { dashboard: Dashboard }) {
 export function DashboardKpisSkeleton() {
   return (
     <Row className="gap-y-4">
-      <Col md={4} lg={4}>
+      <Col md={4} lg={3}>
         <StatCardSkeleton />
       </Col>
-      <Col span={6} md={4} lg={2}>
+      <Col span={6} md={4} lg={3}>
         <StatCardSkeleton />
       </Col>
       <Col span={6} md={4} lg={2}>

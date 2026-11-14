@@ -69,7 +69,7 @@ export function SupplierVehiclesCard({
             currency={currency}
             linkedVehicleIds={linkedIds}
             trigger={
-              <Button size="sm">
+              <Button size="sm" variant="outline">
                 <Plus />
                 Vincular veículo
               </Button>

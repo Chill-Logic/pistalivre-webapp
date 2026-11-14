@@ -113,7 +113,7 @@ export function AutoBillingEnableDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button size="sm">
+        <Button size="sm" variant="outline">
           <Zap />
           Habilitar
         </Button>

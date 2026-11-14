@@ -1,13 +1,14 @@
-import { Sparkles } from "lucide-react";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/card";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
+import { TextLink } from "@/components/molecules/text-link";
 import { ReconciliationItem, ReconciliationItemSkeleton } from "@/components/molecules/reconciliation-item";
 import { ChargeSettleDialog } from "@/components/organisms/charge-settle-dialog";
 import { ReconciliationReceiptDialog } from "@/components/organisms/reconciliation-receipt-dialog";
+import { ROUTES } from "@/constants/routes";
 import { useDismissReconciliation } from "@/hooks/api/gestao/reconciliation/useReconciliation";
 import type { ReconciliationView, ReconSuggestion } from "@/types/reconciliation";
 import { pluralize } from "@/utils/text";
@@ -54,10 +55,7 @@ export function ReconciliationCard({ view }: { view: ReconciliationView }) {
     <Card>
       <CardHeader>
         <Box className="flex flex-wrap items-baseline justify-between gap-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Sparkles className="size-4 text-primary" aria-hidden />
-            Pix para conciliar
-          </CardTitle>
+          <CardTitle className="text-base">Pix para conciliar</CardTitle>
           {view.suggestions.length > 0 && (
             <Text tone="muted">
               {pluralize(view.suggestions.length, "sugestão", "sugestões")} do extrato do Inter
@@ -66,7 +64,20 @@ export function ReconciliationCard({ view }: { view: ReconciliationView }) {
         </Box>
       </CardHeader>
       <CardContent>
-        {view.error && <Alert>Não deu para ler o extrato do Inter agora: {view.error}</Alert>}
+        {view.error &&
+          // The API's message is for the developer (field names); the person
+          // gets what happened and where to fix it.
+          (/incompleta/i.test(view.error) ? (
+            <Alert variant="info" role="status">
+              A conexão com o Inter ainda não foi configurada. Quando estiver, os pix recebidos aparecem aqui
+              com a cobrança que cada um paga.{" "}
+              <TextLink to={ROUTES.integrations}>Configurar o Inter</TextLink>
+            </Alert>
+          ) : (
+            <Alert variant="warning">
+              Não foi possível ler o extrato do Inter agora. Tente de novo em alguns minutos.
+            </Alert>
+          ))}
         <Box className="divide-y">
           {view.suggestions.map((s) => {
             const target = s.targets[0];

@@ -125,7 +125,7 @@ export function AiAssistantLauncher() {
             role="dialog"
             aria-label="Livrinho, o assistente de IA"
             className={cn(
-              "fixed bottom-24 right-6 z-40 flex h-[min(640px,calc(100dvh-8rem))] w-[400px] flex-col overflow-hidden rounded-2xl shadow-2xl",
+              "fixed bottom-[4.5rem] right-6 z-40 flex h-[min(640px,calc(100dvh-6.5rem))] w-[400px] flex-col overflow-hidden rounded-xl border shadow-xl",
               guiding && "hidden",
               "origin-bottom-right duration-200 animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 motion-reduce:animate-none",
             )}
