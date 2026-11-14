@@ -52,6 +52,9 @@ React 19 + Vite 6 + TanStack Query 5 + React Router 7 + Tailwind 3 + Radix/shadc
   números tabulares), cards planos sem sombra, badge retangular, **vermelho só na ação principal** e no ícone
   ativo do menu, gráfico de ranking em cor neutra (cor só quando significa algo), código (`LOC-…`) sem
   monoespaçada. Valide toda tela com print em 390 e 1366 antes de entregar.
+  Toast: `toast` do Sonner, desenhado por `components/atoms/toaster` (card neutro, só o ícone colorido,
+  embaixo à direita no desktop e no topo no celular); nada de `richColors`/`closeButton`. Row/Col tem
+  `-mx-3` fora das camadas do Tailwind: `mx-0` não o anula (para faixa sem calha, use `Box` flex).
 - **O sistema NUNCA faz saída de dinheiro** (pix out, transferência, boleto): é sempre por fora.
 - Dinheiro é calculado **no servidor** (multa/juros, projeção): o front nunca reimplementa a conta.
 - `401` desloga; **`403` não** (logado sem permissão).

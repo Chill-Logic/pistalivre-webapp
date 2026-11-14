@@ -1,5 +1,5 @@
 import { Card } from "@/components/atoms/card";
-import { Col, Row } from "@/components/atoms/grid";
+import { Box } from "@/components/atoms/box";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { TextLink } from "@/components/molecules/text-link";
@@ -12,7 +12,7 @@ import { cn } from "@/utils/cn";
 // Same params as the statement screen opens with: the cache is shared.
 const PARAMS: RentStatementParams = { mode: "OLDEST" };
 
-const CELL = "space-y-1 px-4 py-3 md:px-5 md:py-4";
+const CELL = "flex-1 space-y-1 px-4 py-3 md:px-5 md:py-4";
 
 /**
  * "Where this rental stands" right under its summary: what is owed, the next
@@ -30,8 +30,8 @@ export function RentalMoneyStrip({ rentalId }: { rentalId: string }) {
 
   return (
     <Card>
-      <Row className="mx-0 divide-y md:divide-x md:divide-y-0">
-        <Col md={4} className={CELL}>
+      <Box className="flex flex-col divide-y md:flex-row md:divide-x md:divide-y-0">
+        <Box className={CELL}>
           <Text size="xs" tone="muted">
             {owes ? "Falta pagar" : "Situação"}
           </Text>
@@ -52,8 +52,8 @@ export function RentalMoneyStrip({ rentalId }: { rentalId: string }) {
               : statement.paidThrough &&
                 `Pago até ${formatCalendarDate(statement.paidThrough)}`}
           </Text>
-        </Col>
-        <Col md={4} className={CELL}>
+        </Box>
+        <Box className={CELL}>
           <Text size="xs" tone="muted">
             Próximo vencimento
           </Text>
@@ -65,8 +65,8 @@ export function RentalMoneyStrip({ rentalId }: { rentalId: string }) {
               ? `Vence ${formatCalendarDate(statement.current.due)}`
               : "Nada a vencer"}
           </Text>
-        </Col>
-        <Col md={4} className={CELL}>
+        </Box>
+        <Box className={CELL}>
           <Text size="xs" tone="muted">
             Total pago
           </Text>
@@ -85,8 +85,8 @@ export function RentalMoneyStrip({ rentalId }: { rentalId: string }) {
               </TextLink>
             )}
           </Text>
-        </Col>
-      </Row>
+        </Box>
+      </Box>
     </Card>
   );
 }
@@ -94,15 +94,15 @@ export function RentalMoneyStrip({ rentalId }: { rentalId: string }) {
 export function RentalMoneyStripSkeleton() {
   return (
     <Card>
-      <Row className="mx-0 divide-y md:divide-x md:divide-y-0">
+      <Box className="flex flex-col divide-y md:flex-row md:divide-x md:divide-y-0">
         {[0, 1, 2].map((index) => (
-          <Col key={index} md={4} className={cn(CELL, "space-y-2")}>
+          <Box key={index} className={cn(CELL, "space-y-2")}>
             <Skeleton shape="text" className="w-20 text-xs" />
             <Skeleton shape="text" className="w-28 text-xl" />
             <Skeleton shape="text" className="w-24 text-xs" />
-          </Col>
+          </Box>
         ))}
-      </Row>
+      </Box>
     </Card>
   );
 }

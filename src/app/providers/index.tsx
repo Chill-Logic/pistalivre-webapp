@@ -1,8 +1,8 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { Toaster } from "sonner";
 import { queryClient } from "./query-client";
 import { SidebarProvider } from "./sidebar-provider";
+import { Toaster } from "@/components/atoms/toaster";
 import { TooltipProvider } from "@/components/atoms/tooltip";
 import { PwaUpdatePrompt } from "@/components/organisms/pwa-update-prompt";
 import { QueryDevtools } from "@/components/organisms/query-devtools";
@@ -17,7 +17,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
       {/* No service worker on the public site's domain: it would answer the
           backend's own addresses there (short links, redirects). */}
       {!IS_LANDING_HOST && <PwaUpdatePrompt />}
-      <Toaster position="top-center" richColors closeButton />
+      <Toaster />
       <QueryDevtools />
     </QueryClientProvider>
   );
