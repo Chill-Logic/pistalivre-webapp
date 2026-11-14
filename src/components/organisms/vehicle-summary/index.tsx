@@ -18,7 +18,7 @@ export function VehicleSummary({ vehicle }: { vehicle: Vehicle }) {
     <Card>
       <CardHeader className="gap-2">
         <Box className="flex items-start justify-between gap-2">
-          <Heading className="font-mono tracking-wide">
+          <Heading className="uppercase tracking-[0.04em]">
             {formatPlate(vehicle.plate)}
           </Heading>
           <VehicleStatusBadge status={effectiveVehicleStatus(vehicle)} />

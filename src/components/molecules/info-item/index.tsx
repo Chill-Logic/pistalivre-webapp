@@ -23,7 +23,7 @@ export function InfoItem({
   return (
     <Col {...spans} className="space-y-1">
       <DescriptionTerm>{label}</DescriptionTerm>
-      <DescriptionDetails className={cn(mono && "font-mono")}>
+      <DescriptionDetails className={cn(mono && "tracking-[0.04em]")}>
         {children ?? "—"}
       </DescriptionDetails>
     </Col>

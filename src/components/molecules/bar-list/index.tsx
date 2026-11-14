@@ -34,7 +34,11 @@ export function BarList({ items }: { items: BarItem[] }) {
               {item.display}
             </Text>
           </Box>
-          <Meter value={ratio(item.value, max)} color={item.color} />
+          <Meter
+            value={ratio(item.value, max)}
+            color="hsl(var(--foreground) / 0.7)"
+            className="h-1.5"
+          />
         </ListItem>
       ))}
     </List>

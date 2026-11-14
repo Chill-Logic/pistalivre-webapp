@@ -42,14 +42,14 @@ export function RentalTable({
     {
       header: "Locatário",
       cell: (rental) => rental.customer.name,
-      className: "max-w-56 truncate",
+      className: "max-w-48 truncate",
       skeleton: "w-40",
     },
     {
       header: "Veículo",
       cell: (rental) =>
         `${formatPlate(rental.vehicle.plate)} · ${vehicleName(rental.vehicle)}`,
-      className: "max-w-72 truncate",
+      className: "max-w-56 truncate",
       skeleton: "w-52",
     },
     {
@@ -59,15 +59,12 @@ export function RentalTable({
       skeleton: "w-32",
     },
     {
-      header: "Início",
-      cell: (rental) => formatCalendarDate(rental.startDate),
-      skeleton: "w-20",
-    },
-    {
-      header: "Fim",
+      header: "Período",
       cell: (rental) =>
-        rental.endDate ? formatCalendarDate(rental.endDate) : "Sem prazo",
-      skeleton: "w-20",
+        `${formatCalendarDate(rental.startDate)} até ${
+          rental.endDate ? formatCalendarDate(rental.endDate) : "sem prazo"
+        }`,
+      skeleton: "w-44",
     },
     {
       header: "Situação",

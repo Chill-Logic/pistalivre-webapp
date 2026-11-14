@@ -1,4 +1,4 @@
-import { Download } from "lucide-react";
+import { Download, X } from "lucide-react";
 import { useState } from "react";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -40,29 +40,31 @@ export function PwaInstallInvite({ user }: { user: AuthUser }) {
   return (
     <>
       {visible && (
-        <Card className="mb-4 space-y-3 border-primary/30 bg-primary/5 p-4">
-          <Box className="flex items-center gap-3">
-            <Image
-              src="/pwa-192x192.png"
-              alt=""
-              className="size-11 shrink-0 rounded-xl"
-            />
-            <Box className="min-w-0">
-              <Text weight="semibold">Instale o app no celular</Text>
-              <Text size="sm" tone="muted">
-                Abre direto da tela inicial, sem precisar do navegador.
-              </Text>
-            </Box>
+        <Card className="mb-4 flex items-center gap-3 p-3">
+          <Image
+            src="/pwa-192x192.png"
+            alt=""
+            className="size-9 shrink-0 rounded-lg"
+          />
+          <Box className="min-w-0 flex-1">
+            <Text weight="semibold">Instale o app</Text>
+            <Text size="xs" tone="muted">
+              Abre direto da tela inicial.
+            </Text>
           </Box>
-          <Box className="flex justify-end gap-2">
-            <Button variant="ghost" size="sm" onClick={() => dismiss.mutate()}>
-              Agora não
-            </Button>
-            <Button size="sm" onClick={install}>
-              <Download />
-              Instalar
-            </Button>
-          </Box>
+          <Button variant="outline" size="sm" onClick={install}>
+            <Download />
+            Instalar
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="-mr-1 size-8 shrink-0 text-muted-foreground"
+            aria-label="Agora não"
+            onClick={() => dismiss.mutate()}
+          >
+            <X />
+          </Button>
         </Card>
       )}
       <PwaInstallStepsDialog

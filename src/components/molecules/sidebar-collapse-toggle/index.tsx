@@ -19,10 +19,11 @@ export function SidebarCollapseToggle() {
     <TooltipWhenCollapsed collapsed label={label}>
       <Button
         size="icon"
+        variant="outline"
         onClick={toggleCollapsed}
         aria-label={label}
         aria-expanded={!isCollapsed}
-        className="absolute right-0 top-10 z-10 size-8 translate-x-1/2 rounded-full shadow-lg hover:scale-105 md:size-8"
+        className="absolute right-0 top-10 z-10 size-8 translate-x-1/2 rounded-full bg-background text-muted-foreground shadow-sm hover:text-foreground md:size-8"
       >
         <ChevronLeft
           className={cn(

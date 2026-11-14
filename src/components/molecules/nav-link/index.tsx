@@ -43,10 +43,9 @@ export function NavLink({
             "h-11 rounded-md text-sm font-medium hover:bg-accent active:scale-[0.98] md:h-9",
           layout === "side" && (collapsed ? "justify-center" : "gap-3 px-3"),
           isActive
-            ? cn(
-                "text-primary",
-                layout === "side" && "bg-primary/10 hover:bg-primary/10",
-              )
+            ? layout === "side"
+              ? "bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.06] [&>svg]:text-primary"
+              : "text-primary"
             : "text-muted-foreground hover:text-foreground",
         )}
       >

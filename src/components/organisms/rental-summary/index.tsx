@@ -26,7 +26,7 @@ export function RentalSummary({ rental }: { rental: RentalDetail }) {
     <Card>
       <CardHeader>
         <Box className="flex flex-wrap items-center justify-between gap-2">
-          <Heading className="font-mono tracking-wide">{rental.code}</Heading>
+          <Heading className="uppercase tracking-[0.04em]">{rental.code}</Heading>
           <Box className="flex gap-2">
             {rental.source === "MANUAL" && (
               <Badge variant="outline">Retroativa</Badge>

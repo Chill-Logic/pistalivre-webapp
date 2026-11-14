@@ -15,6 +15,10 @@ React 19 + Vite 6 + TanStack Query 5 + React Router 7 + Tailwind 3 + Radix/shadc
 - Dev: `node node_modules/vite/bin/vite.js --host --port 5173 --strictPort`.
 - API: `docker compose up dev` no `pista-livre`, em `:3000`. Login `admin@pistalivre.dev` / `admin123`
   (5 erros = 15 min de bloqueio). Portal: `cliente.teste@pistalivre.dev` / `teste123`.
+  **Login do Claude para testes visuais** (ADMIN, só no banco de dev, criado em 2026-11-13 com aval do dono):
+  `claude@dev.com` / `Claude-tdnCSF8O`. Use este, e não o do dono, nos prints e no Puppeteer.
+- Se a API não subir com `ERR_MODULE_NOT_FOUND`, o `node_modules` da imagem ficou velho:
+  `docker compose build dev && docker compose up -d -V dev`.
 - Antes de commitar: `npx tsc -b` + `npx eslint . --max-warnings 0` + o grep de HTML nativo (abaixo).
 - Testes visuais: Puppeteer do `../pista-livre/node_modules/puppeteer`, em 390×844 e 1366×820. **Escrita
   sempre simulada** (interceptar a request); nunca gravar em dado existente do dev.
@@ -39,6 +43,10 @@ React 19 + Vite 6 + TanStack Query 5 + React Router 7 + Tailwind 3 + Radix/shadc
   `#E4141B`, regra 60/30/10.
 - Telas de simulação/comparação (ex.: Projeções): **tabela densa editável no desktop**, cards só no celular.
   O PDF da projeção é o botão **"Relatório"**.
+- **Visual sóbrio, sem "cara de template"** (2026-11-13, 1.12.0): fonte Archivo (títulos semicondensados,
+  números tabulares), cards planos sem sombra, badge retangular, **vermelho só na ação principal** e no ícone
+  ativo do menu, gráfico de ranking em cor neutra (cor só quando significa algo), código (`LOC-…`) sem
+  monoespaçada. Valide toda tela com print em 390 e 1366 antes de entregar.
 - **O sistema NUNCA faz saída de dinheiro** (pix out, transferência, boleto): é sempre por fora.
 - Dinheiro é calculado **no servidor** (multa/juros, projeção): o front nunca reimplementa a conta.
 - `401` desloga; **`403` não** (logado sem permissão).

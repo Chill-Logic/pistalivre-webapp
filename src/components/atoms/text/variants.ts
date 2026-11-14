@@ -24,7 +24,7 @@ export const textVariants = cva("", {
       semibold: "font-semibold",
       bold: "font-bold",
     },
-    mono: { true: "font-mono tracking-wide" },
+    mono: { true: "font-semibold uppercase tracking-[0.06em] [font-stretch:92%]" },
     truncate: { true: "truncate" },
   },
   defaultVariants: { size: "sm", tone: "default", weight: "normal" },

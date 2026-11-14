@@ -4,6 +4,7 @@ import { App } from "./app/App";
 import { listenInstallPrompt } from "./helpers/pwa";
 import { applyRealmManifest } from "./helpers/pwa-manifest";
 import { applyTheme, readTheme } from "./helpers/theme";
+import "@fontsource-variable/archivo/standard.css";
 import "./index.css";
 
 // Before the first paint, so a dark-theme user never sees a white flash.

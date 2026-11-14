@@ -14,12 +14,7 @@ export function Table({ className, ...props }: ComponentProps<"table">) {
 }
 
 export function TableHeader({ className, ...props }: ComponentProps<"thead">) {
-  return (
-    <thead
-      className={cn("bg-muted/40 [&_tr]:border-b", className)}
-      {...props}
-    />
-  );
+  return <thead className={cn("[&_tr]:border-b", className)} {...props} />;
 }
 
 export function TableBody({ className, ...props }: ComponentProps<"tbody">) {
@@ -44,7 +39,7 @@ export function TableHead({ className, ...props }: ComponentProps<"th">) {
   return (
     <th
       className={cn(
-        "h-10 whitespace-nowrap px-4 text-left align-middle text-xs font-medium text-muted-foreground",
+        "h-10 whitespace-nowrap px-3 text-left align-middle text-xs font-medium text-muted-foreground first:pl-4 last:pr-4",
         className,
       )}
       {...props}
@@ -55,7 +50,10 @@ export function TableHead({ className, ...props }: ComponentProps<"th">) {
 export function TableCell({ className, ...props }: ComponentProps<"td">) {
   return (
     <td
-      className={cn("whitespace-nowrap px-4 py-3 align-middle", className)}
+      className={cn(
+        "whitespace-nowrap px-3 py-3 align-middle first:pl-4 last:pr-4",
+        className,
+      )}
       {...props}
     />
   );

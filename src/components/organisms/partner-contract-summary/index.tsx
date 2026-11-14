@@ -33,7 +33,7 @@ export function PartnerContractSummary({
     <Card>
       <CardHeader className="space-y-1">
         <Box className="flex flex-wrap items-center justify-between gap-2">
-          <Heading className="min-w-0 font-mono">{contract.code}</Heading>
+          <Heading className="min-w-0 uppercase tracking-[0.04em]">{contract.code}</Heading>
           <PartnerContractStatusBadge status={contract.status} />
         </Box>
         <Text tone="muted">

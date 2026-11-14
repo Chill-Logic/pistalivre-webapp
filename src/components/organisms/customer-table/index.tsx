@@ -25,7 +25,7 @@ function columns(
     {
       header: "CPF",
       cell: (customer) => formatCpf(customer.document),
-      className: "whitespace-nowrap font-mono",
+      className: "whitespace-nowrap",
       skeleton: "w-28",
     },
     {
