@@ -21,7 +21,11 @@ type ListCardProps = {
   children: ReactNode;
 };
 
-/** Titled card with divided rows: charges, invoices, keys, requests… */
+/**
+ * Titled card with divided rows: charges, invoices, keys, requests… With no
+ * rows it shrinks to one line (title, what is missing, the action), so a page
+ * of empty sections does not become a wall of cards.
+ */
 export function ListCard({
   title,
   empty,
@@ -30,6 +34,22 @@ export function ListCard({
   actions,
   children,
 }: ListCardProps) {
+  if (isEmpty && !footer) {
+    return (
+      <Card>
+        <CardHeader className="flex-row items-center justify-between gap-3 space-y-0 py-3 md:py-4">
+          <Box className="min-w-0 space-y-1">
+            <CardTitle className="text-base">{title}</CardTitle>
+            <Text size="xs" tone="muted">
+              {empty}
+            </Text>
+          </Box>
+          {actions && <Box className="flex shrink-0 gap-2">{actions}</Box>}
+        </CardHeader>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">

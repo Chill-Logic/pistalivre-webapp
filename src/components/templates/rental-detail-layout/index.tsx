@@ -7,6 +7,8 @@ import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 
 type RentalDetailLayoutProps = {
   summary: ReactNode;
+  /** Owed / next due / paid, right under the summary. */
+  money?: ReactNode;
   status: ReactNode;
   billing: ReactNode;
   caution: ReactNode;
@@ -37,6 +39,7 @@ type RentalDetailLayoutProps = {
  */
 export function RentalDetailLayout({
   summary,
+  money,
   status,
   billing,
   caution,
@@ -70,6 +73,7 @@ export function RentalDetailLayout({
         <Col lg={8}>
           <Box className="space-y-6">
             {summary}
+            {money}
             {charges}
             {contracts}
             {reconciliation}
@@ -97,6 +101,7 @@ export function RentalDetailLayout({
   return (
     <Row className="items-start gap-y-6">
       <Col>{summary}</Col>
+      {money && <Col>{money}</Col>}
       <Col>{status}</Col>
       <Col>{billing}</Col>
       <Col>{charges}</Col>

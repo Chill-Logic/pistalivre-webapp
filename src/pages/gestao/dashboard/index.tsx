@@ -16,6 +16,10 @@ import {
 } from "@/components/organisms/dashboard-kpis";
 import { QueryError } from "@/components/organisms/query-error";
 import {
+  TodayPanel,
+  TodayPanelSkeleton,
+} from "@/components/organisms/today-panel";
+import {
   VehicleMaintenanceRanking,
   VehicleMaintenanceRankingSkeleton,
 } from "@/components/organisms/vehicle-maintenance-ranking";
@@ -54,6 +58,7 @@ export function DashboardPage() {
       {dashboard.isPending && (
         <SkeletonRegion label="Carregando painel…">
           <DashboardLayout
+            today={<TodayPanelSkeleton />}
             kpis={<DashboardKpisSkeleton />}
             overdueByPurpose={<BarListCardSkeleton rows={2} />}
             topDebtors={<BarListCardSkeleton rows={3} />}
@@ -78,6 +83,7 @@ export function DashboardPage() {
       {data && (
         <DashboardLayout
           banner={<BirthdayBanner birthdays={data.birthdays} />}
+          today={<TodayPanel newLeads={data.funnel.byStatus.NEW ?? 0} />}
           kpis={<DashboardKpis dashboard={data} />}
           overdueByPurpose={
             <BarListCard

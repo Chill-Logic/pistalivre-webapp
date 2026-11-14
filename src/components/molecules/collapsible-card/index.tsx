@@ -28,7 +28,8 @@ type CollapsibleCardProps = {
 
 /**
  * A card whose body opens and closes sliding, from a tap on the title. On a
- * narrow screen the actions wrap below the title instead of cutting it.
+ * narrow screen the actions wrap below the title instead of cutting it. Empty
+ * (count 0) there is nothing to open: plain title, body always shown, tighter.
  */
 export function CollapsibleCard({
   title,
@@ -45,6 +46,22 @@ export function CollapsibleCard({
     defaultOpen,
   );
   const contentId = useId();
+
+  if (count === 0) {
+    return (
+      <Card>
+        <CardHeader className="flex-row flex-wrap items-center justify-between gap-2 space-y-0 pb-2 pt-3 md:pb-2 md:pt-4">
+          <CardTitle className="truncate text-base">{title}</CardTitle>
+          {actions && <Box className="flex flex-wrap gap-2">{actions}</Box>}
+        </CardHeader>
+        <CardContent
+          className={cn("pb-3 text-xs md:pb-4 [&_p]:text-xs", contentClassName)}
+        >
+          {children}
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

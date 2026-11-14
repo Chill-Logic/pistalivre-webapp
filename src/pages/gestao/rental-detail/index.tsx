@@ -25,6 +25,10 @@ import {
   RentalChargesSkeleton,
 } from "@/components/organisms/rental-charges";
 import {
+  RentalMoneyStrip,
+  RentalMoneyStripSkeleton,
+} from "@/components/organisms/rental-money-strip";
+import {
   RentalSummary,
   RentalSummarySkeleton,
 } from "@/components/organisms/rental-summary";
@@ -165,6 +169,7 @@ export function RentalDetailPage() {
         <SkeletonRegion label="Carregando locação…">
           <RentalDetailLayout
             summary={<RentalSummarySkeleton />}
+            money={<RentalMoneyStripSkeleton />}
             status={<RentalStatusCardSkeleton />}
             billing={<RentalBillingCardSkeleton />}
             charges={<RentalChargesSkeleton />}
@@ -196,6 +201,7 @@ export function RentalDetailPage() {
       {rental.data && (
         <RentalDetailLayout
           summary={<RentalSummary rental={rental.data} />}
+          money={<RentalMoneyStrip rentalId={rental.data.id} />}
           status={<RentalStatusCard rental={rental.data} />}
           billing={<RentalBillingCard rental={rental.data} />}
           charges={

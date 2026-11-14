@@ -4,6 +4,8 @@ import { Col, Row } from "@/components/atoms/grid";
 
 type DashboardLayoutProps = {
   banner?: ReactNode;
+  /** "Hoje": what to do now, above the numbers. */
+  today?: ReactNode;
   kpis: ReactNode;
   overdueByPurpose: ReactNode;
   topDebtors: ReactNode;
@@ -23,6 +25,7 @@ export function DashboardLayout(props: DashboardLayoutProps) {
   return (
     <Box className="space-y-6">
       {props.banner}
+      {props.today}
       {props.kpis}
       <Row className="items-stretch gap-y-6">
         <Col lg={6}>{props.overdueByPurpose}</Col>

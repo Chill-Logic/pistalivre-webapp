@@ -90,7 +90,7 @@ export function RentalContractsCard({ rental }: { rental: RentalDetail }) {
       storageKey="rental-contracts"
       actions={
         !retroactive && (
-          <Button asChild size="sm">
+          <Button asChild size="sm" variant="outline">
             <Link to={routeTo.newRentalContract(rental.id)}>
               <FilePlus2 />
               Gerar contrato

@@ -2,7 +2,7 @@
 // desktop, to compare before/after a visual change.
 //
 //   npm run shots -- [--area gestao|cliente|parceiro] [--theme light|dark]
-//                    [--out pasta] [--full] [--ai] caminho...
+//                    [--out pasta] [--full] [--ai] [--sem-login] caminho...
 //
 //   npm run shots -- /gestao /gestao/locacoes
 //   npm run shots -- --area cliente --theme dark /area-cliente
@@ -50,6 +50,8 @@ const theme = flag("theme", "light");
 const out = flag("out", `shots/${new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-")}`);
 const full = has("full");
 const ai = has("ai");
+// Logged out (the login screens themselves redirect a signed-in user away).
+const anonymous = has("sem-login");
 const paths = args.length ? args : ["/gestao"];
 const creds = AREAS[area];
 if (!creds) throw new Error(`Área desconhecida: ${area}`);
@@ -86,7 +88,7 @@ for (const [tag, width, height] of SIZES) {
 
   await page.goto(BASE + creds.login, { waitUntil: "networkidle0" });
   await page.evaluate((value) => localStorage.setItem("pl:theme", value), theme);
-  if (await page.$('input[type="password"]')) {
+  if (!anonymous && (await page.$('input[type="password"]'))) {
     await page.type("form input:not([type=password]):not([type=hidden]):not([type=checkbox])", creds.user);
     await page.type('input[type="password"]', creds.password);
     await page.keyboard.press("Enter");

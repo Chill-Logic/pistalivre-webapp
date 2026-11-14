@@ -100,7 +100,7 @@ export function MaintenanceReportDialog({ rentalId }: { rentalId: string }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button size="sm">
+        <Button size="sm" variant="outline">
           <Wrench />
           Registrar
         </Button>

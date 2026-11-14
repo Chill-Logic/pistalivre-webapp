@@ -68,7 +68,7 @@ export function PortalRentalSections({
             isEmpty={sections.inspections.length === 0}
             actions={
               canWrite && (
-                <Button asChild size="sm">
+                <Button asChild size="sm" variant="outline">
                   <Link to={routeTo.portalInspectionNew(rentalId)}>
                     <ClipboardCheck />
                     Realizar vistoria
@@ -134,7 +134,7 @@ export function PortalRentalSections({
                 canWrite && (
                   <ReimbursementRequestDialog
                     rentalId={rentalId}
-                    triggerVariant="default"
+                    triggerVariant="outline"
                   />
                 )
               }
