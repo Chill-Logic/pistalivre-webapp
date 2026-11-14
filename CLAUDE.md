@@ -92,6 +92,9 @@ pessoa quer, push neste aparelho com "Enviar teste" e, para o ADMIN, o que cada 
 Push: `public/push-sw.js` importado pelo service worker gerado (`workbox.importScripts`), `helpers/push.ts` +
 `usePushDevice` (a permissão só é pedida no clique). Em dev o service worker fica desligado: para testar push,
 `npm run build && npm run preview`. Tempo real por `notification.created` (sala do usuário).
+Convite "Ative as notificações" (`PushInvite`, no `AppShell`): aparece para quem não tem push NESTE aparelho; não
+aparece no navegador do celular (lá vem antes o convite de instalar), com o navegador bloqueando ou sem chave no servidor;
+o X adia 7 dias (`pl:push_invite_snooze`).
 Busca universal **Ctrl+K** (`SearchPalette`, 2026-11-12): registros do servidor (`GET /search`) + telas,
 ações e manual; ao criar tela/ação nova, acrescente em `constants/navigation.ts`/`constants/search.ts`.
 

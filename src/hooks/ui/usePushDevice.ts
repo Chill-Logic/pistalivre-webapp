@@ -22,12 +22,15 @@ export function usePushDevice(publicKey: string | null) {
   const [blocker, setBlocker] = useState<PushBlocker>(null);
   const [subscribed, setSubscribed] = useState(false);
   const [busy, setBusy] = useState(false);
+  /** The device check finished (avoids flashing an invite to someone already subscribed). */
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     setBlocker(pushBlocker());
     currentPushSubscription()
       .then((subscription) => setSubscribed(Boolean(subscription)))
-      .catch(() => setSubscribed(false));
+      .catch(() => setSubscribed(false))
+      .finally(() => setReady(true));
   }, []);
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: queryKeys.notifications.settings() });
@@ -66,5 +69,5 @@ export function usePushDevice(publicKey: string | null) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { blocker, subscribed, busy, enable, disable };
+  return { blocker, subscribed, busy, ready, enable, disable };
 }

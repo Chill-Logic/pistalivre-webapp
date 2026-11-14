@@ -1,6 +1,8 @@
 export const STORAGE_KEYS = {
   authToken: "pl:auth-token",
   theme: "pl:theme",
+  /** Until when (ms) the "Ative as notificações" invite stays hidden on this device. */
+  pushInviteSnooze: "pl:push_invite_snooze",
   /** JSON: { collapsed, groups: { "Operação": true, … } } (helpers/ui-state). */
   sidebarState: "pl:sidebar_state",
   /** JSON: { "rental-contracts": false, … } — the cards that open and close. */
