@@ -464,7 +464,7 @@ ${note}`
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="h-auto whitespace-normal rounded-full py-2"
+                    className="h-auto md:h-auto whitespace-normal rounded-full py-2"
                     onClick={() => send(suggestion)}
                     disabled={working}
                   >
@@ -619,7 +619,7 @@ ${note}`
                               type="button"
                               variant="link"
                               size="sm"
-                              className="h-auto p-0 text-xs"
+                              className="h-auto md:h-auto p-0 text-xs"
                               onClick={() => showSources(placesOf(index))}
                             >
                               Mostrar de novo
@@ -632,7 +632,7 @@ ${note}`
                               type="button"
                               variant="link"
                               size="sm"
-                              className="h-auto p-0 text-xs"
+                              className="h-auto md:h-auto p-0 text-xs"
                               onClick={() => showSources(placesOf(index))}
                             >
                               Mostrar

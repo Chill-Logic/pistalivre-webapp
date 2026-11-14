@@ -93,122 +93,129 @@ export function PortalHomePage() {
         }
       </QueryBoundary>
 
-      <QueryBoundary
-        query={charges}
-        label="Carregando cobranças…"
-        skeleton={<ListCardSkeleton rows={2} row={<ListRowSkeleton />} />}
-      >
-        {(items) => (
-          <ListCard
-            title={openChargesTitle(
-              items.filter((charge) => charge.open).length,
+      <Row className="gap-y-6">
+        <Col lg={7} className="space-y-6">
+          <QueryBoundary
+            query={charges}
+            label="Carregando cobranças…"
+            skeleton={<ListCardSkeleton rows={2} row={<ListRowSkeleton />} />}
+          >
+            {(items) => (
+              <ListCard
+                title={openChargesTitle(
+                  items.filter((charge) => charge.open).length,
+                )}
+                empty="Nenhuma cobrança por enquanto."
+                isEmpty={items.length === 0}
+              >
+                {items.map((charge) => (
+                  <PortalChargeItem key={charge.id} charge={charge} />
+                ))}
+              </ListCard>
             )}
-            empty="Nenhuma cobrança por enquanto."
-            isEmpty={items.length === 0}
+          </QueryBoundary>
+        </Col>
+        <Col lg={5} className="space-y-6">
+          <QueryBoundary
+            query={invoices}
+            label="Carregando notas fiscais…"
+            skeleton={<ListCardSkeleton rows={1} row={<ListRowSkeleton />} />}
           >
-            {items.map((charge) => (
-              <PortalChargeItem key={charge.id} charge={charge} />
-            ))}
-          </ListCard>
-        )}
-      </QueryBoundary>
-
-      <QueryBoundary
-        query={invoices}
-        label="Carregando notas fiscais…"
-        skeleton={<ListCardSkeleton rows={1} row={<ListRowSkeleton />} />}
-      >
-        {(items) => (
-          <ListCard
-            title="Notas fiscais"
-            empty="Nenhuma nota fiscal emitida."
-            isEmpty={items.length === 0}
-          >
-            {items.map((invoice) => (
-              <InvoiceItem key={invoice.id} invoice={invoice} />
-            ))}
-          </ListCard>
-        )}
-      </QueryBoundary>
-
-      <QueryBoundary
-        query={reimbursements}
-        label="Carregando reembolsos…"
-        skeleton={<ListCardSkeleton rows={2} row={<ListRowSkeleton />} />}
-      >
-        {(items) => (
-          <ListCard
-            title={reimbursementsTitle(
-              items.filter((item) => item.status === "REJECTED").length,
+            {(items) => (
+              <ListCard
+                title="Notas fiscais"
+                empty="Nenhuma nota fiscal emitida."
+                isEmpty={items.length === 0}
+              >
+                {items.map((invoice) => (
+                  <InvoiceItem key={invoice.id} invoice={invoice} />
+                ))}
+              </ListCard>
             )}
-            empty="Nenhum pedido de reembolso."
-            isEmpty={items.length === 0}
-            actions={
-              activeRentals.length > 0 && (
-                <ReimbursementRequestDialog rentals={activeRentals} />
-              )
-            }
-            footer={
-              items.length > HOME_REIMBURSEMENTS_LIMIT &&
-              `Mais ${pluralize(items.length - HOME_REIMBURSEMENTS_LIMIT, "pedido", "pedidos")} na página de cada locação.`
-            }
+          </QueryBoundary>
+
+          <QueryBoundary
+            query={reimbursements}
+            label="Carregando reembolsos…"
+            skeleton={<ListCardSkeleton rows={2} row={<ListRowSkeleton />} />}
           >
-            {items.slice(0, HOME_REIMBURSEMENTS_LIMIT).map((item) => (
-              <ReimbursementItem
-                key={item.id}
-                reimbursement={item}
+            {(items) => (
+              <ListCard
+                title={reimbursementsTitle(
+                  items.filter((item) => item.status === "REJECTED").length,
+                )}
+                empty="Nenhum pedido de reembolso."
+                isEmpty={items.length === 0}
                 actions={
-                  item.status === "REJECTED" &&
-                  activeRentals.some(
-                    (rental) => rental.id === item.rental?.id,
-                  ) && (
-                    <ReimbursementRequestDialog
-                      rentalId={item.rental?.id}
-                      maintenanceId={item.maintenanceId ?? undefined}
-                      fixedAmount={item.maintenanceId ? item.amount : undefined}
-                      defaultReason={item.reason}
-                      triggerLabel="Pedir de novo"
-                    />
+                  activeRentals.length > 0 && (
+                    <ReimbursementRequestDialog rentals={activeRentals} />
                   )
                 }
-              />
-            ))}
-          </ListCard>
-        )}
-      </QueryBoundary>
+                footer={
+                  items.length > HOME_REIMBURSEMENTS_LIMIT &&
+                  `Mais ${pluralize(items.length - HOME_REIMBURSEMENTS_LIMIT, "pedido", "pedidos")} na página de cada locação.`
+                }
+              >
+                {items.slice(0, HOME_REIMBURSEMENTS_LIMIT).map((item) => (
+                  <ReimbursementItem
+                    key={item.id}
+                    reimbursement={item}
+                    actions={
+                      item.status === "REJECTED" &&
+                      activeRentals.some(
+                        (rental) => rental.id === item.rental?.id,
+                      ) && (
+                        <ReimbursementRequestDialog
+                          rentalId={item.rental?.id}
+                          maintenanceId={item.maintenanceId ?? undefined}
+                          fixedAmount={
+                            item.maintenanceId ? item.amount : undefined
+                          }
+                          defaultReason={item.reason}
+                          triggerLabel="Pedir de novo"
+                        />
+                      )
+                    }
+                  />
+                ))}
+              </ListCard>
+            )}
+          </QueryBoundary>
 
-      <QueryBoundary
-        query={wallet}
-        label="Carregando carteira…"
-        skeleton={<ListCardSkeleton rows={1} row={<ListRowSkeleton />} />}
-      >
-        {(items) => (
-          <ListCard
-            title="Minha carteira"
-            empty="Nenhuma chave pix cadastrada. É para ela que vão os seus reembolsos."
-            isEmpty={items.length === 0}
-            actions={
-              <WalletAddDialog
-                mutations={walletMutations}
-                prefill={walletPrefill(profile.data, sessionEmail)}
-              />
-            }
+          <QueryBoundary
+            query={wallet}
+            label="Carregando carteira…"
+            skeleton={<ListCardSkeleton rows={1} row={<ListRowSkeleton />} />}
           >
-            {items.map((walletKey) => (
-              <WalletKeyItem
-                key={walletKey.id}
-                walletKey={walletKey}
+            {(items) => (
+              <ListCard
+                title="Minha carteira"
+                empty="Nenhuma chave pix cadastrada. É para ela que vão os seus reembolsos."
+                isEmpty={items.length === 0}
                 actions={
-                  <WalletKeyActions
-                    walletKey={walletKey}
+                  <WalletAddDialog
                     mutations={walletMutations}
+                    prefill={walletPrefill(profile.data, sessionEmail)}
                   />
                 }
-              />
-            ))}
-          </ListCard>
-        )}
-      </QueryBoundary>
+              >
+                {items.map((walletKey) => (
+                  <WalletKeyItem
+                    key={walletKey.id}
+                    walletKey={walletKey}
+                    actions={
+                      <WalletKeyActions
+                        walletKey={walletKey}
+                        mutations={walletMutations}
+                      />
+                    }
+                  />
+                ))}
+              </ListCard>
+            )}
+          </QueryBoundary>
+        </Col>
+      </Row>
 
       {pastRentals.length > 0 && (
         <PortalRentalGroup

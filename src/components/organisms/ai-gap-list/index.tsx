@@ -55,7 +55,7 @@ export function AiGapList({
             <Button
               type="button"
               variant="ghost"
-              className="h-auto w-full p-0 text-left"
+              className="h-auto md:h-auto w-full p-0 text-left"
               onClick={() => onOpen(entry.id)}
             >
               <Card className="w-full space-y-2 p-4">

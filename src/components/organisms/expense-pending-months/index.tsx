@@ -31,7 +31,7 @@ export function ExpensePendingMonths({ months, onOpen }: ExpensePendingMonthsPro
           <ListItem key={pending.month}>
             <Button
               variant="ghost"
-              className="h-auto w-full justify-between gap-3 px-2 py-3 text-left"
+              className="h-auto w-full justify-between gap-3 rounded-none px-2 py-3 text-left md:h-auto"
               onClick={() => onOpen(pending.month)}
             >
               <Box className="min-w-0">

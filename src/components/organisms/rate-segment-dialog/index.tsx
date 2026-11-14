@@ -164,7 +164,7 @@ export function RateSegmentDialog({ billing }: { billing: RentalBilling }) {
                   type="button"
                   variant="link"
                   size="sm"
-                  className="h-auto p-0 text-xs"
+                  className="h-auto md:h-auto p-0 text-xs"
                   onClick={() => setFrom(firstUncovered)}
                 >
                   Usar {formatCalendarDate(firstUncovered)}: primeiro dia ainda

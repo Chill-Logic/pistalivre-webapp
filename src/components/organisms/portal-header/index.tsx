@@ -19,7 +19,7 @@ export function PortalHeader({ user }: { user: AuthUser }) {
 
   return (
     <Header className="sticky top-0 z-30 border-b bg-card/95 pt-safe-t backdrop-blur supports-[backdrop-filter]:bg-card/80">
-      <Box className="mx-auto flex h-14 w-full max-w-3xl items-center gap-2 px-4">
+      <Box className="mx-auto flex h-14 w-full max-w-3xl items-center lg:max-w-6xl gap-2 px-4">
         <Link to={ROUTES.portal} aria-label="Início" className="rounded-md">
           <Logo />
         </Link>

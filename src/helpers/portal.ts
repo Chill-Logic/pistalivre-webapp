@@ -51,7 +51,7 @@ function phoneWithoutCountry(phone: string | null | undefined) {
 export function openChargesTitle(open: number) {
   return open > 0
     ? `${pluralize(open, "cobrança", "cobranças")} em aberto`
-    : "Nenhuma cobrança em aberto";
+    : "Cobranças";
 }
 
 /** Home card title: a refused request asks for action (fix and ask again). */
@@ -71,4 +71,15 @@ export function walletPrefill(
     EMAIL: profile?.email ?? sessionEmail,
     PHONE: phoneWithoutCountry(profile?.phone),
   };
+}
+
+/**
+ * A charge's meta line for the renter: the API writes the staff's channel
+ * ("Fora do Asaas · LOC-…"), but the renter does not know what Asaas is, so
+ * only the rental code stays.
+ */
+export function renterChargeMeta(meta: string | null | undefined) {
+  if (!meta) return null;
+  const parts = meta.split(" · ").filter((part) => !/asaas/i.test(part));
+  return parts.join(" · ") || null;
 }

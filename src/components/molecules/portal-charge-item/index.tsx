@@ -18,6 +18,7 @@ import {
   chargeSituationBadge,
   pixImageSrc,
 } from "@/helpers/charge";
+import { renterChargeMeta } from "@/helpers/portal";
 import { useRegeneratePix } from "@/hooks/api/cliente/finance/useRegeneratePix";
 import { useCopy } from "@/hooks/ui/useCopy";
 import { usePixExpired } from "@/hooks/ui/usePixExpired";
@@ -54,7 +55,7 @@ export function PortalChargeItem({
   const details = [
     charge.methodLabel,
     charge.dueDate && `vence ${formatCalendarDate(charge.dueDate)}`,
-    charge.meta,
+    renterChargeMeta(charge.meta),
   ].filter(Boolean);
 
   return (

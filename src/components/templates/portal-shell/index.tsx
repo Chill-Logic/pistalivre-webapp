@@ -22,7 +22,7 @@ export function PortalShell({ user }: { user: AuthUser }) {
       <TopProgressBar />
       <PortalHeader user={user} />
       <OfflineBanner />
-      <Main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-10 pt-4 md:pt-6">
+      <Main className="mx-auto w-full max-w-3xl flex-1 px-4 lg:max-w-6xl pb-10 pt-4 md:pt-6">
         <PwaInstallInvite user={user} />
         <Suspense fallback={<PageSkeleton />}>
           <Outlet />

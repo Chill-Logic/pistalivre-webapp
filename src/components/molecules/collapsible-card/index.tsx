@@ -55,7 +55,7 @@ export function CollapsibleCard({
           aria-expanded={open}
           aria-controls={contentId}
           onClick={toggle}
-          className="-ml-2 h-auto max-w-full shrink-0 justify-start gap-2 px-2 py-1"
+          className="-ml-2 h-auto md:h-auto max-w-full shrink-0 justify-start gap-2 px-2 py-1"
         >
           <CardTitle className="truncate text-base">{title}</CardTitle>
           {count !== undefined && (

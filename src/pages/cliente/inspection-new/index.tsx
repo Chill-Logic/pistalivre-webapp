@@ -25,7 +25,7 @@ export function PortalInspectionNewPage() {
   }
 
   return (
-    <Box className="space-y-4">
+    <Box className="mx-auto max-w-3xl space-y-4">
       <BackLink to={back} label={rental.data?.code ?? "Locação"} />
       <PageHeader title="Realizar vistoria" />
       <QueryBoundary
