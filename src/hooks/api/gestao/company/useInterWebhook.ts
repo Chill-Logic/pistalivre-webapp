@@ -22,10 +22,10 @@ export function useRegisterInterWebhook() {
   return useMutation({
     mutationFn: (url: string) => companyService.registerInterWebhook(url),
     onSuccess: (result) => {
-      queryClient.setQueryData(
-        queryKeys.company.interWebhook,
-        result.transferUrl,
-      );
+      queryClient.setQueryData(queryKeys.company.interWebhook, {
+        url: result.pixInUrl,
+        hasKey: true,
+      });
     },
   });
 }

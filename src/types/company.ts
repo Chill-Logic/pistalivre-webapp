@@ -90,6 +90,14 @@ export type IntegrationInput = {
 export type IntegrationTestResult = { ok: boolean; message: string };
 
 export type InterWebhookRegistration = {
-  transferUrl: string;
-  pixInUrl: string | null;
+  /** Always null now: the system never sends pix, only the pix-received webhook is registered. */
+  transferUrl: string | null;
+  pixInUrl: string;
+};
+
+/** The pix-received callback registered at the Inter for the receiving key. */
+export type InterWebhookStatus = {
+  url: string | null;
+  /** false = no receiving pix key saved in the settings. */
+  hasKey: boolean;
 };

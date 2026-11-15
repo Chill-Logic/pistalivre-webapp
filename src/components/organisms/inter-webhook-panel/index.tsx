@@ -63,7 +63,7 @@ export function InterWebhookPanel({ configured }: { configured: boolean }) {
 
       <Box className="space-y-1">
         <Text size="xs" tone="muted">
-          Registrado no banco agora
+          Pix recebido · registrado no banco agora
         </Text>
         {registered.isPending && (
           <Skeleton shape="text" className="w-64 text-sm" />
@@ -73,11 +73,20 @@ export function InterWebhookPanel({ configured }: { configured: boolean }) {
             {errorMessage(registered.error)}
           </Text>
         )}
-        {registered.isSuccess && (
-          <Text size="sm" mono={Boolean(registered.data)} className="break-all">
-            {registered.data ?? "Nenhum webhook registrado"}
-          </Text>
-        )}
+        {registered.isSuccess &&
+          (registered.data.hasKey ? (
+            <Text
+              size="sm"
+              mono={Boolean(registered.data.url)}
+              className="break-all"
+            >
+              {registered.data.url ?? "Nenhum webhook registrado"}
+            </Text>
+          ) : (
+            <Text size="sm" tone="destructive">
+              Falta a chave pix de recebimento nas configurações do Inter.
+            </Text>
+          ))}
       </Box>
 
       <FormField
@@ -117,7 +126,7 @@ export function InterWebhookPanel({ configured }: { configured: boolean }) {
         description={
           <>
             Isto troca, no banco de verdade, o endereço que o Inter chama para
-            avisar dos pagamentos e dos pix recebidos. O endereço atual deixa de
+            avisar dos pix recebidos. O endereço atual deixa de
             receber os avisos. Nada aqui move dinheiro.
             <Text inline mono className="mt-2 block break-all text-foreground">
               {trimmed}
@@ -136,20 +145,10 @@ export function InterWebhookPanel({ configured }: { configured: boolean }) {
             Webhook registrado no Inter.
           </Text>
           <Text size="sm">
-            Pagamentos:{" "}
-            <Text inline mono className="break-all">
-              {register.data.transferUrl}
-            </Text>
-          </Text>
-          <Text size="sm">
             Pix recebido:{" "}
-            {register.data.pixInUrl ? (
-              <Text inline mono className="break-all">
-                {register.data.pixInUrl}
-              </Text>
-            ) : (
-              "pulado (falta a chave pix de recebimento ou o escopo webhook.write)"
-            )}
+            <Text inline mono className="break-all">
+              {register.data.pixInUrl}
+            </Text>
           </Text>
         </Alert>
       )}

@@ -6,6 +6,7 @@ import type {
   IntegrationInput,
   IntegrationTestResult,
   InterWebhookRegistration,
+  InterWebhookStatus,
 } from "@/types/company";
 
 /**
@@ -42,12 +43,12 @@ export const companyService = {
     );
     return data;
   },
-  /** The callback registered at the Inter right now. */
+  /** The pix-received callback registered at the Inter right now. */
   async interWebhook() {
-    const { data } = await http.get<{ url: string | null }>(
+    const { data } = await http.get<InterWebhookStatus>(
       "/company/integrations/inter/webhook",
     );
-    return data.url;
+    return data;
   },
   /** Registers OUR callbacks at the Inter (inbound notifications only). */
   async registerInterWebhook(url: string) {
