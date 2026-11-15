@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { RentalStatusBadge } from "@/components/molecules/rental-status-badge";
+import { RentalHandoverDialog } from "@/components/organisms/rental-handover-dialog";
 import { RentalTerminationDialog } from "@/components/organisms/rental-termination-dialog";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import {
@@ -30,26 +31,31 @@ import { formatCalendarDate } from "@/utils/format";
 type RentalStatusCardProps = {
   rental: Pick<
     RentalDetail,
-    "id" | "code" | "status" | "source" | "termination"
+    "id" | "code" | "status" | "source" | "termination" | "handoverAt" | "vehicle"
   >;
 };
 
-/** Current status and the legal next ones, each confirmed in a dialog. */
+/**
+ * Current status and the legal next ones, each confirmed in a dialog. "Ativa"
+ * is never a plain status change: it is "Registrar retirada" (the date the rent
+ * counts from), and an active rental shows the handover date with "Corrigir".
+ */
 export function RentalStatusCard({ rental }: RentalStatusCardProps) {
   const { label } = useLabels();
   const changeStatus = useChangeRentalStatus(rental.id);
   const [target, setTarget] = useState<RentalStatus | null>(null);
   const statusLabel = (code: RentalStatus) =>
     label(LABEL_MAPS.rentalStatus, code);
-  const nextStatuses = RENTAL_TRANSITIONS[rental.status];
+  const nextStatuses = RENTAL_TRANSITIONS[rental.status].filter(
+    (next) => next !== "ACTIVE",
+  );
+  const canHandOver =
+    rental.status !== "DRAFT" && RENTAL_TRANSITIONS[rental.status].includes("ACTIVE");
   const movesVehicle = rental.source === "SYSTEM";
 
   const consequence = (next: RentalStatus) => {
     if (!movesVehicle) {
       return "Locação retroativa: o veículo não muda de situação.";
-    }
-    if (next === "ACTIVE") {
-      return "O veículo passa a alugado e o cliente fica ativo. Nenhuma cobrança é emitida.";
     }
     if (next === "RETURNED" || next === "CANCELLED" || next === "WITHDRAWN") {
       return "O veículo volta a ficar disponível. Esta situação é final e não pode ser desfeita.";
@@ -70,16 +76,23 @@ export function RentalStatusCard({ rental }: RentalStatusCardProps) {
         {rental.termination && (
           <TerminationSummary termination={rental.termination} />
         )}
+        {rental.status === "ACTIVE" && rental.handoverAt && (
+          <Text size="sm" tone="muted">
+            Retirada em {formatCalendarDate(rental.handoverAt)}: o aluguel conta desse dia.
+          </Text>
+        )}
         {rental.status === "ACTIVE" ? (
           <Box className="flex flex-wrap gap-2">
+            <RentalHandoverDialog rental={rental} />
             <RentalTerminationDialog rental={rental} />
           </Box>
-        ) : nextStatuses.length === 0 ? (
+        ) : nextStatuses.length === 0 && !canHandOver ? (
           <Text size="xs" tone="muted">
             Situação final: a locação não muda mais.
           </Text>
         ) : (
           <Box className="flex flex-wrap gap-2">
+            {canHandOver && <RentalHandoverDialog rental={rental} />}
             {nextStatuses.map((next) => (
               <ConfirmDialog
                 key={next}

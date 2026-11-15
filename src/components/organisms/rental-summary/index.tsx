@@ -53,13 +53,20 @@ export function RentalSummary({ rental }: { rental: RentalDetail }) {
             </TextLink>{" "}
             · {vehicleName(rental.vehicle)} {rental.vehicle.year}
           </InfoItem>
-          <InfoItem span={6} md={4} label="Início">
+          <InfoItem span={6} md={3} label="Início">
             {formatCalendarDate(rental.startDate)}
           </InfoItem>
-          <InfoItem span={6} md={4} label="Fim">
+          <InfoItem span={6} md={3} label="Retirada">
+            {rental.handoverAt
+              ? formatCalendarDate(rental.handoverAt)
+              : rental.status === "DRAFT"
+                ? null
+                : "Ainda não retirou"}
+          </InfoItem>
+          <InfoItem span={6} md={3} label="Fim">
             {rental.endDate ? formatCalendarDate(rental.endDate) : "Sem prazo"}
           </InfoItem>
-          <InfoItem md={4} label="Valor">
+          <InfoItem span={6} md={3} label="Valor">
             {rateLabel(
               rental.rate,
               label(LABEL_MAPS.ratePeriod, rental.ratePeriod),

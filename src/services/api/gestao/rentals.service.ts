@@ -39,6 +39,11 @@ export const rentalsService = {
     });
     return data;
   },
+  /** "Registrar retirada" (activates the rental) or, active, corrects the date. */
+  async registerHandover(id: string, input: { date: string }) {
+    const { data } = await http.post<RentalRecord>(`/rentals/${id}/handover`, input);
+    return data;
+  },
   /** What terminating on `date` would do (charges to cancel, automation). */
   async terminationPreview(id: string, date: string) {
     const { data } = await http.get<TerminationPreview>(
