@@ -5,6 +5,7 @@ import type {
   ContractDraft,
   ContractDraftState,
   ContractOptions,
+  ContractReview,
 } from "@/types/contract";
 
 /**
@@ -96,7 +97,8 @@ export const contractsService = {
   ) {
     const { data } = await http.post<Contract>(
       `/rentals/${rentalId}/contracts`,
-      input,
+      // The person confirmed "revisei os termos" on the review dialog.
+      { ...input, reviewed: true },
       { headers: { "Idempotency-Key": key }, timeout: 120_000 },
     );
     return data;
@@ -104,5 +106,17 @@ export const contractsService = {
   /** The PDF goes with it; 409 when the PDF is in a signature request. */
   async remove(id: string) {
     await http.delete(`/contracts/${id}`);
+  },
+  /** Before "Gerar PDF": what was agreed and where the edited text differs. */
+  async review(rentalId: string, html: string) {
+    const { data } = await http.post<ContractReview>(`/rentals/${rentalId}/contracts/review`, { html });
+    return data;
+  },
+  /** Before "Enviar para assinatura": the same over the frozen contract + the default channel. */
+  async reviewDocument(rentalId: string, documentId: string) {
+    const { data } = await http.get<ContractReview>(`/rentals/${rentalId}/contracts/review`, {
+      params: { documentId },
+    });
+    return data;
   },
 };

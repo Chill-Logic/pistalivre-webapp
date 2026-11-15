@@ -45,10 +45,12 @@ export const signaturesService = {
     return data;
   },
   /** A draft over a PDF already attached somewhere. */
-  async create(documentId: string, name: string) {
+  /** `reviewed` = the person confirmed "Revisei os termos" (recorded with who/when). */
+  async create(documentId: string, name: string, reviewed = false) {
     const { data } = await http.post<SignatureDetail>("/signatures", {
       documentId,
       name,
+      ...(reviewed ? { reviewed: true } : {}),
     });
     return data;
   },

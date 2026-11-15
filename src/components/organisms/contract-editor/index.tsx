@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AiDocumentEditor } from "@/components/organisms/ai-document-editor";
+import { ContractReviewDialog } from "@/components/organisms/contract-review-dialog";
 import { toApiError } from "@/helpers/api-error";
 import {
   useContractPreview,
@@ -7,7 +8,12 @@ import {
 } from "@/hooks/api/gestao/contracts/useContractMutations";
 import { useContractDraftSync } from "@/hooks/api/gestao/contracts/useContractDraftSync";
 import { useIdempotencyKey } from "@/hooks/ui/useIdempotencyKey";
-import type { Contract, ContractDraftState } from "@/types/contract";
+import { contractsService } from "@/services/api/gestao/contracts.service";
+import type {
+  Contract,
+  ContractDraftState,
+  ContractReview,
+} from "@/types/contract";
 
 type ContractEditorProps = {
   rentalId: string;
@@ -49,6 +55,10 @@ export function ContractEditor({
   const idempotency = useIdempotencyKey();
   const draft = useContractDraftSync(initialDraft);
   const [error, setError] = useState<string | null>(null);
+  // "Gerar PDF e salvar" → the review (summary + where the text differs +
+  // "Revisei os termos") → only then the PDF.
+  const [pendingHtml, setPendingHtml] = useState<string | null>(null);
+  const [review, setReview] = useState<ContractReview | null>(null);
 
   const save = async (html: string) => {
     setError(null);
@@ -58,15 +68,29 @@ export function ContractEditor({
       setError(toApiError(failure).message);
       return;
     }
+    setReview(null);
+    setPendingHtml(html);
+    try {
+      setReview(await contractsService.review(rentalId, html));
+    } catch (failure) {
+      setPendingHtml(null);
+      setError(toApiError(failure).message);
+    }
+  };
+
+  const confirm = () => {
+    if (pendingHtml == null) return;
     create.mutate(
-      { key: idempotency.key, input: { templateId, html } },
+      { key: idempotency.key, input: { templateId, html: pendingHtml } },
       {
         onSuccess: (contract) => {
           idempotency.renew();
+          setPendingHtml(null);
           onSaved(contract);
         },
         onError: (failure) => {
           const apiError = toApiError(failure);
+          setPendingHtml(null);
           setError(apiError.fields?.cnh ?? apiError.message);
         },
       },
@@ -74,19 +98,32 @@ export function ContractEditor({
   };
 
   return (
-    <AiDocumentEditor
-      initialHtml={initialDraft.html}
-      draft={draft}
-      aiEnabled={aiEnabled}
-      intro="Revise o contrato abaixo. Você pode ajustar o texto antes de gerar o PDF; o que estiver aqui fica congelado no documento. As assinaturas entram no fim do PDF."
-      label="Texto do contrato"
-      cancelTo={cancelTo}
-      chat={{ mode: "contract", suggestions: CONTRACT_SUGGESTIONS, rentalId }}
-      onPreview={(html) => preview.mutate({ rentalId, templateId, html })}
-      previewing={preview.isPending}
-      onSave={(html) => void save(html)}
-      saving={create.isPending}
-      error={error}
-    />
+    <>
+      <ContractReviewDialog
+        open={pendingHtml != null}
+        onOpenChange={(open) => {
+          if (!open && !create.isPending) setPendingHtml(null);
+        }}
+        title="Revisar antes de gerar o contrato"
+        review={review}
+        confirmLabel="Gerar PDF e salvar"
+        busy={create.isPending}
+        onConfirm={confirm}
+      />
+      <AiDocumentEditor
+        initialHtml={initialDraft.html}
+        draft={draft}
+        aiEnabled={aiEnabled}
+        intro="Revise o contrato abaixo. Você pode ajustar o texto antes de gerar o PDF; o que estiver aqui fica congelado no documento. As assinaturas entram no fim do PDF."
+        label="Texto do contrato"
+        cancelTo={cancelTo}
+        chat={{ mode: "contract", suggestions: CONTRACT_SUGGESTIONS, rentalId }}
+        onPreview={(html) => preview.mutate({ rentalId, templateId, html })}
+        previewing={preview.isPending}
+        onSave={(html) => void save(html)}
+        saving={create.isPending || pendingHtml != null}
+        error={error}
+      />
+    </>
   );
 }

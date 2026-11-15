@@ -13,6 +13,20 @@ export type Contract = {
   createdAt: string;
   /** The PDF attached to the rental under "Contrato". */
   document: DocumentFile | null;
+  /** Who generated it and who confirmed "revisei os termos" (names). */
+  generatedBy: string | null;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
+  /** The automatic review's warnings when it was confirmed (empty = none). */
+  reviewWarnings: string[];
+};
+
+/** The review before generating or sending: what was agreed and where the text differs. */
+export type ContractReview = {
+  summary: { label: string; value: string }[];
+  issues: { code: string; message: string }[];
+  /** Only on the send review: how the lessee is told by default. */
+  signer?: { channel: "WHATSAPP" | "EMAIL"; phone: string | null; email: string | null };
 };
 
 /** The customer's CNH as the contract flow sees it (`ok` = valid today). */

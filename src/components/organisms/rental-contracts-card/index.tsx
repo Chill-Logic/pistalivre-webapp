@@ -179,6 +179,9 @@ function ContractRow({
   const subtitle = [
     CONTRACT_STATUS_LABELS[contract.status] ?? contract.status,
     formatDate(contract.createdAt),
+    contract.reviewedBy && `revisado por ${contract.reviewedBy}`,
+    contract.reviewWarnings?.length > 0 &&
+      `gerado com ${contract.reviewWarnings.length === 1 ? "1 aviso" : `${contract.reviewWarnings.length} avisos`} da revisão`,
     signature &&
       `Em assinatura: ${label(LABEL_MAPS.signatureStatus, signature.status)}`,
   ]
