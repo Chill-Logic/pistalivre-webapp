@@ -170,22 +170,22 @@ export function AutoBillingEnableDialog({
                   prorated.extended
                     ? [
                         {
-                          value: "PRORATED",
-                          label: `${prorated.days} dias · ${formatCurrency(prorated.amount)}`,
-                        },
-                        {
                           value: "FULL",
                           label: `Só o ciclo · ${formatCurrency(preview.data.full)}`,
+                        },
+                        {
+                          value: "PRORATED",
+                          label: `${prorated.days} dias · ${formatCurrency(prorated.amount)}`,
                         },
                       ]
                     : [
                         {
-                          value: "PRORATED",
-                          label: `Proporcional · ${formatCurrency(prorated.amount)}`,
-                        },
-                        {
                           value: "FULL",
                           label: `Inteiro · ${formatCurrency(preview.data.full)}`,
+                        },
+                        {
+                          value: "PRORATED",
+                          label: `Proporcional · ${formatCurrency(prorated.amount)}`,
                         },
                       ]
                 }
