@@ -143,7 +143,11 @@ export function useSignerCandidates() {
             queryFn: () => usersService.get(candidate.id),
           })
           .catch(() => null);
-        return { ...candidate, documentation: user?.cpf ?? null };
+        return {
+          ...candidate,
+          documentation: user?.cpf ?? null,
+          phone: user?.phone ?? null,
+        };
       }
       if (candidate.kind === "customer") {
         await offerContact(candidate.id).catch(() => undefined);
