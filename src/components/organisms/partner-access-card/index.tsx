@@ -40,7 +40,7 @@ export function PartnerAccessCard({ partner }: { partner: Partner }) {
           </Text>
           <Box className="flex items-center gap-1 rounded-md border bg-muted/40 py-1 pl-3 pr-1">
             {/* Without the scheme; a narrow card wraps it after "app.parceiro.". */}
-            <Text mono size="xs" className="min-w-0 flex-1 break-words">
+            <Text size="xs" className="min-w-0 flex-1 break-words font-mono">
               {PARTNER_AREA_URL.replace("https://", "").replace(
                 "app.parceiro.",
                 "app.parceiro.\u200B",

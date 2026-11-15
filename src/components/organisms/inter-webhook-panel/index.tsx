@@ -9,6 +9,7 @@ import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { FormField } from "@/components/molecules/form-field";
 import { INTER_WEBHOOK_SUGGESTED_URL } from "@/constants/company";
 import { errorMessage, toApiError } from "@/helpers/api-error";
+import { cn } from "@/utils/cn";
 import {
   useInterWebhook,
   useRegisterInterWebhook,
@@ -77,8 +78,10 @@ export function InterWebhookPanel({ configured }: { configured: boolean }) {
           (registered.data.hasKey ? (
             <Text
               size="sm"
-              mono={Boolean(registered.data.url)}
-              className="break-all"
+              className={cn(
+                "break-all",
+                registered.data.url && "font-mono text-xs",
+              )}
             >
               {registered.data.url ?? "Nenhum webhook registrado"}
             </Text>
@@ -128,7 +131,7 @@ export function InterWebhookPanel({ configured }: { configured: boolean }) {
             Isto troca, no banco de verdade, o endereço que o Inter chama para
             avisar dos pix recebidos. O endereço atual deixa de
             receber os avisos. Nada aqui move dinheiro.
-            <Text inline mono className="mt-2 block break-all text-foreground">
+            <Text inline className="mt-2 block break-all font-mono text-xs text-foreground">
               {trimmed}
             </Text>
           </>
@@ -146,7 +149,7 @@ export function InterWebhookPanel({ configured }: { configured: boolean }) {
           </Text>
           <Text size="sm">
             Pix recebido:{" "}
-            <Text inline mono className="break-all">
+            <Text inline className="break-all font-mono text-xs">
               {register.data.pixInUrl}
             </Text>
           </Text>

@@ -42,7 +42,7 @@ export function CampaignLinkCard({ link, actions }: CampaignLinkCardProps) {
         {utms.join(" · ")} · criado em {formatDate(link.createdAt)}
       </Text>
       <Box className="flex items-center gap-2 rounded-md border bg-muted/40 py-1 pl-3 pr-1">
-        <Text size="sm" mono className="min-w-0 flex-1 truncate">
+        <Text size="sm" className="min-w-0 flex-1 truncate font-mono text-xs">
           {link.url}
         </Text>
         <Button
