@@ -65,7 +65,9 @@ export type DocumentOwnerType =
   | "PROPOSAL"
   | "REIMBURSEMENT"
   | "EXPENSE"
-  | "PARTNER_CONTRACT";
+  | "PARTNER_CONTRACT"
+  | "USER"
+  | "PARTNER";
 
 export type DocumentOwner = { type: DocumentOwnerType; id: string };
 

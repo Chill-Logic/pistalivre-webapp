@@ -109,7 +109,11 @@ export type PartnerContract = {
   createdAt: string;
 };
 
-export type PartnerDetail = Partner & { contracts: PartnerContract[] };
+export type PartnerDetail = Partner & {
+  contracts: PartnerContract[];
+  /** The partner's papers (ID, proof of address, articles of association…). */
+  documents: DocumentFile[];
+};
 
 export type PartnerContractDetail = PartnerContract & { partner: Partner };
 

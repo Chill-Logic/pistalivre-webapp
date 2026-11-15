@@ -27,6 +27,10 @@ function ownerPage(type: DocumentOwnerType, id: string) {
       return { to: routeTo.customer(id), label: "Ver no cliente" };
     case "VEHICLE":
       return { to: routeTo.vehicle(id), label: "Ver no veículo" };
+    case "USER":
+      return { to: routeTo.user(id), label: "Ver no usuário" };
+    case "PARTNER":
+      return { to: routeTo.partner(id), label: "Ver no parceiro" };
     default:
       return null;
   }

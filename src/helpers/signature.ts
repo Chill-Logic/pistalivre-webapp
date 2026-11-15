@@ -41,6 +41,8 @@ const OWNER_NAME: Record<string, string> = {
   DEBT_PAYMENT: "Pagamento de dívida",
   CUSTOMER_DEBT: "Débito do cliente",
   PARTNER_CONTRACT: "Contrato de parceiro",
+  USER: "Usuário",
+  PARTNER: "Parceiro",
 };
 
 /** Singular name of the record type a signed document belongs to. */
@@ -65,6 +67,10 @@ export function documentOwnerHref(type: DocumentOwnerType, id: string) {
       return routeTo.debt(id);
     case "PARTNER_CONTRACT":
       return routeTo.partnerContract(id);
+    case "USER":
+      return routeTo.user(id);
+    case "PARTNER":
+      return routeTo.partner(id);
     default:
       return null;
   }

@@ -1,4 +1,5 @@
 import type { PwaUsageFields } from "@/helpers/pwa";
+import type { DocumentFile } from "@/types/document";
 
 export type UserRole = "ADMIN" | "AGENT";
 
@@ -14,9 +15,13 @@ export type StaffUser = {
 export type StaffUserDetail = StaffUser & {
   /** Digits only. */
   cpf: string | null;
+  /** Digits only (area code + number). */
+  phone: string | null;
   /** Calendar date. */
   birthDate: string | null;
   updatedAt: string;
+  /** The user's papers (ID, proof of address, work contract…). */
+  documents: DocumentFile[];
 };
 
 export type UserFilters = {
@@ -32,6 +37,8 @@ export type UserInput = {
   email: string;
   /** Digits only. */
   cpf: string;
+  /** Digits only; null = none. */
+  phone: string | null;
   /** yyyy-mm-dd or null. */
   birthDate: string | null;
   /** Ignored by the API when an agent edits themselves. */

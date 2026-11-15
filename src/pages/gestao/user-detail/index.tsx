@@ -5,6 +5,10 @@ import { Button } from "@/components/atoms/button";
 import { BackLink } from "@/components/molecules/back-link";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
+import {
+  DocumentsCard,
+  DocumentsCardSkeleton,
+} from "@/components/organisms/documents-card";
 import { UserDeleteButton } from "@/components/organisms/user-delete-button";
 import { UserPasswordDialog } from "@/components/organisms/user-password-dialog";
 import { QueryError } from "@/components/organisms/query-error";
@@ -12,6 +16,7 @@ import {
   UserSummary,
   UserSummarySkeleton,
 } from "@/components/organisms/user-summary";
+import { queryKeys } from "@/constants/query-keys";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { useUser } from "@/hooks/api/gestao/users/useUser";
@@ -57,7 +62,10 @@ export function UserDetailPage() {
       </Box>
       {user.isPending && (
         <SkeletonRegion label="Carregando usuário…">
-          <UserSummarySkeleton />
+          <Box className="space-y-4">
+            <UserSummarySkeleton />
+            <DocumentsCardSkeleton />
+          </Box>
         </SkeletonRegion>
       )}
       {user.isError &&
@@ -66,7 +74,24 @@ export function UserDetailPage() {
         ) : (
           <QueryError error={user.error} onRetry={() => user.refetch()} />
         ))}
-      {user.data && <UserSummary user={user.data} />}
+      {user.data && (
+        <>
+          <UserSummary user={user.data} />
+          {/* Who can edit the user also manages their papers; the rest only see them. */}
+          <DocumentsCard
+            documents={user.data.documents ?? []}
+            empty="Nenhum documento anexado (identidade, comprovante de residência, contrato…)."
+            manage={
+              can.canEdit
+                ? {
+                    owner: { type: "USER", id: user.data.id },
+                    invalidate: queryKeys.users.detail(user.data.id),
+                  }
+                : undefined
+            }
+          />
+        </>
+      )}
     </Box>
   );
 }

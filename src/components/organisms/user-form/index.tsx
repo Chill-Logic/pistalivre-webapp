@@ -21,12 +21,16 @@ import { useLabels } from "@/hooks/ui/useLabels";
 import type { StaffUserDetail, UserRole } from "@/types/user";
 import { isValidCpf } from "@/utils/cpf";
 import { brDateToDay, dayToBrDate, todayInBrasilia } from "@/utils/date";
-import { maskCpf, maskDate, onlyDigits } from "@/utils/masks";
+import { maskCpf, maskDate, maskPhone, onlyDigits } from "@/utils/masks";
 
 const baseSchema = z.object({
   name: z.string().trim().min(1, "Nome é obrigatório").max(120),
   email: z.string().trim().toLowerCase().email("E-mail inválido"),
   cpf: z.string().refine(isValidCpf, "CPF inválido"),
+  phone: z.string().refine((value) => {
+    const digits = onlyDigits(value);
+    return digits === "" || (digits.length >= 10 && digits.length <= 11);
+  }, "Telefone inválido"),
   birthDate: z.string().refine((value) => {
     if (!value) return true;
     const day = brDateToDay(value);
@@ -59,6 +63,7 @@ const API_FIELDS = [
   "name",
   "email",
   "cpf",
+  "phone",
   "birthDate",
   "role",
   "password",
@@ -73,7 +78,7 @@ type UserFormProps = {
   onSaved: (user: StaffUserDetail) => void;
 };
 
-/** Name, e-mail, CPF, birth date, role; the password only on create. */
+/** Name, e-mail, CPF, phone, birth date, role; the password only on create. */
 export function UserForm({
   user,
   canEditRole,
@@ -97,6 +102,7 @@ export function UserForm({
       name: user?.name ?? "",
       email: user?.email ?? "",
       cpf: user?.cpf ? maskCpf(user.cpf) : "",
+      phone: user?.phone ? maskPhone(user.phone) : "",
       birthDate: user?.birthDate ? dayToBrDate(user.birthDate) : "",
       role: (user?.role ?? "AGENT") as UserRole,
       password: "",
@@ -111,6 +117,7 @@ export function UserForm({
         name: values.name.trim(),
         email: values.email,
         cpf: onlyDigits(values.cpf),
+        phone: onlyDigits(values.phone) || null,
         birthDate: values.birthDate ? brDateToDay(values.birthDate) : null,
         role: canEditRole ? values.role : (user?.role ?? "AGENT"),
         ...(isNew ? { password: values.password } : {}),
@@ -146,7 +153,7 @@ export function UserForm({
                 error={errors.email?.message}
               />
             </Col>
-            <Col md={4}>
+            <Col md={6} lg={3}>
               <Controller
                 control={control}
                 name="cpf"
@@ -163,7 +170,26 @@ export function UserForm({
                 )}
               />
             </Col>
-            <Col md={4}>
+            <Col md={6} lg={3}>
+              <Controller
+                control={control}
+                name="phone"
+                render={({ field }) => (
+                  <MaskedField
+                    label="Telefone (opcional)"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    mask={maskPhone}
+                    inputMode="tel"
+                    autoComplete="tel"
+                    placeholder="(00) 00000-0000"
+                    error={errors.phone?.message}
+                  />
+                )}
+              />
+            </Col>
+            <Col md={6} lg={3}>
               <Controller
                 control={control}
                 name="birthDate"
@@ -182,7 +208,7 @@ export function UserForm({
               />
             </Col>
             {canEditRole && (
-              <Col md={4}>
+              <Col md={6} lg={3}>
                 <Controller
                   control={control}
                   name="role"
@@ -246,7 +272,7 @@ export function UserFormSkeleton() {
     <Card>
       <CardContent className="pt-4 md:pt-6">
         <Row className="gap-y-4">
-          {([6, 6, 4, 4, 4] as const).map((md, index) => (
+          {([6, 6, 3, 3, 3, 3] as const).map((md, index) => (
             <Col key={index} md={md} className="space-y-2">
               <Skeleton shape="text" className="w-24 text-sm" />
               <Skeleton className="h-11 md:h-9" />

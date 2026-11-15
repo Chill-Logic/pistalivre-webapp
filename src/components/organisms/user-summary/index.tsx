@@ -9,7 +9,7 @@ import { LABEL_MAPS } from "@/constants/label-maps";
 import { pwaUsageText } from "@/helpers/pwa";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { StaffUserDetail } from "@/types/user";
-import { formatCpf } from "@/utils/document";
+import { formatCpf, formatPhone } from "@/utils/document";
 import { formatCalendarDate, formatDateTime } from "@/utils/format";
 
 export function UserSummary({ user }: { user: StaffUserDetail }) {
@@ -29,6 +29,9 @@ export function UserSummary({ user }: { user: StaffUserDetail }) {
         <Row as="dl" className="gap-y-4">
           <InfoItem md={6} label="E-mail">
             {user.email}
+          </InfoItem>
+          <InfoItem md={6} label="Telefone">
+            {user.phone ? formatPhone(user.phone) : null}
           </InfoItem>
           <InfoItem span={6} md={3} label="CPF" mono>
             {user.cpf ? formatCpf(user.cpf) : null}

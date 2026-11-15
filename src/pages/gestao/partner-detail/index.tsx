@@ -13,6 +13,10 @@ import {
   PartnerContractsCard,
   PartnerContractsCardSkeleton,
 } from "@/components/organisms/partner-contracts-card";
+import {
+  DocumentsCard,
+  DocumentsCardSkeleton,
+} from "@/components/organisms/documents-card";
 import { PartnerDeleteButton } from "@/components/organisms/partner-delete-button";
 import {
   PartnerSummary,
@@ -20,6 +24,7 @@ import {
 } from "@/components/organisms/partner-summary";
 import { QueryError } from "@/components/organisms/query-error";
 import { PartnerDetailLayout } from "@/components/templates/partner-detail-layout";
+import { queryKeys } from "@/constants/query-keys";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { isNotFound } from "@/helpers/api-error";
 import { usePartner } from "@/hooks/api/gestao/partners/usePartners";
@@ -57,6 +62,7 @@ export function PartnerDetailPage() {
               summary={<PartnerSummarySkeleton />}
               access={<PartnerAccessCardSkeleton />}
               contracts={<PartnerContractsCardSkeleton />}
+              documents={<DocumentsCardSkeleton />}
             />
           </SkeletonRegion>
         )}
@@ -81,6 +87,16 @@ export function PartnerDetailPage() {
               <PartnerContractsCard
                 partnerId={partner.data.id}
                 contracts={partner.data.contracts}
+              />
+            }
+            documents={
+              <DocumentsCard
+                documents={partner.data.documents ?? []}
+                empty="Nenhum documento anexado (identidade, comprovante, contrato social…)."
+                manage={{
+                  owner: { type: "PARTNER", id: partner.data.id },
+                  invalidate: queryKeys.partners.detail(partner.data.id),
+                }}
               />
             }
           />
