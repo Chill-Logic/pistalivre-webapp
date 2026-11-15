@@ -16,6 +16,21 @@ export function useLinkAsaasCustomer() {
   });
 }
 
+/**
+ * "Vincular ao Asaas" from the customer screen: finds the person there by CPF
+ * or creates them (for who self-registered, which never touches Asaas).
+ */
+export function useSyncAsaasCustomer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (customerId: string) => customersService.syncAsaas(customerId),
+    onSuccess: (customer) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.customers.all });
+      toast.success(`${customer.name} vinculado ao Asaas`);
+    },
+  });
+}
+
 /** Imports an "only in Asaas" customer as a linked stub (to complete next). */
 export function useImportAsaasCustomer() {
   const queryClient = useQueryClient();

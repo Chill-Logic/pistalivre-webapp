@@ -52,6 +52,11 @@ export const customersService = {
     );
     return data;
   },
+  /** "Vincular ao Asaas": finds by CPF or creates there, with the full profile. */
+  async syncAsaas(id: string) {
+    const { data } = await http.post<CustomerDetail>(`/customers/${id}/asaas-sync`);
+    return data;
+  },
   /** Creates a linked stub from an "only in Asaas" customer (CPF here → 409). */
   async importFromAsaas(asaasCustomerId: string) {
     const { data } = await http.post<CustomerDetail>(

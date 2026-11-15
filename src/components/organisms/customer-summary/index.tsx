@@ -1,3 +1,4 @@
+import { AsaasSyncButton } from "@/components/organisms/asaas-sync-button";
 import { Box } from "@/components/atoms/box";
 import { Card, CardContent, CardHeader } from "@/components/atoms/card";
 import { Col, Row } from "@/components/atoms/grid";
@@ -63,7 +64,17 @@ export function CustomerSummary({ customer }: { customer: CustomerDetail }) {
             </InfoItem>
           )}
           <InfoItem md={6} label="Asaas">
-            {customer.asaasCustomerId ? "Vinculado" : "Não vinculado"}
+            {customer.asaasCustomerId ? (
+              "Vinculado"
+            ) : (
+              <Box className="flex flex-wrap items-center gap-2">
+                Não vinculado
+                <AsaasSyncButton
+                  customerId={customer.id}
+                  customerName={customer.name}
+                />
+              </Box>
+            )}
           </InfoItem>
           {customer.excludeFromMetrics && (
             <InfoItem md={6} label="Métricas">
