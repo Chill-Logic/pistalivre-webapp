@@ -78,7 +78,7 @@ export function DebtPaymentsCard({
                   </Text>
                 )}
                 {payment.notes && (
-                  <Text size="xs" tone="muted">
+                  <Text size="xs" tone="muted" className="whitespace-pre-line break-words">
                     {payment.notes}
                   </Text>
                 )}

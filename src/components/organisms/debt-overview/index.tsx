@@ -104,7 +104,7 @@ export function DebtOverview({ debt }: { debt: DebtDetail }) {
               {debt.createdByName}
             </InfoItem>
           )}
-          {debt.notes && <InfoItem label="Observações">{debt.notes}</InfoItem>}
+          {debt.notes && <InfoItem label="Observações" multiline>{debt.notes}</InfoItem>}
         </Row>
       </CardContent>
     </Card>

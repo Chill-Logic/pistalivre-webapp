@@ -11,6 +11,8 @@ type InfoItemProps = ColSpans & {
   label: string;
   children: ReactNode;
   mono?: boolean;
+  /** Free text (notes): keeps the line breaks exactly as typed. */
+  multiline?: boolean;
 };
 
 /** Label/value pair as a grid column; use inside `<Row as="dl">`. */
@@ -18,12 +20,16 @@ export function InfoItem({
   label,
   children,
   mono = false,
+  multiline = false,
   ...spans
 }: InfoItemProps) {
   return (
     <Col {...spans} className="space-y-1">
       <DescriptionTerm>{label}</DescriptionTerm>
-      <DescriptionDetails className={cn(mono && "tracking-[0.04em]")}>
+      <DescriptionDetails className={cn(
+          mono && "tracking-[0.04em]",
+          multiline && "whitespace-pre-line break-words",
+        )}>
         {children ?? "—"}
       </DescriptionDetails>
     </Col>

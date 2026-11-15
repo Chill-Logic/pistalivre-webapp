@@ -66,7 +66,11 @@ export function PortalMaintenanceItem({
           <ReimbursementStatusBadge status={maintenance.reimbursement.status} />
           {maintenance.reimbursement.status === "REJECTED" &&
             maintenance.reimbursement.staffNote && (
-              <Text inline size="xs" className="text-error-foreground">
+              <Text
+                inline
+                size="xs"
+                className="whitespace-pre-line break-words text-error-foreground"
+              >
                 {maintenance.reimbursement.staffNote}
               </Text>
             )}

@@ -135,7 +135,7 @@ function TerminationSummary({
         {termination.byName && ` · por ${termination.byName}`}
       </Text>
       {termination.notes && (
-        <Text size="xs" tone="muted">
+        <Text size="xs" tone="muted" className="whitespace-pre-line break-words">
           {termination.notes}
         </Text>
       )}

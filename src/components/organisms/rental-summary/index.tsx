@@ -66,7 +66,9 @@ export function RentalSummary({ rental }: { rental: RentalDetail }) {
             )}
           </InfoItem>
           {rental.notes && (
-            <InfoItem label="Observações">{rental.notes}</InfoItem>
+            <InfoItem label="Observações" multiline>
+              {rental.notes}
+            </InfoItem>
           )}
         </Row>
       </CardContent>

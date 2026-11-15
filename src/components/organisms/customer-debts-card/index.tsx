@@ -108,7 +108,7 @@ function CustomerDebtRow({
             ) · abate desde {formatCalendarDate(debt.startsAt)}
           </Text>
           {debt.notes && (
-            <Text size="xs" tone="muted" className="break-words">
+            <Text size="xs" tone="muted" className="whitespace-pre-line break-words">
               {debt.notes}
             </Text>
           )}

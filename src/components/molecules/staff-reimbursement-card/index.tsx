@@ -124,7 +124,7 @@ export function StaffReimbursementCard({
         )}
 
         {reimbursement.staffNote && (
-          <Text size="xs" tone="muted" className="break-words">
+          <Text size="xs" tone="muted" className="whitespace-pre-line break-words">
             {reimbursement.status === "REJECTED"
               ? "Motivo da recusa: "
               : "Nota: "}

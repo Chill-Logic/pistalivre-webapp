@@ -47,7 +47,13 @@ export function ReimbursementItem({
         </Box>
       </Box>
       {reimbursement.staffNote && (
-        <Text size="xs" className={cn(rejected && "text-error-foreground")}>
+        <Text
+          size="xs"
+          className={cn(
+            "whitespace-pre-line break-words",
+            rejected && "text-error-foreground",
+          )}
+        >
           {rejected ? "Motivo da recusa: " : "Observação: "}
           {reimbursement.staffNote}
         </Text>
