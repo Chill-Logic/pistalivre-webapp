@@ -159,6 +159,15 @@ export function AutoBillingEnableDialog({
                 . As cobranças seguem de 7 em 7 dias a partir desta data.
               </Alert>
             )}
+          {isDayString(firstDueDate) &&
+            preview.data?.dueDate &&
+            preview.data.dueDate !== firstDueDate && (
+              <Alert variant="warning" role="note">
+                {formatCalendarDate(firstDueDate)} é domingo ou feriado: a cobrança vence em{" "}
+                {formatCalendarDate(preview.data.dueDate)} (dia útil anterior) e vale pelo ciclo
+                do dia {formatCalendarDate(firstDueDate)}.
+              </Alert>
+            )}
           {prorated && preview.data && (
             <>
               <SegmentedField

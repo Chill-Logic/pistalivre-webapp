@@ -140,6 +140,8 @@ export type AutoBillingInput = {
 /** A 1ª cobrança inteira × proporcional (null = não cabe proporcional). */
 export type FirstChargePreview = {
   full: number;
+  /** Where the 1st charge actually falls: Sunday/holiday → the previous business day. */
+  dueDate?: string;
   prorated: {
     amount: number;
     from: string;
