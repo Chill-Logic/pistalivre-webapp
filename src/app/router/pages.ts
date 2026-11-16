@@ -168,6 +168,10 @@ export const AiAttachmentsPage = lazyPage(
   () => import("@/pages/gestao/ai-attachments"),
   "AiAttachmentsPage",
 );
+export const AsaasNotificationTemplatesPage = lazyPage(
+  () => import("@/pages/gestao/asaas-notification-templates"),
+  "AsaasNotificationTemplatesPage",
+);
 export const NotificationSettingsPage = lazyPage(
   () => import("@/pages/gestao/notification-settings"),
   "NotificationSettingsPage",

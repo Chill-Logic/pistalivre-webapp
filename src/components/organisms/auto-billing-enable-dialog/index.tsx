@@ -58,9 +58,10 @@ export function AutoBillingEnableDialog({
     billing.rentalId,
     open && isDayString(firstDueDate) ? firstDueDate : null,
   );
-  const prorated = isDayString(firstDueDate)
-    ? (preview.data?.prorated ?? null)
-    : null;
+  // While the new date loads, the previous answer is still in hand: never
+  // show it as if it were about the date now typed.
+  const fresh = isDayString(firstDueDate) && !preview.isPlaceholderData && !preview.isFetching;
+  const prorated = fresh ? (preview.data?.prorated ?? null) : null;
   const [errors, setErrors] = useState<{
     firstDueDate?: string;
     form?: string;
@@ -159,7 +160,7 @@ export function AutoBillingEnableDialog({
                 . As cobranças seguem de 7 em 7 dias a partir desta data.
               </Alert>
             )}
-          {isDayString(firstDueDate) &&
+          {fresh &&
             preview.data?.dueDate &&
             preview.data.dueDate !== firstDueDate && (
               <Alert variant="warning" role="note">

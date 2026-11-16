@@ -83,7 +83,8 @@ export function RentalCautionCard({ caution, rental }: RentalCautionCardProps) {
                 </InfoItem>
               )}
             </Row>
-            {rental && (
+            {/* Nothing left to charge (all emitted): no automation to turn on. */}
+            {rental && (pendingCount > 0 || rental.cautionAutoBilling) && (
               <CautionAutoToggle
                 rentalId={rental.id}
                 enabled={Boolean(rental.cautionAutoBilling)}

@@ -1,5 +1,6 @@
 import {
   Bell,
+  BellRing,
   Banknote,
   BookOpen,
   BotMessageSquare,
@@ -165,6 +166,7 @@ export const SIDEBAR_NAV: NavEntry[] = [
       { label: "Modelos", to: ROUTES.models, icon: ScrollText },
       { label: "Documentos", to: ROUTES.documents, icon: FileText },
       { label: "Notificações", to: ROUTES.notificationSettings, icon: Bell },
+      { label: "Avisos do Asaas", to: ROUTES.asaasNotifications, icon: BellRing },
       { label: "Manual", to: ROUTES.manual, icon: BookOpen },
       { label: "Auditoria", to: ROUTES.audit, icon: ShieldCheck, adminOnly: true },
     ],

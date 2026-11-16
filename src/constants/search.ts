@@ -1,6 +1,7 @@
 import {
   BadgeDollarSign,
   Bell,
+  BellRing,
   BookOpen,
   BriefcaseBusiness,
   Car,
@@ -78,6 +79,7 @@ export type SearchAction = {
 };
 
 export const SEARCH_ACTIONS: SearchAction[] = [
+  { id: "asaas-notifications", label: "Avisos do Asaas (modelos de notificação)", keywords: ["notificações do asaas", "avisos do asaas", "modelo de notificação", "whatsapp", "sms", "lembrete de cobrança"], icon: BellRing, to: ROUTES.asaasNotifications },
   { id: "notifications", label: "Preferências de notificação", keywords: ["notificações", "sininho", "push", "avisos", "ativar notificações", "resumo do dia"], icon: Bell, to: ROUTES.notificationSettings },
   { id: "new-rental", label: "Nova locação", keywords: ["alugar", "contrato", "locacao"], icon: Plus, to: ROUTES.rentalNew },
   { id: "new-customer", label: "Novo cliente", keywords: ["cadastrar cliente", "locatario"], icon: Plus, to: ROUTES.customerNew },

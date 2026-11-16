@@ -1,47 +1,48 @@
-import { RefreshCw } from "lucide-react";
-import { useId, useState } from "react";
+import { RefreshCw, Wand2 } from "lucide-react";
+import { useState } from "react";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
-import { Card, CardContent, CardHeader } from "@/components/atoms/card";
-import { Input } from "@/components/atoms/input";
-import { Label } from "@/components/atoms/label";
-import { List, ListItem } from "@/components/atoms/list";
-import { Skeleton } from "@/components/atoms/skeleton";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
-import { CheckboxField } from "@/components/molecules/checkbox-field";
 import { CollapsibleCard } from "@/components/molecules/collapsible-card";
+import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
+import {
+  AsaasNotificationMatrix,
+  AsaasNotificationMatrixSkeleton,
+} from "@/components/organisms/asaas-notification-matrix";
 import { QueryError } from "@/components/organisms/query-error";
+import { TEMPLATE_PERIOD_LABEL } from "@/constants/asaas-notifications";
+import { errorMessage } from "@/helpers/api-error";
 import {
-  ASAAS_NOTIFICATION_CHANNELS,
-  ASAAS_SCHEDULE_MAX_DAYS,
-  ASAAS_SCHEDULED_EVENTS,
-} from "@/constants/asaas-notifications";
-import { LABEL_MAPS } from "@/constants/label-maps";
-import { moneyErrorMessage } from "@/helpers/money-errors";
-import {
-  useCustomerNotifications,
-  useSaveCustomerNotifications,
-} from "@/hooks/api/gestao/customers/useCustomerNotifications";
-import { useLabels } from "@/hooks/ui/useLabels";
+  useApplyNotificationTemplate,
+  useCustomerNotificationSlots,
+  useNotificationTemplates,
+  useSaveCustomerNotificationSlots,
+} from "@/hooks/api/gestao/asaas-notifications/useAsaasNotifications";
+import type {
+  NotificationSlot,
+  NotificationSlots,
+  TemplatePeriod,
+} from "@/types/asaas-notification-template";
 import type { CustomerDetail } from "@/types/customer";
-import type { AsaasNotification } from "@/types/customer-settings";
 
 /**
- * What Asaas warns this customer about, and through which channels. It is
- * read-through: the setting lives at Asaas, here it is read and rewritten.
- * Ticking a box does not save; only "Salvar" sends (a wrong click on a
- * billing screen must not become a change at the provider).
+ * How Asaas warns this customer (read live from Asaas), in the same blocks as
+ * the templates. The setting follows their rental's template by itself;
+ * "Aplicar modelo" redoes it now, and a hand edit here lasts until the next
+ * automatic moment (rental created/activated, periodicity changed). Ticking a
+ * box does not save — only "Salvar".
  */
 export function CustomerNotificationsCard({
   customer,
 }: {
   customer: Pick<CustomerDetail, "id" | "emergencyContact">;
 }) {
-  const notifications = useCustomerNotifications(customer.id);
-  const view = notifications.data;
+  const view = useCustomerNotificationSlots(customer.id);
+  const templates = useNotificationTemplates();
+  const data = view.data;
   const contactEmail = customer.emergencyContact.email;
 
   return (
@@ -51,90 +52,126 @@ export function CustomerNotificationsCard({
       contentClassName="space-y-4"
     >
       <Text size="xs" tone="muted">
-        SMS, WhatsApp e ligação vão sempre para o telefone do próprio cliente.
+        SMS, WhatsApp e ligação vão para o telefone do próprio cliente.
         {contactEmail
-          ? ` Só o e-mail tem cópia, para ${contactEmail} (contato de emergência).`
-          : " Só o e-mail tem cópia: preencha o e-mail do contato de emergência no cadastro para que ele receba."}
+          ? ` O e-mail tem cópia para ${contactEmail} (contato de emergência).`
+          : " Só o e-mail tem cópia: preencha o e-mail do contato de emergência no cadastro para ele receber."}
       </Text>
-      {notifications.isPending && (
+      {view.isPending && (
         <SkeletonRegion label="Carregando notificações…">
-          <NotificationRows />
+          <AsaasNotificationMatrixSkeleton />
         </SkeletonRegion>
       )}
-      {notifications.isError && (
-        <QueryError
-          error={notifications.error}
-          onRetry={() => notifications.refetch()}
-        />
-      )}
-      {view && !view.linked && (
+      {view.isError && <QueryError error={view.error} onRetry={() => view.refetch()} />}
+      {data && !data.linked && (
         <Text tone="muted">
-          Cliente ainda não vinculado ao Asaas: as notificações aparecem aqui
-          depois do vínculo.
+          Cliente ainda não vinculado ao Asaas: as notificações aparecem aqui depois do vínculo.
         </Text>
       )}
-      {view?.linked && view.error && (
+      {data?.linked && data.error && (
         <Alert
           variant="warning"
           className="flex flex-col items-start gap-3 px-4 py-3 sm:flex-row sm:items-center"
         >
           <Text size={null} className="flex-1">
-            O Asaas não respondeu agora: {view.error}
+            O Asaas não respondeu agora: {data.error}
           </Text>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => notifications.refetch()}
-            disabled={notifications.isFetching}
-          >
+          <Button size="sm" variant="outline" onClick={() => view.refetch()} disabled={view.isFetching}>
             <RefreshCw />
             Tentar de novo
           </Button>
         </Alert>
       )}
-      {view?.linked && !view.error && view.items.length === 0 && (
-        <Text tone="muted">
-          O Asaas não tem notificações para este cliente.
-        </Text>
-      )}
-      {view?.linked && !view.error && view.items.length > 0 && (
-        // Remounts with the answer of a save, which becomes the new "clean".
-        <NotificationsForm
-          key={JSON.stringify(view.items)}
-          customerId={customer.id}
-          notifications={view.items}
-        />
+      {data?.linked && !data.error && (
+        <>
+          <ApplyTemplate customerId={customer.id} suggested={data.suggestedPeriod} />
+          {data.slots && Object.keys(data.slots).length > 0 ? (
+            <SlotsForm
+              key={JSON.stringify(data.slots)}
+              customerId={customer.id}
+              slots={data.slots}
+              offsets={templates.data?.offsets ?? {}}
+            />
+          ) : (
+            <Text tone="muted">O Asaas não tem notificações para este cliente.</Text>
+          )}
+        </>
       )}
     </CollapsibleCard>
   );
 }
 
-function NotificationsForm({
+function ApplyTemplate({
   customerId,
-  notifications,
+  suggested,
 }: {
   customerId: string;
-  notifications: AsaasNotification[];
+  suggested: TemplatePeriod | null;
 }) {
-  const save = useSaveCustomerNotifications(customerId);
-  const [rows, setRows] = useState(notifications);
-  const dirty = JSON.stringify(rows) !== JSON.stringify(notifications);
-
-  const patch = (id: string, changes: Partial<AsaasNotification>) => {
-    save.reset();
-    setRows((current) =>
-      current.map((row) => (row.id === id ? { ...row, ...changes } : row)),
+  const apply = useApplyNotificationTemplate(customerId);
+  const [open, setOpen] = useState(false);
+  if (!suggested) {
+    return (
+      <Text size="sm" tone="muted">
+        Sem locação em andamento: o modelo é escolhido quando houver uma.
+      </Text>
     );
-  };
+  }
+  const name = TEMPLATE_PERIOD_LABEL[suggested].toLowerCase();
+  return (
+    <Box className="flex flex-wrap items-center justify-between gap-2 rounded-md border p-3">
+      <Text size="sm">
+        Modelo da locação: <Text inline weight="medium">{TEMPLATE_PERIOD_LABEL[suggested]}</Text>
+      </Text>
+      <ConfirmDialog
+        open={open}
+        onOpenChange={(next) => !apply.isPending && setOpen(next)}
+        trigger={
+          <Button size="sm" variant="outline">
+            <Wand2 />
+            Aplicar modelo {name}
+          </Button>
+        }
+        title={`Aplicar o modelo ${name}?`}
+        description="As notificações deste cliente no Asaas passam a ser as do modelo. O que foi mudado à mão aqui é substituído."
+        confirmLabel="Aplicar"
+        isPending={apply.isPending}
+        onConfirm={() =>
+          apply.mutate(suggested, {
+            onSuccess: () => setOpen(false),
+          })
+        }
+      />
+      {apply.isError && <Alert className="w-full">{errorMessage(apply.error)}</Alert>}
+    </Box>
+  );
+}
+
+function SlotsForm({
+  customerId,
+  slots,
+  offsets,
+}: {
+  customerId: string;
+  slots: Partial<NotificationSlots>;
+  offsets: Partial<Record<NotificationSlot, number[]>>;
+}) {
+  const save = useSaveCustomerNotificationSlots(customerId);
+  const [value, setValue] = useState(slots);
+  const dirty = JSON.stringify(value) !== JSON.stringify(slots);
 
   return (
     <Box className="space-y-4">
-      <List className="divide-y rounded-lg border">
-        {rows.map((row) => (
-          <NotificationRow key={row.id} row={row} onChange={patch} />
-        ))}
-      </List>
-      {save.isError && <Alert>{moneyErrorMessage(save.error)}</Alert>}
+      <AsaasNotificationMatrix
+        value={value}
+        onChange={(next) => {
+          save.reset();
+          setValue(next);
+        }}
+        offsets={offsets}
+        disabled={save.isPending}
+      />
+      {save.isError && <Alert>{errorMessage(save.error)}</Alert>}
       <Box className="flex flex-wrap items-center justify-end gap-3">
         {dirty && (
           <Text size="xs" tone="muted">
@@ -142,122 +179,19 @@ function NotificationsForm({
           </Text>
         )}
         {dirty && (
-          <Button
-            variant="ghost"
-            onClick={() => setRows(notifications)}
-            disabled={save.isPending}
-          >
+          <Button variant="ghost" onClick={() => setValue(slots)} disabled={save.isPending}>
             Descartar
           </Button>
         )}
-        <Button
-          onClick={() => save.mutate(rows)}
-          disabled={!dirty || save.isPending}
-        >
+        <Button onClick={() => save.mutate(value)} disabled={!dirty || save.isPending}>
           {save.isPending && <Spinner className="text-primary-foreground" />}
-          Salvar
+          Salvar no Asaas
         </Button>
       </Box>
     </Box>
   );
 }
 
-function NotificationRow({
-  row,
-  onChange,
-}: {
-  row: AsaasNotification;
-  onChange: (id: string, changes: Partial<AsaasNotification>) => void;
-}) {
-  const { label } = useLabels();
-  const offsetId = useId();
-  const scheduleUnit = ASAAS_SCHEDULED_EVENTS[row.event];
-  const eventLabel = label(LABEL_MAPS.asaasNotificationEvent, row.event);
-  const schedule = scheduleUnit
-    ? row.scheduleOffset === 0
-      ? " · no dia"
-      : ` · ${row.scheduleOffset} ${scheduleUnit}`
-    : "";
-
-  return (
-    <ListItem className="space-y-3 p-3">
-      <Box className="flex flex-wrap items-center justify-between gap-3">
-        <CheckboxField
-          label={`${eventLabel}${schedule}`}
-          checked={row.enabled}
-          onChange={(enabled) => onChange(row.id, { enabled })}
-        />
-        {scheduleUnit && (
-          <Box className="flex items-center gap-2">
-            <Input
-              id={offsetId}
-              type="number"
-              inputMode="numeric"
-              min={0}
-              max={ASAAS_SCHEDULE_MAX_DAYS}
-              value={String(row.scheduleOffset)}
-              onChange={(event) =>
-                onChange(row.id, {
-                  scheduleOffset: Math.min(
-                    ASAAS_SCHEDULE_MAX_DAYS,
-                    Math.max(0, Math.trunc(Number(event.target.value)) || 0),
-                  ),
-                })
-              }
-              disabled={!row.enabled}
-              className="w-20"
-            />
-            <Label htmlFor={offsetId} className="text-xs text-muted-foreground">
-              {scheduleUnit}
-            </Label>
-          </Box>
-        )}
-      </Box>
-      <Box className="flex flex-wrap gap-x-5 gap-y-3 pl-7">
-        {ASAAS_NOTIFICATION_CHANNELS.map((channel) => (
-          <CheckboxField
-            key={channel.key}
-            label={channel.label}
-            checked={row[channel.key]}
-            onChange={(checked) => onChange(row.id, { [channel.key]: checked })}
-            disabled={!row.enabled}
-          />
-        ))}
-      </Box>
-    </ListItem>
-  );
-}
-
-function NotificationRows() {
-  return (
-    <Box className="divide-y rounded-lg border">
-      {[0, 1, 2].map((index) => (
-        <Box key={index} className="space-y-3 p-3">
-          <Box className="flex items-center gap-3">
-            <Skeleton className="size-4 shrink-0" />
-            <Skeleton shape="text" className="w-44 text-sm" />
-          </Box>
-          <Box className="flex flex-wrap gap-5 pl-7">
-            {[0, 1, 2, 3].map((channel) => (
-              <Skeleton key={channel} shape="text" className="w-16 text-sm" />
-            ))}
-          </Box>
-        </Box>
-      ))}
-    </Box>
-  );
-}
-
 export function CustomerNotificationsCardSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton shape="text" className="w-44 text-base" />
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Skeleton shape="text" className="w-full text-xs" />
-        <NotificationRows />
-      </CardContent>
-    </Card>
-  );
+  return <AsaasNotificationMatrixSkeleton />;
 }

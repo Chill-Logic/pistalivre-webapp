@@ -31,35 +31,25 @@ type CautionAutoToggleProps = {
  * before, or at the next hourly run if it is that close). Overdue parcels
  * never charged are not emitted by it — the button "Emitir cobrança" is.
  */
-function nextChargeText(plan: CautionPlanItem[]) {
+function NextCharge({ plan }: { plan: CautionPlanItem[] }) {
   const today = todayInBrasilia();
-  const future = plan
+  const next = plan
     .filter((item) => !item.emitted && item.dueDate >= today)
-    .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
-  const overdue = plan.filter((item) => !item.emitted && item.dueDate < today).length;
-  const lines: string[] = [];
-  const next = future[0];
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))[0];
   if (!next) {
-    lines.push("Não há parcela futura para cobrar: todas já foram emitidas ou já venceram.");
-  } else {
-    const sendOn = addDays(next.dueDate, -LOOKAHEAD_DAYS);
-    const when =
-      sendOn <= today
-        ? "sai na próxima rodada (em até 1 hora)"
-        : `sai em ${formatCalendarDate(sendOn)}, 3 dias antes`;
-    lines.push(
-      `Próxima cobrança: ${next.label} · ${formatCurrency(next.amount)}, vence em ${formatCalendarDate(next.dueDate)} e ${when}.`,
-    );
-    if (future.length > 1) {
-      lines.push(`Depois dela, mais ${future.length - 1} parcela(s), uma de cada vez.`);
-    }
+    return <>Não há parcela futura para cobrar.</>;
   }
-  if (overdue > 0) {
-    lines.push(
-      `${overdue} parcela(s) já vencida(s) sem cobrança não saem sozinhas: use "Emitir cobrança".`,
-    );
-  }
-  return lines.join(" ");
+  const sendOn = addDays(next.dueDate, -LOOKAHEAD_DAYS);
+  return (
+    <>
+      <Text inline className="block">
+        Próxima cobrança: {next.label} · {formatCurrency(next.amount)}
+      </Text>
+      <Text inline className="block">
+        Data da emissão: {formatCalendarDate(sendOn > today ? sendOn : today)}
+      </Text>
+    </>
+  );
 }
 
 /**
@@ -117,7 +107,7 @@ export function CautionAutoToggle({ rentalId, enabled, plan }: CautionAutoToggle
               </Button>
             }
             title="Ligar a cobrança automática da caução?"
-            description={nextChargeText(plan)}
+            description={<NextCharge plan={plan} />}
             confirmLabel="Ligar"
             isPending={toggle.isPending}
             onConfirm={() => toggle.mutate()}
