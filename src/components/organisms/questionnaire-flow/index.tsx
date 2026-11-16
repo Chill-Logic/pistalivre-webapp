@@ -39,7 +39,7 @@ function StepHeader({
 function ChosenPlan({ plan, label }: { plan: QuestionnairePlan; label: string }) {
   return (
     <Card>
-      <CardContent className="flex items-center justify-between gap-3 pt-6">
+      <CardContent className="flex items-center justify-between gap-3 pt-4 md:pt-5">
         <Box className="min-w-0">
           <Text size="xs" tone="muted">
             {label}
@@ -102,7 +102,7 @@ export function QuestionnaireFlow({ token }: { token: string }) {
           step={1}
         />
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 md:pt-5">
             <QuestionnaireQualificationForm
               options={state.options}
               pending={steps.qualification.isPending}
@@ -144,7 +144,7 @@ export function QuestionnaireFlow({ token }: { token: string }) {
         />
         {state.plan && <ChosenPlan plan={state.plan} label="Plano escolhido" />}
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 md:pt-5">
             <QuestionnaireRegistrationForm
               defaults={state.defaults}
               options={state.options}
@@ -204,7 +204,7 @@ export function QuestionnaireSkeleton() {
         </Box>
       </Box>
       <Card>
-        <CardContent className="space-y-6 pt-6">
+        <CardContent className="space-y-6 pt-4 md:pt-5">
           {[0, 1, 2, 3].map((index) => (
             <Box key={index} className="space-y-2">
               <Skeleton shape="text" className="w-2/3 text-sm" />

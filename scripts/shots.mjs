@@ -2,7 +2,8 @@
 // desktop, to compare before/after a visual change.
 //
 //   npm run shots -- [--area gestao|cliente|parceiro] [--theme light|dark]
-//                    [--out pasta] [--full] [--ai] [--sem-login] caminho...
+//                    [--out pasta] [--full] [--ai] [--sem-login]
+//                    [--click "Texto do botão"] [--sizes 1366x620,390x700] caminho...
 //
 //   npm run shots -- /gestao /gestao/locacoes
 //   npm run shots -- --area cliente --theme dark /area-cliente
@@ -52,6 +53,10 @@ const full = has("full");
 const ai = has("ai");
 // Logged out (the login screens themselves redirect a signed-in user away).
 const anonymous = has("sem-login");
+// --click "Texto": after loading, clicks the first button with that text (opens a dialog).
+const click = flag("click", null);
+// --sizes 1366x620,390x700: other viewports (e.g. a short laptop screen).
+const sizes = flag("sizes", null);
 const paths = args.length ? args : ["/gestao"];
 const creds = AREAS[area];
 if (!creds) throw new Error(`Área desconhecida: ${area}`);
@@ -59,7 +64,14 @@ if (!creds) throw new Error(`Área desconhecida: ${area}`);
 mkdirSync(out, { recursive: true });
 const browser = await puppeteer.launch({ headless: true });
 
-for (const [tag, width, height] of SIZES) {
+const viewports = sizes
+  ? sizes.split(",").map((s) => {
+      const [w, h] = s.split("x").map(Number);
+      return [`${w}x${h}`, w, h];
+    })
+  : SIZES;
+
+for (const [tag, width, height] of viewports) {
   const page = await browser.newPage();
   await page.setViewport({ width, height });
   await page.setRequestInterception(true);
@@ -106,6 +118,16 @@ for (const [tag, width, height] of SIZES) {
     await page.evaluate(() =>
       document.querySelectorAll(".tsqd-parent-container").forEach((node) => node.remove()),
     );
+    if (click) {
+      const clicked = await page.evaluate((text) => {
+        const el = [...document.querySelectorAll("button, [role=button], a")].find(
+          (b) => b.textContent?.trim() === text && b.offsetParent !== null,
+        );
+        el?.click();
+        return Boolean(el);
+      }, click);
+      if (!clicked) console.error(`botão não encontrado: ${click}`);
+    }
     await new Promise((done) => setTimeout(done, 800));
     const name = `${path.replace(/^\//, "").replace(/\//g, "_") || "raiz"}-${tag}-${theme}.png`;
     await page.screenshot({ path: `${out}/${name}`, fullPage: full });

@@ -26,7 +26,7 @@ export function LeadCapturePage() {
       </Box>
       <Card>
         {sent ? (
-          <CardContent className="space-y-4 pt-6 text-center">
+          <CardContent className="space-y-4 pt-4 md:pt-5 text-center">
             <Box className="space-y-1">
               <Text size="lg" weight="semibold">
                 Recebemos seu interesse!

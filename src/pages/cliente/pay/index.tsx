@@ -26,7 +26,7 @@ const METHODS = [
 function PaySkeleton() {
   return (
     <Card>
-      <CardContent className="space-y-4 pt-6">
+      <CardContent className="space-y-4 pt-4 md:pt-5">
         <Skeleton className="h-5 w-40" />
         <Skeleton className="h-9 w-48" />
         <Skeleton className="h-10 w-full" />
@@ -104,7 +104,7 @@ export function PayPage() {
       )}
       {payment.isError && (
         <Card>
-          <CardContent className="space-y-2 pt-6">
+          <CardContent className="space-y-2 pt-4 md:pt-5">
             <Heading level={2}>Link indisponível</Heading>
             <Text tone="muted">
               Este link de pagamento não existe ou foi cancelado. Peça um novo à locadora.
@@ -114,7 +114,7 @@ export function PayPage() {
       )}
       {data && (
         <Card>
-          <CardContent className="space-y-5 pt-6">
+          <CardContent className="space-y-5 pt-4 md:pt-5">
             {data.state === "OPEN" && <OpenPayment token={token} data={data} />}
             {data.state === "PAID" && (
               <Box className="space-y-3 text-center">

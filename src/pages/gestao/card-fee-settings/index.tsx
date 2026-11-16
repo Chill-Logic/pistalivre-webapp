@@ -65,7 +65,7 @@ const toBand = (d: Draft): CardFeeBand => ({
 function CardFeeSkeleton() {
   return (
     <Card>
-      <CardContent className="space-y-3 pt-6">
+      <CardContent className="space-y-3 pt-4 md:pt-5">
         {[0, 1, 2].map((i) => (
           <Skeleton key={i} className="h-10 w-full" />
         ))}

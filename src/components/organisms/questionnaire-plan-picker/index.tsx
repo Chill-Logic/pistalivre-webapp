@@ -35,7 +35,7 @@ export function QuestionnairePlanPicker({
   if (!plans.length) {
     return (
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="pt-4 md:pt-5">
           <Text tone="muted">
             Estamos atualizando nossos planos. Nossa equipe vai falar com você
             em breve pelo WhatsApp.

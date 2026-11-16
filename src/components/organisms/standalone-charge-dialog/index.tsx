@@ -210,7 +210,7 @@ export function StandaloneChargeDialog({
           Emitir cobrança
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent size="lg">
         <DialogTitle>Emitir cobrança</DialogTitle>
         <DialogDescription>
           Sai pelo Asaas, com fatura e pix. A locação é opcional.
@@ -227,8 +227,9 @@ export function StandaloneChargeDialog({
             rentalError={errors.rentalId}
             disabled={create.isPending}
           />
+          {/* Wide form: what it is and how much in one line, rules in the next. */}
           <Row className="gap-y-4">
-            <Col md={6}>
+            <Col md={6} lg={split ? 6 : 3}>
               <SelectField
                 label="Finalidade"
                 value={purpose}
@@ -237,13 +238,65 @@ export function StandaloneChargeDialog({
                 disabled={create.isPending}
               />
             </Col>
-            <Col md={6}>
+            <Col md={6} lg={split ? 6 : 3}>
               <SelectField
                 label="Forma"
                 value={method}
                 options={options(METHODS, LABEL_MAPS.paymentMethod)}
                 onChange={(value) => setMethod(value as ChargeMethod)}
                 disabled={create.isPending}
+              />
+            </Col>
+            {!split && (
+              <>
+                <Col md={6} lg={3}>
+                  <MoneyField
+                    label="Valor"
+                    value={amount}
+                    onChange={(value) => {
+                      setAmount(value);
+                      setErrors({});
+                    }}
+                    error={errors.amount}
+                  />
+                </Col>
+                <Col md={6} lg={3}>
+                  <DateField
+                    label="Vencimento"
+                    value={dueDate}
+                    onChange={(value) => {
+                      setDueDate(value);
+                      setErrors({});
+                    }}
+                    error={errors.dueDate}
+                  />
+                </Col>
+              </>
+            )}
+            <Col span={6} lg={3}>
+              <FormField
+                label="Multa (%)"
+                inputMode="decimal"
+                value={fine}
+                onChange={(event) => setFine(event.target.value)}
+                error={errors.finePercent}
+              />
+            </Col>
+            <Col span={6} lg={3}>
+              <FormField
+                label="Juros (% ao mês)"
+                inputMode="decimal"
+                value={interest}
+                onChange={(event) => setInterest(event.target.value)}
+                error={errors.interestPercent}
+              />
+            </Col>
+            <Col md={6} lg={6}>
+              <CheckboxField
+                label="Aceita cartão no link de pagamento"
+                hint="Além do PIX, o cliente pode pagar no cartão pelo link (juros do parcelamento por conta dele). Dá para mudar depois na cobrança."
+                checked={acceptsCard}
+                onChange={setAcceptsCard}
               />
             </Col>
             <Col>
@@ -258,7 +311,7 @@ export function StandaloneChargeDialog({
                 disabled={create.isPending}
               />
             </Col>
-            {split ? (
+            {split && (
               <Col>
                 <InstallmentComposer
                   key={composerKey}
@@ -267,63 +320,14 @@ export function StandaloneChargeDialog({
                   disabled={create.isPending}
                 />
               </Col>
-            ) : (
-              <>
-                <Col md={6}>
-                  <MoneyField
-                    label="Valor"
-                    value={amount}
-                    onChange={(value) => {
-                      setAmount(value);
-                      setErrors({});
-                    }}
-                    error={errors.amount}
-                  />
-                </Col>
-                <Col md={6}>
-                  <DateField
-                    label="Vencimento"
-                    value={dueDate}
-                    onChange={(value) => {
-                      setDueDate(value);
-                      setErrors({});
-                    }}
-                    error={errors.dueDate}
-                  />
-                </Col>
-              </>
             )}
-            <Col>
-              <CheckboxField
-                label="Aceita cartão no link de pagamento"
-                hint="Além do PIX, o cliente pode pagar no cartão pelo link (juros do parcelamento por conta dele). Dá para mudar depois na cobrança."
-                checked={acceptsCard}
-                onChange={setAcceptsCard}
-              />
-            </Col>
-            <Col span={6}>
-              <FormField
-                label="Multa (%)"
-                inputMode="decimal"
-                value={fine}
-                onChange={(event) => setFine(event.target.value)}
-                error={errors.finePercent}
-              />
-            </Col>
-            <Col span={6}>
-              <FormField
-                label="Juros (% ao mês)"
-                inputMode="decimal"
-                value={interest}
-                onChange={(event) => setInterest(event.target.value)}
-                error={errors.interestPercent}
-              />
-            </Col>
           </Row>
           {freeText ? (
             <TextareaField
               label={purpose === "OTHER" ? "Descrição" : "Descrição (opcional)"}
               placeholder="Ex.: taxa de limpeza"
+              rows={2}
+              className="min-h-16"
               value={description}
               onChange={(event) => {
                 setDescription(event.target.value);

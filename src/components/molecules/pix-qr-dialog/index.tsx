@@ -48,8 +48,7 @@ export function PixQrDialog({ pix, title }: PixQrDialogProps) {
           )}
           <Text
             size="xs"
-            mono
-            className="max-h-24 w-full overflow-y-auto break-all rounded-md bg-muted p-2"
+            className="max-h-24 w-full font-mono overflow-y-auto break-all rounded-md bg-muted p-2"
           >
             {pix.payload}
           </Text>

@@ -23,7 +23,7 @@ export function CheckoutPixPanel({ pix }: { pix: { payload: string; encodedImage
         alt="QR Code do PIX"
         className="size-56 rounded-md bg-white p-2"
       />
-      <Text size="xs" mono className="max-h-20 w-full overflow-y-auto break-all rounded-md bg-muted p-2">
+      <Text size="xs" className="max-h-20 font-mono w-full overflow-y-auto break-all rounded-md bg-muted p-2">
         {pix.payload}
       </Text>
       <Text size="xs" tone="muted" className="text-center">

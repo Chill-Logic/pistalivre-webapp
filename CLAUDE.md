@@ -44,6 +44,11 @@ React 19 + Vite 6 + TanStack Query 5 + React Router 7 + Tailwind 3 + Radix/shadc
 - **Listagens = Lista × Tabela**: desktop com tabela padrão + paginação + itens por página; celular sempre
   cards, de 10 em 10 (infinite). Receita no handoff (`usePagedList`, `DataTable` por colunas,
   `ViewToggle`, `ListFooter`).
+- **Modais (2026-11-16, pedido do dono)**: nunca mais altos que a tela — o `DialogContent` rola por dentro e o
+  `DialogFooter` (botões) fica preso embaixo; use sempre `DialogFooter` para os botões. **Formulário = modal LARGO**
+  (`size="lg"`, campos em colunas com `Col md={6} lg={3}`, duas linhas de 4 em vez de uma coluna comprida);
+  `size="sm"` para confirmação e 1–2 campos (o `ConfirmDialog` já usa). No celular é bottom sheet de até 92% da
+  altura. Valide com `npm run shots -- --click "Texto do botão" --sizes 1366x620,390x700 <tela>`.
 - **Sem subtítulo em página**; saudação só no header. Interface em português, código em inglês. Brand
   `#E4141B`, regra 60/30/10.
 - Telas de simulação/comparação (ex.: Projeções): **tabela densa editável no desktop**, cards só no celular.
