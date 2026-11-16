@@ -134,6 +134,8 @@ export const ROUTES = {
   portalQuestionnaireStart: `${PORTAL}/questionario`,
   portalQuestionnaire: `${PORTAL}/questionario/:token`,
   portalPreRegistration: `${PORTAL}/pre-cadastro`,
+  /** Public checkout of an outstanding balance (no login). */
+  portalPay: `${PORTAL}/pagar/:token`,
   portalRental: `${PORTAL}/locacoes/:id`,
   portalInspectionNew: `${PORTAL}/locacoes/:id/vistorias/nova`,
   portalRentalStatement: `${PORTAL}/locacoes/:id/extrato`,

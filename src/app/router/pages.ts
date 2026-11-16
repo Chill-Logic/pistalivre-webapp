@@ -76,6 +76,10 @@ export const QuestionnairePage = lazyPage(
   () => import("@/pages/cliente/questionnaire"),
   "QuestionnairePage",
 );
+export const PayPage = lazyPage(
+  () => import("@/pages/cliente/pay"),
+  "PayPage",
+);
 export const PreRegistrationPage = lazyPage(
   () => import("@/pages/cliente/pre-registration"),
   "PreRegistrationPage",

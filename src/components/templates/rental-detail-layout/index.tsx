@@ -9,6 +9,8 @@ type RentalDetailLayoutProps = {
   summary: ReactNode;
   /** Owed / next due / paid, right under the summary. */
   money?: ReactNode;
+  /** "Cobrança do saldo": the public payment link of what is owed. */
+  paymentLinks?: ReactNode;
   status: ReactNode;
   billing: ReactNode;
   caution: ReactNode;
@@ -42,6 +44,7 @@ type RentalDetailLayoutProps = {
 export function RentalDetailLayout({
   summary,
   money,
+  paymentLinks,
   status,
   billing,
   caution,
@@ -77,6 +80,7 @@ export function RentalDetailLayout({
           <Box className="space-y-6">
             {summary}
             {money}
+            {paymentLinks}
             {charges}
             {contracts}
             {reconciliation}
@@ -106,6 +110,7 @@ export function RentalDetailLayout({
     <Row className="items-start gap-y-6">
       <Col>{summary}</Col>
       {money && <Col>{money}</Col>}
+      {paymentLinks && <Col>{paymentLinks}</Col>}
       <Col>{status}</Col>
       <Col>{billing}</Col>
       <Col>{charges}</Col>

@@ -55,6 +55,8 @@ export const queryKeys = {
     charges: (id: string) => [...queryKeys.rentals.all, "charges", id] as const,
     cautionPlan: (id: string) =>
       [...queryKeys.rentals.all, "caution-plan", id] as const,
+    paymentLinks: (id: string) =>
+      [...queryKeys.rentals.all, "payment-links", id] as const,
   },
   customers: {
     all: ["customers"] as const,
@@ -93,6 +95,7 @@ export const queryKeys = {
     page: () => [...queryKeys.landing.all, "page"] as const,
     versions: () => [...queryKeys.landing.all, "versions"] as const,
   },
+  publicPay: (token: string) => ["public-pay", token] as const,
   publicSite: {
     all: ["public-site"] as const,
     landing: () => [...queryKeys.publicSite.all, "landing"] as const,

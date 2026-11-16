@@ -32,6 +32,7 @@ import {
   RentalMoneyStrip,
   RentalMoneyStripSkeleton,
 } from "@/components/organisms/rental-money-strip";
+import { RentalPaymentLinksCard } from "@/components/organisms/rental-payment-links-card";
 import {
   RentalSummary,
   RentalSummarySkeleton,
@@ -208,6 +209,7 @@ export function RentalDetailPage() {
             emptySections={<EmptySectionsCard />}
             summary={<RentalSummary rental={rental.data} />}
             money={<RentalMoneyStrip rentalId={rental.data.id} />}
+            paymentLinks={<RentalPaymentLinksCard rentalId={rental.data.id} />}
             status={<RentalStatusCard rental={rental.data} />}
             billing={<RentalBillingCard rental={rental.data} />}
             charges={

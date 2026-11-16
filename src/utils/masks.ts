@@ -97,3 +97,20 @@ export function maskPixKey(type: string, value: string) {
   if (type === "PHONE") return maskPhone(value);
   return value.trim();
 }
+
+/** Card number in groups of 4 ("4111 1111 1111 1111"), up to 19 digits. */
+export function maskCardNumber(value: string) {
+  return onlyDigits(value).slice(0, 19).replace(/(\d{4})(?=\d)/g, "$1 ");
+}
+
+/** Card expiry as MM/AA. */
+export function maskCardExpiry(value: string) {
+  const d = onlyDigits(value).slice(0, 4);
+  return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+}
+
+/** CPF up to 11 digits, CNPJ beyond (card holder may be a company). */
+export function maskCpfCnpj(value: string) {
+  const d = onlyDigits(value).slice(0, 14);
+  return d.length <= 11 ? maskCpf(d) : maskCnpj(d);
+}
