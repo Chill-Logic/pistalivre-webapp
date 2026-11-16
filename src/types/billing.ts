@@ -41,6 +41,8 @@ export type RentReceipt = {
 export type RentReconciliation = {
   from: string;
   fromIsManual: boolean;
+  /** Where the start comes from: set by hand, the 1st rent charge or the handover. */
+  fromSource?: "MANUAL" | "FIRST_CHARGE" | "HANDOVER";
   filtered: boolean;
   through: string;
   billableDays: number;
@@ -55,6 +57,8 @@ export type RentReconciliation = {
     start: string;
     end: string;
     due: string;
+    /** The due date before Sunday/holiday moved it earlier. */
+    nominalDue?: string;
     period: RatePeriod;
     accrued: number;
     amount: number;

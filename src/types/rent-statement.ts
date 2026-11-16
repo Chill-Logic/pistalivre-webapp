@@ -42,6 +42,8 @@ export type StatementLabels = {
 
 export type RentStatementReport = {
   available: true;
+  /** The nearest unpaid rent charge, for real (null = none emitted). */
+  nextCharge?: { id: string; amount: number; dueDate: string; referenceDate: string | null } | null;
   customerName: string;
   vehicleLabel: string;
   plate: string;

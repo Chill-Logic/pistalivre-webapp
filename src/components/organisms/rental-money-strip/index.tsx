@@ -16,7 +16,7 @@ const CELL = "flex-1 space-y-1 px-4 py-3 md:px-5 md:py-4";
 
 /**
  * "Where this rental stands" right under its summary: what is owed, the next
- * due date and what was paid. Numbers come ready from the rent statement
+ * open rent charge (a real one, not a projected cycle) and what was paid. Numbers come ready from the rent statement
  * (server); nothing is summed here. A rental with no rent ledger yet (no
  * charge) shows nothing.
  */
@@ -27,6 +27,8 @@ export function RentalMoneyStrip({ rentalId }: { rentalId: string }) {
   if (!report?.available) return null;
   const { statement } = report;
   const owes = statement.balance > 0;
+  // The real next open rent charge — never a projected cycle (owner, 2026-11-15).
+  const next = report.nextCharge ?? null;
 
   return (
     <Card>
@@ -58,12 +60,10 @@ export function RentalMoneyStrip({ rentalId }: { rentalId: string }) {
             Próximo vencimento
           </Text>
           <Text size={null} weight="bold" className="text-xl">
-            {statement.current ? formatCurrency(statement.current.amount) : "—"}
+            {next ? formatCurrency(next.amount) : "—"}
           </Text>
           <Text size="xs" tone="muted">
-            {statement.current
-              ? `Vence ${formatCalendarDate(statement.current.due)}`
-              : "Nada a vencer"}
+            {next ? `Vence ${formatCalendarDate(next.dueDate)}` : "Nenhuma cobrança em aberto"}
           </Text>
         </Box>
         <Box className={CELL}>

@@ -79,7 +79,11 @@ export function RentReconciliationCard({ rentalId }: { rentalId: string }) {
       >
         <Text size="sm" tone="muted">
           De {formatCalendarDate(r.from)}
-          {!r.filtered && !r.fromIsManual && " (1ª cobrança)"} a{" "}
+          {!r.filtered &&
+            (r.fromSource === "HANDOVER"
+              ? " (a partir da retirada)"
+              : !r.fromIsManual && " (1ª cobrança)")}{" "}
+          a{" "}
           {formatCalendarDate(r.through)}:{" "}
           <Text inline size="sm" weight="semibold" tone="foreground">
             {units}
@@ -164,7 +168,11 @@ export function RentReconciliationCard({ rentalId }: { rentalId: string }) {
             {currentCycleName(r.current.period)} em curso:{" "}
             {formatCurrency(r.current.accrued)} corridos de{" "}
             {formatCurrency(r.current.amount)} · vence{" "}
-            {formatCalendarDate(r.current.due)} (fora do saldo)
+            {formatCalendarDate(r.current.due)}
+            {r.current.nominalDue &&
+              r.current.nominalDue.slice(0, 10) !== r.current.due.slice(0, 10) &&
+              ` (${formatCalendarDate(r.current.nominalDue)} é domingo ou feriado)`}{" "}
+            (fora do saldo)
           </Text>
         )}
         {view.debtPart > 0 && (
