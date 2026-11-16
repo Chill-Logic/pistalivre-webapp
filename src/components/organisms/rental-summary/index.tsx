@@ -1,3 +1,5 @@
+import { TriangleAlert } from "lucide-react";
+import { Alert } from "@/components/atoms/alert";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Card, CardContent, CardHeader } from "@/components/atoms/card";
@@ -10,7 +12,7 @@ import { RentalStatusBadge } from "@/components/molecules/rental-status-badge";
 import { TextLink } from "@/components/molecules/text-link";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { routeTo } from "@/constants/routes";
-import { rateLabel } from "@/helpers/rental";
+import { handoverWarningText, rateLabel } from "@/helpers/rental";
 import { vehicleName } from "@/helpers/vehicle";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type { ColSpans } from "@/helpers/grid";
@@ -35,7 +37,13 @@ export function RentalSummary({ rental }: { rental: RentalDetail }) {
           </Box>
         </Box>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        {rental.handoverWarning && (
+          <Alert variant="warning" role="note" className="flex items-start gap-2">
+            <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
+            <Text size="sm">{handoverWarningText(rental.handoverWarning)}</Text>
+          </Alert>
+        )}
         <Row as="dl" className="gap-y-4">
           <InfoItem md={6} label="Locatário">
             <TextLink to={routeTo.customer(rental.customer.id)}>

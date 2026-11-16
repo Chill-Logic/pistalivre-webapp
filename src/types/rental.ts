@@ -76,7 +76,17 @@ export type RentalRecord = RentalListItem & {
 };
 
 /** GET /rentals/:id (documents come only in the read). */
-export type RentalDetail = RentalRecord & { documents: DocumentFile[] };
+/** The vehicle left before the contract was signed (shown until the rental ends). */
+export type HandoverWarning =
+  | { kind: "UNSIGNED"; handoverOn: string }
+  | { kind: "BEFORE_SIGNATURE"; handoverOn: string; signedOn: string };
+
+export type RentalDetail = RentalRecord & {
+  documents: DocumentFile[];
+  /** Earliest signature of a contract of the rental (timestamp); null = none. */
+  contractSignedAt?: string | null;
+  handoverWarning?: HandoverWarning | null;
+};
 
 export type RentalFilters = {
   page: number;

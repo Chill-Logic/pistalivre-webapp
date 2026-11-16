@@ -31,7 +31,7 @@ import { formatCalendarDate } from "@/utils/format";
 type RentalStatusCardProps = {
   rental: Pick<
     RentalDetail,
-    "id" | "code" | "status" | "source" | "termination" | "handoverAt" | "vehicle"
+    "id" | "code" | "status" | "source" | "termination" | "handoverAt" | "vehicle" | "contractSignedAt"
   >;
 };
 

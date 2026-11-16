@@ -1,3 +1,5 @@
+import { formatCalendarDate } from "@/utils/format";
+import type { HandoverWarning } from "@/types/rental";
 import type { BadgeVariantProps } from "@/components/atoms/badge/variants";
 import { CLOSED_RENTAL_STATUSES } from "@/constants/rental";
 import type { RentalStatus } from "@/types/rental";
@@ -30,4 +32,12 @@ export function isRentalClosed(status: RentalStatus) {
 /** "R$ 650,00 · Semanal" */
 export function rateLabel(rate: number, periodLabel: string) {
   return `${formatCurrency(rate)} · ${periodLabel}`;
+}
+
+/** Text of the "vehicle left before the signature" warning. */
+export function handoverWarningText(warning: HandoverWarning) {
+  const on = formatCalendarDate(warning.handoverOn);
+  return warning.kind === "UNSIGNED"
+    ? `Veículo entregue em ${on} sem o contrato assinado. Assine o contrato o quanto antes.`
+    : `Veículo entregue em ${on}, antes da assinatura do contrato (${formatCalendarDate(warning.signedOn)}).`;
 }

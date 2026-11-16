@@ -3,6 +3,7 @@ import { ClipboardCheck, KeyRound, Pencil } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import {
@@ -22,9 +23,10 @@ import { errorMessage, toApiError } from "@/helpers/api-error";
 import { rentalsService } from "@/services/api/gestao/rentals.service";
 import type { RentalDetail } from "@/types/rental";
 import { todayInBrasilia } from "@/utils/date";
+import { formatCalendarDate } from "@/utils/format";
 
 type RentalHandoverDialogProps = {
-  rental: Pick<RentalDetail, "id" | "status" | "handoverAt" | "vehicle">;
+  rental: Pick<RentalDetail, "id" | "status" | "handoverAt" | "vehicle" | "contractSignedAt">;
 };
 
 /**
@@ -40,6 +42,17 @@ export function RentalHandoverDialog({ rental }: RentalHandoverDialogProps) {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState("");
   const [error, setError] = useState<string | null>(null);
+  // Allowed, but the rental will carry a warning until it ends.
+  const signedOn = rental.contractSignedAt
+    ? todayInBrasilia(new Date(rental.contractSignedAt))
+    : null;
+  const earlyNote = !date
+    ? null
+    : !signedOn
+      ? "O contrato ainda não foi assinado. Dá para registrar, mas a locação fica com um aviso até terminar."
+      : date < signedOn
+        ? `A data é anterior à assinatura do contrato (${formatCalendarDate(signedOn)}). Dá para registrar, mas a locação fica com um aviso até terminar.`
+        : null;
 
   const save = useMutation({
     mutationFn: () => rentalsService.registerHandover(rental.id, { date }),
@@ -107,6 +120,11 @@ export function RentalHandoverDialog({ rental }: RentalHandoverDialogProps) {
           }}
           error={error ?? undefined}
         />
+        {earlyNote && (
+          <Alert variant="warning" role="note">
+            {earlyNote}
+          </Alert>
+        )}
 
         {!correcting && (
           <Box className="space-y-2 rounded-md border p-3">
