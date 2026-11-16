@@ -165,7 +165,7 @@ export function AutoBillingEnableDialog({
             preview.data.dueDate !== firstDueDate && (
               <Alert variant="warning" role="note">
                 {formatCalendarDate(firstDueDate)} é domingo ou feriado: a cobrança vence em{" "}
-                {formatCalendarDate(preview.data.dueDate)} (dia útil anterior) e vale pelo ciclo
+                {formatCalendarDate(preview.data.dueDate)} (próximo dia útil) e vale pelo ciclo
                 do dia {formatCalendarDate(firstDueDate)}.
               </Alert>
             )}
