@@ -2,6 +2,10 @@ import { CreditCard, Lock } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
+import {
+  CreditCardPreview,
+  type CreditCardField,
+} from "@/components/atoms/credit-card-preview";
 import { Button } from "@/components/atoms/button";
 import { Form } from "@/components/atoms/form";
 import { Col, Row } from "@/components/atoms/grid";
@@ -89,6 +93,8 @@ export function CheckoutCardForm({
   const [fields, setFields] = useState<Fields>(EMPTY);
   const [errors, setErrors] = useState<Partial<Record<keyof Fields, string>>>({});
   const [formError, setFormError] = useState<string | null>(null);
+  // Which field of the card is being typed: the drawing turns to show it.
+  const [focused, setFocused] = useState<CreditCardField | null>(null);
   const chosen = options.find((o) => String(o.installments) === installments) ?? options[0];
 
   if (blocked) {
@@ -164,10 +170,19 @@ export function CheckoutCardForm({
         <Heading level={3} variant="section">
           Cartão
         </Heading>
+        <CreditCardPreview
+          number={fields.number}
+          name={fields.holderName}
+          expiry={fields.expiry}
+          cvc={fields.ccv}
+          focused={focused}
+          className="py-2"
+        />
         <Row className="gap-y-3">
           <Col>
             <MaskedField
               label="Número do cartão"
+              onFocus={() => setFocused("number")}
               inputMode="numeric"
               autoComplete="cc-number"
               value={fields.number}
@@ -179,6 +194,7 @@ export function CheckoutCardForm({
           <Col>
             <FormField
               label="Nome impresso no cartão"
+              onFocus={() => setFocused("name")}
               autoComplete="cc-name"
               value={fields.holderName}
               onChange={(e) => set("holderName")(e.target.value.toUpperCase())}
@@ -188,6 +204,7 @@ export function CheckoutCardForm({
           <Col span={6}>
             <MaskedField
               label="Validade (MM/AA)"
+              onFocus={() => setFocused("expiry")}
               inputMode="numeric"
               autoComplete="cc-exp"
               value={fields.expiry}
@@ -199,6 +216,8 @@ export function CheckoutCardForm({
           <Col span={6}>
             <MaskedField
               label="CVV"
+              onFocus={() => setFocused("cvc")}
+              onBlur={() => setFocused(null)}
               inputMode="numeric"
               autoComplete="cc-csc"
               value={fields.ccv}
