@@ -217,7 +217,16 @@ export function RentalDetailPage() {
                 ratePeriod={rental.data.ratePeriod}
               />
             }
-            caution={<RentalCautionCard caution={rental.data.caution} />}
+            caution={
+              <RentalCautionCard
+                caution={rental.data.caution}
+                rental={{
+                  id: rental.data.id,
+                  rate: rental.data.rate,
+                  ratePeriod: rental.data.ratePeriod,
+                }}
+              />
+            }
             maintenances={<RelatedMaintenances rentalId={rental.data.id} />}
             inspections={
               <RelatedInspections

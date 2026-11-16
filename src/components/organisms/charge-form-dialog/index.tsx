@@ -67,6 +67,8 @@ type ChargeFormDialogProps = {
   rentalId: string;
   rate: number;
   ratePeriod: RatePeriod;
+  /** Opened from the Caução card: starts on the deposit, with its own button. */
+  caution?: boolean;
 };
 
 type Errors = Partial<
@@ -96,6 +98,7 @@ export function ChargeFormDialog({
   rentalId,
   rate,
   ratePeriod,
+  caution = false,
 }: ChargeFormDialogProps) {
   const { label } = useLabels();
   const create = useCreateRentalCharge(rentalId);
@@ -129,9 +132,9 @@ export function ChargeFormDialog({
   const mode = isCaution ? "caution" : split ? "installments" : "single";
 
   const reset = () => {
-    setPurpose("RENT");
+    setPurpose(caution ? "CAUTION" : "RENT");
     setMethod("PIX");
-    setAmount(rate);
+    setAmount(caution ? null : rate);
     setDueDate("");
     setReferenceDate("");
     setFine(DEFAULT_FINE);
@@ -307,10 +310,17 @@ export function ChargeFormDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button size="sm">
-          <Plus />
-          Nova cobrança
-        </Button>
+        {caution ? (
+          <Button size="sm" variant="outline">
+            <Plus />
+            Emitir cobrança
+          </Button>
+        ) : (
+          <Button size="sm">
+            <Plus />
+            Nova cobrança
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Nova cobrança</DialogTitle>

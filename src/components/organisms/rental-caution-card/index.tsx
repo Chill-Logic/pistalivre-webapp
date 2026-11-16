@@ -10,18 +10,46 @@ import { Col, Row } from "@/components/atoms/grid";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
 import { InfoItem } from "@/components/molecules/info-item";
+import { ChargeFormDialog } from "@/components/organisms/charge-form-dialog";
 import { LABEL_MAPS } from "@/constants/label-maps";
+import { useCautionPlan } from "@/hooks/api/gestao/charges/useCautionPlan";
 import { useLabels } from "@/hooks/ui/useLabels";
-import type { Caution } from "@/types/rental";
+import type { Caution, RatePeriod } from "@/types/rental";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
-export function RentalCautionCard({ caution }: { caution: Caution | null }) {
+type RentalCautionCardProps = {
+  caution: Caution | null;
+  /** With it, "Emitir cobrança" (the parcels not charged yet) and the charged ones marked. */
+  rental?: { id: string; rate: number; ratePeriod: RatePeriod };
+};
+
+/**
+ * The caução the rental implies and, per row, whether it was already charged.
+ * "Emitir cobrança" opens the charge dialog on the deposit: it emits only what
+ * is still missing (the server skips what already went out).
+ */
+export function RentalCautionCard({ caution, rental }: RentalCautionCardProps) {
   const { label } = useLabels();
+  const plan = useCautionPlan(rental?.id ?? "", Boolean(rental && caution));
+  const emittedOn = new Set(
+    (plan.data ?? []).filter((item) => item.emitted).map((item) => item.dueDate),
+  );
+  const pendingCount = (plan.data ?? []).filter((item) => !item.emitted).length;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Caução</CardTitle>
+        <Box className="flex flex-wrap items-center justify-between gap-2">
+          <CardTitle className="text-base">Caução</CardTitle>
+          {rental && caution && pendingCount > 0 && (
+            <ChargeFormDialog
+              rentalId={rental.id}
+              rate={rental.rate}
+              ratePeriod={rental.ratePeriod}
+              caution
+            />
+          )}
+        </Box>
       </CardHeader>
       <CardContent className="space-y-4">
         {!caution ? (
@@ -54,6 +82,7 @@ export function RentalCautionCard({ caution }: { caution: Caution | null }) {
                       <Text truncate>{installment.label}</Text>
                       <Text size="xs" tone="muted">
                         {formatCalendarDate(installment.dueDate)}
+                        {emittedOn.has(installment.dueDate) && " · cobrança emitida"}
                       </Text>
                     </Box>
                     <Text weight="medium">

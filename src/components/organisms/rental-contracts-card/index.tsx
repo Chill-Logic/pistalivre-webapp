@@ -69,7 +69,8 @@ function WithSignatureStart({
  * (status, PDF, rename, delete) + the documents of a "Contrato…" kind (e.g.
  * the signed PDF of a retroactive rental), which leave the generic card. A
  * PDF in a signature request keeps a link to it and cannot be deleted here.
- * "Gerar contrato" does not exist on a retroactive rental (MANUAL).
+ * "Gerar contrato" does not exist on a retroactive rental (MANUAL); with a
+ * contract already there it reads "Reemitir contrato".
  */
 export function RentalContractsCard({ rental }: { rental: RentalDetail }) {
   const contracts = useRentalContracts(rental.id);
@@ -93,7 +94,7 @@ export function RentalContractsCard({ rental }: { rental: RentalDetail }) {
           <Button asChild size="sm" variant="outline">
             <Link to={routeTo.newRentalContract(rental.id)}>
               <FilePlus2 />
-              Gerar contrato
+              {total > 0 ? "Reemitir contrato" : "Gerar contrato"}
             </Link>
           </Button>
         )
