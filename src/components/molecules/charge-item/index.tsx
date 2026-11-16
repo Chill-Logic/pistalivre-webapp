@@ -44,8 +44,13 @@ export function ChargeItem({
   const openPix = !amounts.isPaid ? charge.pix : null;
   const pixToCopy = openPix?.payload;
 
-  const title =
-    charge.label ?? label(LABEL_MAPS.paymentPurpose, charge.purpose);
+  const purposeName = label(LABEL_MAPS.paymentPurpose, charge.purpose);
+  // A caução parcel says it is one ("Caução · Parcela 2/4"), not just "Parcela 2/4".
+  const title = !charge.label
+    ? purposeName
+    : charge.purpose === "CAUTION" && !/cau[cç][aã]o/i.test(charge.label)
+      ? `${purposeName} · ${charge.label}`
+      : charge.label;
   const pixGroup =
     pixToCopy || openPix?.encodedImage || charge.invoiceUrl ? (
       <>

@@ -39,6 +39,11 @@ export const rentalsService = {
     });
     return data;
   },
+  /** Caução on automatic (the next parcels go out 3 days before they are due). */
+  async setCautionAutoBilling(id: string, enabled: boolean) {
+    const { data } = await http.post<RentalRecord>(`/rentals/${id}/caution-auto`, { enabled });
+    return data;
+  },
   /** "Registrar retirada" (activates the rental) or, active, corrects the date. */
   async registerHandover(id: string, input: { date: string }) {
     const { data } = await http.post<RentalRecord>(`/rentals/${id}/handover`, input);

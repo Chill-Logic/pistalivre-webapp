@@ -224,6 +224,7 @@ export function RentalDetailPage() {
                   id: rental.data.id,
                   rate: rental.data.rate,
                   ratePeriod: rental.data.ratePeriod,
+                  cautionAutoBilling: rental.data.cautionAutoBilling,
                 }}
               />
             }

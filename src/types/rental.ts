@@ -56,6 +56,8 @@ export type RentalRecord = RentalListItem & {
   notes: string | null;
   /** Vehicle handover (calendar date): the rent counts from it. Null = not yet. */
   handoverAt: string | null;
+  /** Caução on automatic: the next parcels go out by themselves. */
+  cautionAutoBilling?: boolean;
   paymentMethod: string | null;
   /** 0 = Sunday … 6 = Saturday. */
   paymentWeekday: number | null;
