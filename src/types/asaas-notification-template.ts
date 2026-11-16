@@ -45,6 +45,8 @@ export type CustomerNotificationSlotsView = {
   linked: boolean;
   /** Template their live rental calls for (null = no live rental). */
   suggestedPeriod: TemplatePeriod | null;
+  /** The setting already is that template: nothing to apply. */
+  matchesSuggested?: boolean;
   error: string | null;
   applied?: TemplatePeriod;
 };

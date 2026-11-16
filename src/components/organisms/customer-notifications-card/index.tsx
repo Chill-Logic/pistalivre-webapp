@@ -84,7 +84,10 @@ export function CustomerNotificationsCard({
       )}
       {data?.linked && !data.error && (
         <>
-          <ApplyTemplate customerId={customer.id} suggested={data.suggestedPeriod} />
+          {/* Already on the rental template: nothing to offer. */}
+          {!data.matchesSuggested && (
+            <ApplyTemplate customerId={customer.id} suggested={data.suggestedPeriod} />
+          )}
           {data.slots && Object.keys(data.slots).length > 0 ? (
             <SlotsForm
               key={JSON.stringify(data.slots)}
