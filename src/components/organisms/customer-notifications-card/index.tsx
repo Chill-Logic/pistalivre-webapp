@@ -1,4 +1,4 @@
-import { RefreshCw, Wand2 } from "lucide-react";
+import { BellOff, BellRing, RefreshCw, Wand2 } from "lucide-react";
 import { useState } from "react";
 import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
@@ -20,6 +20,7 @@ import {
   useCustomerNotificationSlots,
   useNotificationTemplates,
   useSaveCustomerNotificationSlots,
+  useSetAllNotificationsDisabled,
 } from "@/hooks/api/gestao/asaas-notifications/useAsaasNotifications";
 import type {
   NotificationSlot,
@@ -69,10 +70,13 @@ export function CustomerNotificationsCard({
           <AsaasNotificationMatrixSkeleton />
         </SkeletonRegion>
       )}
-      {view.isError && <QueryError error={view.error} onRetry={() => view.refetch()} />}
+      {view.isError && (
+        <QueryError error={view.error} onRetry={() => view.refetch()} />
+      )}
       {data && !data.linked && (
         <Text tone="muted">
-          Cliente ainda não vinculado ao Asaas: as notificações aparecem aqui depois do vínculo.
+          Cliente ainda não vinculado ao Asaas: as notificações aparecem aqui
+          depois do vínculo.
         </Text>
       )}
       {data?.linked && data.error && (
@@ -83,7 +87,12 @@ export function CustomerNotificationsCard({
           <Text size={null} className="flex-1">
             O Asaas não respondeu agora: {data.error}
           </Text>
-          <Button size="sm" variant="outline" onClick={() => view.refetch()} disabled={view.isFetching}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => view.refetch()}
+            disabled={view.isFetching}
+          >
             <RefreshCw />
             Tentar de novo
           </Button>
@@ -91,9 +100,16 @@ export function CustomerNotificationsCard({
       )}
       {data?.linked && !data.error && (
         <>
+          <AllNotificationsSwitch
+            customerId={customer.id}
+            disabled={data.allDisabled === true}
+          />
           {/* Already on the rental template: nothing to offer. */}
           {!data.matchesSuggested && (
-            <ApplyTemplate customerId={customer.id} suggested={data.suggestedPeriod} />
+            <ApplyTemplate
+              customerId={customer.id}
+              suggested={data.suggestedPeriod}
+            />
           )}
           {data.slots && Object.keys(data.slots).length > 0 ? (
             <SlotsForm
@@ -103,11 +119,83 @@ export function CustomerNotificationsCard({
               offsets={templates.data?.offsets ?? {}}
             />
           ) : (
-            <Text tone="muted">O Asaas não tem notificações para este cliente.</Text>
+            <Text tone="muted">
+              O Asaas não tem notificações para este cliente.
+            </Text>
           )}
         </>
       )}
     </CollapsibleCard>
+  );
+}
+
+/**
+ * "Desligar todas as notificações": one switch at Asaas that silences every
+ * warning to this customer. The blocks below stay as they are and come back
+ * on "Religar"; applying a template does not turn them back on.
+ */
+function AllNotificationsSwitch({
+  customerId,
+  disabled,
+}: {
+  customerId: string;
+  disabled: boolean;
+}) {
+  const toggle = useSetAllNotificationsDisabled(customerId);
+  const [open, setOpen] = useState(false);
+
+  if (disabled) {
+    return (
+      <Alert
+        variant="warning"
+        className="flex flex-col items-start gap-3 px-4 py-3 sm:flex-row sm:items-center"
+      >
+        <Text size={null} className="flex-1">
+          Todas as notificações estão desligadas: o Asaas não avisa este cliente
+          de nada. Os avisos abaixo voltam a valer quando você religar.
+        </Text>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={toggle.isPending}
+          onClick={() => toggle.mutate(false)}
+        >
+          {toggle.isPending ? <Spinner /> : <BellRing />}
+          Religar notificações
+        </Button>
+        {toggle.isError && <Text size="xs">{errorMessage(toggle.error)}</Text>}
+      </Alert>
+    );
+  }
+
+  return (
+    <Box className="flex flex-wrap items-center justify-between gap-2 rounded-md border p-3">
+      <Text size="sm" tone="muted">
+        Para parar todos os avisos deste cliente (e-mail, SMS, WhatsApp e
+        ligação) de uma vez.
+      </Text>
+      <ConfirmDialog
+        destructive
+        open={open}
+        onOpenChange={(next) => !toggle.isPending && setOpen(next)}
+        trigger={
+          <Button size="sm" variant="outline">
+            <BellOff />
+            Desligar todas as notificações
+          </Button>
+        }
+        title="Desligar todas as notificações?"
+        description="O Asaas para de mandar qualquer aviso de cobrança a este cliente: lembrete, vencimento, atraso e confirmação de pagamento. Os avisos configurados ficam guardados e voltam quando você religar."
+        confirmLabel="Desligar"
+        isPending={toggle.isPending}
+        onConfirm={() =>
+          toggle.mutate(true, { onSuccess: () => setOpen(false) })
+        }
+      />
+      {toggle.isError && (
+        <Alert className="w-full">{errorMessage(toggle.error)}</Alert>
+      )}
+    </Box>
   );
 }
 
@@ -131,7 +219,10 @@ function ApplyTemplate({
   return (
     <Box className="flex flex-wrap items-center justify-between gap-2 rounded-md border p-3">
       <Text size="sm">
-        Modelo da locação: <Text inline weight="medium">{TEMPLATE_PERIOD_LABEL[suggested]}</Text>
+        Modelo da locação:{" "}
+        <Text inline weight="medium">
+          {TEMPLATE_PERIOD_LABEL[suggested]}
+        </Text>
       </Text>
       <ConfirmDialog
         open={open}
@@ -152,7 +243,9 @@ function ApplyTemplate({
           })
         }
       />
-      {apply.isError && <Alert className="w-full">{errorMessage(apply.error)}</Alert>}
+      {apply.isError && (
+        <Alert className="w-full">{errorMessage(apply.error)}</Alert>
+      )}
     </Box>
   );
 }
@@ -189,11 +282,18 @@ function SlotsForm({
           </Text>
         )}
         {dirty && (
-          <Button variant="ghost" onClick={() => setValue(slots)} disabled={save.isPending}>
+          <Button
+            variant="ghost"
+            onClick={() => setValue(slots)}
+            disabled={save.isPending}
+          >
             Descartar
           </Button>
         )}
-        <Button onClick={() => save.mutate(value)} disabled={!dirty || save.isPending}>
+        <Button
+          onClick={() => save.mutate(value)}
+          disabled={!dirty || save.isPending}
+        >
           {save.isPending && <Spinner className="text-primary-foreground" />}
           Salvar no Asaas
         </Button>

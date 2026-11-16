@@ -3,7 +3,10 @@ import { toast } from "sonner";
 import { TEMPLATE_PERIOD_LABEL } from "@/constants/asaas-notifications";
 import { queryKeys } from "@/constants/query-keys";
 import { asaasNotificationsService } from "@/services/api/gestao/asaas-notifications.service";
-import type { NotificationSlots, TemplatePeriod } from "@/types/asaas-notification-template";
+import type {
+  NotificationSlots,
+  TemplatePeriod,
+} from "@/types/asaas-notification-template";
 
 const templatesKey = ["asaas-notification-templates"] as const;
 const customerKey = (customerId: string) =>
@@ -11,7 +14,10 @@ const customerKey = (customerId: string) =>
 
 /** The three templates (weekly, monthly, daily). */
 export function useNotificationTemplates() {
-  return useQuery({ queryKey: templatesKey, queryFn: asaasNotificationsService.templates });
+  return useQuery({
+    queryKey: templatesKey,
+    queryFn: asaasNotificationsService.templates,
+  });
 }
 
 export function useSaveNotificationTemplate() {
@@ -21,7 +27,9 @@ export function useSaveNotificationTemplate() {
       asaasNotificationsService.saveTemplate(input.period, input.slots),
     onSuccess: (_, input) => {
       queryClient.invalidateQueries({ queryKey: templatesKey });
-      toast.success(`Modelo ${TEMPLATE_PERIOD_LABEL[input.period].toLowerCase()} salvo`);
+      toast.success(
+        `Modelo ${TEMPLATE_PERIOD_LABEL[input.period].toLowerCase()} salvo`,
+      );
     },
   });
 }
@@ -47,10 +55,28 @@ export function useSaveCustomerNotificationSlots(customerId: string) {
   });
 }
 
+/** "Desligar todas as notificações" / "Religar" (one switch at Asaas). */
+export function useSetAllNotificationsDisabled(customerId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (disabled: boolean) =>
+      asaasNotificationsService.setAllDisabled(customerId, disabled),
+    onSuccess: (view) => {
+      queryClient.setQueryData(customerKey(customerId), view);
+      toast.success(
+        view.allDisabled
+          ? "Notificações desligadas no Asaas"
+          : "Notificações religadas no Asaas",
+      );
+    },
+  });
+}
+
 export function useApplyNotificationTemplate(customerId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (period?: TemplatePeriod) => asaasNotificationsService.applyTemplate(customerId, period),
+    mutationFn: (period?: TemplatePeriod) =>
+      asaasNotificationsService.applyTemplate(customerId, period),
     onSuccess: (view) => {
       queryClient.setQueryData(customerKey(customerId), view);
       toast.success(

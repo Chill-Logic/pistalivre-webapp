@@ -47,6 +47,8 @@ export type CustomerNotificationSlotsView = {
   suggestedPeriod: TemplatePeriod | null;
   /** The setting already is that template: nothing to apply. */
   matchesSuggested?: boolean;
+  /** "Desligar todas as notificações" is on: Asaas warns this customer of nothing. */
+  allDisabled?: boolean;
   error: string | null;
   applied?: TemplatePeriod;
 };
