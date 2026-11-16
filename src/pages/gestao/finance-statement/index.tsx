@@ -16,6 +16,7 @@ import {
 } from "@/components/organisms/statement-totals";
 import { showsSourcePerLine } from "@/helpers/statement";
 import { useStatement } from "@/hooks/api/gestao/finance/useStatement";
+import { useExportDownloadLink } from "@/hooks/ui/useExportDownloadLink";
 import { useStatementFilters } from "@/hooks/ui/useStatementFilters";
 
 /**
@@ -27,6 +28,7 @@ export function FinanceStatementPage() {
     useStatementFilters();
   const statement = useStatement(filters);
   const data = statement.data;
+  useExportDownloadLink();
 
   return (
     <Box className="space-y-4 md:space-y-6">
