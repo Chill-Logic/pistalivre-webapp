@@ -26,8 +26,10 @@ import type { WaivedDay } from "@/types/billing";
 import { formatCalendarDate } from "@/utils/format";
 
 /**
- * Specific days waived on the DAILY rent (e.g. discounted for a repair the
- * renter paid): the automation skips them and they do not count as due.
+ * Specific days waived on the rent (e.g. discounted for a repair the renter
+ * paid, or the bike returned early on the last day): on the daily rent the day
+ * is skipped; on weekly/monthly its share (amount ÷ days of the cycle) is.
+ * The server does the math.
  */
 export function WaivedDaysDialog({
   rentalId,
@@ -84,9 +86,10 @@ export function WaivedDaysDialog({
       <DialogContent>
         <DialogTitle>Dias abonados</DialogTitle>
         <DialogDescription>
-          Dias em que a diária não é cobrada (por exemplo, descontados por uma
-          manutenção que o locatário pagou). A cobrança automática pula esses
-          dias e eles não contam no devido.
+          Dias que não são cobrados (por exemplo, descontados por uma
+          manutenção que o locatário pagou, ou a moto devolvida cedo no último
+          dia). Na diária, o dia some; no semanal e no mensal, sai a parte do
+          dia (valor ÷ dias do ciclo). Eles não contam no devido.
         </DialogDescription>
         {days.length > 0 ? (
           <Box className="divide-y rounded-md border">

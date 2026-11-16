@@ -63,9 +63,7 @@ export function RentReconciliationCard({ rentalId }: { rentalId: string }) {
             rentalId={rentalId}
             reconcileFrom={rules.reconcileFrom}
           />
-          {rules.ratePeriod === "DAILY" && (
-            <WaivedDaysDialog rentalId={rentalId} days={rules.waivedDays} />
-          )}
+          <WaivedDaysDialog rentalId={rentalId} days={rules.waivedDays} />
           <RentCreditsDialog rentalId={rentalId} credits={rules.rentCredits} />
         </>
       }
