@@ -1,4 +1,5 @@
 import { FilePlus2, FileText, Signature, Trash2 } from "lucide-react";
+import { Badge } from "@/components/atoms/badge";
 import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
@@ -177,8 +178,11 @@ function ContractRow({
   const { view, download } = useFileActions();
   const { label } = useLabels();
   const signature = document?.signature;
+  const revoked = contract.status === "REVOKED";
   const subtitle = [
-    CONTRACT_STATUS_LABELS[contract.status] ?? contract.status,
+    revoked && contract.revokedAt
+      ? `Revogado em ${formatDate(contract.revokedAt)} (assinado um mais novo)`
+      : (CONTRACT_STATUS_LABELS[contract.status] ?? contract.status),
     formatDate(contract.createdAt),
     contract.reviewedBy && `revisado por ${contract.reviewedBy}`,
     contract.reviewWarnings?.length > 0 &&
@@ -220,6 +224,7 @@ function ContractRow({
       onDownload={() => download.mutate(document)}
       isViewing={view.isPending}
       isDownloading={download.isPending}
+      badge={revoked ? <Badge variant="outline">Revogado</Badge> : undefined}
       actions={
         <>
           <SignatureLink document={document} />

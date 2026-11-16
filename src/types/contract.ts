@@ -1,6 +1,6 @@
 import type { DocumentFile } from "@/types/document";
 
-export type ContractStatus = "DRAFT" | "SENT" | "SIGNED" | "VOID";
+export type ContractStatus = "DRAFT" | "SENT" | "SIGNED" | "VOID" | "REVOKED";
 
 /** A generated contract (the frozen HTML stays on the server). */
 export type Contract = {
@@ -10,6 +10,8 @@ export type Contract = {
   templateId: string;
   templateVersion: number;
   signedAt: string | null;
+  /** A newer contract of the same kind was signed (status REVOKED). */
+  revokedAt?: string | null;
   createdAt: string;
   /** The PDF attached to the rental under "Contrato". */
   document: DocumentFile | null;

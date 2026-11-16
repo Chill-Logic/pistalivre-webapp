@@ -24,6 +24,8 @@ type DocumentItemProps = {
   isDownloading: boolean;
   /** Extra buttons after view/download (edit, delete). */
   actions?: ReactNode;
+  /** A status tag beside the signature one (e.g. "Revogado"). */
+  badge?: ReactNode;
   /** Present = a checkbox to pick it for a bulk action. */
   selection?: {
     checked: boolean;
@@ -41,6 +43,7 @@ export function DocumentItem({
   isViewing,
   isDownloading,
   actions,
+  badge,
   selection,
 }: DocumentItemProps) {
   const Icon = document.contentType?.startsWith("image/")
@@ -77,15 +80,20 @@ export function DocumentItem({
         <Text size="xs" tone="muted" truncate>
           {subtitle ?? meta.join(" · ")}
         </Text>
-        {document.signature && (
+        {(badge || document.signature) && (
           <Box className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-            <SignatureStatusBadge status={document.signature.status} />
-            <TextLink
-              to={routeTo.signature(document.signature.requestId)}
-              className="text-xs"
-            >
-              ver pedido
-            </TextLink>
+            {badge}
+            {document.signature && (
+              <>
+                <SignatureStatusBadge status={document.signature.status} />
+                <TextLink
+                  to={routeTo.signature(document.signature.requestId)}
+                  className="text-xs"
+                >
+                  ver pedido
+                </TextLink>
+              </>
+            )}
           </Box>
         )}
       </Box>

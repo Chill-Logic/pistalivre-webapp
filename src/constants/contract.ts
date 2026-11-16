@@ -7,6 +7,7 @@ export const CONTRACT_STATUS_LABELS: Record<ContractStatus, string> = {
   SENT: "Enviado para assinatura",
   SIGNED: "Assinado",
   VOID: "Cancelado",
+  REVOKED: "Revogado",
 };
 
 export const CONTRACT_STATUS_VARIANT: Record<
@@ -17,6 +18,7 @@ export const CONTRACT_STATUS_VARIANT: Record<
   SENT: "warning",
   SIGNED: "success",
   VOID: "neutral",
+  REVOKED: "outline",
 };
 
 /** Kind slug of a contract document ("contrato", "contrato-assinado"…). */
