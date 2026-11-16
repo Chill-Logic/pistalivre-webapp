@@ -17,6 +17,7 @@ import { FormField } from "@/components/molecules/form-field";
 import { MaskedField } from "@/components/molecules/masked-field";
 import { SelectField } from "@/components/molecules/select-field";
 import { CustomerDocumentReader } from "@/components/organisms/customer-document-reader";
+import { EmergencyContactsEditor } from "@/components/organisms/emergency-contacts-editor";
 import {
   CUSTOMER_FORM_FIELDS,
   customerFormDefaults,
@@ -258,7 +259,7 @@ export function CustomerForm({
   });
 
   const masked = (
-    name: keyof CustomerFormValues,
+    name: Exclude<keyof CustomerFormValues, "emergencyContacts">,
     label: string,
     mask: (value: string) => string,
     extra: {
@@ -428,42 +429,9 @@ export function CustomerForm({
 
           <Box className="space-y-4">
             <Heading level={2} variant="section">
-              Contato de emergência
+              Contatos de emergência
             </Heading>
-            <Row className="gap-y-4">
-              <Col md={6}>
-                <FormField
-                  label="Nome — opcional"
-                  error={errors.emergencyContactName?.message}
-                  {...register("emergencyContactName")}
-                />
-              </Col>
-              <Col md={6}>
-                <FormField
-                  label="Vínculo — opcional"
-                  placeholder="Mãe, cônjuge…"
-                  error={errors.emergencyContactRelation?.message}
-                  {...register("emergencyContactRelation")}
-                />
-              </Col>
-              <Col md={6}>
-                {masked(
-                  "emergencyContactPhone",
-                  "Telefone — opcional",
-                  maskPhone,
-                  { inputMode: "tel" },
-                )}
-              </Col>
-              <Col md={6}>
-                <FormField
-                  label="E-mail — opcional"
-                  type="email"
-                  inputMode="email"
-                  error={errors.emergencyContactEmail?.message}
-                  {...register("emergencyContactEmail")}
-                />
-              </Col>
-            </Row>
+            <EmergencyContactsEditor control={control} errors={errors} />
           </Box>
 
           {formError && <Alert>{formError}</Alert>}

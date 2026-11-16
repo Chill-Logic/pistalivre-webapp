@@ -4,6 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/card";
+import { Box } from "@/components/atoms/box";
 import { Col, Row } from "@/components/atoms/grid";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
@@ -18,7 +19,7 @@ export function CustomerContactCard({
   customer: CustomerDetail;
 }) {
   const lines = addressLines(customer.address);
-  const emergency = customer.emergencyContact;
+  const contacts = customer.emergencyContacts.filter(hasEmergencyContact);
 
   return (
     <Card>
@@ -36,24 +37,31 @@ export function CustomerContactCard({
                 ))
               : null}
           </InfoItem>
-          <InfoItem label="Contato de emergência">
-            {hasEmergencyContact(emergency)
-              ? [
-                  [
-                    emergency.name,
-                    emergency.relation && `(${emergency.relation})`,
-                  ]
-                    .filter(Boolean)
-                    .join(" "),
-                  emergency.phone,
-                  emergency.email,
-                ]
-                  .filter(Boolean)
-                  .map((line) => (
-                    <Text key={line as string} inline className="block">
-                      {line}
-                    </Text>
-                  ))
+          <InfoItem
+            label={
+              contacts.length > 1
+                ? "Contatos de emergência"
+                : "Contato de emergência"
+            }
+          >
+            {contacts.length > 0
+              ? contacts.map((contact, index) => (
+                  <Box key={index} className={index > 0 ? "mt-2" : undefined}>
+                    {[
+                      [contact.name, contact.relation && `(${contact.relation})`]
+                        .filter(Boolean)
+                        .join(" "),
+                      contact.phone,
+                      contact.email,
+                    ]
+                      .filter(Boolean)
+                      .map((line) => (
+                        <Text key={line as string} inline className="block">
+                          {line}
+                        </Text>
+                      ))}
+                  </Box>
+                ))
               : null}
           </InfoItem>
         </Row>

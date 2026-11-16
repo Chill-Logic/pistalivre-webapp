@@ -27,9 +27,11 @@ export function addressLines(address: CustomerAddress) {
 
 export function hasEmergencyContact(contact: {
   name: string | null;
+  relation?: string | null;
   phone: string | null;
+  email?: string | null;
 }) {
-  return Boolean(contact.name || contact.phone);
+  return Boolean(contact.name || contact.relation || contact.phone || contact.email);
 }
 
 /**

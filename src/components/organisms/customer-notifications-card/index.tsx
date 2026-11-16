@@ -38,12 +38,19 @@ import type { CustomerDetail } from "@/types/customer";
 export function CustomerNotificationsCard({
   customer,
 }: {
-  customer: Pick<CustomerDetail, "id" | "emergencyContact">;
+  customer: Pick<CustomerDetail, "id" | "emergencyContacts">;
 }) {
   const view = useCustomerNotificationSlots(customer.id);
   const templates = useNotificationTemplates();
   const data = view.data;
-  const contactEmail = customer.emergencyContact.email;
+  // Every contact's e-mail gets a copy (the API sends all of them to Asaas).
+  const contactEmails = [
+    ...new Set(
+      customer.emergencyContacts
+        .map((c) => c.email?.trim().toLowerCase())
+        .filter((e): e is string => Boolean(e)),
+    ),
+  ];
 
   return (
     <CollapsibleCard
@@ -53,9 +60,9 @@ export function CustomerNotificationsCard({
     >
       <Text size="xs" tone="muted">
         SMS, WhatsApp e ligação vão para o telefone do próprio cliente.
-        {contactEmail
-          ? ` O e-mail tem cópia para ${contactEmail} (contato de emergência).`
-          : " Só o e-mail tem cópia: preencha o e-mail do contato de emergência no cadastro para ele receber."}
+        {contactEmails.length
+          ? ` O e-mail tem cópia para ${contactEmails.join(", ")} (${contactEmails.length > 1 ? "contatos" : "contato"} de emergência).`
+          : " Só o e-mail tem cópia: preencha o e-mail de um contato de emergência no cadastro para ele receber."}
       </Text>
       {view.isPending && (
         <SkeletonRegion label="Carregando notificações…">

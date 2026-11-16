@@ -99,29 +99,35 @@ export function useSignerCandidates() {
     [candidates],
   );
 
-  /** Remembers a customer's emergency contact as a candidate (once). */
+  /** Remembers a customer's emergency contacts as candidates (once each). */
   const offerContact = useCallback(
     async (customerId: string) => {
       const customer = await queryClient.fetchQuery({
         queryKey: queryKeys.customers.detail(customerId),
         queryFn: () => customersService.get(customerId),
       });
-      const contact = customer.emergencyContact;
-      if (!contact?.name?.trim() || !contact.email?.trim()) return;
-      const candidate: SignerCandidate = {
-        kind: "contact",
-        id: customer.id,
-        name: contact.name.trim(),
-        email: contact.email.trim(),
-        phone: contact.phone,
-        documentation: null,
-        of: customer.name,
-      };
-      setContacts((current) =>
-        current.some((item) => item.id === candidate.id)
-          ? current
-          : [candidate, ...current],
+      // Only the ones that can sign: a name and an e-mail. The id is the
+      // customer's + the position, so each contact is offered once.
+      const offered: SignerCandidate[] = (customer.emergencyContacts ?? []).flatMap(
+        (contact, index) =>
+          contact.name?.trim() && contact.email?.trim()
+            ? [
+                {
+                  kind: "contact" as const,
+                  id: `${customer.id}#${index}`,
+                  name: contact.name.trim(),
+                  email: contact.email.trim(),
+                  phone: contact.phone,
+                  documentation: null,
+                  of: customer.name,
+                },
+              ]
+            : [],
       );
+      setContacts((current) => [
+        ...offered.filter((c) => !current.some((item) => item.id === c.id)),
+        ...current,
+      ]);
     },
     [queryClient],
   );

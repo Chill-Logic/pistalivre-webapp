@@ -81,7 +81,8 @@ export type CustomerDetail = CustomerListItem & {
   driverLicenseIssuedAt: string | null;
   driverLicenseValidUntil: string | null;
   address: CustomerAddress;
-  emergencyContact: EmergencyContact;
+  /** Up to 5, in the order registered (the 1st was the only one before). */
+  emergencyContacts: EmergencyContact[];
   asaasCustomerId: string | null;
   excludeFromMetrics: boolean;
   updatedAt: string;

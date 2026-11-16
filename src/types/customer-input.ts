@@ -12,10 +12,13 @@ export type CustomerInput = {
   /** yyyy-mm-dd */
   birthDate: string | null;
   rg: string | null;
-  emergencyContactName: string | null;
-  emergencyContactRelation: string | null;
-  emergencyContactPhone: string | null;
-  emergencyContactEmail: string | null;
+  /** The whole list (replaces what is saved); empty rows are dropped. */
+  emergencyContacts: {
+    name: string | null;
+    relation: string | null;
+    phone: string | null;
+    email: string | null;
+  }[];
   addressLine: string | null;
   addressNumber: string | null;
   neighborhood: string | null;
