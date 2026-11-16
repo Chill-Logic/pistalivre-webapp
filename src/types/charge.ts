@@ -19,7 +19,8 @@ export type RentalChargeInput = {
   /** OTHER only (the others get the standard description). */
   description?: string;
   /** "Emitir mesmo assim" after a DUPLICATE_RENT. */
-  confirmDuplicate?: boolean;
+  confirmDuplicate?: boolean;  /** The payment link offers card (interest on the payer). Default: no. */
+  acceptsCard?: boolean;
 };
 
 export type ChargeUpdateInput = { amount: number; dueDate: string };
@@ -64,6 +65,7 @@ export type InstallmentPlanParams = {
 /** POST /rentals/:id/charges/caution (items = the preview with edited dates). */
 export type CautionChargesInput = {
   method: ChargeMethod;
+  acceptsCard?: boolean;
   finePercent?: number;
   interestPercent?: number;
   items: ChargePlanItem[];
@@ -73,6 +75,7 @@ export type CautionChargesInput = {
 export type InstallmentChargesInput = {
   purpose: Exclude<ChargePurpose, "CAUTION">;
   method: ChargeMethod;
+  acceptsCard?: boolean;
   description?: string;
   finePercent?: number;
   interestPercent?: number;

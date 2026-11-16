@@ -101,6 +101,22 @@ export function useChargeReferenceDate(id: string, rentalId: string | null) {
   });
 }
 
+export function useChargeAcceptsCard(id: string, rentalId: string | null) {
+  const refresh = useRefreshAfterCharge();
+  return useMutation({
+    mutationFn: (acceptsCard: boolean) => chargesService.setAcceptsCard(id, acceptsCard),
+    onSuccess: (charge) => {
+      refresh(rentalId);
+      toast.success(charge.acceptsCard ? "Cartão liberado no link" : "Cartão desligado no link");
+    },
+  });
+}
+
+/** The public payment link of a charge (created on first request). */
+export function useChargePayLink(id: string) {
+  return useMutation({ mutationFn: () => chargesService.payLink(id) });
+}
+
 /** "2 cobranças emitidas · 1 já existia" (what a batch did). */
 function batchToast(result: ChargeBatchResult) {
   const created = result.created.length;

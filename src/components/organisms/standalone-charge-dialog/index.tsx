@@ -95,6 +95,7 @@ export function StandaloneChargeDialog({
   const [fine, setFine] = useState(DEFAULT_FINE);
   const [interest, setInterest] = useState(DEFAULT_INTEREST);
   const [description, setDescription] = useState("");
+  const [acceptsCard, setAcceptsCard] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [blocked, setBlocked] = useState(false);
   const [split, setSplit] = useState(false);
@@ -115,6 +116,7 @@ export function StandaloneChargeDialog({
     setFine(DEFAULT_FINE);
     setInterest(DEFAULT_INTEREST);
     setDescription("");
+    setAcceptsCard(false);
     setErrors({});
     setBlocked(false);
     setSplit(false);
@@ -151,6 +153,7 @@ export function StandaloneChargeDialog({
           ...(target.rentalId ? { rentalId: target.rentalId } : {}),
           purpose,
           method,
+          acceptsCard,
           ...(split
             ? { items: installments }
             : { amount: amount ?? 0, dueDate }),
@@ -290,6 +293,14 @@ export function StandaloneChargeDialog({
                 </Col>
               </>
             )}
+            <Col>
+              <CheckboxField
+                label="Aceita cartão no link de pagamento"
+                hint="Além do PIX, o cliente pode pagar no cartão pelo link (juros do parcelamento por conta dele). Dá para mudar depois na cobrança."
+                checked={acceptsCard}
+                onChange={setAcceptsCard}
+              />
+            </Col>
             <Col span={6}>
               <FormField
                 label="Multa (%)"

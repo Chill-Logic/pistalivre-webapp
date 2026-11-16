@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { TextLink } from "@/components/molecules/text-link";
 import { ChargeSettleDialog } from "@/components/organisms/charge-settle-dialog";
+import { ChargePayLinkDialog } from "@/components/organisms/charge-pay-link-dialog";
 import { ChargeSettlementDialog } from "@/components/organisms/charge-settlement-dialog";
 import { QueryError } from "@/components/organisms/query-error";
 import {
@@ -122,7 +123,14 @@ export function CustomerChargesCard({
  * already paid (not by the received pix) → correct the receipt.
  */
 function CustomerChargeActions({ charge }: { charge: Charge }) {
-  if (!charge.amounts.isPaid) return <ChargeSettleDialog charge={charge} />;
+  if (!charge.amounts.isPaid) {
+    return (
+      <>
+        {charge.channel === "asaas" && <ChargePayLinkDialog charge={charge} />}
+        <ChargeSettleDialog charge={charge} />
+      </>
+    );
+  }
   if (
     !charge.settledByReceipt &&
     charge.channel === "manual" &&

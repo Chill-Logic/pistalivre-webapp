@@ -120,6 +120,7 @@ export function ChargeFormDialog({
   const [fine, setFine] = useState(DEFAULT_FINE);
   const [interest, setInterest] = useState(DEFAULT_INTEREST);
   const [description, setDescription] = useState("");
+  const [acceptsCard, setAcceptsCard] = useState(false);
   const [duplicate, setDuplicate] = useState<string | null>(null);
   const [errors, setErrors] = useState<Errors>({});
   const [blocked, setBlocked] = useState(false);
@@ -140,6 +141,7 @@ export function ChargeFormDialog({
     setFine(DEFAULT_FINE);
     setInterest(DEFAULT_INTEREST);
     setDescription("");
+    setAcceptsCard(false);
     setDuplicate(null);
     setErrors({});
     setBlocked(false);
@@ -216,6 +218,7 @@ export function ChargeFormDialog({
           key: idempotency.key,
           input: {
             method,
+            acceptsCard,
             ...surcharge(),
             items: cautionItems.map((item) => ({
               label: item.label,
@@ -242,6 +245,7 @@ export function ChargeFormDialog({
         input: {
           purpose: purpose as Exclude<ChargePurpose, "CAUTION">,
           method,
+          acceptsCard,
           ...surcharge(),
           ...(purpose === "OTHER" ? { description: description.trim() } : {}),
           items: installments,
@@ -269,6 +273,7 @@ export function ChargeFormDialog({
           method,
           amount,
           dueDate,
+          acceptsCard,
           ...surcharge(),
           ...(purpose === "RENT" && referenceDate ? { referenceDate } : {}),
           ...(purpose === "OTHER" ? { description: description.trim() } : {}),
@@ -429,6 +434,14 @@ export function ChargeFormDialog({
                 />
               </Col>
             )}
+            <Col>
+              <CheckboxField
+                label="Aceita cartão no link de pagamento"
+                hint="Além do PIX, o cliente pode pagar no cartão pelo link (juros do parcelamento por conta dele). Dá para mudar depois na cobrança."
+                checked={acceptsCard}
+                onChange={setAcceptsCard}
+              />
+            </Col>
             {surchargeFree ? (
               <Col>
                 <Text size="xs" tone="muted">

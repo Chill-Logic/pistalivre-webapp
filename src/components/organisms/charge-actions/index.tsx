@@ -1,4 +1,5 @@
 import { ChargeDeleteButton } from "@/components/organisms/charge-delete-button";
+import { ChargePayLinkDialog } from "@/components/organisms/charge-pay-link-dialog";
 import { ChargeEditDialog } from "@/components/organisms/charge-edit-dialog";
 import { ChargeReferenceDateDialog } from "@/components/organisms/charge-reference-date-dialog";
 import { ChargeSettleDialog } from "@/components/organisms/charge-settle-dialog";
@@ -22,6 +23,7 @@ export function ChargeActions({ charge }: { charge: Charge }) {
     return (
       <>
         {reference}
+        {charge.channel === "asaas" && <ChargePayLinkDialog charge={charge} />}
         <ChargeSettleDialog charge={charge} />
         <ChargeEditDialog charge={charge} />
         <ChargeDeleteButton charge={charge} />

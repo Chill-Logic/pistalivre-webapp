@@ -18,6 +18,7 @@ import { List, ListItem } from "@/components/atoms/list";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { CopyCode } from "@/components/molecules/copy-code";
+import { CheckboxField } from "@/components/molecules/checkbox-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { toApiError } from "@/helpers/api-error";
 import {
@@ -46,6 +47,7 @@ export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDia
   const idempotency = useIdempotencyKey();
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState<number | null>(balance);
+  const [acceptsCard, setAcceptsCard] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<PaymentLink | null>(null);
 
@@ -54,6 +56,7 @@ export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDia
     setOpen(next);
     if (!next) return;
     setAmount(balance);
+    setAcceptsCard(false);
     setError(null);
     setCreated(null);
   };
@@ -65,7 +68,7 @@ export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDia
       return;
     }
     create.mutate(
-      { amount: amount === balance ? null : amount, key: idempotency.key },
+      { amount: amount === balance ? null : amount, acceptsCard, key: idempotency.key },
       {
         onSuccess: (link) => {
           idempotency.renew();
@@ -89,7 +92,7 @@ export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDia
           <>
             <DialogTitle>Link gerado</DialogTitle>
             <DialogDescription>
-              {formatCurrency(created.amount)} · vale até {formatDate(created.expiresAt)}. O cliente
+              {formatCurrency(created.amount)} · vale até {created.expiresAt ? formatDate(created.expiresAt) : "—"}. O cliente
               abre sem login e paga por PIX ou cartão.
             </DialogDescription>
             <Box className="space-y-3">
@@ -114,8 +117,7 @@ export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDia
           <>
             <DialogTitle>Cobrar o saldo devedor</DialogTitle>
             <DialogDescription>
-              Gera um link de pagamento (PIX ou cartão em até 12×, com os juros do parcelamento por
-              conta do cliente) que vale 7 dias.
+              Gera um link de pagamento por PIX (e cartão, se você marcar) que vale 7 dias.
             </DialogDescription>
             <Form onSubmit={onSubmit} noValidate className="space-y-4">
               <MoneyField
@@ -129,6 +131,12 @@ export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDia
               <Text size="xs" tone="muted">
                 Saldo devedor do sistema: {formatCurrency(balance)}.
               </Text>
+              <CheckboxField
+                label="Aceita cartão"
+                hint="Além do PIX, o cliente pode pagar no cartão (juros do parcelamento por conta dele)."
+                checked={acceptsCard}
+                onChange={setAcceptsCard}
+              />
               <Box className="space-y-1">
                 <Text size="sm" weight="medium">
                   {charges.length > 0

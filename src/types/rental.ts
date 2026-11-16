@@ -131,6 +131,8 @@ export type Charge = {
   paidAt: string | null;
   /** Settled by the pix received on the rental (derived, not by hand). */
   settledByReceipt: boolean;
+  /** Its payment link offers card (interest on the payer). Off by default. */
+  acceptsCard: boolean;
   amounts: ChargeAmounts;
   invoiceUrl: string | null;
   pix: { encodedImage: string; payload: string; expirationDate: string } | null;

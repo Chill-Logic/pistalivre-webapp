@@ -1,4 +1,5 @@
 import { http } from "@/services/http/client";
+import type { PaymentLink } from "@/types/payment-link";
 import type {
   CautionChargesInput,
   CautionPlanItem,
@@ -91,6 +92,16 @@ export const chargesService = {
       input,
       idempotent(key),
     );
+    return data;
+  },
+  /** Liga/desliga o cartão no link de pagamento da cobrança. */
+  async setAcceptsCard(id: string, acceptsCard: boolean) {
+    const { data } = await http.put<Charge>(`/charges/${id}/accepts-card`, { acceptsCard });
+    return data;
+  },
+  /** O link público de pagamento da cobrança (criado na 1ª vez, o mesmo depois). */
+  async payLink(id: string) {
+    const { data } = await http.post<PaymentLink>(`/charges/${id}/pay-link`);
     return data;
   },
   async setReferenceDate(id: string, referenceDate: string | null) {

@@ -33,8 +33,8 @@ export function paymentLinkPaidLabel(link: PaymentLink) {
 export function paymentLinkMessage(link: PaymentLink) {
   return [
     `Olá! Segue o link para pagar o saldo da sua locação: ${formatCurrency(link.amount)}.`,
-    `Dá para pagar por PIX ou no cartão em até 12×.`,
-    `O link vale até ${formatDate(link.expiresAt)}: ${link.url}`,
+    "É só abrir o link e pagar.",
+    link.expiresAt ? `O link vale até ${formatDate(link.expiresAt)}: ${link.url}` : link.url,
   ].join("\n");
 }
 

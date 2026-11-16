@@ -20,7 +20,7 @@ export type PaymentLink = {
   amount: number;
   description: string;
   referenceDate: string;
-  expiresAt: string;
+  expiresAt: string | null;
   paidMethod: "PIX" | "CREDIT_CARD" | null;
   paidAt: string | null;
   installments: number | null;
@@ -56,7 +56,8 @@ export type PublicPayment = {
   firstName: string;
   description: string;
   amount: number;
-  expiresAt: string;
+  /** null = does not expire (the link of one charge). */
+  expiresAt: string | null;
   pix: { payload: string; encodedImage: string } | null;
   cardOptions: CardInstallmentOption[];
   cardBlocked: boolean;

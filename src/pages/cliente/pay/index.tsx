@@ -67,10 +67,12 @@ function OpenPayment({ token, data }: { token: string; data: PublicPayment }) {
       <PaymentHeader data={data} />
       <Text size="sm" tone="muted" className="flex items-center gap-1">
         <Clock className="size-4" />
-        Link válido até {formatDate(data.expiresAt)}
+        {data.expiresAt ? `Link válido até ${formatDate(data.expiresAt)}` : "Pague pelo PIX abaixo"}
       </Text>
-      <SegmentedField label="Como você quer pagar?" value={method} options={METHODS} onChange={setMethod} />
-      {method === "PIX" ? (
+      {data.cardOptions.length > 0 && (
+        <SegmentedField label="Como você quer pagar?" value={method} options={METHODS} onChange={setMethod} />
+      )}
+      {method === "PIX" || data.cardOptions.length === 0 ? (
         data.pix ? (
           <CheckoutPixPanel pix={data.pix} />
         ) : (
@@ -129,8 +131,8 @@ export function PayPage() {
               <Box className="space-y-3">
                 <PaymentHeader data={data} />
                 <Alert>
-                  Este link venceu em {formatDate(data.expiresAt)}. Fale com a locadora para receber
-                  um link novo.
+                  Este link venceu{data.expiresAt ? ` em ${formatDate(data.expiresAt)}` : ""}. Fale com
+                  a locadora para receber um link novo.
                 </Alert>
                 <TalkToUs whatsapp={data.company.whatsapp} />
               </Box>

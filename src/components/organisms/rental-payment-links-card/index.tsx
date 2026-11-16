@@ -45,7 +45,7 @@ function LiveLink({ link }: { link: PaymentLink }) {
       </Box>
       <Text size="xs" tone={expired ? "destructive" : "muted"}>
         {expired ? "Venceu em " : "Vale até "}
-        {formatDate(link.expiresAt)}
+        {link.expiresAt ? formatDate(link.expiresAt) : "—"}
         {link.renewCount > 0 && ` · renovado ${link.renewCount}×`}
       </Text>
       <CopyCode code={link.url} copied="Link copiado" />

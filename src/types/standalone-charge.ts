@@ -12,6 +12,8 @@ export type StandaloneChargeInput = {
   purpose: ChargePurpose;
   method: ChargeMethod;
   description?: string;
+  /** The payment link offers card (interest on the payer). Default: no. */
+  acceptsCard?: boolean;
   finePercent?: number;
   interestPercent?: number;
   amount?: number;

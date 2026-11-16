@@ -25,8 +25,8 @@ function useRefreshRental() {
 export function useCreatePaymentLink(rentalId: string) {
   const refresh = useRefreshRental();
   return useMutation({
-    mutationFn: ({ amount, key }: { amount: number | null; key: string }) =>
-      paymentLinksService.create(rentalId, { amount }, key),
+    mutationFn: ({ amount, acceptsCard, key }: { amount: number | null; acceptsCard: boolean; key: string }) =>
+      paymentLinksService.create(rentalId, { amount, acceptsCard }, key),
     onSettled: refresh,
   });
 }
