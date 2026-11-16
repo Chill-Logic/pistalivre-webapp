@@ -15,14 +15,12 @@ import { DocumentEditDialog } from "@/components/organisms/document-edit-dialog"
 import { ManageDocumentActions } from "@/components/organisms/documents-card";
 import { QueryError } from "@/components/organisms/query-error";
 import { CONTRACT_STATUS_LABELS } from "@/constants/contract";
-import { LABEL_MAPS } from "@/constants/label-maps";
 import { queryKeys } from "@/constants/query-keys";
 import { routeTo } from "@/constants/routes";
 import { splitRentalDocuments } from "@/helpers/contract";
 import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
 import { useDeleteContract } from "@/hooks/api/gestao/contracts/useContractMutations";
 import { useRentalContracts } from "@/hooks/api/gestao/contracts/useRentalContracts";
-import { useLabels } from "@/hooks/ui/useLabels";
 import type { Contract } from "@/types/contract";
 import type { DocumentFile, DocumentOwner } from "@/types/document";
 import type { RentalDetail } from "@/types/rental";
@@ -176,19 +174,18 @@ function ContractRow({
   owner: DocumentOwner;
 }) {
   const { view, download } = useFileActions();
-  const { label } = useLabels();
   const signature = document?.signature;
   const revoked = contract.status === "REVOKED";
+  // The signature tag below already says "Assinado"/"Enviado": the line only
+  // carries what it does not (draft, revoked, date, who reviewed).
   const subtitle = [
     revoked && contract.revokedAt
       ? `Revogado em ${formatDate(contract.revokedAt)} (assinado um mais novo)`
-      : (CONTRACT_STATUS_LABELS[contract.status] ?? contract.status),
+      : !signature && (CONTRACT_STATUS_LABELS[contract.status] ?? contract.status),
     formatDate(contract.createdAt),
     contract.reviewedBy && `revisado por ${contract.reviewedBy}`,
     contract.reviewWarnings?.length > 0 &&
       `gerado com ${contract.reviewWarnings.length === 1 ? "1 aviso" : `${contract.reviewWarnings.length} avisos`} da revisão`,
-    signature &&
-      `Em assinatura: ${label(LABEL_MAPS.signatureStatus, signature.status)}`,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -248,7 +245,6 @@ function ContractDocumentRow({
   owner: DocumentOwner;
 }) {
   const { view, download } = useFileActions();
-  const { label } = useLabels();
   const signature = document.signature;
 
   return (
@@ -256,11 +252,7 @@ function ContractDocumentRow({
       document={document}
       subtitle={
         signature
-          ? [
-              document.category?.name,
-              formatDate(document.createdAt),
-              `Em assinatura: ${label(LABEL_MAPS.signatureStatus, signature.status)}`,
-            ]
+          ? [document.category?.name, formatDate(document.createdAt)]
               .filter(Boolean)
               .join(" · ")
           : undefined
