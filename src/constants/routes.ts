@@ -108,6 +108,7 @@ export const ROUTES = {
   manual: `${GESTAO}/manual`,
   notificationSettings: `${GESTAO}/notificacoes`,
   asaasNotifications: `${GESTAO}/avisos-do-asaas`,
+  cardFeeSettings: `${GESTAO}/juros-do-cartao`,
   partners: `${GESTAO}/parceiros`,
   partnerNew: `${GESTAO}/parceiros/novo`,
   partnerDetail: `${GESTAO}/parceiros/:id`,
