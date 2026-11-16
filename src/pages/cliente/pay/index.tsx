@@ -6,6 +6,7 @@ import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Card, CardContent } from "@/components/atoms/card";
 import { ExternalLink } from "@/components/atoms/external-link";
+import { Col, Row } from "@/components/atoms/grid";
 import { Heading } from "@/components/atoms/heading";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
@@ -40,8 +41,11 @@ function PaySkeleton() {
 function TalkToUs({ whatsapp }: { whatsapp: string | null }) {
   if (!whatsapp) return null;
   return (
-    <Button asChild variant="outline" className="w-full">
-      <ExternalLink href={`https://wa.me/${whatsapp}`} className="text-foreground hover:no-underline">
+    <Button asChild variant="outline" className="w-full sm:w-auto">
+      <ExternalLink
+        href={`https://wa.me/${whatsapp}`}
+        className="text-foreground hover:no-underline"
+      >
         <MessageCircle />
         Falar com a locadora
       </ExternalLink>
@@ -63,23 +67,44 @@ function PaymentHeader({ data }: { data: PublicPayment }) {
 function OpenPayment({ token, data }: { token: string; data: PublicPayment }) {
   const [method, setMethod] = useState("PIX");
   return (
-    <Box className="space-y-5">
-      <PaymentHeader data={data} />
-      <Text size="sm" tone="muted" className="flex items-center gap-1">
-        <Clock className="size-4" />
-        {data.expiresAt ? `Link válido até ${formatDate(data.expiresAt)}` : "Pague pelo PIX abaixo"}
-      </Text>
-      {data.cardOptions.length > 0 && (
-        <SegmentedField label="Como você quer pagar?" value={method} options={METHODS} onChange={setMethod} />
-      )}
+    <Box className="space-y-6">
+      {/* Desktop: what it is on the left, how to pay on the right. */}
+      <Row className="items-end gap-y-4">
+        <Col lg={5} className="space-y-2">
+          <PaymentHeader data={data} />
+          <Text size="sm" tone="muted" className="flex items-center gap-1">
+            <Clock className="size-4" />
+            {data.expiresAt
+              ? `Link válido até ${formatDate(data.expiresAt)}`
+              : "Pague pelo PIX abaixo"}
+          </Text>
+        </Col>
+        {data.cardOptions.length > 0 && (
+          <Col lg={7}>
+            <SegmentedField
+              label="Como você quer pagar?"
+              value={method}
+              options={METHODS}
+              onChange={setMethod}
+            />
+          </Col>
+        )}
+      </Row>
       {method === "PIX" || data.cardOptions.length === 0 ? (
         data.pix ? (
           <CheckoutPixPanel pix={data.pix} />
         ) : (
-          <Alert>O PIX não carregou agora. Atualize a página em instantes ou pague no cartão.</Alert>
+          <Alert>
+            O PIX não carregou agora. Atualize a página em instantes ou pague no
+            cartão.
+          </Alert>
         )
       ) : (
-        <CheckoutCardForm token={token} options={data.cardOptions} blocked={data.cardBlocked} />
+        <CheckoutCardForm
+          token={token}
+          options={data.cardOptions}
+          blocked={data.cardBlocked}
+        />
       )}
     </Box>
   );
@@ -96,7 +121,10 @@ export function PayPage() {
   const data = payment.data;
 
   return (
-    <PublicLayout companyName={data?.company.name ?? undefined}>
+    <PublicLayout
+      companyName={data?.company.name ?? undefined}
+      width={!data || data.state === "OPEN" ? "wide" : "narrow"}
+    >
       {payment.isPending && (
         <SkeletonRegion label="Carregando pagamento…">
           <PaySkeleton />
@@ -107,7 +135,8 @@ export function PayPage() {
           <CardContent className="space-y-2 pt-4 md:pt-5">
             <Heading level={2}>Link indisponível</Heading>
             <Text tone="muted">
-              Este link de pagamento não existe ou foi cancelado. Peça um novo à locadora.
+              Este link de pagamento não existe ou foi cancelado. Peça um novo à
+              locadora.
             </Text>
           </CardContent>
         </Card>
@@ -123,7 +152,8 @@ export function PayPage() {
                 <Text tone="muted">
                   {formatCurrency(data.amount)} pago
                   {data.paidMethod === "CREDIT_CARD" ? " no cartão" : " no PIX"}
-                  {data.paidAt ? ` em ${formatDate(data.paidAt)}` : ""}. Obrigado!
+                  {data.paidAt ? ` em ${formatDate(data.paidAt)}` : ""}.
+                  Obrigado!
                 </Text>
               </Box>
             )}
@@ -131,13 +161,16 @@ export function PayPage() {
               <Box className="space-y-3">
                 <PaymentHeader data={data} />
                 <Alert>
-                  Este link venceu{data.expiresAt ? ` em ${formatDate(data.expiresAt)}` : ""}. Fale com
-                  a locadora para receber um link novo.
+                  Este link venceu
+                  {data.expiresAt ? ` em ${formatDate(data.expiresAt)}` : ""}.
+                  Fale com a locadora para receber um link novo.
                 </Alert>
                 <TalkToUs whatsapp={data.company.whatsapp} />
               </Box>
             )}
-            {data.state !== "EXPIRED" && <TalkToUs whatsapp={data.company.whatsapp} />}
+            {data.state !== "EXPIRED" && (
+              <TalkToUs whatsapp={data.company.whatsapp} />
+            )}
           </CardContent>
         </Card>
       )}
