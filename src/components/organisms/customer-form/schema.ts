@@ -1,20 +1,23 @@
 import { z } from "zod";
+import { isValidPhone } from "@/utils/masks";
 import { DEFAULT_NATIONALITY } from "@/constants/customer";
 import type { CustomerDetail } from "@/types/customer";
 import type { CustomerInput } from "@/types/customer-input";
 import { isValidCpf } from "@/utils/cpf";
 import { brDateToDay, dayToBrDate, todayInBrasilia } from "@/utils/date";
-import { onlyDigits } from "@/utils/masks";
 
 const optional = (max: number) => z.string().trim().max(max);
-const isPhone = (value: string) => [10, 11].includes(onlyDigits(value).length);
+// With or without the DDI; a number that can exist (mobile starts with 9).
+const isPhone = (value: string) => isValidPhone(value);
 
 /** Mirrors the API's createCustomerSchema (same PT messages). */
 export const customerFormSchema = z.object({
   name: z.string().trim().min(1, "Nome é obrigatório").max(120),
   document: z.string().refine(isValidCpf, "CPF inválido"),
   email: z.string().trim().toLowerCase().email("E-mail inválido"),
-  phone: z.string().refine(isPhone, "Telefone inválido"),
+  phone: z
+    .string()
+    .refine(isPhone, "Telefone inválido: confira o DDD e o número (celular começa com 9)"),
   maritalStatus: optional(40),
   profession: optional(80),
   birthDate: z.string().refine((value) => {

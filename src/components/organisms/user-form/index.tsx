@@ -21,16 +21,15 @@ import { useLabels } from "@/hooks/ui/useLabels";
 import type { StaffUserDetail, UserRole } from "@/types/user";
 import { isValidCpf } from "@/utils/cpf";
 import { brDateToDay, dayToBrDate, todayInBrasilia } from "@/utils/date";
-import { maskCpf, maskDate, maskPhone, onlyDigits } from "@/utils/masks";
+import { isValidPhone, maskCpf, phoneDigits, maskDate, maskPhone, onlyDigits } from "@/utils/masks";
 
 const baseSchema = z.object({
   name: z.string().trim().min(1, "Nome é obrigatório").max(120),
   email: z.string().trim().toLowerCase().email("E-mail inválido"),
   cpf: z.string().refine(isValidCpf, "CPF inválido"),
-  phone: z.string().refine((value) => {
-    const digits = onlyDigits(value);
-    return digits === "" || (digits.length >= 10 && digits.length <= 11);
-  }, "Telefone inválido"),
+  phone: z
+    .string()
+    .refine((value) => onlyDigits(value) === "" || isValidPhone(value), "Telefone inválido"),
   birthDate: z.string().refine((value) => {
     if (!value) return true;
     const day = brDateToDay(value);
@@ -117,7 +116,7 @@ export function UserForm({
         name: values.name.trim(),
         email: values.email,
         cpf: onlyDigits(values.cpf),
-        phone: onlyDigits(values.phone) || null,
+        phone: phoneDigits(values.phone) || null,
         birthDate: values.birthDate ? brDateToDay(values.birthDate) : null,
         role: canEditRole ? values.role : (user?.role ?? "AGENT"),
         ...(isNew ? { password: values.password } : {}),

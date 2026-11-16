@@ -120,4 +120,6 @@ export type Dashboard = {
   funnel: LeadFunnel;
   birthdays: Birthday[];
   balances: Balances;
+  /** Active rentals without a signed contract. */
+  unsignedRentals?: { id: string; code: string; customerName: string; handoverAt: string | null }[];
 };

@@ -15,8 +15,30 @@ export function maskCpf(value: string) {
 }
 
 /** (00) 00000-0000 (mobile) or (00) 0000-0000 (landline). */
+/**
+ * The phone digits without the country code: "+55 21 98765-4321" and
+ * "(21) 98765-4321" are the same number (who types the DDI must not end with
+ * DDD 55 + a number that can't exist).
+ */
+export function phoneDigits(value: string) {
+  let d = onlyDigits(value);
+  if (d.length >= 12 && d.startsWith("55")) d = d.slice(2);
+  return d.slice(0, 11);
+}
+
+/** Can exist: 10 digits = landline (2–5), 11 = mobile (starts with 9). */
+export function isValidPhone(value: string) {
+  const d = phoneDigits(value);
+  if (!/^[1-9][0-9]/.test(d)) return false;
+  if (d.length === 10) return /^[2-5]$/.test(d[2]);
+  if (d.length === 11) return d[2] === "9";
+  return false;
+}
+
 export function maskPhone(value: string) {
-  const c = onlyDigits(value).slice(0, 11);
+  // Up to 13 digits typed (DDI + DDD + number); the DDI is dropped.
+  const raw = onlyDigits(value).slice(0, 13);
+  const c = raw.length >= 12 && raw.startsWith("55") ? raw.slice(2) : raw.slice(0, 11);
   const ddd = c.slice(0, 2);
   if (c.length <= 2) return ddd ? `(${ddd}` : "";
   const rest = c.slice(2);

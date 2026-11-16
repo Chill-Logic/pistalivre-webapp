@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import { Badge } from "@/components/atoms/badge";
 import { Link, useLocation } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Card } from "@/components/atoms/card";
@@ -39,6 +40,7 @@ export function RentalCard({ rental }: { rental: RentalListItem }) {
           <Text weight="medium" truncate>
             {rental.customer.name}
           </Text>
+          {rental.unsignedContract && <Badge variant="warning">Sem contrato assinado</Badge>}
           <Text size="xs" tone="muted" truncate>
             {formatPlate(rental.vehicle.plate)} · {vehicleName(rental.vehicle)}
           </Text>

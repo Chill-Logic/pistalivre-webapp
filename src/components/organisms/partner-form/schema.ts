@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { PartnerDetail, PartnerInput } from "@/types/partner";
 import { isValidCnpj, normalizeCnpj } from "@/utils/cnpj";
 import { isValidCpf } from "@/utils/cpf";
-import { maskCnpj, maskCpf, maskPhone, onlyDigits } from "@/utils/masks";
+import { isValidPhone, maskCnpj, maskCpf, maskPhone, onlyDigits, phoneDigits } from "@/utils/masks";
 
 /** Mirrors the API's partnerSchema (same PT messages). */
 export const partnerFormSchema = z
@@ -31,12 +31,11 @@ export const partnerFormSchema = z
         message: `${values.documentType} inválido`,
       });
     }
-    const phone = onlyDigits(values.phone);
-    if (phone && phone.length < 10) {
+    if (onlyDigits(values.phone) && !isValidPhone(values.phone)) {
       ctx.addIssue({
         code: "custom",
         path: ["phone"],
-        message: "Telefone incompleto",
+        message: "Telefone inválido",
       });
     }
   });
@@ -89,7 +88,7 @@ export function toPartnerInput(values: PartnerFormValues): PartnerInput {
     // A person has no trade name.
     tradeName: isCompany ? values.tradeName || null : null,
     email: values.email.toLowerCase(),
-    phone: onlyDigits(values.phone) || null,
+    phone: phoneDigits(values.phone) || null,
     pixKey: values.pixKey || null,
     notes: values.notes || null,
     active: values.active,

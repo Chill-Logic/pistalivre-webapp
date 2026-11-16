@@ -83,7 +83,12 @@ export function DashboardPage() {
       {data && (
         <DashboardLayout
           banner={<BirthdayBanner birthdays={data.birthdays} />}
-          today={<TodayPanel newLeads={data.funnel.byStatus.NEW ?? 0} />}
+          today={
+            <TodayPanel
+              newLeads={data.funnel.byStatus.NEW ?? 0}
+              unsigned={data.unsignedRentals ?? []}
+            />
+          }
           kpis={<DashboardKpis dashboard={data} />}
           overdueByPurpose={
             <BarListCard

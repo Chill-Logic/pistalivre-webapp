@@ -1,4 +1,5 @@
 import { Box } from "@/components/atoms/box";
+import type { Dashboard } from "@/types/dashboard";
 import {
   Card,
   CardContent,
@@ -40,7 +41,14 @@ const lateLabel = (daysLate: number) =>
  * charge (today and overdue, the server's queue and total), vehicles standing
  * still, and new leads waiting for a call. Each block leads to its screen.
  */
-export function TodayPanel({ newLeads }: { newLeads: number }) {
+export function TodayPanel({
+  newLeads,
+  unsigned = [],
+}: {
+  newLeads: number;
+  /** Active rentals without a signed contract. */
+  unsigned?: NonNullable<Dashboard["unsignedRentals"]>;
+}) {
   const toCollect = useFinanceToCollect();
   const idle = useVehicles(IDLE_FILTERS);
   const charges = (toCollect.data?.days ?? []).flatMap((day) =>
@@ -140,6 +148,28 @@ export function TodayPanel({ newLeads }: { newLeads: number }) {
                   </ListItem>
                 ))}
               </List>
+            )}
+            {unsigned.length > 0 && (
+              <Box className="space-y-2 border-t pt-3">
+                <Text weight="semibold">
+                  {pluralize(unsigned.length, "locação ativa sem contrato assinado", "locações ativas sem contrato assinado")}
+                </Text>
+                <List className="divide-y">
+                  {unsigned.slice(0, ROWS).map((rental) => (
+                    <ListItem key={rental.id} className="flex items-center gap-3 py-2">
+                      <TextLink
+                        to={routeTo.rental(rental.id)}
+                        className="shrink-0 decoration-transparent hover:decoration-primary"
+                      >
+                        {rental.code}
+                      </TextLink>
+                      <Text truncate tone="muted">
+                        {rental.customerName}
+                      </Text>
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
             )}
             {newLeads > 0 && (
               <Text size="sm" className="border-t pt-3">

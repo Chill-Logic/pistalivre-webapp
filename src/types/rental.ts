@@ -18,6 +18,8 @@ export type RentalListItem = {
   id: string;
   code: string;
   status: RentalStatus;
+  /** Active and without a signed contract (only on the list). */
+  unsignedContract?: boolean;
   /** Calendar dates at midnight UTC: format with formatCalendarDate. */
   startDate: string;
   endDate: string | null;

@@ -1,4 +1,6 @@
 import { FileText } from "lucide-react";
+import { Box } from "@/components/atoms/box";
+import { Badge } from "@/components/atoms/badge";
 import { Text } from "@/components/atoms/text";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { RentalStatusBadge } from "@/components/molecules/rental-status-badge";
@@ -69,7 +71,16 @@ export function RentalTable({
     },
     {
       header: "Situação",
-      cell: (rental) => <RentalStatusBadge status={rental.status} />,
+      cell: (rental) => (
+        <Box className="flex flex-wrap items-center gap-1.5">
+          <RentalStatusBadge status={rental.status} />
+          {rental.unsignedContract && (
+            <Badge variant="warning" title="Locação ativa sem contrato assinado">
+              Sem assinatura
+            </Badge>
+          )}
+        </Box>
+      ),
       skeletonShape: "pill",
     },
   ];
