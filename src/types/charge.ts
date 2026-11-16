@@ -43,6 +43,12 @@ export type ChargePlanItem = {
 export type CautionPlanItem = ChargePlanItem & {
   label: string;
   emitted: boolean;
+  /**
+   * yyyy-mm-dd — when the charge actually falls due: `dueDate` (the plan's
+   * date) or, on a Sunday or national holiday, the next business day (same
+   * rule as the rent; the plan's date goes as "referente a").
+   */
+  chargeDueDate: string;
 };
 
 export type InstallmentPeriodicity = "WEEKLY" | "BIWEEKLY" | "MONTHLY";

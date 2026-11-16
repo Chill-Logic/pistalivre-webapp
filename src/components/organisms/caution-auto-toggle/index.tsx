@@ -33,17 +33,24 @@ type CautionAutoToggleProps = {
  */
 function NextCharge({ plan }: { plan: CautionPlanItem[] }) {
   const today = todayInBrasilia();
+  // The day the charge falls due (pushed off Sunday/holiday), as the job reads it.
+  const dueOf = (item: CautionPlanItem) => item.chargeDueDate ?? item.dueDate;
   const next = plan
-    .filter((item) => !item.emitted && item.dueDate >= today)
-    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))[0];
+    .filter((item) => !item.emitted && dueOf(item) >= today)
+    .sort((a, b) => dueOf(a).localeCompare(dueOf(b)))[0];
   if (!next) {
     return <>Não há parcela futura para cobrar.</>;
   }
-  const sendOn = addDays(next.dueDate, -LOOKAHEAD_DAYS);
+  const sendOn = addDays(dueOf(next), -LOOKAHEAD_DAYS);
   return (
     <>
       <Text inline className="block">
         Próxima cobrança: {next.label} · {formatCurrency(next.amount)}
+      </Text>
+      <Text inline className="block">
+        Vencimento: {formatCalendarDate(dueOf(next))}
+        {dueOf(next) !== next.dueDate &&
+          ` (a parcela de ${formatCalendarDate(next.dueDate)} cai em domingo ou feriado)`}
       </Text>
       <Text inline className="block">
         Data da emissão: {formatCalendarDate(sendOn > today ? sendOn : today)}

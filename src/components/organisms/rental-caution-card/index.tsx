@@ -47,6 +47,16 @@ export function RentalCautionCard({ caution, rental }: RentalCautionCardProps) {
   const labelOn = new Map(
     (plan.data ?? []).map((item) => [item.dueDate, item.label]),
   );
+  // Sunday/holiday: the charge falls due on the next business day.
+  const chargeDueOn = new Map(
+    (plan.data ?? []).map((item) => [item.dueDate, item.chargeDueDate]),
+  );
+  const pushedNote = (planDate: string) => {
+    const due = chargeDueOn.get(planDate);
+    return due && due !== planDate
+      ? ` · vence ${formatCalendarDate(due)} (próximo dia útil)`
+      : "";
+  };
 
   return (
     <Card>
@@ -107,6 +117,7 @@ export function RentalCautionCard({ caution, rental }: RentalCautionCardProps) {
                         </Text>
                         <Text size="xs" tone="muted">
                           {formatCalendarDate(installment.dueDate)}
+                          {pushedNote(installment.dueDate)}
                           {emittedOn.has(installment.dueDate) &&
                             " · cobrança emitida"}
                         </Text>

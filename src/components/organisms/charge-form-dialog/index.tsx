@@ -46,7 +46,7 @@ import type {
   ChargePurpose,
 } from "@/types/charge";
 import type { RatePeriod } from "@/types/rental";
-import { formatCurrency } from "@/utils/format";
+import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
 /** House defaults (management app): 10% fine, 1% interest a month. */
 const DEFAULT_FINE = "10";
@@ -529,7 +529,13 @@ export function ChargeFormDialog({
 type CautionPlanFieldsProps = {
   isPending: boolean;
   isError: boolean;
-  items: { label: string; amount: number; dueDate: string; emitted: boolean }[];
+  items: {
+    label: string;
+    amount: number;
+    dueDate: string;
+    chargeDueDate?: string;
+    emitted: boolean;
+  }[];
   dates: Record<number, string>;
   onDateChange: (index: number, value: string) => void;
   itemErrors: Record<number, string>;
@@ -575,14 +581,27 @@ function CautionPlanFields({
           );
         }
         sentIndex += 1;
+        const value = dates[index] ?? item.dueDate;
+        // The plan's date unchanged: the server knows where it falls due.
+        const pushedTo =
+          value === item.dueDate && item.chargeDueDate !== item.dueDate
+            ? item.chargeDueDate
+            : undefined;
         return (
-          <DateField
-            key={index}
-            label={`${item.label} · ${formatCurrency(item.amount)}`}
-            value={dates[index] ?? item.dueDate}
-            onChange={(value) => onDateChange(index, value)}
-            error={itemErrors[sentIndex]}
-          />
+          <Box key={index} className="space-y-1">
+            <DateField
+              label={`${item.label} · ${formatCurrency(item.amount)}`}
+              value={value}
+              onChange={(next) => onDateChange(index, next)}
+              error={itemErrors[sentIndex]}
+            />
+            {pushedTo && (
+              <Text size="xs" tone="muted">
+                Cai em domingo ou feriado: vence {formatCalendarDate(pushedTo)}{" "}
+                (próximo dia útil).
+              </Text>
+            )}
+          </Box>
         );
       })}
     </Box>
