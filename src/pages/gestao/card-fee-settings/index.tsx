@@ -4,7 +4,12 @@ import { Alert } from "@/components/atoms/alert";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/atoms/card";
 import { Col, Row } from "@/components/atoms/grid";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Spinner } from "@/components/atoms/spinner";
@@ -22,8 +27,11 @@ import { PageHeader } from "@/components/molecules/page-header";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { QueryError } from "@/components/organisms/query-error";
 import { toApiError } from "@/helpers/api-error";
-import { useCardFees, useSaveCardFees } from "@/hooks/api/gestao/card-fees/useCardFees";
-import type { CardFeeBand } from "@/types/card-fees";
+import {
+  useCardFees,
+  useSaveCardFees,
+} from "@/hooks/api/gestao/card-fees/useCardFees";
+import type { CardAnticipation, CardFeeBand } from "@/types/card-fees";
 import { formatCurrency } from "@/utils/format";
 
 /** A band as typed (strings, so a half-typed "3," doesn't jump). */
@@ -36,6 +44,17 @@ const toDraft = (b: CardFeeBand): Draft => ({
   fixed: String(b.fixedPerInstallment).replace(".", ","),
 });
 const num = (v: string) => Number(v.replace(",", "."));
+/** Anticipation as typed ("1,25"). */
+type AnticipationDraft = { single: string; installments: string };
+const toAnticipationDraft = (a: CardAnticipation): AnticipationDraft => ({
+  single: String(a.single).replace(".", ","),
+  installments: String(a.installments).replace(".", ","),
+});
+const toAnticipation = (d: AnticipationDraft): CardAnticipation => ({
+  single: d.single.trim() ? num(d.single) : 0,
+  installments: d.installments.trim() ? num(d.installments) : 0,
+});
+
 const toBand = (d: Draft): CardFeeBand => ({
   from: num(d.from),
   to: num(d.to),
@@ -65,25 +84,39 @@ export function CardFeeSettingsPage() {
   const settings = useCardFees();
   const save = useSaveCardFees();
   const [rows, setRows] = useState<Draft[]>([]);
+  const [anticipation, setAnticipation] = useState<AnticipationDraft>({
+    single: "0",
+    installments: "0",
+  });
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (settings.data) setRows(settings.data.bands.map(toDraft));
+    if (!settings.data) return;
+    setRows(settings.data.bands.map(toDraft));
+    setAnticipation(toAnticipationDraft(settings.data.anticipation));
   }, [settings.data]);
 
   const update = (index: number, patch: Partial<Draft>) => {
-    setRows((current) => current.map((r, i) => (i === index ? { ...r, ...patch } : r)));
+    setRows((current) =>
+      current.map((r, i) => (i === index ? { ...r, ...patch } : r)),
+    );
     setError(null);
   };
 
   const addRow = () => {
     const last = rows[rows.length - 1];
     const from = last ? num(last.to) + 1 : 1;
-    setRows([...rows, { from: String(from), to: String(from), percent: "0", fixed: "0" }]);
+    setRows([
+      ...rows,
+      { from: String(from), to: String(from), percent: "0", fixed: "0" },
+    ]);
   };
 
   const onSave = (bands: CardFeeBand[] | null) =>
-    save.mutate(bands, { onError: (err) => setError(toApiError(err).message) });
+    save.mutate(
+      { bands, anticipation: toAnticipation(anticipation) },
+      { onError: (err) => setError(toApiError(err).message) },
+    );
 
   const data = settings.data;
 
@@ -95,31 +128,42 @@ export function CardFeeSettingsPage() {
           <CardFeeSkeleton />
         </SkeletonRegion>
       )}
-      {settings.isError && <QueryError error={settings.error} onRetry={() => settings.refetch()} />}
+      {settings.isError && (
+        <QueryError error={settings.error} onRetry={() => settings.refetch()} />
+      )}
       {data && (
         <Row className="items-start gap-y-6">
           <Col lg={7}>
             <Card>
               <CardHeader>
                 <Box className="flex flex-wrap items-center justify-between gap-2">
-                  <CardTitle className="text-base">Faixas de parcelas</CardTitle>
-                  {data.isDefault && <Badge variant="outline">Taxas padrão</Badge>}
+                  <CardTitle className="text-base">
+                    Faixas de parcelas
+                  </CardTitle>
+                  {data.isDefault && (
+                    <Badge variant="outline">Taxas padrão</Badge>
+                  )}
                 </Box>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Text size="sm" tone="muted">
-                  O link de pagamento cobra no cartão o saldo mais o percentual e a taxa por parcela
-                  da faixa. As faixas começam em 1× e se emendam; a última define o máximo de
-                  parcelas (até 21×).
+                  O link de pagamento cobra no cartão o saldo mais o percentual
+                  e a taxa por parcela da faixa. As faixas começam em 1× e se
+                  emendam; a última define o máximo de parcelas (até 21×).
                 </Text>
                 {rows.map((row, index) => (
-                  <Row key={index} className="items-end gap-y-3 rounded-lg border p-3">
+                  <Row
+                    key={index}
+                    className="items-end gap-y-3 rounded-lg border p-3"
+                  >
                     <Col span={6} md={2}>
                       <FormField
                         label="De"
                         inputMode="numeric"
                         value={row.from}
-                        onChange={(e) => update(index, { from: e.target.value })}
+                        onChange={(e) =>
+                          update(index, { from: e.target.value })
+                        }
                       />
                     </Col>
                     <Col span={6} md={2}>
@@ -135,7 +179,9 @@ export function CardFeeSettingsPage() {
                         label="Percentual (%)"
                         inputMode="decimal"
                         value={row.percent}
-                        onChange={(e) => update(index, { percent: e.target.value })}
+                        onChange={(e) =>
+                          update(index, { percent: e.target.value })
+                        }
                       />
                     </Col>
                     <Col span={6} md={4}>
@@ -143,7 +189,9 @@ export function CardFeeSettingsPage() {
                         label="Por parcela (R$)"
                         inputMode="decimal"
                         value={row.fixed}
-                        onChange={(e) => update(index, { fixed: e.target.value })}
+                        onChange={(e) =>
+                          update(index, { fixed: e.target.value })
+                        }
                       />
                     </Col>
                     <Col md={1} className="flex justify-end">
@@ -154,26 +202,81 @@ export function CardFeeSettingsPage() {
                         className="text-destructive"
                         aria-label={`Remover faixa ${index + 1}`}
                         disabled={rows.length === 1}
-                        onClick={() => setRows(rows.filter((_, i) => i !== index))}
+                        onClick={() =>
+                          setRows(rows.filter((_, i) => i !== index))
+                        }
                       >
                         <Trash2 />
                       </Button>
                     </Col>
                   </Row>
                 ))}
-                <Button type="button" variant="outline" size="sm" onClick={addRow}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addRow}
+                >
                   <Plus />
                   Adicionar faixa
                 </Button>
+                <Box className="space-y-3 border-t pt-4">
+                  <Text weight="medium">Antecipação</Text>
+                  <Text size="sm" tone="muted">
+                    Se vocês antecipam o recebimento do cartão, a taxa entra nos
+                    juros do cliente: 1 mês no à vista e, no parcelado, a média
+                    dos meses adiantados ((parcelas + 1) ÷ 2). Em 0%, nada é
+                    embutido.
+                  </Text>
+                  <Row className="gap-y-3">
+                    <Col span={6}>
+                      <FormField
+                        label="À vista (% ao mês)"
+                        inputMode="decimal"
+                        value={anticipation.single}
+                        onChange={(e) => {
+                          setAnticipation({
+                            ...anticipation,
+                            single: e.target.value,
+                          });
+                          setError(null);
+                        }}
+                      />
+                    </Col>
+                    <Col span={6}>
+                      <FormField
+                        label="Parcelado (% ao mês)"
+                        inputMode="decimal"
+                        value={anticipation.installments}
+                        onChange={(e) => {
+                          setAnticipation({
+                            ...anticipation,
+                            installments: e.target.value,
+                          });
+                          setError(null);
+                        }}
+                      />
+                    </Col>
+                  </Row>
+                </Box>
                 {error && <Alert>{error}</Alert>}
                 <Box className="flex flex-wrap justify-end gap-2">
                   {!data.isDefault && (
-                    <Button variant="ghost" disabled={save.isPending} onClick={() => onSave(null)}>
+                    <Button
+                      variant="ghost"
+                      disabled={save.isPending}
+                      onClick={() => onSave(null)}
+                    >
                       Voltar às taxas padrão
                     </Button>
                   )}
-                  <Button disabled={save.isPending} onClick={() => onSave(rows.map(toBand))}>
-                    {save.isPending && <Spinner className="text-primary-foreground" />}
+                  <Button
+                    disabled={save.isPending}
+                    onClick={() => onSave(rows.map(toBand))}
+                  >
+                    {save.isPending && (
+                      <Spinner className="text-primary-foreground" />
+                    )}
                     Salvar
                   </Button>
                 </Box>
@@ -200,8 +303,12 @@ export function CardFeeSettingsPage() {
                     {data.example.options.map((o) => (
                       <TableRow key={o.installments}>
                         <TableCell>{o.installments}×</TableCell>
-                        <TableCell className="text-right">{formatCurrency(o.perInstallment)}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(o.total)}</TableCell>
+                        <TableCell className="text-right">
+                          {formatCurrency(o.perInstallment)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {formatCurrency(o.total)}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

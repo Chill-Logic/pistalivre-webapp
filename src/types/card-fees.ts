@@ -10,9 +10,18 @@ export type CardFeeBand = {
   fixedPerInstallment: number;
 };
 
+/** Anticipation built into the interest (% a month); 0 = not built in. */
+export type CardAnticipation = {
+  /** Card paid at once. */
+  single: number;
+  /** Card in installments. */
+  installments: number;
+};
+
 /** GET/PUT /settings/card-fees. */
 export type CardFeeSettings = {
   bands: CardFeeBand[];
+  anticipation: CardAnticipation;
   /** Nobody changed it: the default (Dalila's) rates. */
   isDefault: boolean;
   /** The table applied to an example amount, computed by the server. */
