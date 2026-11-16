@@ -87,6 +87,7 @@ export function RentalCautionCard({ caution, rental }: RentalCautionCardProps) {
               <CautionAutoToggle
                 rentalId={rental.id}
                 enabled={Boolean(rental.cautionAutoBilling)}
+                plan={plan.data ?? []}
               />
             )}
             {caution.installments && caution.installments.length > 0 && (
