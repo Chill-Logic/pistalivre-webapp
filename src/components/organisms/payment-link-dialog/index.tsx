@@ -42,12 +42,17 @@ type PaymentLinkDialogProps = {
  * default) and what gets grouped, then hands over the link and the WhatsApp
  * message. The confirmation says what happens to the grouped charges.
  */
-export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDialogProps) {
+export function PaymentLinkDialog({
+  rentalId,
+  balance,
+  charges,
+}: PaymentLinkDialogProps) {
   const create = useCreatePaymentLink(rentalId);
   const idempotency = useIdempotencyKey();
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState<number | null>(balance);
   const [acceptsCard, setAcceptsCard] = useState(false);
+  const [cardInstallments, setCardInstallments] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<PaymentLink | null>(null);
 
@@ -68,7 +73,12 @@ export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDia
       return;
     }
     create.mutate(
-      { amount: amount === balance ? null : amount, acceptsCard, key: idempotency.key },
+      {
+        amount: amount === balance ? null : amount,
+        acceptsCard,
+        cardInstallments: acceptsCard && cardInstallments,
+        key: idempotency.key,
+      },
       {
         onSuccess: (link) => {
           idempotency.renew();
@@ -92,8 +102,9 @@ export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDia
           <>
             <DialogTitle>Link gerado</DialogTitle>
             <DialogDescription>
-              {formatCurrency(created.amount)} · vale até {created.expiresAt ? formatDate(created.expiresAt) : "—"}. O cliente
-              abre sem login e paga por PIX ou cartão.
+              {formatCurrency(created.amount)} · vale até{" "}
+              {created.expiresAt ? formatDate(created.expiresAt) : "—"}. O
+              cliente abre sem login e paga por PIX ou cartão.
             </DialogDescription>
             <Box className="space-y-3">
               <CopyCode code={created.url} copied="Link copiado" />
@@ -117,7 +128,8 @@ export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDia
           <>
             <DialogTitle>Cobrar o saldo devedor</DialogTitle>
             <DialogDescription>
-              Gera um link de pagamento por PIX (e cartão, se você marcar) que vale 7 dias.
+              Gera um link de pagamento por PIX (e cartão, se você marcar) que
+              vale 7 dias.
             </DialogDescription>
             <Form onSubmit={onSubmit} noValidate className="space-y-4">
               <MoneyField
@@ -133,10 +145,17 @@ export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDia
               </Text>
               <CheckboxField
                 label="Aceita cartão"
-                hint="Além do PIX, o cliente pode pagar no cartão (juros do parcelamento por conta dele)."
                 checked={acceptsCard}
                 onChange={setAcceptsCard}
               />
+              {acceptsCard && (
+                <CheckboxField
+                  label="Aceitar parcelamento"
+                  hint="Juros do parcelamento por conta do cliente. Sem marcar, só cartão à vista."
+                  checked={cardInstallments}
+                  onChange={setCardInstallments}
+                />
+              )}
               <Box className="space-y-1">
                 <Text size="sm" weight="medium">
                   {charges.length > 0
@@ -146,12 +165,14 @@ export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDia
                 {charges.length > 0 && (
                   <>
                     <Text size="xs" tone="muted">
-                      Elas são removidas no Asaas (dá para restaurar lá, e os avisos delas param) e
-                      ficam listadas no link.
+                      Elas são removidas no Asaas (dá para restaurar lá, e os
+                      avisos delas param) e ficam listadas no link.
                     </Text>
                     <List className="max-h-32 overflow-y-auto text-xs text-muted-foreground">
                       {charges.map((charge) => (
-                        <ListItem key={charge.paymentId}>{groupedChargeLine(charge)}</ListItem>
+                        <ListItem key={charge.paymentId}>
+                          {groupedChargeLine(charge)}
+                        </ListItem>
                       ))}
                     </List>
                   </>
@@ -160,12 +181,18 @@ export function PaymentLinkDialog({ rentalId, balance, charges }: PaymentLinkDia
               {error && <Alert>{error}</Alert>}
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button type="button" variant="outline" disabled={create.isPending}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={create.isPending}
+                  >
                     Cancelar
                   </Button>
                 </DialogClose>
                 <Button type="submit" disabled={create.isPending}>
-                  {create.isPending && <Spinner className="text-primary-foreground" />}
+                  {create.isPending && (
+                    <Spinner className="text-primary-foreground" />
+                  )}
                   Gerar link
                 </Button>
               </DialogFooter>

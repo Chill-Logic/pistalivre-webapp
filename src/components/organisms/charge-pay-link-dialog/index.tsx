@@ -42,7 +42,9 @@ export function ChargePayLinkDialog({ charge }: { charge: Charge }) {
   const message = payLink.data
     ? [
         `Olá! Segue o link para pagar a cobrança de ${formatCurrency(charge.amounts.amount)} (vence ${formatCalendarDate(charge.dueDate)}).`,
-        charge.acceptsCard ? "Dá para pagar por PIX ou no cartão." : "O pagamento é por PIX.",
+        charge.acceptsCard
+          ? "Dá para pagar por PIX ou no cartão."
+          : "O pagamento é por PIX.",
         payLink.data.url,
       ].join("\n")
     : "";
@@ -58,12 +60,14 @@ export function ChargePayLinkDialog({ charge }: { charge: Charge }) {
       <DialogContent>
         <DialogTitle>Link de pagamento</DialogTitle>
         <DialogDescription>
-          O cliente abre sem login e paga esta cobrança. O link não vence: vale enquanto ela estiver
-          em aberto.
+          O cliente abre sem login e paga esta cobrança. O link não vence: vale
+          enquanto ela estiver em aberto.
         </DialogDescription>
         <Box className="space-y-4">
           {payLink.isPending && <Skeleton className="h-10 w-full" />}
-          {payLink.isError && <Alert>{toApiError(payLink.error).message}</Alert>}
+          {payLink.isError && (
+            <Alert>{toApiError(payLink.error).message}</Alert>
+          )}
           {payLink.data && (
             <>
               <CopyCode code={payLink.data.url} copied="Link copiado" />
@@ -80,12 +84,29 @@ export function ChargePayLinkDialog({ charge }: { charge: Charge }) {
           )}
           <CheckboxField
             label="Aceita cartão"
-            hint="O link passa a oferecer cartão em até 12×, com os juros do parcelamento por conta do cliente (Configurações › Juros do cartão)."
             checked={charge.acceptsCard}
             disabled={acceptsCard.isPending}
-            onChange={(checked) => acceptsCard.mutate(checked)}
+            onChange={(checked) => acceptsCard.mutate({ acceptsCard: checked })}
           />
-          {acceptsCard.isError && <Text size="sm" tone="destructive">{toApiError(acceptsCard.error).message}</Text>}
+          {charge.acceptsCard && (
+            <CheckboxField
+              label="Aceitar parcelamento"
+              hint="Juros do parcelamento por conta do cliente. Sem marcar, só cartão à vista."
+              checked={charge.cardInstallments}
+              disabled={acceptsCard.isPending}
+              onChange={(checked) =>
+                acceptsCard.mutate({
+                  acceptsCard: true,
+                  cardInstallments: checked,
+                })
+              }
+            />
+          )}
+          {acceptsCard.isError && (
+            <Text size="sm" tone="destructive">
+              {toApiError(acceptsCard.error).message}
+            </Text>
+          )}
         </Box>
       </DialogContent>
     </Dialog>

@@ -15,6 +15,7 @@ import { Form } from "@/components/atoms/form";
 import { Col, Row } from "@/components/atoms/grid";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
+import { CheckboxField } from "@/components/molecules/checkbox-field";
 import { DateField } from "@/components/molecules/date-field";
 import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
@@ -95,6 +96,7 @@ export function StandaloneChargeDialog({
   const [target, setTarget] = useState(blank);
   const [purpose, setPurpose] = useState<ChargePurpose>("OTHER");
   const [payWith, setPayWith] = useState<PayWith>("PIX");
+  const [cardInstallments, setCardInstallments] = useState(false);
   const [amount, setAmount] = useState<number | null>(null);
   const [dueDate, setDueDate] = useState("");
   const [fine, setFine] = useState(DEFAULT_FINE);
@@ -110,6 +112,7 @@ export function StandaloneChargeDialog({
     setTarget(blank);
     setPurpose("OTHER");
     setPayWith("PIX");
+    setCardInstallments(false);
     setAmount(null);
     setDueDate("");
     setFine(DEFAULT_FINE);
@@ -142,6 +145,7 @@ export function StandaloneChargeDialog({
           purpose,
           method: "PIX",
           acceptsCard: payWith === "CARD",
+          cardInstallments: payWith === "CARD" && cardInstallments,
           amount: amount ?? 0,
           dueDate,
           finePercent: Number(fine.replace(",", ".")) || 0,
@@ -258,6 +262,17 @@ export function StandaloneChargeDialog({
                 error={errors.interestPercent}
               />
             </Col>
+            {payWith === "CARD" && (
+              <Col lg={6} className="flex items-end">
+                <CheckboxField
+                  label="Aceitar parcelamento"
+                  hint="Juros por conta do cliente. Sem marcar, só cartão à vista."
+                  checked={cardInstallments}
+                  onChange={setCardInstallments}
+                  disabled={create.isPending}
+                />
+              </Col>
+            )}
           </Row>
           {freeText ? (
             <TextareaField

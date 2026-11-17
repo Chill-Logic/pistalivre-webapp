@@ -104,10 +104,17 @@ export function useChargeReferenceDate(id: string, rentalId: string | null) {
 export function useChargeAcceptsCard(id: string, rentalId: string | null) {
   const refresh = useRefreshAfterCharge();
   return useMutation({
-    mutationFn: (acceptsCard: boolean) => chargesService.setAcceptsCard(id, acceptsCard),
+    mutationFn: (input: { acceptsCard: boolean; cardInstallments?: boolean }) =>
+      chargesService.setAcceptsCard(id, input),
     onSuccess: (charge) => {
       refresh(rentalId);
-      toast.success(charge.acceptsCard ? "Cartão liberado no link" : "Cartão desligado no link");
+      toast.success(
+        !charge.acceptsCard
+          ? "Cartão desligado no link"
+          : charge.cardInstallments
+            ? "Cartão parcelado liberado no link"
+            : "Cartão à vista liberado no link",
+      );
     },
   });
 }

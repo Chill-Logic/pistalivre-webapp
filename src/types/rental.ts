@@ -133,6 +133,8 @@ export type Charge = {
   settledByReceipt: boolean;
   /** Its payment link offers card (interest on the payer). Off by default. */
   acceptsCard: boolean;
+  /** With card: installments allowed (otherwise card at once only). */
+  cardInstallments: boolean;
   amounts: ChargeAmounts;
   invoiceUrl: string | null;
   pix: { encodedImage: string; payload: string; expirationDate: string } | null;
