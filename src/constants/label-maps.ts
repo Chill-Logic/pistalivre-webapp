@@ -19,6 +19,7 @@ export const LABEL_MAPS = {
   customerStatus: "CUSTOMER_STATUS_LABELS",
   maintenanceType: "MAINTENANCE_TYPE_LABELS",
   maintenanceService: "MAINTENANCE_SERVICE_LABELS",
+  maintenancePayer: "MAINTENANCE_PAYER_LABELS",
   inspectionType: "INSPECTION_TYPE_LABELS",
   inspectionActor: "INSPECTION_ACTOR_LABELS",
   statementSource: "STATEMENT_SOURCE_LABELS",

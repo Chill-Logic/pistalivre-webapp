@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Gauge, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -27,6 +27,12 @@ export function MaintenancesPage() {
         actions={
           <>
             <ViewToggle view={view} onChange={setView} />
+            <Button asChild variant="outline">
+              <Link to={ROUTES.maintenanceAnalysis}>
+                <Gauge />
+                Análise
+              </Link>
+            </Button>
             <Button asChild>
               <Link to={ROUTES.maintenanceNew}>
                 <Plus />

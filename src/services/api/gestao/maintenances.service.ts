@@ -2,6 +2,10 @@ import { toQueryParams } from "@/helpers/query-params";
 import { http } from "@/services/http/client";
 import type { Paginated } from "@/types/api";
 import type {
+  MaintenanceAnalysis,
+  MaintenanceAnalysisFilters,
+} from "@/types/maintenance-analysis";
+import type {
   MaintenanceDetail,
   MaintenanceFilters,
   MaintenanceInput,
@@ -9,6 +13,18 @@ import type {
 } from "@/types/maintenance";
 
 export const maintenancesService = {
+  /** Taxa de manutenção: the cost cut by `dimension`; `key` = one row's maintenances. */
+  async analysis(filters: MaintenanceAnalysisFilters, key?: string) {
+    const { data } = await http.get<MaintenanceAnalysis>("/maintenances/analysis", {
+      params: {
+        groupBy: filters.dimension,
+        from: filters.from,
+        to: filters.to,
+        ...(key ? { key } : {}),
+      },
+    });
+    return data;
+  },
   async list(filters: MaintenanceFilters) {
     const { data } = await http.get<Paginated<MaintenanceListItem>>(
       "/maintenances",

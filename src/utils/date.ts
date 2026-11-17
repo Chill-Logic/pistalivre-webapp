@@ -90,3 +90,10 @@ export function ageInYears(birthDate: string, today: string) {
     month > birthMonth || (month === birthMonth && day >= birthDay);
   return year - birthYear - (hadBirthday ? 0 : 1);
 }
+
+/** The last 12 months: from the 1st of the month 11 months back to `today`. */
+export function lastTwelveMonths(today: string) {
+  const [year, month] = today.split("-").map(Number);
+  const start = new Date(Date.UTC(year, month - 1 - 11, 1));
+  return { start: start.toISOString().slice(0, 10), end: today };
+}

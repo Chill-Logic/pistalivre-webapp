@@ -1,3 +1,4 @@
+import type { MaintenanceRate } from "@/types/maintenance-analysis";
 import type { VehicleStatus } from "@/types/vehicle";
 
 export type FleetCounts = {
@@ -122,4 +123,6 @@ export type Dashboard = {
   balances: Balances;
   /** Active rentals without a signed contract. */
   unsignedRentals?: { id: string; code: string; customerName: string; handoverAt: string | null }[];
+  /** Maintenance rate of the last 12 months (older APIs don't send it). */
+  maintenanceRate?: MaintenanceRate;
 };

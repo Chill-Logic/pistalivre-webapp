@@ -107,6 +107,12 @@ curtas entre ferramentas e nos relatórios de subagentes.
   Integrações › Inteligência artificial; o `GEMINI_*` do env saiu (`9c0e9a6`). Depois de publicar, a IA fica
   desligada até alguém salvar a integração.
 
+- **Taxa de manutenção (2026-11-17, webapp 1.38.0 + backend 1.40.0):** Frota › **Análise** (`/gestao/manutencoes/analise`,
+  botão "Análise" em Manutenções, card no Painel com os últimos 12 meses). `?por=` (moto, modelo, ano, dono, cliente, locação,
+  mês, tempo de locação, tipo, serviço, oficina, quem pagou), `?de=`/`?ate=`, `?ordem=`. As quatro réguas (custo, R$/moto-mês,
+  R$/km, % da receita) vêm prontas de `GET /maintenances/analysis`; clicar na linha abre as manutenções dela (`key=`).
+  Ferramenta do Livrinho: `analise_de_manutencao`.
+
 ## O que está no ar
 
 | O quê | Onde |

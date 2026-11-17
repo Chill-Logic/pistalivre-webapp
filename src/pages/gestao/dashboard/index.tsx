@@ -11,6 +11,10 @@ import {
   ColumnChartCardSkeleton,
 } from "@/components/organisms/column-chart-card";
 import {
+  MaintenanceRateCard,
+  MaintenanceRateCardSkeleton,
+} from "@/components/organisms/maintenance-rate-card";
+import {
   DashboardKpis,
   DashboardKpisSkeleton,
 } from "@/components/organisms/dashboard-kpis";
@@ -64,6 +68,7 @@ export function DashboardPage() {
             topDebtors={<BarListCardSkeleton rows={3} />}
             funnel={<BarListCardSkeleton rows={6} />}
             leadSources={<BarListCardSkeleton rows={3} />}
+            maintenanceRate={<MaintenanceRateCardSkeleton />}
             fleet={<BarListCardSkeleton rows={4} />}
             maintenanceTypes={<BarListCardSkeleton rows={3} />}
             monthlyActivity={<ColumnChartCardSkeleton />}
@@ -122,6 +127,11 @@ export function DashboardPage() {
               items={leadSourceItems(data)}
               empty="Sem leads ainda."
             />
+          }
+          maintenanceRate={
+            data.maintenanceRate && (
+              <MaintenanceRateCard rate={data.maintenanceRate} />
+            )
           }
           fleet={
             <BarListCard

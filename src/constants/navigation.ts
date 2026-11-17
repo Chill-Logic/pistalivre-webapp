@@ -21,6 +21,7 @@ import {
   ClipboardCheck,
   FileSignature,
   FileText,
+  Gauge,
   HandCoins,
   Handshake,
   LayoutDashboard,
@@ -117,7 +118,13 @@ export const SIDEBAR_NAV: NavEntry[] = [
       CATALOG,
       CATEGORIES,
       { label: "Vistorias", to: ROUTES.inspections, icon: ClipboardCheck },
-      { label: "Manutenções", to: ROUTES.maintenances, icon: Wrench },
+      {
+        label: "Manutenções",
+        to: ROUTES.maintenances,
+        icon: Wrench,
+        except: [ROUTES.maintenanceAnalysis],
+      },
+      { label: "Análise", to: ROUTES.maintenanceAnalysis, icon: Gauge },
     ],
   },
   {

@@ -2,6 +2,7 @@ import type { LeadFilters } from "@/types/crm";
 import type { CustomerFilters } from "@/types/customer";
 import type { InspectionFilters } from "@/types/inspection";
 import type { MaintenanceFilters } from "@/types/maintenance";
+import type { MaintenanceAnalysisFilters } from "@/types/maintenance-analysis";
 import type { RentalFilters } from "@/types/rental";
 import type { StatementFilters } from "@/types/statement";
 import type { InstallmentPlanParams } from "@/types/charge";
@@ -76,6 +77,10 @@ export const queryKeys = {
       [...queryKeys.maintenances.all, "list", filters] as const,
     detail: (id: string) =>
       [...queryKeys.maintenances.all, "detail", id] as const,
+    analysis: (filters: MaintenanceAnalysisFilters) =>
+      [...queryKeys.maintenances.all, "analysis", filters] as const,
+    analysisGroup: (filters: MaintenanceAnalysisFilters, key: string) =>
+      [...queryKeys.maintenances.all, "analysis", filters, key] as const,
   },
   inspections: {
     all: ["inspections"] as const,

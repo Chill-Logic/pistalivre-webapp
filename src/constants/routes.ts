@@ -55,6 +55,7 @@ export const ROUTES = {
   customerEdit: `${GESTAO}/clientes/:id/editar`,
   maintenances: `${GESTAO}/manutencoes`,
   maintenanceNew: `${GESTAO}/manutencoes/nova`,
+  maintenanceAnalysis: `${GESTAO}/manutencoes/analise`,
   maintenanceDetail: `${GESTAO}/manutencoes/:id`,
   maintenanceEdit: `${GESTAO}/manutencoes/:id/editar`,
   inspections: `${GESTAO}/vistorias`,

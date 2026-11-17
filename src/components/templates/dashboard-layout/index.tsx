@@ -11,6 +11,8 @@ type DashboardLayoutProps = {
   topDebtors: ReactNode;
   funnel: ReactNode;
   leadSources: ReactNode;
+  /** Taxa de manutenção (last 12 months), full width above the fleet. */
+  maintenanceRate?: ReactNode;
   fleet: ReactNode;
   maintenanceTypes: ReactNode;
   monthlyActivity: ReactNode;
@@ -32,6 +34,7 @@ export function DashboardLayout(props: DashboardLayoutProps) {
         <Col lg={6}>{props.topDebtors}</Col>
         <Col lg={6}>{props.funnel}</Col>
         <Col lg={6}>{props.leadSources}</Col>
+        {props.maintenanceRate && <Col>{props.maintenanceRate}</Col>}
         <Col lg={6}>{props.fleet}</Col>
         <Col lg={6}>{props.maintenanceTypes}</Col>
         <Col lg={6}>{props.monthlyActivity}</Col>
