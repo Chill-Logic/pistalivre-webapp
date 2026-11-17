@@ -11,9 +11,7 @@ import { CollapsibleCard } from "@/components/molecules/collapsible-card";
 import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { TextLink } from "@/components/molecules/text-link";
-import { ChargeSettleDialog } from "@/components/organisms/charge-settle-dialog";
-import { ChargePayLinkDialog } from "@/components/organisms/charge-pay-link-dialog";
-import { ChargeSettlementDialog } from "@/components/organisms/charge-settlement-dialog";
+import { ChargeActions } from "@/components/organisms/charge-actions";
 import { QueryError } from "@/components/organisms/query-error";
 import {
   AttachButton,
@@ -24,7 +22,6 @@ import {
   customerChargesKey,
   useCustomerCharges,
 } from "@/hooks/api/gestao/customers/useCustomerCharges";
-import type { Charge } from "@/types/rental";
 
 const SKELETON_ROWS = 3;
 
@@ -89,7 +86,7 @@ export function CustomerChargesCard({
                     )}
                   </Text>
                 }
-                actions={<CustomerChargeActions charge={charge} />}
+                actions={<ChargeActions charge={charge} />}
                 attach={
                   <AttachButton
                     owner={{ type: "PAYMENT", id: charge.id }}
@@ -118,28 +115,6 @@ export function CustomerChargesCard({
   );
 }
 
-/**
- * Same rule as the management's customer page: open → "Dar baixa"; manual
- * already paid (not by the received pix) → correct the receipt.
- */
-function CustomerChargeActions({ charge }: { charge: Charge }) {
-  if (!charge.amounts.isPaid) {
-    return (
-      <>
-        {charge.channel === "asaas" && <ChargePayLinkDialog charge={charge} />}
-        <ChargeSettleDialog charge={charge} />
-      </>
-    );
-  }
-  if (
-    !charge.settledByReceipt &&
-    charge.channel === "manual" &&
-    charge.paidAt
-  ) {
-    return <ChargeSettlementDialog charge={charge} />;
-  }
-  return null;
-}
 
 function CustomerChargesSkeletonRows() {
   return (
