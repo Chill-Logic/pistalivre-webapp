@@ -160,14 +160,15 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
+      <DialogContent size="lg">
         <DialogTitle>{current ? "Editar item do catálogo" : "Novo item do catálogo"}</DialogTitle>
         <DialogDescription>
           Um modelo e ano, como o cliente vê. As cores e as unidades vêm da frota.
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
+          {/* Wide form: model in one line, picture and text (or preview) side by side. */}
           <Row className="gap-y-4">
-            <Col sm={6}>
+            <Col md={6} lg={3}>
               <CreatableCombobox
                 label="Marca"
                 value={brand}
@@ -183,7 +184,7 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
                 disabled={pending}
               />
             </Col>
-            <Col sm={6}>
+            <Col md={6} lg={3}>
               <CreatableCombobox
                 label="Modelo"
                 value={model}
@@ -196,7 +197,7 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
                 disabled={pending || !brand}
               />
             </Col>
-            <Col sm={6}>
+            <Col md={6} lg={3}>
               <FormField
                 label="Ano"
                 inputMode="numeric"
@@ -208,59 +209,69 @@ export function CatalogItemDialog({ open, onOpenChange, item, preset }: CatalogI
                 disabled={pending}
               />
             </Col>
-          </Row>
-          <TextareaField
-            label="Descrição (opcional)"
-            rows={3}
-            maxLength={600}
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            disabled={pending}
-          />
-          <SegmentedField
-            label="Imagem principal"
-            value={mode}
-            options={IMAGE_MODES}
-            onChange={setMode}
-            disabled={pending}
-          />
-          {mode === "upload" ? (
-            <Box className="space-y-1">
-              <FilePicker
-                label={current?.imageSource === "upload" ? "Trocar a imagem" : "Escolher a imagem"}
-                accept={IMAGE_ACCEPT}
-                files={files}
-                onChange={setFiles}
-                multiple={false}
+            <Col md={6} lg={3}>
+              <CheckboxField
+                label="Ativo"
+                hint="Inativo fica fora do catálogo que o cliente vê."
+                checked={active}
+                onChange={setActive}
                 disabled={pending}
               />
-              <Text size="xs" tone="muted">
-                PNG com fundo transparente fica melhor. Até 8 MB. Com cores
-                cadastradas, a capa é a foto da cor padrão.
-              </Text>
-              {errors.file && <Text size="xs" tone="destructive">{errors.file}</Text>}
-            </Box>
-          ) : (
-            <FormField
-              label="Link da imagem (https)"
-              inputMode="url"
-              placeholder="https://…/modelo.png"
-              value={imageUrl}
-              onChange={(event) => setImageUrl(event.target.value)}
-              error={errors.imageUrl}
-              disabled={pending}
-            />
-          )}
-          {shownImage && (
-            <VehicleShowcase src={shownImage} alt="Prévia da imagem principal" className="rounded-md border" />
-          )}
-          <CheckboxField
-            label="Ativo"
-            hint="Inativo fica fora do catálogo que o cliente vê."
-            checked={active}
-            onChange={setActive}
-            disabled={pending}
-          />
+            </Col>
+            <Col md={6} lg={shownImage ? 8 : 6} className="space-y-4">
+              <SegmentedField
+                label="Imagem principal"
+                value={mode}
+                options={IMAGE_MODES}
+                onChange={setMode}
+                disabled={pending}
+              />
+              {mode === "upload" ? (
+                <Box className="space-y-1">
+                  <FilePicker
+                    label={current?.imageSource === "upload" ? "Trocar a imagem" : "Escolher a imagem"}
+                    accept={IMAGE_ACCEPT}
+                    files={files}
+                    onChange={setFiles}
+                    multiple={false}
+                    disabled={pending}
+                  />
+                  <Text size="xs" tone="muted">
+                    PNG com fundo transparente fica melhor. Até 8 MB. Com cores
+                    cadastradas, a capa é a foto da cor padrão.
+                  </Text>
+                  {errors.file && <Text size="xs" tone="destructive">{errors.file}</Text>}
+                </Box>
+              ) : (
+                <FormField
+                  label="Link da imagem (https)"
+                  inputMode="url"
+                  placeholder="https://…/modelo.png"
+                  value={imageUrl}
+                  onChange={(event) => setImageUrl(event.target.value)}
+                  error={errors.imageUrl}
+                  disabled={pending}
+                />
+              )}
+            </Col>
+            {shownImage && (
+              <Col md={6} lg={4}>
+                <VehicleShowcase src={shownImage} alt="Prévia da imagem principal" className="rounded-md border" />
+              </Col>
+            )}
+            {/* Beside the picture when there is no preview; full line below it otherwise. */}
+            <Col lg={shownImage ? 12 : 6}>
+              <TextareaField
+                label="Descrição (opcional)"
+                rows={2}
+                className="min-h-16"
+                maxLength={600}
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                disabled={pending}
+              />
+            </Col>
+          </Row>
           {current ? (
             <CatalogVariantsEditor item={current} />
           ) : (

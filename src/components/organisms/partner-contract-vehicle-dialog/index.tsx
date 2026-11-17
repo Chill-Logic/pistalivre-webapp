@@ -268,7 +268,7 @@ export function PartnerContractVehicleDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
+      <DialogContent size={mode === "leave" ? "sm" : "lg"}>
         <DialogTitle>
           {link ? `${TITLES[mode]}: ${partnerVehicleName(link)}` : TITLES[mode]}
         </DialogTitle>
@@ -278,48 +278,59 @@ export function PartnerContractVehicleDialog({
             : "O parceiro vê o veículo a partir do dia da entrada (num contrato ativo)."}
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
-          {mode === "add" && (
-            <RemoteCombobox
-              label="Veículo"
-              value={picked?.value ?? ""}
-              selectedLabel={picked?.label}
-              options={options}
-              isLoading={picker.isLoading}
-              search={picker.search}
-              onSearchChange={picker.setSearch}
-              onChange={(option) => {
-                setPicked(option);
-                setErrors((current) => ({ ...current, vehicleId: undefined }));
-              }}
-              placeholder="Escolha o veículo"
-              searchPlaceholder="Placa, marca ou modelo…"
-              error={errors.vehicleId}
-              emptyContent={
-                picker.search ? (
-                  "Nenhum veículo deste parceiro com essa busca."
-                ) : (
-                  <Box className="space-y-2 px-3">
-                    <Text size="sm">Este parceiro ainda não tem veículo.</Text>
-                    <TextLink to={newVehicleUrl}>
-                      Cadastrar novo veículo
-                    </TextLink>
-                  </Box>
-                )
-              }
-            />
-          )}
-          {mode === "add" && (
-            <Button asChild variant="link" size="sm" className="h-auto px-0">
-              <Link to={newVehicleUrl}>
-                <Plus />
-                Cadastrar novo veículo
-              </Link>
-            </Button>
-          )}
-          {mode !== "leave" && (
-            <>
-              <Row className="gap-y-4">
-                <Col sm={5}>
+          {/* Wide form: vehicle and offer in one line, value and dates in the next. */}
+          <Row className="gap-y-4">
+            {mode === "add" && (
+              <Col lg={4} className="space-y-1">
+                <RemoteCombobox
+                  label="Veículo"
+                  value={picked?.value ?? ""}
+                  selectedLabel={picked?.label}
+                  options={options}
+                  isLoading={picker.isLoading}
+                  search={picker.search}
+                  onSearchChange={picker.setSearch}
+                  onChange={(option) => {
+                    setPicked(option);
+                    setErrors((current) => ({
+                      ...current,
+                      vehicleId: undefined,
+                    }));
+                  }}
+                  placeholder="Escolha o veículo"
+                  searchPlaceholder="Placa, marca ou modelo…"
+                  error={errors.vehicleId}
+                  emptyContent={
+                    picker.search ? (
+                      "Nenhum veículo deste parceiro com essa busca."
+                    ) : (
+                      <Box className="space-y-2 px-3">
+                        <Text size="sm">
+                          Este parceiro ainda não tem veículo.
+                        </Text>
+                        <TextLink to={newVehicleUrl}>
+                          Cadastrar novo veículo
+                        </TextLink>
+                      </Box>
+                    )
+                  }
+                />
+                <Button
+                  asChild
+                  variant="link"
+                  size="sm"
+                  className="h-auto px-0"
+                >
+                  <Link to={newVehicleUrl}>
+                    <Plus />
+                    Cadastrar novo veículo
+                  </Link>
+                </Button>
+              </Col>
+            )}
+            {mode !== "leave" && (
+              <>
+                <Col md={6} lg={3}>
                   <MoneyField
                     label="Locação oferecida"
                     value={offerRate}
@@ -333,7 +344,8 @@ export function PartnerContractVehicleDialog({
                     error={errors.offerRate}
                   />
                 </Col>
-                <Col sm={7}>
+                {/* Three segments need the room: narrower cuts "Semanal". */}
+                <Col md={6} lg={5}>
                   <SegmentedField
                     label="Recorrência"
                     value={offerRatePeriod}
@@ -348,34 +360,40 @@ export function PartnerContractVehicleDialog({
                     error={errors.offerRatePeriod}
                   />
                 </Col>
-              </Row>
-              <MoneyField
-                label="Valor de aquisição (opcional)"
-                value={acquisitionValue}
-                onChange={setAcquisitionValue}
-                error={errors.acquisitionValue}
-              />
-              <DateField
-                label="Entrada no contrato"
-                value={joinedAt}
-                onChange={setJoinedAt}
-                error={errors.joinedAt}
-              />
-            </>
-          )}
-          {(mode === "leave" ||
-            (mode === "edit" && contract.status !== "DRAFT")) && (
-            <DateField
-              label={
-                mode === "leave" ? "Saída do contrato" : "Saída (opcional)"
-              }
-              value={leftAt}
-              onChange={setLeftAt}
-              clearable={mode === "edit"}
-              placeholder="Ainda no contrato"
-              error={errors.leftAt}
-            />
-          )}
+                <Col md={6} lg={4}>
+                  <MoneyField
+                    label="Valor de aquisição (opcional)"
+                    value={acquisitionValue}
+                    onChange={setAcquisitionValue}
+                    error={errors.acquisitionValue}
+                  />
+                </Col>
+                <Col md={6} lg={3}>
+                  <DateField
+                    label="Entrada no contrato"
+                    value={joinedAt}
+                    onChange={setJoinedAt}
+                    error={errors.joinedAt}
+                  />
+                </Col>
+              </>
+            )}
+            {(mode === "leave" ||
+              (mode === "edit" && contract.status !== "DRAFT")) && (
+              <Col {...(mode === "leave" ? {} : { md: 6, lg: 3 })}>
+                <DateField
+                  label={
+                    mode === "leave" ? "Saída do contrato" : "Saída (opcional)"
+                  }
+                  value={leftAt}
+                  onChange={setLeftAt}
+                  clearable={mode === "edit"}
+                  placeholder="Ainda no contrato"
+                  error={errors.leftAt}
+                />
+              </Col>
+            )}
+          </Row>
           {mode === "leave" &&
             (errors.joinedAt || errors.offerRate || errors.offerRatePeriod) && (
               <Alert>

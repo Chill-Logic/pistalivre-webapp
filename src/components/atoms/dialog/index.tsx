@@ -99,8 +99,9 @@ export function DialogFooter({ className, ...props }: ComponentProps<"div">) {
       className={cn(
         // Pinned to the bottom of the scrolling dialog: the buttons are always
         // in reach, however long the form. The negative margins/offset match
-        // the dialog padding (p-5 / sm:p-6) so it sits flush with the edge.
-        "sticky -bottom-5 z-10 -mx-5 -mb-5 flex flex-col-reverse gap-2 border-t bg-card px-5 pb-5 pt-3 sm:-bottom-6 sm:-mx-6 sm:-mb-6 sm:flex-row sm:justify-end sm:px-6 sm:pb-6",
+        // the dialog padding (p-5 / sm:p-6) so it sits flush with the edge;
+        // `!` because a parent `space-y-*` zeroes the bottom margin.
+        "sticky -bottom-5 z-10 -mx-5 !-mb-5 flex flex-col-reverse gap-2 border-t bg-card px-5 pb-5 pt-3 sm:-bottom-6 sm:-mx-6 sm:!-mb-6 sm:flex-row sm:justify-end sm:px-6 sm:pb-6",
         className,
       )}
       {...props}

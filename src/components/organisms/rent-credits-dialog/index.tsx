@@ -88,7 +88,7 @@ export function RentCreditsDialog({
           Descontos{credits.length ? ` (${credits.length})` : ""}
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent size="lg">
         <DialogTitle>Descontos no aluguel</DialogTitle>
         <DialogDescription>
           Valor abatido do aluguel (por exemplo, uma manutenção que o locatário
@@ -137,8 +137,9 @@ export function RentCreditsDialog({
           noValidate
           className="space-y-3 border-t pt-4"
         >
+          {/* Wide form: day, value and reason in one line, the check below. */}
           <Row className="gap-y-3">
-            <Col sm={6}>
+            <Col span={6} lg={3}>
               <DateField
                 label="Dia"
                 value={date}
@@ -149,7 +150,7 @@ export function RentCreditsDialog({
                 error={errors.date}
               />
             </Col>
-            <Col sm={6}>
+            <Col span={6} lg={3}>
               <MoneyField
                 label="Valor"
                 value={amount}
@@ -160,22 +161,26 @@ export function RentCreditsDialog({
                 error={errors.amount}
               />
             </Col>
+            <Col lg={6}>
+              <FormField
+                label="Motivo"
+                placeholder="Ex.: manutenção paga pelo locatário"
+                value={reason}
+                onChange={(event) => {
+                  setReason(event.target.value);
+                  setErrors({});
+                }}
+                error={errors.reason}
+              />
+            </Col>
+            <Col>
+              <CheckboxField
+                label="Mostrar o motivo no relatório do cliente"
+                checked={showInReport}
+                onChange={setShowInReport}
+              />
+            </Col>
           </Row>
-          <FormField
-            label="Motivo"
-            placeholder="Ex.: manutenção paga pelo locatário"
-            value={reason}
-            onChange={(event) => {
-              setReason(event.target.value);
-              setErrors({});
-            }}
-            error={errors.reason}
-          />
-          <CheckboxField
-            label="Mostrar o motivo no relatório do cliente"
-            checked={showInReport}
-            onChange={setShowInReport}
-          />
           {errors.form && <Alert>{errors.form}</Alert>}
           <DialogFooter>
             <Button type="submit" disabled={add.isPending}>

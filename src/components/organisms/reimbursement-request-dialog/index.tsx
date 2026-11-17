@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/atoms/dialog";
 import { Form } from "@/components/atoms/form";
+import { Col, Row } from "@/components/atoms/grid";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { FilePicker } from "@/components/molecules/file-picker";
@@ -140,7 +141,10 @@ export function ReimbursementRequestDialog({
           {triggerLabel}
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      {/* Wide only for the form; the "no pix key yet" notice stays narrow. */}
+      <DialogContent
+        size={wallet.isSuccess && keys.length === 0 ? "md" : "lg"}
+      >
         <DialogTitle>{triggerLabel}</DialogTitle>
         <DialogDescription>
           A locadora analisa o pedido e, se aprovar, faz o pix para a chave da
@@ -153,62 +157,77 @@ export function ReimbursementRequestDialog({
           </Alert>
         ) : (
           <Form onSubmit={onSubmit} noValidate className="space-y-4">
-            {!rentalId && rentals.length > 1 && (
-              <SelectField
-                label="Locação"
-                value={pickedRental}
-                placeholder="Escolha a locação"
-                options={rentals.map((rental) => ({
-                  value: rental.id,
-                  label: `${rental.code} · ${rental.vehicle.plate}`,
-                }))}
-                onChange={setPickedRental}
-                error={errors.rentalId}
-                disabled={request.isPending}
-              />
-            )}
-            {locked ? (
-              <Box className="space-y-1">
-                <Text weight="medium">Valor</Text>
-                <Text size="base" weight="semibold" className="tabular-nums">
-                  {formatCurrency(fixedAmount)}
-                </Text>
-                <Text size="xs" tone="muted">
-                  O valor da manutenção registrada.
-                </Text>
-              </Box>
-            ) : (
-              <MoneyField
-                label="Valor"
-                value={amount}
-                onChange={setAmount}
-                error={errors.amount}
-              />
-            )}
-            <SelectField
-              label="Chave pix (destino)"
-              value={walletMethodId}
-              placeholder={
-                wallet.isPending ? "Carregando chaves…" : "Escolha a chave"
-              }
-              options={keys.map((key) => ({
-                value: key.id,
-                label: `${key.ownerName ?? "Chave"} · ${label(LABEL_MAPS.pixKeyType, key.pixKeyType)}`,
-              }))}
-              onChange={setWalletMethodId}
-              error={errors.walletMethodId}
-              disabled={request.isPending || wallet.isPending}
-            />
-            {selectedKey && (
-              <Text size="xs" tone="muted" className="break-all">
-                Vai para: {selectedKey.ownerName}
-                {selectedKey.bank && ` — ${selectedKey.bank}`} ·{" "}
-                {selectedKey.pixKey}
-              </Text>
-            )}
+            {/* Wide form: rental, value and pix key in one line. */}
+            <Row className="gap-y-4">
+              {!rentalId && rentals.length > 1 && (
+                <Col md={6} lg={3}>
+                  <SelectField
+                    label="Locação"
+                    value={pickedRental}
+                    placeholder="Escolha a locação"
+                    options={rentals.map((rental) => ({
+                      value: rental.id,
+                      label: `${rental.code} · ${rental.vehicle.plate}`,
+                    }))}
+                    onChange={setPickedRental}
+                    error={errors.rentalId}
+                    disabled={request.isPending}
+                  />
+                </Col>
+              )}
+              <Col md={6} lg={3}>
+                {locked ? (
+                  <Box className="space-y-1">
+                    <Text weight="medium">Valor</Text>
+                    <Text
+                      size="base"
+                      weight="semibold"
+                      className="tabular-nums"
+                    >
+                      {formatCurrency(fixedAmount)}
+                    </Text>
+                    <Text size="xs" tone="muted">
+                      O valor da manutenção registrada.
+                    </Text>
+                  </Box>
+                ) : (
+                  <MoneyField
+                    label="Valor"
+                    value={amount}
+                    onChange={setAmount}
+                    error={errors.amount}
+                  />
+                )}
+              </Col>
+              <Col lg={6} className="space-y-1">
+                <SelectField
+                  label="Chave pix (destino)"
+                  value={walletMethodId}
+                  placeholder={
+                    wallet.isPending ? "Carregando chaves…" : "Escolha a chave"
+                  }
+                  options={keys.map((key) => ({
+                    value: key.id,
+                    label: `${key.ownerName ?? "Chave"} · ${label(LABEL_MAPS.pixKeyType, key.pixKeyType)}`,
+                  }))}
+                  onChange={setWalletMethodId}
+                  error={errors.walletMethodId}
+                  disabled={request.isPending || wallet.isPending}
+                />
+                {selectedKey && (
+                  <Text size="xs" tone="muted" className="break-all">
+                    Vai para: {selectedKey.ownerName}
+                    {selectedKey.bank && ` — ${selectedKey.bank}`} ·{" "}
+                    {selectedKey.pixKey}
+                  </Text>
+                )}
+              </Col>
+            </Row>
             <TextareaField
               label="Motivo"
               placeholder="Explique por que está pedindo o reembolso"
+              rows={2}
+              className="min-h-16"
               value={reason}
               onChange={(event) => setReason(event.target.value)}
               error={errors.reason}

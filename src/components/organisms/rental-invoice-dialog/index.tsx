@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/atoms/dialog";
 import { Form } from "@/components/atoms/form";
+import { Col, Row } from "@/components/atoms/grid";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { DateField } from "@/components/molecules/date-field";
@@ -118,66 +119,79 @@ export function RentalInvoiceDialog({
           Emitir NF
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent size="lg">
         <DialogTitle>Emitir nota fiscal</DialogTitle>
         <DialogDescription>
           A nota é agendada no Asaas e sai autorizada pela prefeitura.
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
-          <SelectField
-            label="Finalidade"
-            value={purpose}
-            options={(["RENT", "CAUTION"] as const).map((key) => ({
-              value: key,
-              label: label(LABEL_MAPS.paymentPurpose, key),
-            }))}
-            onChange={(next) => {
-              const nextPurpose = next as Purpose;
-              setPurpose(nextPurpose);
-              setValue(suggested(nextPurpose, monthKey));
-              setErrors({});
-            }}
-            disabled={create.isPending}
-          />
-          {purpose === "RENT" &&
-            (noRent ? (
-              <Text tone="muted">
-                Não há cobranças de aluguel nesta locação para faturar.
-              </Text>
-            ) : (
+          {/* Wide form: what, which month, how much and when in one line. */}
+          <Row className="gap-y-4">
+            {/* Short choice (Aluguel/Caução); the month label needs the room. */}
+            <Col md={6} lg={2}>
               <SelectField
-                label="Mês de competência"
-                value={monthKey}
-                options={suggestions.rentMonths.map((item) => ({
-                  value: item.key,
-                  label: `${item.label} — ${formatCurrency(item.sum)}`,
+                label="Finalidade"
+                value={purpose}
+                options={(["RENT", "CAUTION"] as const).map((key) => ({
+                  value: key,
+                  label: label(LABEL_MAPS.paymentPurpose, key),
                 }))}
-                onChange={(key) => {
-                  setMonthKey(key);
-                  setValue(suggested("RENT", key));
+                onChange={(next) => {
+                  const nextPurpose = next as Purpose;
+                  setPurpose(nextPurpose);
+                  setValue(suggested(nextPurpose, monthKey));
                   setErrors({});
                 }}
                 disabled={create.isPending}
               />
-            ))}
-          <MoneyField
-            label="Valor da NF"
-            value={value}
-            onChange={(next) => {
-              setValue(next);
-              setErrors({});
-            }}
-            error={errors.value}
-          />
-          <DateField
-            label="Data de emissão"
-            value={effectiveDate}
-            onChange={(next) => {
-              setEffectiveDate(next);
-              setErrors({});
-            }}
-            error={errors.effectiveDate}
-          />
+            </Col>
+            {purpose === "RENT" && (
+              <Col md={6} lg={4}>
+                {noRent ? (
+                  <Text tone="muted">
+                    Não há cobranças de aluguel nesta locação para faturar.
+                  </Text>
+                ) : (
+                  <SelectField
+                    label="Mês de competência"
+                    value={monthKey}
+                    options={suggestions.rentMonths.map((item) => ({
+                      value: item.key,
+                      label: `${item.label} — ${formatCurrency(item.sum)}`,
+                    }))}
+                    onChange={(key) => {
+                      setMonthKey(key);
+                      setValue(suggested("RENT", key));
+                      setErrors({});
+                    }}
+                    disabled={create.isPending}
+                  />
+                )}
+              </Col>
+            )}
+            <Col md={6} lg={3}>
+              <MoneyField
+                label="Valor da NF"
+                value={value}
+                onChange={(next) => {
+                  setValue(next);
+                  setErrors({});
+                }}
+                error={errors.value}
+              />
+            </Col>
+            <Col md={6} lg={3}>
+              <DateField
+                label="Data de emissão"
+                value={effectiveDate}
+                onChange={(next) => {
+                  setEffectiveDate(next);
+                  setErrors({});
+                }}
+                error={errors.effectiveDate}
+              />
+            </Col>
+          </Row>
           {description && (
             <Box className="rounded-md bg-muted px-3 py-2">
               <Text size="xs" tone="muted">

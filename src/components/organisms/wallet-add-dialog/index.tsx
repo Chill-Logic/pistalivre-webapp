@@ -7,6 +7,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogTitle,
   DialogTrigger,
 } from "@/components/atoms/dialog";
@@ -151,19 +152,6 @@ export function WalletAddDialog({
             error={error.pixKey}
             disabled={busy}
           />
-          {!owner && (
-            <Button
-              type="button"
-              className="w-full"
-              onClick={verify}
-              disabled={preview.isPending}
-            >
-              {preview.isPending && (
-                <Spinner className="text-primary-foreground" />
-              )}
-              Verificar chave
-            </Button>
-          )}
           {owner && (
             <Box className="space-y-3">
               <Box className="rounded-md bg-success px-3 py-3">
@@ -193,9 +181,24 @@ export function WalletAddDialog({
                   disabled={add.isPending}
                 />
               )}
+            </Box>
+          )}
+          {error.form && <Alert>{error.form}</Alert>}
+        </Box>
+        {/* Pinned at the bottom: verify first, then confirm or correct. */}
+        <DialogFooter>
+          {owner ? (
+            <>
               <Button
                 type="button"
-                className="w-full"
+                variant="ghost"
+                onClick={() => setOwner(null)}
+                disabled={add.isPending}
+              >
+                Não, corrigir
+              </Button>
+              <Button
+                type="button"
                 onClick={confirm}
                 disabled={add.isPending}
               >
@@ -204,19 +207,20 @@ export function WalletAddDialog({
                 )}
                 Sim, adicionar essa chave
               </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full"
-                onClick={() => setOwner(null)}
-                disabled={add.isPending}
-              >
-                Não, corrigir
-              </Button>
-            </Box>
+            </>
+          ) : (
+            <Button
+              type="button"
+              onClick={verify}
+              disabled={preview.isPending}
+            >
+              {preview.isPending && (
+                <Spinner className="text-primary-foreground" />
+              )}
+              Verificar chave
+            </Button>
           )}
-          {error.form && <Alert>{error.form}</Alert>}
-        </Box>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

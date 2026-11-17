@@ -134,7 +134,7 @@ export function DueChangeDialog({ billing }: { billing: RentalBilling }) {
           Trocar vencimento
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent size="lg">
         <DialogTitle>Trocar vencimento</DialogTitle>
         <DialogDescription>
           Sem data, vale o quanto antes: do primeiro dia ainda não cobrado. O
@@ -142,7 +142,7 @@ export function DueChangeDialog({ billing }: { billing: RentalBilling }) {
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
           <Row className="gap-y-4">
-            <Col span={period === "DAILY" ? 12 : 6}>
+            <Col span={period === "DAILY" ? 12 : 6} lg={3}>
               <SelectField
                 label="Ciclo"
                 value={period}
@@ -152,7 +152,7 @@ export function DueChangeDialog({ billing }: { billing: RentalBilling }) {
               />
             </Col>
             {period === "WEEKLY" && (
-              <Col span={6}>
+              <Col span={6} lg={3}>
                 <SelectField
                   label="Vence toda"
                   value={weekday}
@@ -170,7 +170,7 @@ export function DueChangeDialog({ billing }: { billing: RentalBilling }) {
               </Col>
             )}
             {period === "MONTHLY" && (
-              <Col span={6}>
+              <Col span={6} lg={3}>
                 <SelectField
                   label="Vence todo"
                   value={monthDay}
@@ -184,7 +184,7 @@ export function DueChangeDialog({ billing }: { billing: RentalBilling }) {
                 />
               </Col>
             )}
-            <Col md={6}>
+            <Col span={6} lg={3}>
               <MoneyField
                 label={`Valor por ${ratePeriodSuffix(period)}`}
                 value={rate}
@@ -194,7 +194,7 @@ export function DueChangeDialog({ billing }: { billing: RentalBilling }) {
                 }}
               />
             </Col>
-            <Col md={6}>
+            <Col span={6} lg={3}>
               <DateField
                 label="A partir de (opcional)"
                 value={notBefore}

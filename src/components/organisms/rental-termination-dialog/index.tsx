@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/atoms/dialog";
 import { Form } from "@/components/atoms/form";
+import { Col, Row } from "@/components/atoms/grid";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
@@ -145,34 +146,42 @@ export function RentalTerminationDialog({
           Rescindir
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto">
+      <DialogContent size="lg">
         <DialogTitle>Rescindir a locação {rental.code}?</DialogTitle>
         <DialogDescription>
           A locação é encerrada na data abaixo e o aluguel é cobrado até ela.
           Isso não pode ser desfeito.
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
-          <DateField
-            label="Data da rescisão"
-            value={date}
-            onChange={(value) => {
-              setDate(value);
-              setErrors((current) => ({ ...current, date: undefined }));
-            }}
-            error={errors.date}
-          />
+          <Row className="gap-y-4">
+            <Col md={6} lg={3}>
+              <DateField
+                label="Data da rescisão"
+                value={date}
+                onChange={(value) => {
+                  setDate(value);
+                  setErrors((current) => ({ ...current, date: undefined }));
+                }}
+                error={errors.date}
+              />
+            </Col>
+          </Row>
 
+          {/* The reasons side by side: four per line on the desktop. */}
           <Box role="group" aria-label="Motivos" className="space-y-2">
             <Text weight="medium">Motivos</Text>
-            {options(LABEL_MAPS.rentalTerminationReason).map((option) => (
-              <CheckboxField
-                key={option.value}
-                label={option.label}
-                checked={reasons.includes(option.value)}
-                onChange={(checked) => toggleReason(option.value, checked)}
-                disabled={terminate.isPending}
-              />
-            ))}
+            <Row className="gap-y-2">
+              {options(LABEL_MAPS.rentalTerminationReason).map((option) => (
+                <Col key={option.value} sm={6} lg={3}>
+                  <CheckboxField
+                    label={option.label}
+                    checked={reasons.includes(option.value)}
+                    onChange={(checked) => toggleReason(option.value, checked)}
+                    disabled={terminate.isPending}
+                  />
+                </Col>
+              ))}
+            </Row>
             {errors.reasons && (
               <Text size="xs" tone="destructive">
                 {errors.reasons}
@@ -180,22 +189,28 @@ export function RentalTerminationDialog({
             )}
           </Box>
           {withOther && (
-            <FormField
-              label="Qual o motivo?"
-              value={otherReason}
-              onChange={(event) => {
-                setOtherReason(event.target.value);
-                setErrors((current) => ({
-                  ...current,
-                  otherReason: undefined,
-                }));
-              }}
-              error={errors.otherReason}
-            />
+            <Row className="gap-y-4">
+              <Col lg={6}>
+                <FormField
+                  label="Qual o motivo?"
+                  value={otherReason}
+                  onChange={(event) => {
+                    setOtherReason(event.target.value);
+                    setErrors((current) => ({
+                      ...current,
+                      otherReason: undefined,
+                    }));
+                  }}
+                  error={errors.otherReason}
+                />
+              </Col>
+            </Row>
           )}
           <TextareaField
             label="Observação (opcional)"
             placeholder="Ex.: veículo recolhido na base em 07/11, com 3 semanas em atraso."
+            rows={2}
+            className="min-h-16"
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
           />
