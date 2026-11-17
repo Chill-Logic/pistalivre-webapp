@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryKeys } from "@/constants/query-keys";
 import { cardFeesService } from "@/services/api/gestao/card-fees.service";
@@ -8,6 +13,26 @@ export function useCardFees() {
   return useQuery({
     queryKey: queryKeys.cardFees(),
     queryFn: cardFeesService.get,
+  });
+}
+
+/**
+ * The example table for what is TYPED (not saved yet), computed by the server.
+ * Keeps the last table while the next one loads; invalid bands → error.
+ */
+export function useCardFeesPreview(
+  input: {
+    bands: CardFeeBand[];
+    anticipation: CardAnticipation;
+    amount: number;
+  } | null,
+) {
+  return useQuery({
+    queryKey: [...queryKeys.cardFees(), "preview", input],
+    queryFn: () => cardFeesService.preview(input!),
+    enabled: input !== null,
+    placeholderData: keepPreviousData,
+    retry: false,
   });
 }
 

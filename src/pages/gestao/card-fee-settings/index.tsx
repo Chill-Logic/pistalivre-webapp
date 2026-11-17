@@ -1,5 +1,5 @@
 import { Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Alert } from "@/components/atoms/alert";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
@@ -23,44 +23,44 @@ import {
 } from "@/components/atoms/table";
 import { Text } from "@/components/atoms/text";
 import { FormField } from "@/components/molecules/form-field";
+import { MoneyField } from "@/components/molecules/money-field";
 import { PageHeader } from "@/components/molecules/page-header";
+import { PercentField } from "@/components/molecules/percent-field";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { QueryError } from "@/components/organisms/query-error";
 import { toApiError } from "@/helpers/api-error";
 import {
   useCardFees,
+  useCardFeesPreview,
   useSaveCardFees,
 } from "@/hooks/api/gestao/card-fees/useCardFees";
+import { useDebouncedValue } from "@/hooks/ui/useDebouncedValue";
 import type { CardAnticipation, CardFeeBand } from "@/types/card-fees";
+import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/format";
 
-/** A band as typed (strings, so a half-typed "3," doesn't jump). */
-type Draft = { from: string; to: string; percent: string; fixed: string };
+/** A band as typed: installments as text (digits only), money/percent as numbers. */
+type Draft = {
+  from: string;
+  to: string;
+  percent: number | null;
+  fixed: number | null;
+};
 
 const toDraft = (b: CardFeeBand): Draft => ({
   from: String(b.from),
   to: String(b.to),
-  percent: String(b.percent).replace(".", ","),
-  fixed: String(b.fixedPerInstallment).replace(".", ","),
+  percent: b.percent,
+  fixed: b.fixedPerInstallment,
 });
-const num = (v: string) => Number(v.replace(",", "."));
-/** Anticipation as typed ("1,25"). */
-type AnticipationDraft = { single: string; installments: string };
-const toAnticipationDraft = (a: CardAnticipation): AnticipationDraft => ({
-  single: String(a.single).replace(".", ","),
-  installments: String(a.installments).replace(".", ","),
-});
-const toAnticipation = (d: AnticipationDraft): CardAnticipation => ({
-  single: d.single.trim() ? num(d.single) : 0,
-  installments: d.installments.trim() ? num(d.installments) : 0,
-});
-
 const toBand = (d: Draft): CardFeeBand => ({
-  from: num(d.from),
-  to: num(d.to),
-  percent: num(d.percent),
-  fixedPerInstallment: num(d.fixed),
+  from: Number(d.from),
+  to: Number(d.to),
+  percent: d.percent ?? 0,
+  fixedPerInstallment: d.fixed ?? 0,
 });
+const onlyDigits = (v: string) => v.replace(/\D/g, "").slice(0, 2);
+const DEFAULT_EXAMPLE = 1000;
 
 function CardFeeSkeleton() {
   return (
@@ -76,25 +76,48 @@ function CardFeeSkeleton() {
 
 /**
  * Configurações › Juros do cartão: what the payment link adds when the
- * customer pays the balance in installments (gross-up: the net is the
- * balance). Bands of installments, contiguous from 1×; the last one is the
- * maximum offered. The example comes computed from the server.
+ * customer pays by card (gross-up: the net is the amount). Bands of
+ * installments, contiguous from 1×; the last one is the maximum offered. The
+ * example follows what is TYPED (computed by the server, not saved) and its
+ * amount is editable.
  */
 export function CardFeeSettingsPage() {
   const settings = useCardFees();
   const save = useSaveCardFees();
   const [rows, setRows] = useState<Draft[]>([]);
-  const [anticipation, setAnticipation] = useState<AnticipationDraft>({
-    single: "0",
-    installments: "0",
-  });
+  const [anticipation, setAnticipation] = useState<{
+    single: number | null;
+    installments: number | null;
+  }>({ single: 0, installments: 0 });
+  const [exampleAmount, setExampleAmount] = useState<number | null>(
+    DEFAULT_EXAMPLE,
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!settings.data) return;
     setRows(settings.data.bands.map(toDraft));
-    setAnticipation(toAnticipationDraft(settings.data.anticipation));
+    setAnticipation(settings.data.anticipation);
   }, [settings.data]);
+
+  const typedAnticipation: CardAnticipation = {
+    single: anticipation.single ?? 0,
+    installments: anticipation.installments ?? 0,
+  };
+  const draft = useMemo(
+    () =>
+      rows.length && exampleAmount && exampleAmount > 0
+        ? {
+            bands: rows.map(toBand),
+            anticipation: typedAnticipation,
+            amount: exampleAmount,
+          }
+        : null,
+    // typedAnticipation is derived from `anticipation`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rows, anticipation, exampleAmount],
+  );
+  const preview = useCardFeesPreview(useDebouncedValue(draft, 400));
 
   const update = (index: number, patch: Partial<Draft>) => {
     setRows((current) =>
@@ -105,20 +128,21 @@ export function CardFeeSettingsPage() {
 
   const addRow = () => {
     const last = rows[rows.length - 1];
-    const from = last ? num(last.to) + 1 : 1;
+    const from = last ? Number(last.to) + 1 : 1;
     setRows([
       ...rows,
-      { from: String(from), to: String(from), percent: "0", fixed: "0" },
+      { from: String(from), to: String(from), percent: 0, fixed: 0 },
     ]);
   };
 
   const onSave = (bands: CardFeeBand[] | null) =>
     save.mutate(
-      { bands, anticipation: toAnticipation(anticipation) },
+      { bands, anticipation: typedAnticipation },
       { onError: (err) => setError(toApiError(err).message) },
     );
 
   const data = settings.data;
+  const options = preview.data?.options ?? data?.example.options ?? [];
 
   return (
     <Box className="space-y-6">
@@ -147,7 +171,7 @@ export function CardFeeSettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <Text size="sm" tone="muted">
-                  O link de pagamento cobra no cartão o saldo mais o percentual
+                  O link de pagamento cobra no cartão o valor mais o percentual
                   e a taxa por parcela da faixa. As faixas começam em 1× e se
                   emendam; a última define o máximo de parcelas (até 21×).
                 </Text>
@@ -162,7 +186,7 @@ export function CardFeeSettingsPage() {
                         inputMode="numeric"
                         value={row.from}
                         onChange={(e) =>
-                          update(index, { from: e.target.value })
+                          update(index, { from: onlyDigits(e.target.value) })
                         }
                       />
                     </Col>
@@ -171,27 +195,23 @@ export function CardFeeSettingsPage() {
                         label="Até"
                         inputMode="numeric"
                         value={row.to}
-                        onChange={(e) => update(index, { to: e.target.value })}
+                        onChange={(e) =>
+                          update(index, { to: onlyDigits(e.target.value) })
+                        }
                       />
                     </Col>
                     <Col span={6} md={3}>
-                      <FormField
-                        label="Percentual (%)"
-                        inputMode="decimal"
+                      <PercentField
+                        label="Percentual"
                         value={row.percent}
-                        onChange={(e) =>
-                          update(index, { percent: e.target.value })
-                        }
+                        onChange={(percent) => update(index, { percent })}
                       />
                     </Col>
                     <Col span={6} md={4}>
-                      <FormField
-                        label="Por parcela (R$)"
-                        inputMode="decimal"
+                      <MoneyField
+                        label="Por parcela"
                         value={row.fixed}
-                        onChange={(e) =>
-                          update(index, { fixed: e.target.value })
-                        }
+                        onChange={(fixed) => update(index, { fixed })}
                       />
                     </Col>
                     <Col md={1} className="flex justify-end">
@@ -230,29 +250,21 @@ export function CardFeeSettingsPage() {
                   </Text>
                   <Row className="gap-y-3">
                     <Col span={6}>
-                      <FormField
-                        label="À vista (% ao mês)"
-                        inputMode="decimal"
+                      <PercentField
+                        label="À vista (ao mês)"
                         value={anticipation.single}
-                        onChange={(e) => {
-                          setAnticipation({
-                            ...anticipation,
-                            single: e.target.value,
-                          });
+                        onChange={(single) => {
+                          setAnticipation({ ...anticipation, single });
                           setError(null);
                         }}
                       />
                     </Col>
                     <Col span={6}>
-                      <FormField
-                        label="Parcelado (% ao mês)"
-                        inputMode="decimal"
+                      <PercentField
+                        label="Parcelado (ao mês)"
                         value={anticipation.installments}
-                        onChange={(e) => {
-                          setAnticipation({
-                            ...anticipation,
-                            installments: e.target.value,
-                          });
+                        onChange={(installments) => {
+                          setAnticipation({ ...anticipation, installments });
                           setError(null);
                         }}
                       />
@@ -286,12 +298,27 @@ export function CardFeeSettingsPage() {
           <Col lg={5}>
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">
-                  Exemplo: saldo de {formatCurrency(data.example.amount)}
-                </CardTitle>
+                <CardTitle className="text-base">Exemplo</CardTitle>
               </CardHeader>
-              <CardContent>
-                <Table>
+              <CardContent className="space-y-4">
+                <MoneyField
+                  label="Valor da cobrança"
+                  value={exampleAmount}
+                  onChange={setExampleAmount}
+                />
+                {preview.isError && (
+                  <Alert variant="warning">
+                    {toApiError(preview.error).message} Ajuste para ver o
+                    exemplo.
+                  </Alert>
+                )}
+                <Table
+                  aria-busy={preview.isFetching}
+                  className={cn(
+                    "transition-opacity",
+                    preview.isFetching && "opacity-60",
+                  )}
+                >
                   <TableHeader>
                     <TableRow className="hover:bg-transparent">
                       <TableHead>Parcelas</TableHead>
@@ -300,7 +327,7 @@ export function CardFeeSettingsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data.example.options.map((o) => (
+                    {options.map((o) => (
                       <TableRow key={o.installments}>
                         <TableCell>{o.installments}×</TableCell>
                         <TableCell className="text-right">
@@ -313,8 +340,9 @@ export function CardFeeSettingsPage() {
                     ))}
                   </TableBody>
                 </Table>
-                <Text size="xs" tone="muted" className="mt-3">
-                  Mostra a tabela salva. Salve para ver o efeito de uma mudança.
+                <Text size="xs" tone="muted">
+                  Com tudo repassado ao cliente. Acompanha o que você digita; só
+                  vale nas cobranças depois de salvar.
                 </Text>
               </CardContent>
             </Card>

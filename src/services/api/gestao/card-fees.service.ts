@@ -4,11 +4,24 @@ import type {
   CardFeeBand,
   CardFeeSettings,
 } from "@/types/card-fees";
+import type { CardInstallmentOption } from "@/types/payment-link";
 
 /** Configurações › Juros do cartão (the payment link's card interest). */
 export const cardFeesService = {
   async get() {
     const { data } = await http.get<CardFeeSettings>("/settings/card-fees");
+    return data;
+  },
+  /** The table applied to an amount WITHOUT saving (the server does the math). */
+  async preview(input: {
+    bands: CardFeeBand[];
+    anticipation: CardAnticipation;
+    amount: number;
+  }) {
+    const { data } = await http.post<{
+      amount: number;
+      options: CardInstallmentOption[];
+    }>("/settings/card-fees/preview", input);
     return data;
   },
   /** bands null = back to the default rates; anticipation left out = unchanged. */
