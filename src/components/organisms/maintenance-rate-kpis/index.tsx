@@ -13,12 +13,15 @@ import { pluralize } from "@/utils/text";
 type MaintenanceRateKpisProps = {
   totals: AnalysisMeasures;
   kmCoverage: { vehicles: number; withKm: number };
+  /** The period (YYYY-MM-DD): adds the average fleet under the vehicle-months. */
+  period?: { from: string; to: string };
 };
 
 /** The four rulers of the whole fleet in the period, ready from the server. */
 export function MaintenanceRateKpis({
   totals,
   kmCoverage,
+  period,
 }: MaintenanceRateKpisProps) {
   return (
     <Row className="gap-y-4">
@@ -31,12 +34,12 @@ export function MaintenanceRateKpis({
       </Col>
       <Col span={6} lg={3}>
         <StatCard
-          label="R$ por moto-mês"
+          label="R$ por veículo-mês"
           value={formatMeasure(
             totals.costPerVehicleMonth,
             "costPerVehicleMonth",
           )}
-          hint={formatFleetMonths(totals.fleetMonths)}
+          hint={formatFleetMonths(totals.fleetMonths, period)}
         />
       </Col>
       <Col span={6} lg={3}>

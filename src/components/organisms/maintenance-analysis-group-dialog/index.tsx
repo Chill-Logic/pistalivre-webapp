@@ -40,7 +40,7 @@ type MaintenanceAnalysisGroupDialogProps = {
 };
 
 const RECORD_LABEL = {
-  vehicle: "Abrir a moto",
+  vehicle: "Abrir o veículo",
   customer: "Abrir o cliente",
   rental: "Abrir a locação",
 };
@@ -77,11 +77,11 @@ export function MaintenanceAnalysisGroupDialog({
               <InfoItem span={6} md={3} label="Custo">
                 {formatCurrency(row.cost)}
               </InfoItem>
-              <InfoItem span={6} md={3} label="R$ por moto-mês">
+              <InfoItem span={6} md={3} label="R$ por veículo-mês">
                 {formatMeasure(row.costPerVehicleMonth, "costPerVehicleMonth")}
                 {!fleetWide && (
                   <Text size="xs" tone="muted">
-                    {formatFleetMonths(row.fleetMonths)}
+                    {formatFleetMonths(row.fleetMonths, filters)}
                   </Text>
                 )}
               </InfoItem>

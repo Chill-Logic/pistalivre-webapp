@@ -357,7 +357,7 @@ export function DebtForm({
             <Col>
               <TextareaField
                 label="Observação (opcional)"
-                placeholder="Ex.: para a entrada da moto 3; combinado por WhatsApp"
+                placeholder="Ex.: para a entrada do veículo 3; combinado por WhatsApp"
                 error={errors.notes?.message}
                 {...register("notes")}
               />

@@ -79,7 +79,7 @@ export function PartnerContractSummary({
             </>
           ) : contract.payoutMode === "FIXED" ? (
             <>
-              <InfoItem span={6} lg={4} label="Repasse fixo por moto (mês)">
+              <InfoItem span={6} lg={4} label="Repasse fixo por veículo (mês)">
                 {formatCurrency(contract.fixedPayout ?? 0)}
                 {" · proporcional aos dias alugados"}
               </InfoItem>

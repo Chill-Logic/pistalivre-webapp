@@ -24,7 +24,7 @@ const NEEDED = [
 const NEXT = [
   "A gente confere seus dados e documentos.",
   "Preparamos o contrato da locação.",
-  "Você assina pelo celular e combina a retirada da moto.",
+  "Você assina pelo celular e combina a retirada do veículo.",
 ];
 
 /** The form's shape while the options load. */

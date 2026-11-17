@@ -60,7 +60,7 @@ export function contractTerms(
     return `${formatPercent(contract.sharePercent)}${base} para o parceiro`;
   }
   if (contract.payoutMode === "FIXED") {
-    return `Repasse de até ${formatCurrency(contract.fixedPayout ?? 0)} por moto/mês${maintenanceRuleSuffix(contract)}`;
+    return `Repasse de até ${formatCurrency(contract.fixedPayout ?? 0)} por veículo/mês${maintenanceRuleSuffix(contract)}`;
   }
   const fee = [
     contract.adminFeePercent !== null &&

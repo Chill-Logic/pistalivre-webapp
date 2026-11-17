@@ -20,7 +20,7 @@ export function LeadCapturePage() {
       <Box className="space-y-1 text-center">
         <Heading>Quero alugar</Heading>
         <Text tone="muted">
-          Alugue sua moto ou veículo com a gente. Deixe seu contato que a gente
+          Alugue seu veículo com a gente. Deixe seu contato que a gente
           te chama!
         </Text>
       </Box>

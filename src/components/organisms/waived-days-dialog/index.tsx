@@ -87,7 +87,7 @@ export function WaivedDaysDialog({
         <DialogTitle>Dias abonados</DialogTitle>
         <DialogDescription>
           Dias que não são cobrados (por exemplo, descontados por uma
-          manutenção que o locatário pagou, ou a moto devolvida cedo no último
+          manutenção que o locatário pagou, ou o veículo devolvido cedo no último
           dia). Na diária, o dia some; no semanal e no mensal, sai a parte do
           dia (valor ÷ dias do ciclo). Eles não contam no devido.
         </DialogDescription>

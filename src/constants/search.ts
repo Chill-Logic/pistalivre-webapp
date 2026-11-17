@@ -84,7 +84,7 @@ export const SEARCH_ACTIONS: SearchAction[] = [
   { id: "notifications", label: "Preferências de notificação", keywords: ["notificações", "sininho", "push", "avisos", "ativar notificações", "resumo do dia"], icon: Bell, to: ROUTES.notificationSettings },
   { id: "new-rental", label: "Nova locação", keywords: ["alugar", "contrato", "locacao"], icon: Plus, to: ROUTES.rentalNew },
   { id: "new-customer", label: "Novo cliente", keywords: ["cadastrar cliente", "locatario"], icon: Plus, to: ROUTES.customerNew },
-  { id: "maintenance-analysis", label: "Taxa de manutenção (análise)", keywords: ["análise de manutenção", "custo de manutenção", "custo por km", "r$ por moto", "qual moto gasta mais", "manutenção por modelo", "manutenção por cliente", "% da receita"], icon: Gauge, to: ROUTES.maintenanceAnalysis },
+  { id: "maintenance-analysis", label: "Taxa de manutenção (análise)", keywords: ["análise de manutenção", "custo de manutenção", "custo por km", "r$ por veículo", "qual veículo gasta mais", "qual moto gasta mais", "manutenção por modelo", "manutenção por cliente", "% da receita"], icon: Gauge, to: ROUTES.maintenanceAnalysis },
   { id: "new-maintenance", label: "Registrar manutenção", keywords: ["nova manutenção", "oficina", "conserto", "revisão"], icon: Plus, to: ROUTES.maintenanceNew },
   { id: "new-inspection", label: "Nova vistoria", keywords: ["vistoriar", "fotos", "km"], icon: Plus, to: ROUTES.inspectionPick },
   { id: "new-vehicle", label: "Novo veículo", keywords: ["cadastrar moto", "cadastrar carro", "frota"], icon: Plus, to: ROUTES.vehicleNew },

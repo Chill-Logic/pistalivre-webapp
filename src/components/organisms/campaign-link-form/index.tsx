@@ -116,7 +116,7 @@ export function CampaignLinkForm({
             <Col md={6} lg={4}>
               <FormField
                 label="Nome do link (interno)"
-                placeholder="Ex.: Instagram bio, motos julho"
+                placeholder="Ex.: Instagram bio, veículos julho"
                 {...register("label")}
                 error={errors.label?.message}
               />
@@ -142,7 +142,7 @@ export function CampaignLinkForm({
             <Col md={6} lg={4}>
               <FormField
                 label="Campanha (utm_campaign)"
-                placeholder="Ex.: motos-julho"
+                placeholder="Ex.: veiculos-julho"
                 {...register("utmCampaign")}
                 error={errors.utmCampaign?.message}
               />

@@ -28,9 +28,24 @@ export function formatMeasure(value: number | null, measure: Measure): string {
   return formatCurrency(value);
 }
 
-/** "39,1 meses de moto". */
-export function formatFleetMonths(months: number) {
-  return `${MONTHS.format(months)} ${months === 1 ? "mês" : "meses"} de moto`;
+/**
+ * The vehicle-months under a number: "17,9 meses somando todos os veículos",
+ * plus the average fleet when the period is known ("≈ 1,5 veículo em média").
+ */
+export function formatFleetMonths(
+  months: number,
+  period?: { from: string; to: string },
+) {
+  const text = `${MONTHS.format(months)} ${months === 1 ? "mês" : "meses"} somando todos os veículos`;
+  if (!period) return text;
+  const days =
+    (Date.parse(`${period.to}T00:00:00Z`) -
+      Date.parse(`${period.from}T00:00:00Z`)) /
+      86_400_000 +
+    1;
+  const average = months / (days / 30.4375);
+  if (!Number.isFinite(average) || average <= 0) return text;
+  return `${text} (≈ ${MONTHS.format(average)} ${average < 2 ? "veículo" : "veículos"} em média)`;
 }
 
 /** "8.050 km". */
@@ -83,8 +98,13 @@ export function analysisRowPath(row: AnalysisRow): string | null {
   return routeTo.rental(row.link.id);
 }
 
-/** "km medido em 1 de 13 motos" (the R$/km reads only there). */
+/** "km medido em 1 de 13 veículos" (the R$/km reads only there). */
 export function kmCoverageHint(coverage: { vehicles: number; withKm: number }) {
-  if (coverage.withKm === 0) return "Nenhuma moto com km medido no período";
-  return `km medido em ${coverage.withKm} de ${coverage.vehicles} ${coverage.vehicles === 1 ? "moto" : "motos"}`;
+  if (coverage.withKm === 0) return "Nenhum veículo com km medido no período";
+  return `km medido em ${coverage.withKm} de ${coverage.vehicles} ${coverage.vehicles === 1 ? "veículo" : "veículos"}`;
+}
+
+/** Short form for a table cell: "8,9 meses na frota". */
+export function formatMonthsInFleet(months: number) {
+  return `${MONTHS.format(months)} ${months === 1 ? "mês" : "meses"} na frota`;
 }

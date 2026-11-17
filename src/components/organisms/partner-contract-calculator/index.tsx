@@ -316,7 +316,7 @@ export function PartnerContractCalculator({
             >
               <DescriptionList className="space-y-1.5">
                 <Line
-                  term={`Aluguel recebido (${data.vehicleCount} motos)`}
+                  term={`Aluguel recebido (${data.vehicleCount} veículos)`}
                   value={data.revenue}
                 />
                 {data.costsByPayer.COMPANY > 0 && !fixedPayout && (
@@ -464,7 +464,7 @@ export function PartnerContractCalculator({
             <Row key={group.key} className="items-end gap-y-2">
               <Col span={3}>
                 <FormField
-                  label="Motos"
+                  label="Veículos"
                   inputMode="numeric"
                   value={group.count}
                   onChange={(event) =>
@@ -549,7 +549,7 @@ export function PartnerContractCalculator({
 
         <Box className="space-y-3">
           <Heading level={3} variant="section">
-            Despesas por moto
+            Despesas por veículo
           </Heading>
           <Row className="gap-y-3">
             {visibleCosts.map((cost) => (

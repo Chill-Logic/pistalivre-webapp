@@ -13,7 +13,7 @@ const OPENINGS: Record<AiChatMode, string[]> = {
     "Bora, {nome}? Me pergunta qualquer coisa da operação.",
     "Que bom te ver, {nome}! No que eu ajudo hoje?",
     "Pista livre pra perguntar, {nome}. Manda!",
-    "{nome}, qual capítulo de hoje: cobranças, clientes ou motos?",
+    "{nome}, qual capítulo de hoje: cobranças, clientes ou veículos?",
   ],
   contract: [
     "Bora deixar esse contrato redondo, {nome}?",

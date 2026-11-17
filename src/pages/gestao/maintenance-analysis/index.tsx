@@ -45,7 +45,7 @@ import { useMaintenanceAnalysisFilters } from "@/hooks/ui/useMaintenanceAnalysis
 import type { AnalysisRow } from "@/types/maintenance-analysis";
 
 /**
- * Taxa de manutenção: the maintenance cost cut by any dimension (moto,
+ * Taxa de manutenção: the maintenance cost cut by any dimension (veículo,
  * modelo, cliente, mês…) and read by four rulers computed on the server.
  */
 export function MaintenanceAnalysisPage() {
@@ -104,6 +104,7 @@ export function MaintenanceAnalysisPage() {
           <MaintenanceRateKpis
             totals={data.totals}
             kmCoverage={data.kmCoverage}
+            period={data}
           />
           <Row className="items-stretch gap-y-4">
             <Col lg={7}>
@@ -125,9 +126,9 @@ export function MaintenanceAnalysisPage() {
                     <ListItem>
                       <Text size="sm" tone="muted">
                         <Text inline weight="medium" tone="foreground">
-                          R$ por moto-mês:
+                          R$ por veículo-mês:
                         </Text>{" "}
-                        o custo dividido pelos meses que as motos da linha
+                        o custo dividido pelos meses que os veículos da linha
                         ficaram na frota.
                       </Text>
                     </ListItem>
@@ -165,8 +166,8 @@ export function MaintenanceAnalysisPage() {
                       <ListItem>
                         <Text size="sm" tone="muted">
                           Manutenção sem locação ligada entra na locação que
-                          rodava na moto naquele dia; dias sem locação ficam em
-                          "Sem locação (moto parada)".
+                          rodava no veículo naquele dia; dias sem locação ficam
+                          em "Sem locação (veículo parado)".
                         </Text>
                       </ListItem>
                     )}

@@ -14,7 +14,7 @@ import { Text } from "@/components/atoms/text";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { ANALYSIS_GROUP_HEADER } from "@/constants/maintenance-analysis";
 import {
-  formatFleetMonths,
+  formatMonthsInFleet,
   formatKm,
   formatMeasure,
 } from "@/helpers/maintenance-analysis";
@@ -49,8 +49,8 @@ const COLUMNS: Column[] = [
   { measure: "cost", header: "Custo" },
   {
     measure: "costPerVehicleMonth",
-    header: "R$ por moto-mês",
-    sub: (row) => formatFleetMonths(row.fleetMonths),
+    header: "R$ por veículo-mês",
+    sub: (row) => formatMonthsInFleet(row.fleetMonths),
   },
   {
     measure: "costPerKm",

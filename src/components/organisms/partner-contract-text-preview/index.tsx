@@ -37,7 +37,7 @@ export function PartnerContractTextPreview({
       <CardContent className="space-y-4 pt-4 md:pt-6">
         <Alert variant="info" role="note" className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Text>
-            Prévia gerada dos termos, ainda sem as motos. Depois de salvar os termos, o texto fica editável aqui, com o
+            Prévia gerada dos termos, ainda sem os veículos. Depois de salvar os termos, o texto fica editável aqui, com o
             Livrinho ajustando as cláusulas.
           </Text>
           <Button type="button" variant="outline" size="sm" onClick={onEditTerms} className="shrink-0">

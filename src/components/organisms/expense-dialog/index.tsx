@@ -344,7 +344,7 @@ function ExpenseForm({
             <Col md={12} lg={6}>
               <FormField
                 label="O que foi"
-                placeholder="Ex.: IPVA da moto"
+                placeholder="Ex.: IPVA do veículo"
                 value={state.description}
                 onChange={(event) => set("description", event.target.value)}
                 error={errors.description}

@@ -68,7 +68,7 @@ export function PartnerContractDocumentPage() {
             {!hasVehicles && (
               <Alert variant="info" role="note" className="flex items-center gap-2">
                 <Car className="size-4 shrink-0" aria-hidden />
-                Ainda sem motos neste contrato: inclua na tela do contrato (ou
+                Ainda sem veículos neste contrato: inclua na tela do contrato (ou
                 peça ao Livrinho) antes de enviar.
               </Alert>
             )}

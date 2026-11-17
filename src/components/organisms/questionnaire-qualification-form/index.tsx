@@ -81,7 +81,7 @@ export function QuestionnaireQualificationForm({
         error={fields.incomeType}
       />
       <SegmentedField
-        label="4. Seu objetivo final é ter uma moto própria?"
+        label="4. Seu objetivo final é ter um veículo próprio?"
         value={ownVehicle}
         options={OWN_VEHICLE}
         onChange={setOwnVehicle}

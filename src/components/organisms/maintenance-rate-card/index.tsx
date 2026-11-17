@@ -32,7 +32,11 @@ export function MaintenanceRateCard({ rate }: { rate: MaintenanceRate }) {
           </Link>
         </Button>
       </Box>
-      <MaintenanceRateKpis totals={rate.totals} kmCoverage={rate.kmCoverage} />
+      <MaintenanceRateKpis
+        totals={rate.totals}
+        kmCoverage={rate.kmCoverage}
+        period={rate}
+      />
     </Box>
   );
 }

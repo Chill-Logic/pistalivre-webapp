@@ -92,7 +92,7 @@ export const contractFormSchema = z
         }
       }
     } else if (c.payoutMode === "FIXED") {
-      if (!c.fixedPayout) issue("fixedPayout", "Informe o repasse por moto");
+      if (!c.fixedPayout) issue("fixedPayout", "Informe o repasse por veículo");
     } else if (
       parsePercentInput(c.adminFeePercent) === null &&
       c.adminFeeFixed === null

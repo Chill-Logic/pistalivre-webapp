@@ -75,7 +75,7 @@ export function QuestionnairePlanPicker({
                   </Box>
                   {plan.ownershipAtEnd && (
                     <Badge variant="success" className="shrink-0 whitespace-nowrap">
-                      Ao final a moto é sua
+                      Ao final o veículo é seu
                     </Badge>
                   )}
                 </Box>

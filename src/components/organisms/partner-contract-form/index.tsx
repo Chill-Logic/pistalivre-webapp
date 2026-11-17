@@ -52,7 +52,7 @@ import type { PartnerContract } from "@/types/partner";
 /** How a management contract pays the owner. */
 const PAYOUT_MODE_OPTIONS = [
   { value: "SHARE", label: "Taxa da empresa" },
-  { value: "FIXED", label: "Repasse fixo por moto" },
+  { value: "FIXED", label: "Repasse fixo por veículo" },
 ];
 
 /**
@@ -229,7 +229,7 @@ export function PartnerContractForm({
       );
       if (v.payoutMode === "FIXED") {
         add(
-          "Repasse por moto (mês)",
+          "Repasse por veículo (mês)",
           "fixedPayout",
           v.fixedPayout,
           () => set("fixedPayout", Number(v.fixedPayout)),
@@ -330,7 +330,7 @@ export function PartnerContractForm({
     } | null;
     if (calc && onCalculatorFill) {
       add(
-        "Motos",
+        "Veículos",
         "calculator",
         true,
         () => onCalculatorFill({ key: Date.now(), ...calc }),
@@ -478,7 +478,7 @@ export function PartnerContractForm({
                     name="fixedPayout"
                     render={({ field }) => (
                       <MoneyField
-                        label="Repasse por moto (mês)"
+                        label="Repasse por veículo (mês)"
                         value={field.value}
                         onChange={field.onChange}
                         error={errors.fixedPayout?.message}
@@ -512,13 +512,13 @@ export function PartnerContractForm({
                 </Col>
                 <Col>
                   <Text size="xs" tone="muted">
-                    A empresa leva a moto na oficina e paga a conta. No fim do
+                    A empresa leva o veículo na oficina e paga a conta. No fim do
                     mês, do repasse do dono sai{" "}
                     {costPlusFee
                       ? "a conta inteira da oficina, mais o percentual de taxa"
                       : "só o percentual da conta da oficina; o resto a empresa assume"}
                     . O seguro também sai do repasse, inteiro. O repasse por
-                    moto é o máximo, proporcional aos dias alugada; se os
+                    veículo é o máximo, proporcional aos dias alugado; se os
                     descontos passarem dele, a diferença fica para o mês
                     seguinte.
                   </Text>
