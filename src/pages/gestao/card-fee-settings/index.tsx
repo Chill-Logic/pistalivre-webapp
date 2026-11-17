@@ -244,26 +244,40 @@ export function CardFeeSettingsPage() {
                     key={index}
                     className="items-end gap-y-3 rounded-lg border p-3"
                   >
-                    <Col span={6} md={2}>
-                      <FormField
-                        label="De"
-                        inputMode="numeric"
-                        value={row.from}
-                        onChange={(e) =>
-                          update(index, { from: onlyDigits(e.target.value) })
-                        }
-                      />
-                    </Col>
-                    <Col span={6} md={2}>
-                      <FormField
-                        label="Até"
-                        inputMode="numeric"
-                        value={row.to}
-                        onChange={(e) =>
-                          update(index, { to: onlyDigits(e.target.value) })
-                        }
-                      />
-                    </Col>
+                    {row.from === "1" && row.to === "1" ? (
+                      // Only 1×: it reads "À vista", not "de 1 até 1".
+                      <Col md={4} className="self-center">
+                        <Text weight="medium">À vista</Text>
+                        <Text size="xs" tone="muted">
+                          1× no cartão
+                        </Text>
+                      </Col>
+                    ) : (
+                      <>
+                        <Col span={6} md={2}>
+                          <FormField
+                            label="De"
+                            inputMode="numeric"
+                            value={row.from}
+                            onChange={(e) =>
+                              update(index, {
+                                from: onlyDigits(e.target.value),
+                              })
+                            }
+                          />
+                        </Col>
+                        <Col span={6} md={2}>
+                          <FormField
+                            label="Até"
+                            inputMode="numeric"
+                            value={row.to}
+                            onChange={(e) =>
+                              update(index, { to: onlyDigits(e.target.value) })
+                            }
+                          />
+                        </Col>
+                      </>
+                    )}
                     <Col span={6} md={3}>
                       <PercentField
                         label="Percentual"
@@ -285,7 +299,7 @@ export function CardFeeSettingsPage() {
                         size="icon"
                         className="text-destructive"
                         aria-label={`Remover faixa ${index + 1}`}
-                        disabled={rows.length === 1}
+                        disabled={index === 0}
                         onClick={() =>
                           setRows(rows.filter((_, i) => i !== index))
                         }
