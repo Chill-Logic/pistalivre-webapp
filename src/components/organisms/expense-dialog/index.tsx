@@ -101,7 +101,7 @@ export function ExpenseDialog({ target, trigger }: ExpenseDialogProps) {
       }}
     >
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto">
+      <DialogContent size="lg">
         {open && (
           <ExpenseForm
             target={target}
@@ -338,9 +338,10 @@ function ExpenseForm({
           : `${name}${context.length ? ` · ${context.join(" · ")}` : ""}`}
       </DialogDescription>
       <Form onSubmit={onSubmit} noValidate className="space-y-4">
+        {/* Wide form: what and when, then the money, then how it was paid. */}
         <Row className="gap-y-4">
           {isOneOff && (
-            <Col>
+            <Col md={12} lg={6}>
               <FormField
                 label="O que foi"
                 placeholder="Ex.: IPVA da moto"
@@ -352,7 +353,7 @@ function ExpenseForm({
             </Col>
           )}
           {(isOneOff || target.kind === "supplierMonth") && (
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <SelectField
                 label="Mês"
                 value={state.month}
@@ -364,7 +365,7 @@ function ExpenseForm({
             </Col>
           )}
           {perVehicle && supplier && (
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <SelectField
                 label="Veículo"
                 value={state.vehicleId}
@@ -386,7 +387,7 @@ function ExpenseForm({
             </Col>
           )}
           {isOneOff && (
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <RemoteCombobox
                 label="Veículo (opcional)"
                 value={picked?.value ?? state.vehicleId}
@@ -408,7 +409,7 @@ function ExpenseForm({
               />
             </Col>
           )}
-          <Col md={6}>
+          <Col md={6} lg={3}>
             <SelectField
               label="Situação"
               value={state.status}
@@ -419,7 +420,7 @@ function ExpenseForm({
             />
           </Col>
           {isOneOff && (
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <SelectField
                 label="Moeda"
                 value={state.currency}
@@ -434,7 +435,7 @@ function ExpenseForm({
             </Col>
           )}
           {state.status !== "WAIVED" && isForeign && (
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <MoneyField
                 label={`Valor em ${currencySymbol(state.currency)}`}
                 value={state.foreignAmount}
@@ -448,7 +449,7 @@ function ExpenseForm({
             </Col>
           )}
           {state.status !== "WAIVED" && (
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <MoneyField
                 label={
                   isForeign
@@ -482,9 +483,10 @@ function ExpenseForm({
             onCardChange={(value) => set("paymentCardId", value)}
             errors={errors}
             disabled={pending}
+            cols={{ md: 6, lg: 3 }}
           />
           {state.status === "PAID" && (
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <DateField
                 label="Dia do pagamento"
                 value={state.paidAt}
@@ -497,6 +499,7 @@ function ExpenseForm({
             <TextareaField
               label="Observação (opcional)"
               rows={2}
+              className="min-h-16"
               value={state.notes}
               onChange={(event) => set("notes", event.target.value)}
               error={errors.notes}

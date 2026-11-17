@@ -17,13 +17,14 @@ import { Col, Row } from "@/components/atoms/grid";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
-import { CheckboxField } from "@/components/molecules/checkbox-field";
 import { DateField } from "@/components/molecules/date-field";
 import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { SelectField } from "@/components/molecules/select-field";
 import { TextareaField } from "@/components/molecules/textarea-field";
-import { InstallmentComposer } from "@/components/organisms/installment-composer";
+import { CardPaymentOptions } from "@/components/organisms/card-payment-options";
+import { DEFAULT_CARD_PAYMENT_OPTIONS } from "@/constants/card-payment-options";
+import type { CardPaymentOptionsValue } from "@/types/card-payment-options";
 import { LABEL_MAPS, type LabelMapName } from "@/constants/label-maps";
 import { toApiError } from "@/helpers/api-error";
 import {
@@ -34,15 +35,12 @@ import {
 import { useCautionPlan } from "@/hooks/api/gestao/charges/useCautionPlan";
 import {
   useCreateCautionCharges,
-  useCreateInstallmentCharges,
   useCreateRentalCharge,
 } from "@/hooks/api/gestao/charges/useChargeMutations";
 import { useIdempotencyKey } from "@/hooks/ui/useIdempotencyKey";
 import { useLabels } from "@/hooks/ui/useLabels";
 import type {
   ChargeBatchResult,
-  ChargeMethod,
-  ChargePlanItem,
   ChargePurpose,
 } from "@/types/charge";
 import type { RatePeriod } from "@/types/rental";
@@ -61,7 +59,16 @@ const PURPOSES: ChargePurpose[] = [
   "CLAIM",
   "OTHER",
 ];
-const METHODS: ChargeMethod[] = ["PIX", "BOLETO"];
+/**
+ * Forma (owner, 2026-11-16): PIX or Card — the same charge (PIX for us, a
+ * boleto with Pix at Asaas); "Cartão" turns the card on in the payment link.
+ * No splitting: whoever wants installments pays by card.
+ */
+type PayWith = "PIX" | "CARD";
+const PAY_WITH = [
+  { value: "PIX", label: "PIX" },
+  { value: "CARD", label: "Cartão de crédito" },
+];
 
 type ChargeFormDialogProps = {
   rentalId: string;
@@ -84,9 +91,8 @@ type Errors = Partial<
 > & { form?: string };
 
 /**
- * Issue charges on the rental, three ways (as the management app):
+ * Issue charges on the rental, two ways:
  * - one charge;
- * - "Parcelar": N independent charges split by the server;
  * - Caução: the deposit the rental's settings imply (dates editable;
  *   the ones already charged are skipped).
  * The description is the standard one (purpose, vehicle, plate, code),
@@ -103,24 +109,22 @@ export function ChargeFormDialog({
   const { label } = useLabels();
   const create = useCreateRentalCharge(rentalId);
   const createCaution = useCreateCautionCharges(rentalId);
-  const createInstallments = useCreateInstallmentCharges(rentalId);
   const idempotency = useIdempotencyKey();
   const [open, setOpen] = useState(false);
-  const [split, setSplit] = useState(false);
-  const [installments, setInstallments] = useState<ChargePlanItem[]>([]);
-  const [composerKey, setComposerKey] = useState(0);
   const [cautionDates, setCautionDates] = useState<Record<number, string>>({});
   const [itemErrors, setItemErrors] = useState<Record<number, string>>({});
   const [partial, setPartial] = useState<string | null>(null);
   const [purpose, setPurpose] = useState<ChargePurpose>("RENT");
-  const [method, setMethod] = useState<ChargeMethod>("PIX");
+  const [payWith, setPayWith] = useState<PayWith>("PIX");
+  const [card, setCard] = useState<CardPaymentOptionsValue>(
+    DEFAULT_CARD_PAYMENT_OPTIONS,
+  );
   const [amount, setAmount] = useState<number | null>(rate);
   const [dueDate, setDueDate] = useState("");
   const [referenceDate, setReferenceDate] = useState("");
   const [fine, setFine] = useState(DEFAULT_FINE);
   const [interest, setInterest] = useState(DEFAULT_INTEREST);
   const [description, setDescription] = useState("");
-  const [acceptsCard, setAcceptsCard] = useState(false);
   const [duplicate, setDuplicate] = useState<string | null>(null);
   const [errors, setErrors] = useState<Errors>({});
   const [blocked, setBlocked] = useState(false);
@@ -128,26 +132,29 @@ export function ChargeFormDialog({
   const surchargeFree = purpose === "RENT" && ratePeriod === "DAILY";
   const isCaution = purpose === "CAUTION";
   const cautionPlan = useCautionPlan(rentalId, open && isCaution);
-  const pending =
-    create.isPending || createCaution.isPending || createInstallments.isPending;
-  const mode = isCaution ? "caution" : split ? "installments" : "single";
+  const pending = create.isPending || createCaution.isPending;
+  const mode = isCaution ? "caution" : "single";
+  const cardInput = () => ({
+    acceptsCard: payWith === "CARD",
+    cardInstallments: payWith === "CARD" && card.installments,
+    cardPassFees: card.passFees,
+    cardPassInstallmentFee: card.passInstallmentFee,
+    cardPassAnticipation: card.passAnticipation,
+  });
 
   const reset = () => {
     setPurpose(caution ? "CAUTION" : "RENT");
-    setMethod("PIX");
+    setPayWith("PIX");
+    setCard(DEFAULT_CARD_PAYMENT_OPTIONS);
     setAmount(caution ? null : rate);
     setDueDate("");
     setReferenceDate("");
     setFine(DEFAULT_FINE);
     setInterest(DEFAULT_INTEREST);
     setDescription("");
-    setAcceptsCard(false);
     setDuplicate(null);
     setErrors({});
     setBlocked(false);
-    setSplit(false);
-    setInstallments([]);
-    setComposerKey((key) => key + 1);
     setCautionDates({});
     setItemErrors({});
     setPartial(null);
@@ -217,8 +224,8 @@ export function ChargeFormDialog({
         {
           key: idempotency.key,
           input: {
-            method,
-            acceptsCard,
+            method: "PIX",
+            ...cardInput(),
             ...surcharge(),
             items: cautionItems.map((item) => ({
               label: item.label,
@@ -231,28 +238,6 @@ export function ChargeFormDialog({
       );
       return;
     }
-    if (purpose === "OTHER" && !description.trim()) {
-      setErrors({ description: "Descreva a cobrança" });
-      return;
-    }
-    if (installments.length === 0) {
-      setErrors({ form: "Monte as parcelas antes de emitir." });
-      return;
-    }
-    createInstallments.mutate(
-      {
-        key: idempotency.key,
-        input: {
-          purpose: purpose as Exclude<ChargePurpose, "CAUTION">,
-          method,
-          acceptsCard,
-          ...surcharge(),
-          ...(purpose === "OTHER" ? { description: description.trim() } : {}),
-          items: installments,
-        },
-      },
-      batchHandlers,
-    );
   };
 
   const submit = (confirmDuplicate: boolean) => {
@@ -270,10 +255,10 @@ export function ChargeFormDialog({
         key: idempotency.key,
         input: {
           purpose,
-          method,
+          method: "PIX",
           amount,
           dueDate,
-          acceptsCard,
+          ...cardInput(),
           ...surcharge(),
           ...(purpose === "RENT" && referenceDate ? { referenceDate } : {}),
           ...(purpose === "OTHER" ? { description: description.trim() } : {}),
@@ -327,14 +312,15 @@ export function ChargeFormDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent size="lg">
         <DialogTitle>Nova cobrança</DialogTitle>
         <DialogDescription>
           Sai pelo Asaas, com fatura e pix para o cliente.
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
+          {/* Wide form: what it is and how much in one line, rules in the next. */}
           <Row className="gap-y-4">
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <SelectField
                 label="Finalidade"
                 value={purpose}
@@ -343,34 +329,18 @@ export function ChargeFormDialog({
                 disabled={pending}
               />
             </Col>
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <SelectField
                 label="Forma"
-                value={method}
-                options={options(METHODS, LABEL_MAPS.paymentMethod)}
-                onChange={(value) => setMethod(value as ChargeMethod)}
+                value={payWith}
+                options={PAY_WITH}
+                onChange={(value) => setPayWith(value as PayWith)}
                 disabled={pending}
               />
             </Col>
-            {!isCaution && (
-              <Col>
-                <CheckboxField
-                  label="Parcelar em várias vezes"
-                  hint="Cada parcela vira uma cobrança separada."
-                  checked={split}
-                  onChange={(checked) => {
-                    setSplit(checked);
-                    setErrors({});
-                    setItemErrors({});
-                    setPartial(null);
-                  }}
-                  disabled={pending}
-                />
-              </Col>
-            )}
             {mode === "single" && (
               <>
-                <Col md={6}>
+                <Col md={6} lg={3}>
                   <MoneyField
                     label="Valor"
                     value={amount}
@@ -381,7 +351,7 @@ export function ChargeFormDialog({
                     error={errors.amount}
                   />
                 </Col>
-                <Col md={6}>
+                <Col md={6} lg={3}>
                   <DateField
                     label="Vencimento"
                     value={dueDate}
@@ -394,7 +364,7 @@ export function ChargeFormDialog({
                   />
                 </Col>
                 {purpose === "RENT" && (
-                  <Col>
+                  <Col md={6} lg={6}>
                     <DateField
                       label="Referente a (se for de outro dia)"
                       placeholder="O mesmo do vencimento"
@@ -407,13 +377,43 @@ export function ChargeFormDialog({
                 )}
               </>
             )}
-            {mode === "installments" && (
-              <Col>
-                <InstallmentComposer
-                  key={composerKey}
-                  onItemsChange={setInstallments}
-                  itemErrors={itemErrors}
+            {surchargeFree ? (
+              <Col md={6} lg={3}>
+                <Text size="xs" tone="muted">
+                  Aluguel na diária não tem multa nem juros.
+                </Text>
+              </Col>
+            ) : (
+              <>
+                <Col span={6} lg={3}>
+                  <FormField
+                    label="Multa (%)"
+                    inputMode="decimal"
+                    value={fine}
+                    onChange={(event) => setFine(event.target.value)}
+                    error={errors.finePercent}
+                  />
+                </Col>
+                <Col span={6} lg={3}>
+                  <FormField
+                    label="Juros (% ao mês)"
+                    inputMode="decimal"
+                    value={interest}
+                    onChange={(event) => setInterest(event.target.value)}
+                    error={errors.interestPercent}
+                  />
+                </Col>
+              </>
+            )}
+            {payWith === "CARD" && (
+              <Col lg={6}>
+                <CardPaymentOptions
+                  value={card}
+                  onChange={(patch) =>
+                    setCard((current) => ({ ...current, ...patch }))
+                  }
                   disabled={pending}
+                  hints={false}
                 />
               </Col>
             )}
@@ -434,47 +434,13 @@ export function ChargeFormDialog({
                 />
               </Col>
             )}
-            <Col>
-              <CheckboxField
-                label="Aceita cartão no link de pagamento"
-                hint="Além do PIX, o cliente pode pagar no cartão pelo link (juros do parcelamento por conta dele). Dá para mudar depois na cobrança."
-                checked={acceptsCard}
-                onChange={setAcceptsCard}
-              />
-            </Col>
-            {surchargeFree ? (
-              <Col>
-                <Text size="xs" tone="muted">
-                  Aluguel na diária não tem multa nem juros.
-                </Text>
-              </Col>
-            ) : (
-              <>
-                <Col span={6}>
-                  <FormField
-                    label="Multa (%)"
-                    inputMode="decimal"
-                    value={fine}
-                    onChange={(event) => setFine(event.target.value)}
-                    error={errors.finePercent}
-                  />
-                </Col>
-                <Col span={6}>
-                  <FormField
-                    label="Juros (% ao mês)"
-                    inputMode="decimal"
-                    value={interest}
-                    onChange={(event) => setInterest(event.target.value)}
-                    error={errors.interestPercent}
-                  />
-                </Col>
-              </>
-            )}
             {purpose === "OTHER" ? (
               <Col>
                 <TextareaField
                   label="Descrição"
                   placeholder="O que está sendo cobrado"
+                  rows={2}
+                  className="min-h-16"
                   value={description}
                   onChange={(event) => {
                     setDescription(event.target.value);
@@ -521,16 +487,13 @@ export function ChargeFormDialog({
               disabled={
                 pending ||
                 blocked ||
-                (mode === "caution" && cautionItems.length === 0) ||
-                (mode === "installments" && installments.length === 0)
+                (mode === "caution" && cautionItems.length === 0)
               }
             >
               {pending && <Spinner className="text-primary-foreground" />}
               {mode === "caution"
                 ? `Emitir caução (${cautionItems.length})`
-                : mode === "installments"
-                  ? `Emitir ${installments.length} ${installments.length === 1 ? "parcela" : "parcelas"}`
-                  : "Emitir cobrança"}
+                : "Emitir cobrança"}
             </Button>
           </DialogFooter>
         </Form>
@@ -585,38 +548,43 @@ function CautionPlanFields({
   return (
     <Box className="space-y-3">
       <Text weight="medium">Cobranças da caução ({items.length})</Text>
-      {items.map((item, index) => {
-        if (item.emitted) {
+      {/* Side by side: a long deposit plan doesn't stretch the dialog. */}
+      <Row className="items-end gap-y-3">
+        {items.map((item, index) => {
+          if (item.emitted) {
+            return (
+              <Col key={index} md={6} lg={4}>
+                <Text size="sm" tone="muted">
+                  {item.label} · {formatCurrency(item.amount)} · já emitida
+                </Text>
+              </Col>
+            );
+          }
+          sentIndex += 1;
+          const value = dates[index] ?? item.dueDate;
+          // The plan's date unchanged: the server knows where it falls due.
+          const pushedTo =
+            value === item.dueDate && item.chargeDueDate !== item.dueDate
+              ? item.chargeDueDate
+              : undefined;
           return (
-            <Text key={index} size="sm" tone="muted">
-              {item.label} · {formatCurrency(item.amount)} · já emitida
-            </Text>
+            <Col key={index} md={6} lg={4} className="space-y-1">
+              <DateField
+                label={`${item.label} · ${formatCurrency(item.amount)}`}
+                value={value}
+                onChange={(next) => onDateChange(index, next)}
+                error={itemErrors[sentIndex]}
+              />
+              {pushedTo && (
+                <Text size="xs" tone="muted">
+                  Cai em domingo ou feriado: vence{" "}
+                  {formatCalendarDate(pushedTo)} (próximo dia útil).
+                </Text>
+              )}
+            </Col>
           );
-        }
-        sentIndex += 1;
-        const value = dates[index] ?? item.dueDate;
-        // The plan's date unchanged: the server knows where it falls due.
-        const pushedTo =
-          value === item.dueDate && item.chargeDueDate !== item.dueDate
-            ? item.chargeDueDate
-            : undefined;
-        return (
-          <Box key={index} className="space-y-1">
-            <DateField
-              label={`${item.label} · ${formatCurrency(item.amount)}`}
-              value={value}
-              onChange={(next) => onDateChange(index, next)}
-              error={itemErrors[sentIndex]}
-            />
-            {pushedTo && (
-              <Text size="xs" tone="muted">
-                Cai em domingo ou feriado: vence {formatCalendarDate(pushedTo)}{" "}
-                (próximo dia útil).
-              </Text>
-            )}
-          </Box>
-        );
-      })}
+        })}
+      </Row>
     </Box>
   );
 }

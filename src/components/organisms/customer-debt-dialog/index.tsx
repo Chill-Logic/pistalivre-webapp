@@ -123,15 +123,16 @@ export function CustomerDebtDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent size="lg">
         <DialogTitle>{debt ? "Editar débito" : "Registrar débito"}</DialogTitle>
         <DialogDescription>
           O que o cliente deve à locadora. Ele paga com a parte da diária
           separada para débitos (nos valores da locação) ou à vista.
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
+          {/* Wide form: what it is in one line, the dates in the next. */}
           <Row className="gap-y-4">
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <SelectField
                 label="Origem"
                 value={origin}
@@ -144,7 +145,7 @@ export function CustomerDebtDialog({
                 disabled={save.isPending}
               />
             </Col>
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <MoneyField
                 label="Valor total"
                 value={amount}
@@ -155,7 +156,7 @@ export function CustomerDebtDialog({
                 error={errors.amount}
               />
             </Col>
-            <Col>
+            <Col lg={6}>
               <FormField
                 label="Descrição (aparece para o cliente)"
                 placeholder="Ex.: conserto da carenagem"
@@ -164,7 +165,7 @@ export function CustomerDebtDialog({
                 error={errors.description}
               />
             </Col>
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <DateField
                 label="Dia do fato"
                 value={incurredAt}
@@ -172,7 +173,7 @@ export function CustomerDebtDialog({
                 error={errors.incurredAt}
               />
             </Col>
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <DateField
                 label="Abate a partir de"
                 value={startsAt}
@@ -183,6 +184,8 @@ export function CustomerDebtDialog({
             <Col>
               <TextareaField
                 label="Observação interna (opcional)"
+                rows={2}
+                className="min-h-16"
                 value={notes}
                 onChange={(event) => setNotes(event.target.value)}
                 error={errors.notes}

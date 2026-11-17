@@ -120,13 +120,14 @@ export function PaymentCardDialog({ trigger, card }: PaymentCardDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto">
+      <DialogContent size="lg">
         <DialogTitle>{card ? `Editar ${card.name}` : "Novo cartão"}</DialogTitle>
         <DialogDescription>
           Só os 4 últimos dígitos, para reconhecer o cartão. O acréscimo é o que
           ele cobra numa compra em dólar ou euro (IOF + spread).
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
+          {/* Wide form: name, then whose it is, then the surcharge. */}
           <Row className="gap-y-4">
             <Col md={8}>
               <FormField
@@ -151,7 +152,7 @@ export function PaymentCardDialog({ trigger, card }: PaymentCardDialogProps) {
                 disabled={save.isPending}
               />
             </Col>
-            <Col>
+            <Col md={6}>
               <SegmentedField
                 label="De quem é"
                 value={state.holderType}
@@ -161,7 +162,7 @@ export function PaymentCardDialog({ trigger, card }: PaymentCardDialogProps) {
               />
             </Col>
             {state.holderType === "USER" && (
-              <Col>
+              <Col md={6}>
                 <RemoteCombobox
                   label="Pessoa da equipe"
                   value={state.holder?.value ?? ""}
@@ -189,7 +190,7 @@ export function PaymentCardDialog({ trigger, card }: PaymentCardDialogProps) {
               />
             </Col>
             {card && (
-              <Col>
+              <Col md={6}>
                 <CheckboxField
                   label="Ativo"
                   hint="Cartão inativo sai das opções; o que já foi pago com ele continua."

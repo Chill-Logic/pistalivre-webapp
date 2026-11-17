@@ -183,7 +183,7 @@ export function ManualPaymentDialog({
           Registrar recebimento
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent size="lg">
         <DialogTitle>Registrar recebimento</DialogTitle>
         <DialogDescription>
           Para pagamentos feitos fora do Asaas (pix direto para a gente). Nada é
@@ -203,8 +203,9 @@ export function ManualPaymentDialog({
               disabled={create.isPending}
             />
           )}
+          {/* Wide form: what was owed in one line, what was paid in the next. */}
           <Row className="gap-y-4">
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <SelectField
                 label="Finalidade"
                 value={purpose}
@@ -213,7 +214,7 @@ export function ManualPaymentDialog({
                 disabled={create.isPending}
               />
             </Col>
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <SelectField
                 label="Forma"
                 value={method}
@@ -222,7 +223,7 @@ export function ManualPaymentDialog({
                 disabled={create.isPending}
               />
             </Col>
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <MoneyField
                 label="Quanto deveria pagar"
                 value={amount}
@@ -235,7 +236,7 @@ export function ManualPaymentDialog({
                 error={errors.amount}
               />
             </Col>
-            <Col md={6}>
+            <Col md={6} lg={3}>
               <DateField
                 label="Quando deveria pagar"
                 value={dueDate}
@@ -246,45 +247,49 @@ export function ManualPaymentDialog({
                 error={errors.dueDate}
               />
             </Col>
+            <Col lg={6}>
+              <CheckboxField
+                label="Já recebi este pagamento"
+                checked={settled}
+                onChange={setSettled}
+                disabled={create.isPending}
+              />
+            </Col>
+            {settled ? (
+              <>
+                <Col md={6} lg={3}>
+                  <MoneyField
+                    label="Quanto pagou"
+                    value={paidValue}
+                    onChange={(value) => {
+                      setPaidValue(value);
+                      setPaidTouched(true);
+                      setErrors({});
+                    }}
+                    error={errors.paidValue}
+                  />
+                </Col>
+                <Col md={6} lg={3}>
+                  <DateField
+                    label="Quando pagou"
+                    value={paidAt}
+                    onChange={(value) => {
+                      setPaidAt(value);
+                      setErrors({});
+                    }}
+                    error={errors.paidAt}
+                  />
+                </Col>
+              </>
+            ) : (
+              <Col lg={6}>
+                <Text size="xs" tone="muted">
+                  Fica em aberto. Quando o cliente pagar, use “Dar baixa” na
+                  cobrança.
+                </Text>
+              </Col>
+            )}
           </Row>
-          <CheckboxField
-            label="Já recebi este pagamento"
-            checked={settled}
-            onChange={setSettled}
-            disabled={create.isPending}
-          />
-          {settled ? (
-            <Row className="gap-y-4">
-              <Col md={6}>
-                <MoneyField
-                  label="Quanto pagou"
-                  value={paidValue}
-                  onChange={(value) => {
-                    setPaidValue(value);
-                    setPaidTouched(true);
-                    setErrors({});
-                  }}
-                  error={errors.paidValue}
-                />
-              </Col>
-              <Col md={6}>
-                <DateField
-                  label="Quando pagou"
-                  value={paidAt}
-                  onChange={(value) => {
-                    setPaidAt(value);
-                    setErrors({});
-                  }}
-                  error={errors.paidAt}
-                />
-              </Col>
-            </Row>
-          ) : (
-            <Text size="xs" tone="muted">
-              Fica em aberto. Quando o cliente pagar, use “Dar baixa” na
-              cobrança.
-            </Text>
-          )}
           {paidLess && (
             <Alert variant="warning">
               Pagou menos do que devia: a diferença continua em aberto como
@@ -299,6 +304,8 @@ export function ManualPaymentDialog({
           <TextareaField
             label="Observação (opcional)"
             placeholder="Ex.: pix direto na conta C6, comprovante no WhatsApp"
+            rows={2}
+            className="min-h-16"
             value={note}
             onChange={(event) => setNote(event.target.value)}
             error={errors.label}

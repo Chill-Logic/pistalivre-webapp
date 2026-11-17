@@ -91,7 +91,7 @@ export function DebtPaymentDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent size="lg">
         {open && (
           <DebtPaymentForm
             debt={debt}
@@ -130,7 +130,7 @@ export function DebtListPaymentDialog({
       }}
     >
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent>
+      <DialogContent size="lg">
         {open && (
           <DebtPaymentLoader
             debtId={debtId}
@@ -342,9 +342,10 @@ function DebtPaymentForm({
         {formatCurrency(debt.balance.outstanding)}.
       </DialogDescription>
       <Form onSubmit={onSubmit} noValidate className="space-y-4">
+        {/* Wide form: what and which slip, then the four amounts in a line. */}
         <Row className="gap-y-4">
           {openInstallments.length > 0 && (
-            <Col>
+            <Col lg={6}>
               <SelectField
                 label="O que está sendo pago"
                 value={selected}
@@ -354,17 +355,7 @@ function DebtPaymentForm({
               />
             </Col>
           )}
-          {earlierOpen > 0 && (
-            <Col>
-              <Alert variant="warning">
-                {earlierOpen === 1
-                  ? "Há 1 parcela anterior em aberto."
-                  : `Há ${earlierOpen} parcelas anteriores em aberto.`}{" "}
-                O pagamento cobre sempre da mais antiga para a frente.
-              </Alert>
-            </Col>
-          )}
-          <Col>
+          <Col lg={openInstallments.length > 0 ? 6 : 12}>
             <FormField
               label="Código do boleto (opcional)"
               placeholder="Cole a linha digitável ou o código de barras"
@@ -377,6 +368,16 @@ function DebtPaymentForm({
               }
             />
           </Col>
+          {earlierOpen > 0 && (
+            <Col>
+              <Alert variant="warning">
+                {earlierOpen === 1
+                  ? "Há 1 parcela anterior em aberto."
+                  : `Há ${earlierOpen} parcelas anteriores em aberto.`}{" "}
+                O pagamento cobre sempre da mais antiga para a frente.
+              </Alert>
+            </Col>
+          )}
           {boleto && (
             <Col className="space-y-2">
               <Text size="xs" tone="muted">
@@ -407,7 +408,7 @@ function DebtPaymentForm({
               )}
             </Col>
           )}
-          <Col md={6}>
+          <Col md={6} lg={3}>
             <MoneyField
               label="Valor pago"
               value={amount}
@@ -418,7 +419,7 @@ function DebtPaymentForm({
               error={errors.amount}
             />
           </Col>
-          <Col md={6}>
+          <Col md={6} lg={3}>
             <DateField
               label="Data do pagamento"
               value={paidAt}
@@ -429,7 +430,7 @@ function DebtPaymentForm({
               error={errors.paidAt}
             />
           </Col>
-          <Col span={6}>
+          <Col span={6} lg={3}>
             <MoneyField
               label="Multa/juros pagos"
               value={surcharge}
@@ -441,7 +442,7 @@ function DebtPaymentForm({
               error={errors.surcharge}
             />
           </Col>
-          <Col span={6}>
+          <Col span={6} lg={3}>
             <MoneyField
               label="Desconto"
               value={discount}
@@ -480,6 +481,8 @@ function DebtPaymentForm({
           <Col>
             <TextareaField
               label="Observação (opcional)"
+              rows={2}
+              className="min-h-16"
               value={notes}
               onChange={(event) => setNotes(event.target.value)}
               disabled={add.isPending}

@@ -140,40 +140,43 @@ export function RateSegmentDialog({ billing }: { billing: RentalBilling }) {
           Alterar valores
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent size="lg">
         <DialogTitle>Alterar valores</DialogTitle>
         <DialogDescription>
           Vale a partir da data escolhida. Os dias antes dela continuam com o
           valor que tinham.
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
-          <Box className="space-y-1">
-            <DateField
-              label="A partir de"
-              value={from}
-              onChange={(value) => {
-                setFrom(value);
-                setErrors({});
-              }}
-              error={errors.from}
-            />
-            {firstUncovered &&
-              firstUncovered > minFrom &&
-              from !== firstUncovered && (
-                <Button
-                  type="button"
-                  variant="link"
-                  size="sm"
-                  className="h-auto md:h-auto p-0 text-xs"
-                  onClick={() => setFrom(firstUncovered)}
-                >
-                  Usar {formatCalendarDate(firstUncovered)}: primeiro dia ainda
-                  não cobrado
-                </Button>
-              )}
-          </Box>
+          {/* Wide form: from when and the rate in one line, the share below. */}
           <Row className="gap-y-4">
-            <Col span={7}>
+            <Col lg={4}>
+              <Box className="space-y-1">
+                <DateField
+                  label="A partir de"
+                  value={from}
+                  onChange={(value) => {
+                    setFrom(value);
+                    setErrors({});
+                  }}
+                  error={errors.from}
+                />
+                {firstUncovered &&
+                  firstUncovered > minFrom &&
+                  from !== firstUncovered && (
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="sm"
+                      className="h-auto md:h-auto p-0 text-xs"
+                      onClick={() => setFrom(firstUncovered)}
+                    >
+                      Usar {formatCalendarDate(firstUncovered)}: primeiro dia
+                      ainda não cobrado
+                    </Button>
+                  )}
+              </Box>
+            </Col>
+            <Col span={7} lg={5}>
               <MoneyField
                 label="Valor"
                 value={rate}
@@ -184,7 +187,7 @@ export function RateSegmentDialog({ billing }: { billing: RentalBilling }) {
                 error={errors.rate}
               />
             </Col>
-            <Col span={5}>
+            <Col span={5} lg={3}>
               <SelectField
                 label="Período"
                 value={period}
@@ -192,7 +195,9 @@ export function RateSegmentDialog({ billing }: { billing: RentalBilling }) {
                 onChange={(value) => setPeriod(value as RatePeriod)}
               />
             </Col>
-            <Col span={7}>
+            {/* Keeps the share under the rate on the wide layout. */}
+            <Col lg={4} className="hidden lg:block" />
+            <Col span={7} lg={5}>
               <MoneyField
                 label="Parte para débitos (opcional)"
                 value={share}
@@ -200,7 +205,7 @@ export function RateSegmentDialog({ billing }: { billing: RentalBilling }) {
                 error={errors.debtShare}
               />
             </Col>
-            <Col span={5}>
+            <Col span={5} lg={3}>
               <SelectField
                 label="Período"
                 value={sharePeriod}
