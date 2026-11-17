@@ -12,16 +12,18 @@ import { Image } from "@/components/atoms/image";
 import { Text } from "@/components/atoms/text";
 import { useCopy } from "@/hooks/ui/useCopy";
 import type { Charge } from "@/types/rental";
-import { formatDateTime } from "@/utils/format";
+import { formatCalendarDate, formatDate } from "@/utils/format";
 
 type PixQrDialogProps = {
   pix: NonNullable<Charge["pix"]>;
   /** What the charge is ("Aluguel · R$ 80,00"), on the dialog's title. */
   title: string;
+  /** The charge's due date (yyyy-mm-dd): the QR still pays after it, with the fine. */
+  dueDate?: string | null;
 };
 
 /** The charge's pix QR (to show the customer) plus the copy-and-paste code. */
-export function PixQrDialog({ pix, title }: PixQrDialogProps) {
+export function PixQrDialog({ pix, title, dueDate }: PixQrDialogProps) {
   const copy = useCopy();
 
   return (
@@ -41,9 +43,13 @@ export function PixQrDialog({ pix, title }: PixQrDialogProps) {
             alt="QR Code do pix"
             className="size-56 rounded-md bg-white p-2"
           />
+          {/* The QR's expiration is not the due date: after the due date it
+              still pays (with fine/interest) until it expires. */}
           {pix.expirationDate && (
-            <Text size="xs" tone="muted">
-              Válido até {formatDateTime(pix.expirationDate)}
+            <Text size="xs" tone="muted" className="text-center">
+              {dueDate
+                ? `Vence ${formatCalendarDate(dueDate)} · aceita pagamento até ${formatDate(pix.expirationDate)}`
+                : `Aceita pagamento até ${formatDate(pix.expirationDate)}`}
             </Text>
           )}
           <Text

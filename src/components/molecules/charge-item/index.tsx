@@ -68,6 +68,7 @@ export function ChargeItem({
           <PixQrDialog
             pix={openPix}
             title={`${title} · ${formatCurrency(amounts.amount)}`}
+            dueDate={charge.dueDate}
           />
         )}
         {charge.invoiceUrl && (
