@@ -17,6 +17,8 @@ export const cardFeesService = {
     bands: CardFeeBand[];
     anticipation: CardAnticipation;
     amount: number;
+    /** Pass the anticipation on in the example (default: no, like a new charge). */
+    passAnticipation: boolean;
   }) {
     const { data } = await http.post<{
       amount: number;

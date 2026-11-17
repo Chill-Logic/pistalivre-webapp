@@ -25,6 +25,7 @@ export function useCardFeesPreview(
     bands: CardFeeBand[];
     anticipation: CardAnticipation;
     amount: number;
+    passAnticipation: boolean;
   } | null,
 ) {
   return useQuery({

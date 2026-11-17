@@ -25,6 +25,7 @@ import { Text } from "@/components/atoms/text";
 import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { PageHeader } from "@/components/molecules/page-header";
+import { SwitchField } from "@/components/molecules/switch-field";
 import { PercentField } from "@/components/molecules/percent-field";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { QueryError } from "@/components/organisms/query-error";
@@ -90,6 +91,8 @@ export function CardFeeSettingsPage() {
     single: number | null;
     installments: number | null;
   }>({ single: 0, installments: 0 });
+  /** Example only: pass the anticipation on (a new charge does not, by default). */
+  const [passAnticipation, setPassAnticipation] = useState(false);
   const [exampleAmount, setExampleAmount] = useState<number | null>(
     DEFAULT_EXAMPLE,
   );
@@ -112,11 +115,12 @@ export function CardFeeSettingsPage() {
             bands: rows.map(toBand),
             anticipation: typedAnticipation,
             amount: exampleAmount,
+            passAnticipation,
           }
         : null,
     // typedAnticipation is derived from `anticipation`.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [rows, anticipation, exampleAmount],
+    [rows, anticipation, exampleAmount, passAnticipation],
   );
   const preview = useCardFeesPreview(useDebouncedValue(draft, 400));
 
@@ -169,7 +173,7 @@ export function CardFeeSettingsPage() {
       )}
       {data && (
         <Row className="items-start gap-y-6">
-          <Col lg={7}>
+          <Col lg={6}>
             <Card>
               <CardHeader>
                 <Box className="flex flex-wrap items-center justify-between gap-2">
@@ -355,7 +359,7 @@ export function CardFeeSettingsPage() {
               </CardContent>
             </Card>
           </Col>
-          <Col lg={5}>
+          <Col lg={6}>
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Exemplo</CardTitle>
@@ -365,6 +369,12 @@ export function CardFeeSettingsPage() {
                   label="Valor da cobrança"
                   value={exampleAmount}
                   onChange={setExampleAmount}
+                />
+                <SwitchField
+                  label="Repassar a antecipação"
+                  hint="Como na cobrança com a caixa Antecipação marcada. Desligado (o padrão), o cliente não paga a antecipação."
+                  checked={passAnticipation}
+                  onChange={setPassAnticipation}
                 />
                 {preview.isError && (
                   <Alert variant="warning">
@@ -385,9 +395,14 @@ export function CardFeeSettingsPage() {
                       <TableHead className="text-right">Parcela</TableHead>
                       <TableHead className="text-right">Total</TableHead>
                       {hasReceived && (
-                        <TableHead className="text-right">
-                          Você recebe
-                        </TableHead>
+                        <>
+                          <TableHead className="text-right">
+                            Sem antecipar
+                          </TableHead>
+                          <TableHead className="text-right">
+                            Antecipando
+                          </TableHead>
+                        </>
                       )}
                     </TableRow>
                   </TableHeader>
@@ -402,28 +417,27 @@ export function CardFeeSettingsPage() {
                           {formatCurrency(o.total)}
                         </TableCell>
                         {hasReceived && (
-                          <TableCell
-                            className={cn(
-                              "text-right",
-                              o.received != null &&
-                                o.received < shownAmount - 0.005 &&
-                                "text-destructive",
-                            )}
-                          >
-                            {o.received != null
-                              ? formatCurrency(o.received)
-                              : "—"}
-                          </TableCell>
+                          <>
+                            <ReceivedCell
+                              value={o.received}
+                              amount={shownAmount}
+                            />
+                            <ReceivedCell
+                              value={o.receivedAnticipating}
+                              amount={shownAmount}
+                            />
+                          </>
                         )}
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
                 <Text size="xs" tone="muted">
-                  Com tudo repassado ao cliente. "Você recebe" desconta a taxa
-                  real do Asaas (sem antecipação); em vermelho, vocês absorvem
-                  parte dela. Acompanha o que você digita; só vale nas cobranças
-                  depois de salvar.
+                  Quanto vocês recebem depois da taxa real do Asaas, sem
+                  antecipar e antecipando. Em vermelho, abaixo do valor da
+                  cobrança: vocês absorvem parte da taxa — se for antecipar,
+                  marque Antecipação na cobrança. Acompanha o que você digita;
+                  só vale nas cobranças depois de salvar.
                 </Text>
               </CardContent>
             </Card>
@@ -431,5 +445,25 @@ export function CardFeeSettingsPage() {
         </Row>
       )}
     </Box>
+  );
+}
+
+/** What the company receives (red when below the charge's amount). */
+function ReceivedCell({
+  value,
+  amount,
+}: {
+  value: number | null | undefined;
+  amount: number;
+}) {
+  return (
+    <TableCell
+      className={cn(
+        "text-right",
+        value != null && value < amount - 0.005 && "text-destructive",
+      )}
+    >
+      {value != null ? formatCurrency(value) : "—"}
+    </TableCell>
   );
 }

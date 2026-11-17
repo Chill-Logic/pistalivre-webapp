@@ -66,6 +66,8 @@ export type CardInstallmentOption = {
   interest: number;
   /** Settings screen only: what the company receives after the real Asaas fee (null = unknown). */
   received?: number | null;
+  /** Settings screen only: what is left if the company anticipates (real Asaas anticipation). */
+  receivedAnticipating?: number | null;
 };
 
 /** GET /public/pay/:token: the checkout as the payer sees it (minimal data). */
