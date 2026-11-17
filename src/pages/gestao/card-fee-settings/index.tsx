@@ -29,6 +29,7 @@ import { PercentField } from "@/components/molecules/percent-field";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { QueryError } from "@/components/organisms/query-error";
 import { toApiError } from "@/helpers/api-error";
+import { feeBandsSummary } from "@/helpers/card-fees";
 import {
   useCardFees,
   useCardFeesPreview,
@@ -37,7 +38,7 @@ import {
 import { useDebouncedValue } from "@/hooks/ui/useDebouncedValue";
 import type { CardAnticipation, CardFeeBand } from "@/types/card-fees";
 import { cn } from "@/utils/cn";
-import { formatCurrency } from "@/utils/format";
+import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
 /** A band as typed: installments as text (digits only), money/percent as numbers. */
 type Draft = {
@@ -143,6 +144,17 @@ export function CardFeeSettingsPage() {
 
   const data = settings.data;
   const options = preview.data?.options ?? data?.example.options ?? [];
+  const shownAmount =
+    preview.data?.amount ?? data?.example.amount ?? DEFAULT_EXAMPLE;
+  const hasReceived = options.some((o) => o.received != null);
+
+  /** "Usar as taxas do Asaas": fills the bands and the anticipation (not saved yet). */
+  const applyProviderFees = (bands: CardFeeBand[]) => {
+    if (!data?.asaas) return;
+    setRows(bands.map(toDraft));
+    setAnticipation(data.asaas.anticipation);
+    setError(null);
+  };
 
   return (
     <Box className="space-y-6">
@@ -175,6 +187,54 @@ export function CardFeeSettingsPage() {
                   e a taxa por parcela da faixa. As faixas começam em 1× e se
                   emendam; a última define o máximo de parcelas (até 21×).
                 </Text>
+                {data.asaas ? (
+                  <Box className="space-y-2 rounded-lg border bg-muted/40 p-3">
+                    <Text size="sm" weight="medium">
+                      Taxas da conta no Asaas
+                    </Text>
+                    <Text size="sm" tone="muted">
+                      {feeBandsSummary(data.asaas.bands)}. Antecipação:{" "}
+                      {data.asaas.anticipation.single.toLocaleString("pt-BR")}%
+                      (à vista) e{" "}
+                      {data.asaas.anticipation.installments.toLocaleString(
+                        "pt-BR",
+                      )}
+                      % (parcelado) ao mês.
+                    </Text>
+                    {data.asaas.promoUntil && (
+                      <Text size="sm" tone="muted">
+                        Promoção até {formatCalendarDate(data.asaas.promoUntil)}
+                        . Depois: {feeBandsSummary(data.asaas.regularBands)}.
+                      </Text>
+                    )}
+                    <Box className="flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => applyProviderFees(data.asaas!.bands)}
+                      >
+                        Usar as taxas do Asaas
+                      </Button>
+                      {data.asaas.promoUntil && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() =>
+                            applyProviderFees(data.asaas!.regularBands)
+                          }
+                        >
+                          Usar as de depois da promoção
+                        </Button>
+                      )}
+                    </Box>
+                  </Box>
+                ) : (
+                  <Text size="xs" tone="muted">
+                    Não deu para ler as taxas do Asaas agora.
+                  </Text>
+                )}
                 {rows.map((row, index) => (
                   <Row
                     key={index}
@@ -324,6 +384,11 @@ export function CardFeeSettingsPage() {
                       <TableHead>Parcelas</TableHead>
                       <TableHead className="text-right">Parcela</TableHead>
                       <TableHead className="text-right">Total</TableHead>
+                      {hasReceived && (
+                        <TableHead className="text-right">
+                          Você recebe
+                        </TableHead>
+                      )}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -336,13 +401,29 @@ export function CardFeeSettingsPage() {
                         <TableCell className="text-right">
                           {formatCurrency(o.total)}
                         </TableCell>
+                        {hasReceived && (
+                          <TableCell
+                            className={cn(
+                              "text-right",
+                              o.received != null &&
+                                o.received < shownAmount - 0.005 &&
+                                "text-destructive",
+                            )}
+                          >
+                            {o.received != null
+                              ? formatCurrency(o.received)
+                              : "—"}
+                          </TableCell>
+                        )}
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
                 <Text size="xs" tone="muted">
-                  Com tudo repassado ao cliente. Acompanha o que você digita; só
-                  vale nas cobranças depois de salvar.
+                  Com tudo repassado ao cliente. "Você recebe" desconta a taxa
+                  real do Asaas (sem antecipação); em vermelho, vocês absorvem
+                  parte dela. Acompanha o que você digita; só vale nas cobranças
+                  depois de salvar.
                 </Text>
               </CardContent>
             </Card>

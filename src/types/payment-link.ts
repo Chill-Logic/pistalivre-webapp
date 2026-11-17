@@ -64,6 +64,8 @@ export type CardInstallmentOption = {
   total: number;
   perInstallment: number;
   interest: number;
+  /** Settings screen only: what the company receives after the real Asaas fee (null = unknown). */
+  received?: number | null;
 };
 
 /** GET /public/pay/:token: the checkout as the payer sees it (minimal data). */
