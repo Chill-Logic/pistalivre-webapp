@@ -161,6 +161,8 @@ export const LEGACY_ROUTES = {
 
 /** Concrete URLs for routes with params. */
 export const routeTo = {
+  /** The public checkout of a payment link (portal area). */
+  portalPay: (token: string) => ROUTES.portalPay.replace(":token", encodeURIComponent(token)),
   vehicle: (id: string) => `${ROUTES.vehicles}/${id}`,
   editVehicle: (id: string) => `${ROUTES.vehicles}/${id}/editar`,
   rental: (id: string) => `${ROUTES.rentals}/${id}`,

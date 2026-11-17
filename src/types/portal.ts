@@ -39,6 +39,8 @@ export type PixQrCode = {
 /** A charge as the portal shows it (Asaas and manual merged, read-only). */
 export type PortalCharge = {
   id: string;
+  /** Our charge id ("Pagar" opens our checkout); null = not ours. */
+  paymentId: string | null;
   title: string | null;
   methodLabel: string;
   dueDate: string | null;

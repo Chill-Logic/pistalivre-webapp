@@ -37,6 +37,13 @@ export const portalService = {
     const { data } = await http.get<Items<PortalCharge>>("/me/charges");
     return data.items;
   },
+  /** "Pagar": the charge's public checkout link (ours, not the Asaas invoice). */
+  async chargePayLink(paymentId: string) {
+    const { data } = await http.post<{ token: string; url: string }>(
+      `/me/charges/${encodeURIComponent(paymentId)}/pay-link`,
+    );
+    return data;
+  },
   async invoices() {
     const { data } = await http.get<Items<PortalInvoice>>("/me/invoices");
     return data.items;

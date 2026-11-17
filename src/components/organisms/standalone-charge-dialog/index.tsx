@@ -15,28 +15,22 @@ import { Form } from "@/components/atoms/form";
 import { Col, Row } from "@/components/atoms/grid";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
-import { CheckboxField } from "@/components/molecules/checkbox-field";
 import { DateField } from "@/components/molecules/date-field";
 import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { SelectField } from "@/components/molecules/select-field";
 import { TextareaField } from "@/components/molecules/textarea-field";
-import { InstallmentComposer } from "@/components/organisms/installment-composer";
 import {
   CustomerRentalPicker,
   type CustomerRentalValue,
 } from "@/components/organisms/customer-rental-picker";
 import { LABEL_MAPS, type LabelMapName } from "@/constants/label-maps";
 import { toApiError } from "@/helpers/api-error";
-import { itemFieldErrors, moneyErrorMessage } from "@/helpers/money-errors";
+import { moneyErrorMessage } from "@/helpers/money-errors";
 import { useCreateStandaloneCharge } from "@/hooks/api/gestao/charges/useStandaloneChargeMutations";
 import { useIdempotencyKey } from "@/hooks/ui/useIdempotencyKey";
 import { useLabels } from "@/hooks/ui/useLabels";
-import type {
-  ChargeMethod,
-  ChargePlanItem,
-  ChargePurpose,
-} from "@/types/charge";
+import type { ChargePurpose } from "@/types/charge";
 
 /** House defaults (management app): 10% fine, 1% interest a month. */
 const DEFAULT_FINE = "10";
@@ -50,7 +44,18 @@ const PURPOSES: ChargePurpose[] = [
   "CLAIM",
   "OTHER",
 ];
-const METHODS: ChargeMethod[] = ["PIX", "BOLETO"];
+/**
+ * Forma (owner, 2026-11-16): PIX or Card. Both are the same charge — PIX for
+ * us, born as a boleto at Asaas (the boleto carries the Pix) — and "Cartão"
+ * only turns the card on in the payment link, with the installment interest
+ * on the customer. No splitting here: whoever wants installments pays by card
+ * (otherwise we would be financing the customer).
+ */
+type PayWith = "PIX" | "CARD";
+const PAY_WITH = [
+  { value: "PIX", label: "PIX" },
+  { value: "CARD", label: "Cartão de crédito" },
+];
 
 type StandaloneChargeDialogProps = {
   /** Fixed customer (customer record). Omit to pick one (Financeiro). */
@@ -89,20 +94,14 @@ export function StandaloneChargeDialog({
   const [open, setOpen] = useState(false);
   const [target, setTarget] = useState(blank);
   const [purpose, setPurpose] = useState<ChargePurpose>("OTHER");
-  const [method, setMethod] = useState<ChargeMethod>("PIX");
+  const [payWith, setPayWith] = useState<PayWith>("PIX");
   const [amount, setAmount] = useState<number | null>(null);
   const [dueDate, setDueDate] = useState("");
   const [fine, setFine] = useState(DEFAULT_FINE);
   const [interest, setInterest] = useState(DEFAULT_INTEREST);
   const [description, setDescription] = useState("");
-  const [acceptsCard, setAcceptsCard] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [blocked, setBlocked] = useState(false);
-  const [split, setSplit] = useState(false);
-  const [composerKey, setComposerKey] = useState(0);
-  const [installments, setInstallments] = useState<ChargePlanItem[]>([]);
-  const [itemErrors, setItemErrors] = useState<Record<number, string>>({});
-  const [partial, setPartial] = useState<string | null>(null);
 
   const onOpenChange = (next: boolean) => {
     if (create.isPending) return;
@@ -110,20 +109,14 @@ export function StandaloneChargeDialog({
     if (!next) return;
     setTarget(blank);
     setPurpose("OTHER");
-    setMethod("PIX");
+    setPayWith("PIX");
     setAmount(null);
     setDueDate("");
     setFine(DEFAULT_FINE);
     setInterest(DEFAULT_INTEREST);
     setDescription("");
-    setAcceptsCard(false);
     setErrors({});
     setBlocked(false);
-    setSplit(false);
-    setComposerKey((key) => key + 1);
-    setInstallments([]);
-    setItemErrors({});
-    setPartial(null);
   };
 
   const freeText = purpose === "OTHER" || !target.rentalId;
@@ -132,18 +125,13 @@ export function StandaloneChargeDialog({
     event.preventDefault();
     const next: Errors = {};
     if (!target.customerId) next.customerId = "Escolha o cliente";
-    if (!split && (!amount || amount <= 0)) next.amount = "Informe o valor";
-    if (!split && !dueDate) next.dueDate = "Informe o vencimento";
-    if (split && installments.length === 0) {
-      next.form = "Monte as parcelas antes de emitir.";
-    }
+    if (!amount || amount <= 0) next.amount = "Informe o valor";
+    if (!dueDate) next.dueDate = "Informe o vencimento";
     if (purpose === "OTHER" && !description.trim()) {
       next.description = "Descreva a cobrança";
     }
     setErrors(next);
     if (Object.keys(next).length > 0) return;
-    setItemErrors({});
-    setPartial(null);
 
     create.mutate(
       {
@@ -152,11 +140,10 @@ export function StandaloneChargeDialog({
           customerId: target.customerId,
           ...(target.rentalId ? { rentalId: target.rentalId } : {}),
           purpose,
-          method,
-          acceptsCard,
-          ...(split
-            ? { items: installments }
-            : { amount: amount ?? 0, dueDate }),
+          method: "PIX",
+          acceptsCard: payWith === "CARD",
+          amount: amount ?? 0,
+          dueDate,
           finePercent: Number(fine.replace(",", ".")) || 0,
           interestPercent: Number(interest.replace(",", ".")) || 0,
           ...(freeText && description.trim()
@@ -165,29 +152,13 @@ export function StandaloneChargeDialog({
         },
       },
       {
-        onSuccess: (result) => {
+        onSuccess: () => {
           idempotency.renew();
-          if (result.code === "PARTIAL" && result.failed?.length) {
-            // Sending the batch again would duplicate what was issued.
-            setBlocked(true);
-            setPartial(
-              `${result.created.length} emitidas; não saíram: ${result.failed
-                .map((fail) => `parcela ${fail.index + 1} (${fail.message})`)
-                .join(", ")}. Emita essas à parte, uma a uma.`,
-            );
-            return;
-          }
           setOpen(false);
         },
         onError: (error) => {
           const apiError = toApiError(error);
           if (apiError.code === "NOT_RECORDED") setBlocked(true);
-          const perItem = itemFieldErrors(apiError.fields);
-          setItemErrors(perItem);
-          if (Object.keys(perItem).length > 0) {
-            setErrors({ form: "Corrija as parcelas marcadas." });
-            return;
-          }
           const fields = apiError.fields ?? {};
           const placed = Object.keys(fields).length > 0;
           setErrors({
@@ -229,7 +200,7 @@ export function StandaloneChargeDialog({
           />
           {/* Wide form: what it is and how much in one line, rules in the next. */}
           <Row className="gap-y-4">
-            <Col md={6} lg={split ? 6 : 3}>
+            <Col md={6} lg={3}>
               <SelectField
                 label="Finalidade"
                 value={purpose}
@@ -238,41 +209,37 @@ export function StandaloneChargeDialog({
                 disabled={create.isPending}
               />
             </Col>
-            <Col md={6} lg={split ? 6 : 3}>
+            <Col md={6} lg={3}>
               <SelectField
                 label="Forma"
-                value={method}
-                options={options(METHODS, LABEL_MAPS.paymentMethod)}
-                onChange={(value) => setMethod(value as ChargeMethod)}
+                value={payWith}
+                options={PAY_WITH}
+                onChange={(value) => setPayWith(value as PayWith)}
                 disabled={create.isPending}
               />
             </Col>
-            {!split && (
-              <>
-                <Col md={6} lg={3}>
-                  <MoneyField
-                    label="Valor"
-                    value={amount}
-                    onChange={(value) => {
-                      setAmount(value);
-                      setErrors({});
-                    }}
-                    error={errors.amount}
-                  />
-                </Col>
-                <Col md={6} lg={3}>
-                  <DateField
-                    label="Vencimento"
-                    value={dueDate}
-                    onChange={(value) => {
-                      setDueDate(value);
-                      setErrors({});
-                    }}
-                    error={errors.dueDate}
-                  />
-                </Col>
-              </>
-            )}
+            <Col md={6} lg={3}>
+              <MoneyField
+                label="Valor"
+                value={amount}
+                onChange={(value) => {
+                  setAmount(value);
+                  setErrors({});
+                }}
+                error={errors.amount}
+              />
+            </Col>
+            <Col md={6} lg={3}>
+              <DateField
+                label="Vencimento"
+                value={dueDate}
+                onChange={(value) => {
+                  setDueDate(value);
+                  setErrors({});
+                }}
+                error={errors.dueDate}
+              />
+            </Col>
             <Col span={6} lg={3}>
               <FormField
                 label="Multa (%)"
@@ -291,36 +258,6 @@ export function StandaloneChargeDialog({
                 error={errors.interestPercent}
               />
             </Col>
-            <Col md={6} lg={6}>
-              <CheckboxField
-                label="Aceita cartão no link de pagamento"
-                hint="Além do PIX, o cliente pode pagar no cartão pelo link (juros do parcelamento por conta dele). Dá para mudar depois na cobrança."
-                checked={acceptsCard}
-                onChange={setAcceptsCard}
-              />
-            </Col>
-            <Col>
-              <CheckboxField
-                label="Parcelar em várias vezes"
-                hint="Cada parcela vira uma cobrança separada."
-                checked={split}
-                onChange={(checked) => {
-                  setSplit(checked);
-                  setErrors({});
-                }}
-                disabled={create.isPending}
-              />
-            </Col>
-            {split && (
-              <Col>
-                <InstallmentComposer
-                  key={composerKey}
-                  onItemsChange={setInstallments}
-                  itemErrors={itemErrors}
-                  disabled={create.isPending}
-                />
-              </Col>
-            )}
           </Row>
           {freeText ? (
             <TextareaField
@@ -342,7 +279,6 @@ export function StandaloneChargeDialog({
               código.
             </Text>
           )}
-          {partial && <Alert variant="warning">{partial}</Alert>}
           {errors.form && <Alert>{errors.form}</Alert>}
           <DialogFooter>
             <DialogClose asChild>
@@ -358,9 +294,7 @@ export function StandaloneChargeDialog({
               {create.isPending && (
                 <Spinner className="text-primary-foreground" />
               )}
-              {split && installments.length > 0
-                ? `Emitir ${installments.length} ${installments.length === 1 ? "parcela" : "parcelas"}`
-                : "Emitir cobrança"}
+              Emitir cobrança
             </Button>
           </DialogFooter>
         </Form>

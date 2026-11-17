@@ -1,5 +1,6 @@
 import {
   Copy,
+  CreditCard,
   ExternalLink as ExternalIcon,
   QrCode,
   RefreshCw,
@@ -19,6 +20,7 @@ import {
   pixImageSrc,
 } from "@/helpers/charge";
 import { renterChargeMeta } from "@/helpers/portal";
+import { useChargeCheckout } from "@/hooks/api/cliente/finance/useChargeCheckout";
 import { useRegeneratePix } from "@/hooks/api/cliente/finance/useRegeneratePix";
 import { useCopy } from "@/hooks/ui/useCopy";
 import { usePixExpired } from "@/hooks/ui/usePixExpired";
@@ -44,6 +46,7 @@ export function PortalChargeItem({
 }) {
   const copy = useCopy();
   const regenerate = useRegeneratePix();
+  const checkout = useChargeCheckout();
   const [showQr, setShowQr] = useState(false);
   const situation = chargeSituation(charge);
   const badge = chargeSituationBadge(situation);
@@ -51,7 +54,10 @@ export function PortalChargeItem({
   const pixExpired = usePixExpired(charge.pix?.expirationDate);
   const pix =
     !readOnly && charge.open && charge.pix && !pixExpired ? charge.pix : null;
-  const invoiceUrl = readOnly ? null : charge.invoiceUrl;
+  // "Pagar" opens OUR checkout (PIX, or card when the charge accepts it); the
+  // Asaas invoice stays only for a charge we cannot open there.
+  const canCheckout = !readOnly && charge.open && Boolean(charge.paymentId);
+  const invoiceUrl = readOnly || canCheckout ? null : charge.invoiceUrl;
   const due = charge.dueDate
     ? `Vence ${formatCalendarDate(charge.dueDate)}${charge.methodLabel ? ` por ${charge.methodLabel}` : ""}`
     : charge.methodLabel;
@@ -104,11 +110,27 @@ export function PortalChargeItem({
           Pago em {formatCalendarDate(charge.paidAt)}
         </Text>
       )}
-      {(pix || invoiceUrl) && (
+      {(canCheckout || pix || invoiceUrl) && (
         <Box className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          {canCheckout && charge.paymentId && (
+            <Button
+              size="sm"
+              disabled={checkout.isPending}
+              onClick={() =>
+                charge.paymentId && checkout.mutate(charge.paymentId)
+              }
+            >
+              {checkout.isPending ? (
+                <Spinner className="text-primary-foreground" />
+              ) : (
+                <CreditCard />
+              )}
+              Pagar
+            </Button>
+          )}
           {pix && (
             <Button
-              variant="default"
+              variant={canCheckout ? "outline" : "default"}
               size="sm"
               onClick={() => copy(pix.payload, "Pix copiado")}
             >
