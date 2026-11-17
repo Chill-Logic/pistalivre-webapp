@@ -26,18 +26,31 @@ import { MoneyField } from "@/components/molecules/money-field";
 import { toApiError } from "@/helpers/api-error";
 import {
   groupedChargeLine,
+  unchargedLine,
   paymentLinkMessage,
   whatsappShareUrl,
 } from "@/helpers/payment-link";
 import { useCreatePaymentLink } from "@/hooks/api/gestao/payment-links/usePaymentLinks";
 import { useIdempotencyKey } from "@/hooks/ui/useIdempotencyKey";
-import type { GroupedCharge, PaymentLink } from "@/types/payment-link";
+import type {
+  GroupedCharge,
+  PaymentLink,
+  UnchargedPeriod,
+} from "@/types/payment-link";
 import { formatCurrency, formatDate } from "@/utils/format";
 
 type PaymentLinkDialogProps = {
   rentalId: string;
   balance: number;
   charges: GroupedCharge[];
+  /** In the balance without a charge (e.g. the last bit of a monthly). */
+  uncharged: UnchargedPeriod[];
+  /** balance − everything listed (server): makes the list add up to the balance. */
+  adjustment: number;
+  /** Fine/interest of the overdue charges it groups (server). */
+  surcharge: number;
+  /** balance + surcharge: the default amount of the link (server). */
+  total: number;
 };
 
 /**
@@ -49,11 +62,15 @@ export function PaymentLinkDialog({
   rentalId,
   balance,
   charges,
+  uncharged,
+  adjustment,
+  surcharge,
+  total,
 }: PaymentLinkDialogProps) {
   const create = useCreatePaymentLink(rentalId);
   const idempotency = useIdempotencyKey();
   const [open, setOpen] = useState(false);
-  const [amount, setAmount] = useState<number | null>(balance);
+  const [amount, setAmount] = useState<number | null>(total);
   const [acceptsCard, setAcceptsCard] = useState(false);
   const [card, setCard] = useState<CardPaymentOptionsValue>(
     DEFAULT_CARD_PAYMENT_OPTIONS,
@@ -65,7 +82,7 @@ export function PaymentLinkDialog({
     if (create.isPending) return;
     setOpen(next);
     if (!next) return;
-    setAmount(balance);
+    setAmount(total);
     setAcceptsCard(false);
     setError(null);
     setCreated(null);
@@ -79,7 +96,7 @@ export function PaymentLinkDialog({
     }
     create.mutate(
       {
-        amount: amount === balance ? null : amount,
+        amount: amount === total ? null : amount,
         acceptsCard,
         cardInstallments: acceptsCard && card.installments,
         cardPassFees: card.passFees,
@@ -149,7 +166,9 @@ export function PaymentLinkDialog({
                 }}
               />
               <Text size="xs" tone="muted">
-                Saldo devedor do sistema: {formatCurrency(balance)}.
+                {surcharge > 0
+                  ? `Saldo ${formatCurrency(balance)} + multa e juros das vencidas ${formatCurrency(surcharge)} = ${formatCurrency(total)}.`
+                  : `Saldo devedor do sistema: ${formatCurrency(balance)}.`}
               </Text>
               <SwitchField
                 label="Aceita cartão"
@@ -186,6 +205,45 @@ export function PaymentLinkDialog({
                   </>
                 )}
               </Box>
+              {uncharged.length > 0 && (
+                <Box className="space-y-1">
+                  <Text size="sm" weight="medium">
+                    No saldo, sem cobrança emitida
+                  </Text>
+                  <List className="text-xs text-muted-foreground">
+                    {uncharged.map((period) => (
+                      <ListItem key={period.from}>
+                        {unchargedLine(period)}
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              )}
+              {/* The list adds up to the balance (numbers from the server). */}
+              {(adjustment !== 0 || uncharged.length > 0 || surcharge > 0) && (
+                <Box className="space-y-0.5 border-t pt-2 text-xs">
+                  {adjustment < 0 && (
+                    <Text size="xs" tone="muted">
+                      Já pago em parte: −{formatCurrency(-adjustment)}
+                    </Text>
+                  )}
+                  {adjustment > 0 && (
+                    <Text size="xs" tone="muted">
+                      Outros valores em aberto: {formatCurrency(adjustment)}
+                    </Text>
+                  )}
+                  {surcharge > 0 && (
+                    <Text size="xs" tone="muted">
+                      Multa e juros das vencidas: +{formatCurrency(surcharge)}
+                    </Text>
+                  )}
+                  <Text size="xs" weight="medium">
+                    {surcharge > 0
+                      ? `Total do link: ${formatCurrency(total)}`
+                      : `Saldo devedor: ${formatCurrency(balance)}`}
+                  </Text>
+                </Box>
+              )}
               {error && <Alert>{error}</Alert>}
               <DialogFooter>
                 <DialogClose asChild>

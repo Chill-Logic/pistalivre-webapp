@@ -1,4 +1,8 @@
-import type { PaymentLink, PaymentLinkState } from "@/types/payment-link";
+import type {
+  PaymentLink,
+  PaymentLinkState,
+  UnchargedPeriod,
+} from "@/types/payment-link";
 import { formatCalendarDate, formatCurrency, formatDate } from "@/utils/format";
 
 export const PAYMENT_LINK_STATE_LABEL: Record<PaymentLinkState, string> = {
@@ -23,7 +27,9 @@ export function paymentLinkPaidLabel(link: PaymentLink) {
   if (link.state !== "PAID") return null;
   const when = link.paidAt ? ` em ${formatDate(link.paidAt)}` : "";
   if (link.paidMethod === "CREDIT_CARD") {
-    const total = link.grossAmount ? ` (${formatCurrency(link.grossAmount)} no cartão)` : "";
+    const total = link.grossAmount
+      ? ` (${formatCurrency(link.grossAmount)} no cartão)`
+      : "";
     return `Pago no cartão ${link.installments ?? 1}×${total}${when}`;
   }
   return `Pago no PIX${when}`;
@@ -34,14 +40,28 @@ export function paymentLinkMessage(link: PaymentLink) {
   return [
     `Olá! Segue o link para pagar o saldo da sua locação: ${formatCurrency(link.amount)}.`,
     "É só abrir o link e pagar.",
-    link.expiresAt ? `O link vale até ${formatDate(link.expiresAt)}: ${link.url}` : link.url,
+    link.expiresAt
+      ? `O link vale até ${formatDate(link.expiresAt)}: ${link.url}`
+      : link.url,
   ].join("\n");
 }
 
 export const whatsappShareUrl = (text: string) =>
   `https://wa.me/?text=${encodeURIComponent(text)}`;
 
+/** "06/11/2026 · R$ 53,33" or "06/11/2026 a 07/11/2026 · R$ 106,67". */
+export function unchargedLine(period: UnchargedPeriod) {
+  const when =
+    period.from === period.to
+      ? formatCalendarDate(period.from)
+      : `${formatCalendarDate(period.from)} a ${formatCalendarDate(period.to)}`;
+  return `${when} · ${formatCurrency(period.amount)}`;
+}
+
 /** "20/10/2026 · R$ 60,00" for a grouped charge. */
-export function groupedChargeLine(charge: { dueDate: string | null; amount: number }) {
+export function groupedChargeLine(charge: {
+  dueDate: string | null;
+  amount: number;
+}) {
   return `${charge.dueDate ? formatCalendarDate(charge.dueDate) : "sem data"} · ${formatCurrency(charge.amount)}`;
 }

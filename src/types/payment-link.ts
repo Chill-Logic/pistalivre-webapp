@@ -34,11 +34,27 @@ export type PaymentLink = {
   createdAt: string;
 };
 
+/** A part of the balance no charge was ever issued for (e.g. the last bit of a monthly). */
+export type UnchargedPeriod = {
+  /** yyyy-mm-dd, first and last billed day. */
+  from: string;
+  to: string;
+  amount: number;
+};
+
 /** GET /rentals/:id/payment-links: the preview of a new link + the history. */
 export type RentalPaymentLinks = {
   balance: number;
   /** Open rent charges a new link would group. */
   charges: GroupedCharge[];
+  /** In the balance without a charge (shown so the list adds up). */
+  uncharged: UnchargedPeriod[];
+  /** balance − everything listed: negative = already paid in part; positive = open outside the list. */
+  adjustment: number;
+  /** Fine/interest already accrued on the overdue charges it groups (goes in the link). */
+  surcharge: number;
+  /** The link's amount: balance + surcharge (server). */
+  total: number;
   openLink: PaymentLink | null;
   items: PaymentLink[];
 };

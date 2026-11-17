@@ -3,7 +3,12 @@ import { useState } from "react";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/atoms/card";
 import { ExternalLink } from "@/components/atoms/external-link";
 import { List, ListItem } from "@/components/atoms/list";
 import { Skeleton } from "@/components/atoms/skeleton";
@@ -83,7 +88,9 @@ function LiveLink({ link }: { link: PaymentLink }) {
           title="Cancelar o link?"
           description="O PIX do link é removido e o link para de funcionar. O saldo continua devido na locação; as cobranças agrupadas não voltam."
           confirmLabel="Cancelar link"
-          onConfirm={() => cancel.mutate(link.id, { onSettled: () => setConfirmCancel(false) })}
+          onConfirm={() =>
+            cancel.mutate(link.id, { onSettled: () => setConfirmCancel(false) })
+          }
         />
       </Box>
       {link.groupedCharges.length > 0 && (
@@ -124,7 +131,8 @@ export function RentalPaymentLinksCard({ rentalId }: { rentalId: string }) {
   const data = links.data;
   if (links.isPending) return <RentalPaymentLinksCardSkeleton />;
   if (!data) return null;
-  const live = data.items.find((l) => l.state === "OPEN" || l.state === "EXPIRED") ?? null;
+  const live =
+    data.items.find((l) => l.state === "OPEN" || l.state === "EXPIRED") ?? null;
   const past = data.items.filter((l) => l !== live);
   if (!live && past.length === 0 && data.balance <= 0) return null;
 
@@ -134,7 +142,15 @@ export function RentalPaymentLinksCard({ rentalId }: { rentalId: string }) {
         <Box className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle className="text-base">Cobrança do saldo</CardTitle>
           {!live && data.balance > 0 && (
-            <PaymentLinkDialog rentalId={rentalId} balance={data.balance} charges={data.charges} />
+            <PaymentLinkDialog
+              rentalId={rentalId}
+              balance={data.balance}
+              charges={data.charges}
+              uncharged={data.uncharged ?? []}
+              adjustment={data.adjustment ?? 0}
+              surcharge={data.surcharge ?? 0}
+              total={data.total ?? data.balance}
+            />
           )}
         </Box>
       </CardHeader>
@@ -144,8 +160,10 @@ export function RentalPaymentLinksCard({ rentalId }: { rentalId: string }) {
         ) : (
           data.balance > 0 && (
             <Text size="sm" tone="muted">
-              Saldo devedor de {formatCurrency(data.balance)}. Gere um link para o cliente pagar por
-              PIX ou cartão.
+              Saldo devedor de {formatCurrency(data.balance)}
+              {(data.surcharge ?? 0) > 0 &&
+                ` + ${formatCurrency(data.surcharge)} de multa e juros das vencidas`}
+              . Gere um link para o cliente pagar por PIX ou cartão.
             </Text>
           )
         )}
