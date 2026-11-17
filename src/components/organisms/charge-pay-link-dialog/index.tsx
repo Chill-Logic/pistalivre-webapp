@@ -13,7 +13,8 @@ import {
 import { ExternalLink } from "@/components/atoms/external-link";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
-import { CheckboxField } from "@/components/molecules/checkbox-field";
+import { SwitchField } from "@/components/molecules/switch-field";
+import { CardPaymentOptions } from "@/components/organisms/card-payment-options";
 import { CopyCode } from "@/components/molecules/copy-code";
 import { toApiError } from "@/helpers/api-error";
 import { whatsappShareUrl } from "@/helpers/payment-link";
@@ -82,22 +83,36 @@ export function ChargePayLinkDialog({ charge }: { charge: Charge }) {
               </Button>
             </>
           )}
-          <CheckboxField
+          <SwitchField
             label="Aceita cartão"
             checked={charge.acceptsCard}
             disabled={acceptsCard.isPending}
             onChange={(checked) => acceptsCard.mutate({ acceptsCard: checked })}
           />
           {charge.acceptsCard && (
-            <CheckboxField
-              label="Aceitar parcelamento"
-              hint="Juros do parcelamento por conta do cliente. Sem marcar, só cartão à vista."
-              checked={charge.cardInstallments}
+            <CardPaymentOptions
+              value={{
+                installments: charge.cardInstallments,
+                passFees: charge.cardPassFees,
+                passInstallmentFee: charge.cardPassInstallmentFee,
+                passAnticipation: charge.cardPassAnticipation,
+              }}
               disabled={acceptsCard.isPending}
-              onChange={(checked) =>
+              onChange={(patch) =>
                 acceptsCard.mutate({
                   acceptsCard: true,
-                  cardInstallments: checked,
+                  ...(patch.installments !== undefined
+                    ? { cardInstallments: patch.installments }
+                    : {}),
+                  ...(patch.passFees !== undefined
+                    ? { cardPassFees: patch.passFees }
+                    : {}),
+                  ...(patch.passInstallmentFee !== undefined
+                    ? { cardPassInstallmentFee: patch.passInstallmentFee }
+                    : {}),
+                  ...(patch.passAnticipation !== undefined
+                    ? { cardPassAnticipation: patch.passAnticipation }
+                    : {}),
                 })
               }
             />

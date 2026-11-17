@@ -104,8 +104,13 @@ export function useChargeReferenceDate(id: string, rentalId: string | null) {
 export function useChargeAcceptsCard(id: string, rentalId: string | null) {
   const refresh = useRefreshAfterCharge();
   return useMutation({
-    mutationFn: (input: { acceptsCard: boolean; cardInstallments?: boolean }) =>
-      chargesService.setAcceptsCard(id, input),
+    mutationFn: (input: {
+      acceptsCard: boolean;
+      cardInstallments?: boolean;
+      cardPassFees?: boolean;
+      cardPassInstallmentFee?: boolean;
+      cardPassAnticipation?: boolean;
+    }) => chargesService.setAcceptsCard(id, input),
     onSuccess: (charge) => {
       refresh(rentalId);
       toast.success(

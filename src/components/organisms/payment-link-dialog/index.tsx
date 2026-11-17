@@ -18,7 +18,10 @@ import { List, ListItem } from "@/components/atoms/list";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { CopyCode } from "@/components/molecules/copy-code";
-import { CheckboxField } from "@/components/molecules/checkbox-field";
+import { SwitchField } from "@/components/molecules/switch-field";
+import { CardPaymentOptions } from "@/components/organisms/card-payment-options";
+import { DEFAULT_CARD_PAYMENT_OPTIONS } from "@/constants/card-payment-options";
+import type { CardPaymentOptionsValue } from "@/types/card-payment-options";
 import { MoneyField } from "@/components/molecules/money-field";
 import { toApiError } from "@/helpers/api-error";
 import {
@@ -52,7 +55,9 @@ export function PaymentLinkDialog({
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState<number | null>(balance);
   const [acceptsCard, setAcceptsCard] = useState(false);
-  const [cardInstallments, setCardInstallments] = useState(false);
+  const [card, setCard] = useState<CardPaymentOptionsValue>(
+    DEFAULT_CARD_PAYMENT_OPTIONS,
+  );
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<PaymentLink | null>(null);
 
@@ -76,7 +81,10 @@ export function PaymentLinkDialog({
       {
         amount: amount === balance ? null : amount,
         acceptsCard,
-        cardInstallments: acceptsCard && cardInstallments,
+        cardInstallments: acceptsCard && card.installments,
+        cardPassFees: card.passFees,
+        cardPassInstallmentFee: card.passInstallmentFee,
+        cardPassAnticipation: card.passAnticipation,
         key: idempotency.key,
       },
       {
@@ -143,17 +151,17 @@ export function PaymentLinkDialog({
               <Text size="xs" tone="muted">
                 Saldo devedor do sistema: {formatCurrency(balance)}.
               </Text>
-              <CheckboxField
+              <SwitchField
                 label="Aceita cartão"
                 checked={acceptsCard}
                 onChange={setAcceptsCard}
               />
               {acceptsCard && (
-                <CheckboxField
-                  label="Aceitar parcelamento"
-                  hint="Juros do parcelamento por conta do cliente. Sem marcar, só cartão à vista."
-                  checked={cardInstallments}
-                  onChange={setCardInstallments}
+                <CardPaymentOptions
+                  value={card}
+                  onChange={(patch) =>
+                    setCard((current) => ({ ...current, ...patch }))
+                  }
                 />
               )}
               <Box className="space-y-1">

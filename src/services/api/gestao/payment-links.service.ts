@@ -10,7 +10,18 @@ export const paymentLinksService = {
     return data;
   },
   /** Creates the PIX charge and groups the open rent charges (removed in Asaas). */
-  async create(rentalId: string, input: { amount: number | null; acceptsCard: boolean; cardInstallments: boolean }, key: string) {
+  async create(
+    rentalId: string,
+    input: {
+      amount: number | null;
+      acceptsCard: boolean;
+      cardInstallments: boolean;
+      cardPassFees: boolean;
+      cardPassInstallmentFee: boolean;
+      cardPassAnticipation: boolean;
+    },
+    key: string,
+  ) {
     const { data } = await http.post<PaymentLink>(
       `/rentals/${rentalId}/payment-links`,
       input,
@@ -23,7 +34,9 @@ export const paymentLinksService = {
     return data;
   },
   async cancel(id: string) {
-    const { data } = await http.post<PaymentLink>(`/payment-links/${id}/cancel`);
+    const { data } = await http.post<PaymentLink>(
+      `/payment-links/${id}/cancel`,
+    );
     return data;
   },
 };

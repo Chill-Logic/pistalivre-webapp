@@ -15,12 +15,14 @@ import { Form } from "@/components/atoms/form";
 import { Col, Row } from "@/components/atoms/grid";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
-import { CheckboxField } from "@/components/molecules/checkbox-field";
 import { DateField } from "@/components/molecules/date-field";
 import { FormField } from "@/components/molecules/form-field";
 import { MoneyField } from "@/components/molecules/money-field";
 import { SelectField } from "@/components/molecules/select-field";
 import { TextareaField } from "@/components/molecules/textarea-field";
+import { CardPaymentOptions } from "@/components/organisms/card-payment-options";
+import { DEFAULT_CARD_PAYMENT_OPTIONS } from "@/constants/card-payment-options";
+import type { CardPaymentOptionsValue } from "@/types/card-payment-options";
 import {
   CustomerRentalPicker,
   type CustomerRentalValue,
@@ -96,7 +98,9 @@ export function StandaloneChargeDialog({
   const [target, setTarget] = useState(blank);
   const [purpose, setPurpose] = useState<ChargePurpose>("OTHER");
   const [payWith, setPayWith] = useState<PayWith>("PIX");
-  const [cardInstallments, setCardInstallments] = useState(false);
+  const [card, setCard] = useState<CardPaymentOptionsValue>(
+    DEFAULT_CARD_PAYMENT_OPTIONS,
+  );
   const [amount, setAmount] = useState<number | null>(null);
   const [dueDate, setDueDate] = useState("");
   const [fine, setFine] = useState(DEFAULT_FINE);
@@ -112,7 +116,7 @@ export function StandaloneChargeDialog({
     setTarget(blank);
     setPurpose("OTHER");
     setPayWith("PIX");
-    setCardInstallments(false);
+    setCard(DEFAULT_CARD_PAYMENT_OPTIONS);
     setAmount(null);
     setDueDate("");
     setFine(DEFAULT_FINE);
@@ -145,7 +149,10 @@ export function StandaloneChargeDialog({
           purpose,
           method: "PIX",
           acceptsCard: payWith === "CARD",
-          cardInstallments: payWith === "CARD" && cardInstallments,
+          cardInstallments: payWith === "CARD" && card.installments,
+          cardPassFees: card.passFees,
+          cardPassInstallmentFee: card.passInstallmentFee,
+          cardPassAnticipation: card.passAnticipation,
           amount: amount ?? 0,
           dueDate,
           finePercent: Number(fine.replace(",", ".")) || 0,
@@ -263,13 +270,14 @@ export function StandaloneChargeDialog({
               />
             </Col>
             {payWith === "CARD" && (
-              <Col lg={6} className="flex items-end">
-                <CheckboxField
-                  label="Aceitar parcelamento"
-                  hint="Juros por conta do cliente. Sem marcar, só cartão à vista."
-                  checked={cardInstallments}
-                  onChange={setCardInstallments}
+              <Col lg={6}>
+                <CardPaymentOptions
+                  value={card}
+                  onChange={(patch) =>
+                    setCard((current) => ({ ...current, ...patch }))
+                  }
                   disabled={create.isPending}
+                  hints={false}
                 />
               </Col>
             )}

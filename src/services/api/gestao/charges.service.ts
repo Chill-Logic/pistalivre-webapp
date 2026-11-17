@@ -97,7 +97,13 @@ export const chargesService = {
   /** Liga/desliga o cartão no link de pagamento da cobrança. */
   async setAcceptsCard(
     id: string,
-    input: { acceptsCard: boolean; cardInstallments?: boolean },
+    input: {
+      acceptsCard: boolean;
+      cardInstallments?: boolean;
+      cardPassFees?: boolean;
+      cardPassInstallmentFee?: boolean;
+      cardPassAnticipation?: boolean;
+    },
   ) {
     const { data } = await http.put<Charge>(
       `/charges/${id}/accepts-card`,

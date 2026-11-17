@@ -29,16 +29,29 @@ export function useCreatePaymentLink(rentalId: string) {
       amount,
       acceptsCard,
       cardInstallments,
+      cardPassFees,
+      cardPassInstallmentFee,
+      cardPassAnticipation,
       key,
     }: {
       amount: number | null;
       acceptsCard: boolean;
       cardInstallments: boolean;
+      cardPassFees: boolean;
+      cardPassInstallmentFee: boolean;
+      cardPassAnticipation: boolean;
       key: string;
     }) =>
       paymentLinksService.create(
         rentalId,
-        { amount, acceptsCard, cardInstallments },
+        {
+          amount,
+          acceptsCard,
+          cardInstallments,
+          cardPassFees,
+          cardPassInstallmentFee,
+          cardPassAnticipation,
+        },
         key,
       ),
     onSettled: refresh,

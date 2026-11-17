@@ -15,6 +15,9 @@ export type StandaloneChargeInput = {
   /** The payment link offers card (interest on the payer). Default: no. */
   acceptsCard?: boolean;
   cardInstallments?: boolean;
+  cardPassFees?: boolean;
+  cardPassInstallmentFee?: boolean;
+  cardPassAnticipation?: boolean;
   finePercent?: number;
   interestPercent?: number;
   amount?: number;

@@ -135,6 +135,10 @@ export type Charge = {
   acceptsCard: boolean;
   /** With card: installments allowed (otherwise card at once only). */
   cardInstallments: boolean;
+  /** With card: the fees go to the customer (off = the company absorbs). */
+  cardPassFees: boolean;
+  cardPassInstallmentFee: boolean;
+  cardPassAnticipation: boolean;
   amounts: ChargeAmounts;
   invoiceUrl: string | null;
   pix: { encodedImage: string; payload: string; expirationDate: string } | null;

@@ -53,7 +53,8 @@ const full = has("full");
 const ai = has("ai");
 // Logged out (the login screens themselves redirect a signed-in user away).
 const anonymous = has("sem-login");
-// --click "Texto": after loading, clicks the first button with that text (opens a dialog).
+// --click "Texto": after loading, clicks the first button with that text (opens a
+// dialog); "A>>B" clicks in sequence.
 const click = flag("click", null);
 // --sizes 1366x620,390x700: other viewports (e.g. a short laptop screen).
 const sizes = flag("sizes", null);
@@ -118,15 +119,18 @@ for (const [tag, width, height] of viewports) {
     await page.evaluate(() =>
       document.querySelectorAll(".tsqd-parent-container").forEach((node) => node.remove()),
     );
-    if (click) {
-      const clicked = await page.evaluate((text) => {
-        const el = [...document.querySelectorAll("button, [role=button], a")].find(
-          (b) => b.textContent?.trim() === text && b.offsetParent !== null,
-        );
-        el?.click();
-        return Boolean(el);
-      }, click);
-      if (!clicked) console.error(`botão não encontrado: ${click}`);
+    // "A>>B>>C": clicks in sequence (open a dialog, then pick an option…).
+    for (const text of click ? click.split(">>") : []) {
+      const handle = await page.evaluateHandle((wanted) => {
+        const nodes = [
+          ...document.querySelectorAll("button, [role=button], [role=option], [role=switch], a, label"),
+        ];
+        return nodes.find((b) => b.textContent?.trim() === wanted && b.getClientRects().length > 0) ?? null;
+      }, text.trim());
+      const el = handle.asElement();
+      if (el) await el.click();
+      else console.error(`botão não encontrado: ${text}`);
+      await new Promise((done) => setTimeout(done, 500));
     }
     await new Promise((done) => setTimeout(done, 800));
     const name = `${path.replace(/^\//, "").replace(/\//g, "_") || "raiz"}-${tag}-${theme}.png`;
