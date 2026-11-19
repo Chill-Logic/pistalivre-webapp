@@ -44,6 +44,10 @@ export const MaintenanceAnalysisPage = lazyPage(
   () => import("@/pages/gestao/maintenance-analysis"),
   "MaintenanceAnalysisPage",
 );
+export const NoteDetailPage = lazyPage(
+  () => import("@/pages/gestao/note-detail"),
+  "NoteDetailPage",
+);
 export const MaintenanceDetailPage = lazyPage(
   () => import("@/pages/gestao/maintenance-detail"),
   "MaintenanceDetailPage",

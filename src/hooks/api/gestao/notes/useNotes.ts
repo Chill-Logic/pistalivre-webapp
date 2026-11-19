@@ -11,11 +11,18 @@ export function useNotes(owner: NoteOwner) {
   });
 }
 
-/** Write, edit and delete the notes of one record. */
+export function useNote(id: string) {
+  return useQuery({
+    queryKey: queryKeys.notes.detail(id),
+    queryFn: () => notesService.get(id),
+  });
+}
+
+/** Write, edit and delete the notes of one record (lists and detail refresh). */
 export function useNoteWrites(owner: NoteOwner) {
   const queryClient = useQueryClient();
   const refresh = () =>
-    queryClient.invalidateQueries({ queryKey: queryKeys.notes.byOwner(owner) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.notes.all });
 
   const create = useMutation({
     mutationFn: ({ input, files }: { input: NoteInput; files: File[] }) =>

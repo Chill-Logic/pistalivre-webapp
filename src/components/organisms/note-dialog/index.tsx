@@ -91,9 +91,9 @@ export function NoteDialog({ owner, note, trigger }: NoteDialogProps) {
             error={apiError?.fields?.title}
           />
           <TextareaField
-            label="Nota"
+            label="Nota (aceita Markdown: # título, **negrito**, - lista, > citação)"
             value={body}
-            rows={6}
+            rows={10}
             onChange={(event) => setBody(event.target.value)}
             error={localError ?? apiError?.fields?.body}
           />

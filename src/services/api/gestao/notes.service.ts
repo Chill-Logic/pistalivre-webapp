@@ -8,6 +8,10 @@ export const notesService = {
     });
     return data.items;
   },
+  async get(id: string) {
+    const { data } = await http.get<Note>(`/notes/${id}`);
+    return data;
+  },
   /** Title, text and files in ONE request: a failed file keeps nothing. */
   async create(owner: NoteOwner, input: NoteInput, files: File[]) {
     const body = new FormData();

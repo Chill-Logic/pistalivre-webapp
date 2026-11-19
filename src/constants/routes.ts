@@ -57,6 +57,7 @@ export const ROUTES = {
   maintenanceNew: `${GESTAO}/manutencoes/nova`,
   maintenanceAnalysis: `${GESTAO}/manutencoes/analise`,
   maintenanceDetail: `${GESTAO}/manutencoes/:id`,
+  noteDetail: `${GESTAO}/notas/:id`,
   maintenanceEdit: `${GESTAO}/manutencoes/:id/editar`,
   inspections: `${GESTAO}/vistorias`,
   inspectionPick: `${GESTAO}/vistorias/nova`,
@@ -212,6 +213,7 @@ export const routeTo = {
   editProposalTemplate: (id: string) =>
     `${ROUTES.modelsProposals}/${id}/editar`,
   maintenance: (id: string) => `${ROUTES.maintenances}/${id}`,
+  note: (id: string) => ROUTES.noteDetail.replace(":id", id),
   editMaintenance: (id: string) => `${ROUTES.maintenances}/${id}/editar`,
   /** From a vehicle or a rental (the vehicle comes fixed). */
   newMaintenance: (from: { vehicleId?: string; rentalId?: string } = {}) => {

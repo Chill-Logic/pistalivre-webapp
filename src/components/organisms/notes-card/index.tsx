@@ -1,24 +1,24 @@
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronRight, Paperclip, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Card, CardContent, CardHeader } from "@/components/atoms/card";
-import { Heading } from "@/components/atoms/heading";
 import { Skeleton } from "@/components/atoms/skeleton";
 import { Text } from "@/components/atoms/text";
-import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { ListCard } from "@/components/organisms/list-card";
 import { NoteDialog } from "@/components/organisms/note-dialog";
 import { QueryError } from "@/components/organisms/query-error";
-import { RecordAttachments } from "@/components/organisms/record-attachments";
-import { queryKeys } from "@/constants/query-keys";
 import { routeTo } from "@/constants/routes";
-import { useNotes, useNoteWrites } from "@/hooks/api/gestao/notes/useNotes";
+import { useNotes } from "@/hooks/api/gestao/notes/useNotes";
 import type { Note, NoteOwner } from "@/types/note";
 import { formatDateTime } from "@/utils/format";
+import { markdownPreview, pluralize } from "@/utils/text";
 
-/** "Notas" of a record (staff only): newest first, each with its files. */
+/**
+ * "Notas" of a record (staff only), newest first: each one is a short preview
+ * that opens the note's own page (full text, files, edit/delete).
+ */
 export function NotesCard({ owner }: { owner: NoteOwner }) {
   const notes = useNotes(owner);
 
@@ -51,75 +51,41 @@ export function NotesCard({ owner }: { owner: NoteOwner }) {
 }
 
 function NoteItem({ owner, note }: { owner: NoteOwner; note: Note }) {
-  const { remove } = useNoteWrites(owner);
+  const preview = markdownPreview(note.body, 120);
+  const fromElsewhere =
+    (note.origin.type !== owner.type || note.origin.id !== owner.id) &&
+    note.origin.label;
   return (
-    <Box className="space-y-2 py-3 first:pt-0 last:pb-0">
-      <Box className="flex items-start justify-between gap-2">
-        <Box className="min-w-0 space-y-0.5">
-          {note.title && (
-            <Heading level={3} className="break-words text-sm font-semibold">
-              {note.title}
-            </Heading>
-          )}
-          <Text size="xs" tone="muted">
-            {note.author.name} · {formatDateTime(note.createdAt)}
-            {note.editedAt && " · editada"}
+    <Link
+      to={routeTo.note(note.id)}
+      className="-mx-2 flex items-start gap-2 rounded-md px-2 py-3 transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <Box className="min-w-0 flex-1 space-y-1">
+        <Text weight="semibold" className="break-words">
+          {note.title || preview || "Nota"}
+        </Text>
+        {note.title && preview && (
+          <Text size="sm" tone="muted" className="break-words">
+            {preview}
           </Text>
-          {(note.origin.type !== owner.type || note.origin.id !== owner.id) &&
-            note.origin.label && (
-              <Text size="xs" tone="muted">
-                Em{" "}
-                {note.origin.type === "RENTAL" ? (
-                  <Link
-                    to={routeTo.rental(note.origin.id)}
-                    className="font-medium text-foreground underline-offset-4 hover:underline"
-                  >
-                    {note.origin.label}
-                  </Link>
-                ) : (
-                  note.origin.label
-                )}
-              </Text>
-            )}
-        </Box>
-        {note.canEdit && (
-          <Box className="flex shrink-0 gap-1">
-            <NoteDialog
-              owner={owner}
-              note={note}
-              trigger={
-                <Button variant="ghost" size="icon" aria-label="Editar nota">
-                  <Pencil />
-                </Button>
-              }
-            />
-            <ConfirmDialog
-              trigger={
-                <Button variant="ghost" size="icon" aria-label="Excluir nota">
-                  <Trash2 />
-                </Button>
-              }
-              title="Excluir nota?"
-              description="A nota e os arquivos dela saem de vez."
-              confirmLabel="Excluir"
-              destructive
-              isPending={remove.isPending}
-              onConfirm={() => remove.mutate(note.id)}
-            />
-          </Box>
+        )}
+        <Text size="xs" tone="muted">
+          {note.author.name} · {formatDateTime(note.createdAt)}
+          {note.editedAt && " · editada"}
+          {fromElsewhere && ` · ${note.origin.label}`}
+        </Text>
+        {note.documents.length > 0 && (
+          <Text size="xs" tone="muted" className="flex items-center gap-1">
+            <Paperclip className="size-3.5" aria-hidden />
+            {pluralize(note.documents.length, "arquivo", "arquivos")}
+          </Text>
         )}
       </Box>
-      {note.body.trim() && (
-        <Text className="whitespace-pre-line break-words">{note.body}</Text>
-      )}
-      <RecordAttachments
-        owner={{ type: "NOTE", id: note.id }}
-        attachments={note.documents}
-        invalidate={queryKeys.notes.byOwner(owner)}
-        attachLabel="Anexar arquivo"
-        withAttach={note.canEdit}
+      <ChevronRight
+        className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+        aria-hidden
       />
-    </Box>
+    </Link>
   );
 }
 
@@ -135,8 +101,8 @@ export function NotesCardSkeleton() {
           {Array.from({ length: 2 }, (_, index) => (
             <Box key={index} className="space-y-1.5">
               <Skeleton shape="text" className="w-40" />
+              <Skeleton shape="text" className="w-full text-sm" />
               <Skeleton shape="text" className="w-28 text-xs" />
-              <Skeleton shape="text" className="w-full" />
             </Box>
           ))}
         </CardContent>

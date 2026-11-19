@@ -75,6 +75,7 @@ export const queryKeys = {
     all: ["notes"] as const,
     byOwner: (owner: NoteOwner) =>
       [...queryKeys.notes.all, owner.type, owner.id] as const,
+    detail: (id: string) => [...queryKeys.notes.all, "detail", id] as const,
   },
   maintenances: {
     all: ["maintenances"] as const,
