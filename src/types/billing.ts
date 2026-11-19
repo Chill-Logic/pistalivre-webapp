@@ -112,6 +112,8 @@ export type RentalBilling = {
   reconcileFrom: string | null;
   receipts: { items: RentReceipt[]; credit: number };
   reconciliation: RentReconciliation | null;
+  /** Cancelled/withdrawn rental: no rent and no debt (a reissue carries them). */
+  rentVoid?: boolean;
   paidThrough: string | null;
   debtPart: number;
   period: { from: string | null; through: string | null };

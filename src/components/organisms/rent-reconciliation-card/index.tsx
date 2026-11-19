@@ -43,6 +43,19 @@ export function RentReconciliationCard({ rentalId }: { rentalId: string }) {
   const view = billing.data;
   const rules = whole.data ?? view;
   const r = view.reconciliation;
+  if (!r && view.rentVoid) {
+    return (
+      <CollapsibleCard
+        title="Acerto do aluguel"
+        storageKey="rental-reconciliation"
+      >
+        <Text size="sm" tone="muted">
+          Locação cancelada: não gera aluguel nem débito. Se ela foi
+          reemitida, a conta segue na locação nova.
+        </Text>
+      </CollapsibleCard>
+    );
+  }
   if (!r) return null;
 
   const units = cyclesLabel(r);
