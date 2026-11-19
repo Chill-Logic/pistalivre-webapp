@@ -158,11 +158,9 @@ function CustomerDebtRow({
           <Text size="xs" tone="muted">
             {formatCurrency(debt.amount)} em{" "}
             {formatCalendarDate(debt.incurredAt)} · pago{" "}
-            {formatCurrency(debt.paidFromRent + debt.paidDirect)} (diária{" "}
-            {formatCurrency(debt.paidFromRent)}
-            {debt.paidDirect > 0 &&
-              ` · à vista ${formatCurrency(debt.paidDirect)}`}
-            ) · abate desde {formatCalendarDate(debt.startsAt)}
+            {formatCurrency(debt.paidFromRent + debt.paidDirect)}
+            {paidParts(debt)} · abate desde{" "}
+            {formatCalendarDate(debt.startsAt)}
           </Text>
           {debt.transferredFrom && (
             <Text size="xs" tone="muted">
@@ -281,6 +279,16 @@ function CustomerDebtRow({
       </Box>
     </ListItem>
   );
+}
+
+/** " (R$ x abatido dos pagamentos de aluguel · R$ y à vista)", or "" when nothing was paid. */
+function paidParts(debt: CustomerDebt) {
+  const parts = [
+    debt.paidFromRent > 0 &&
+      `${formatCurrency(debt.paidFromRent)} abatido dos pagamentos de aluguel`,
+    debt.paidDirect > 0 && `${formatCurrency(debt.paidDirect)} à vista`,
+  ].filter(Boolean);
+  return parts.length > 0 ? ` (${parts.join(" · ")})` : "";
 }
 
 function CustomerDebtsSkeletonRows() {
