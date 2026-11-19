@@ -6,6 +6,7 @@ import type {
   CustomerDebtInput,
   CustomerDebtPaymentInput,
   CustomerDebtsView,
+  TransferRentBalanceInput,
 } from "@/types/customer-debt";
 
 /** Lives under the customer's keys, so customer invalidation reaches it. */
@@ -47,11 +48,30 @@ export function useSaveCustomerDebt(customerId: string, id?: string) {
 }
 
 export function useDeleteCustomerDebt(customerId: string) {
-  return useCustomerDebtWrite(
-    customerId,
-    (id: string) => customerDebtsService.remove(id),
-    "Débito excluído",
-  );
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => customerDebtsService.remove(id),
+    onSuccess: (view) => {
+      queryClient.setQueryData(customerDebtsKey(customerId), view);
+      // A transferred debt gives the balance back to its rental.
+      void queryClient.invalidateQueries({ queryKey: queryKeys.rentals.all });
+      toast.success("Débito excluído");
+    },
+  });
+}
+
+/** Ended rental's open rent → customer debt; the rental's screens refresh too. */
+export function useTransferRentBalance(customerId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ rentalId, input }: { rentalId: string; input: TransferRentBalanceInput }) =>
+      customerDebtsService.transferRentBalance(rentalId, input),
+    onSuccess: (view) => {
+      queryClient.setQueryData(customerDebtsKey(customerId), view);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.rentals.all });
+      toast.success("Saldo transferido para débito");
+    },
+  });
 }
 
 export function useAddCustomerDebtPayment(customerId: string, debtId: string) {

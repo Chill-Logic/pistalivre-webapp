@@ -16,6 +16,7 @@ type MoneyFieldProps = {
   currency?: string;
   /** Line under the field (e.g. the amount in reais). */
   hint?: string;
+  disabled?: boolean;
 };
 
 /** Money input: digits fill from the cents ("R$ 0,05" → "R$ 1,50"). */
@@ -26,6 +27,7 @@ export function MoneyField({
   error,
   currency = "BRL",
   hint,
+  disabled,
 }: MoneyFieldProps) {
   const id = useId();
   const errorId = `${id}-error`;
@@ -49,6 +51,7 @@ export function MoneyField({
           value={formatMoneyInput(value)}
           onChange={(event) => onChange(parseMoneyInput(event.target.value))}
           placeholder="0,00"
+          disabled={disabled}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : hint ? hintId : undefined}
           className={cn("text-right tabular-nums", symbol.length > 2 ? "pl-12" : "pl-10")}

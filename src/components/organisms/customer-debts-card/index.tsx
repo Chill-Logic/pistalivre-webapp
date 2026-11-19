@@ -1,5 +1,6 @@
-import { Trash2 } from "lucide-react";
+import { CalendarRange, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
@@ -15,6 +16,9 @@ import { CustomerDebtDialog } from "@/components/organisms/customer-debt-dialog"
 import { CustomerDebtPaymentDialog } from "@/components/organisms/customer-debt-payment-dialog";
 import { QueryError } from "@/components/organisms/query-error";
 import { RecordAttachments } from "@/components/organisms/record-attachments";
+import { TransferRentBalanceDialog } from "@/components/organisms/transfer-rent-balance-dialog";
+import { routeTo } from "@/constants/routes";
+import { rentalStatementHref } from "@/helpers/rent-statement";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { moneyErrorMessage } from "@/helpers/money-errors";
 import {
@@ -24,7 +28,7 @@ import {
   useDeleteCustomerDebtPayment,
 } from "@/hooks/api/gestao/customer-debts/useCustomerDebts";
 import { useLabels } from "@/hooks/ui/useLabels";
-import type { CustomerDebt } from "@/types/customer-debt";
+import type { CustomerDebt, RentBalance } from "@/types/customer-debt";
 import { formatCalendarDate, formatCurrency } from "@/utils/format";
 
 /**
@@ -35,11 +39,17 @@ import { formatCalendarDate, formatCurrency } from "@/utils/format";
 export function CustomerDebtsCard({ customerId }: { customerId: string }) {
   const debts = useCustomerDebts(customerId);
   const view = debts.data;
+  const rentBalances = view?.rentBalances ?? [];
+  const empty = view && view.items.length === 0 && rentBalances.length === 0;
 
   return (
     <CollapsibleCard
       title="Débitos do cliente"
-      count={view?.items.filter((debt) => debt.balance > 0).length}
+      count={
+        view &&
+        view.items.filter((debt) => debt.balance > 0).length +
+          rentBalances.length
+      }
       storageKey="customer-debts"
       contentClassName="space-y-3"
       actions={<CustomerDebtDialog customerId={customerId} />}
@@ -52,17 +62,22 @@ export function CustomerDebtsCard({ customerId }: { customerId: string }) {
       {debts.isError && (
         <QueryError error={debts.error} onRetry={() => debts.refetch()} />
       )}
-      {view && view.items.length === 0 && (
-        <Text tone="muted">Nenhum débito.</Text>
-      )}
-      {view && view.items.length > 0 && (
+      {empty && <Text tone="muted">Nenhum débito.</Text>}
+      {view && !empty && (
         <>
           <Text tone="muted">
-            Saldo devedor {formatCurrency(view.totalBalance)}
+            Saldo devedor {formatCurrency(view.totalOwed ?? view.totalBalance)}
             {view.weeklyShare > 0 &&
               ` · abatendo ${formatCurrency(view.weeklyShare)} por semana pela diária`}
           </Text>
           <List className="divide-y">
+            {rentBalances.map((balance) => (
+              <RentBalanceRow
+                key={balance.rentalId}
+                customerId={customerId}
+                balance={balance}
+              />
+            ))}
             {view.items.map((debt) => (
               <CustomerDebtRow
                 key={debt.id}
@@ -74,6 +89,48 @@ export function CustomerDebtsCard({ customerId }: { customerId: string }) {
         </>
       )}
     </CollapsibleCard>
+  );
+}
+
+/**
+ * Open rent of an ended rental: computed from its ledger, never stored, so
+ * a payment on the rental lowers it by itself. Transferring moves it into a
+ * debt (and zeroes the rental).
+ */
+function RentBalanceRow({
+  customerId,
+  balance,
+}: {
+  customerId: string;
+  balance: RentBalance;
+}) {
+  return (
+    <ListItem className="space-y-2 py-3">
+      <Box className="flex items-start justify-between gap-3">
+        <Box className="min-w-0">
+          <Text weight="medium" className="break-words">
+            Aluguel em aberto · {balance.code}
+          </Text>
+          <Text size="xs" tone="muted">
+            Locação encerrada
+            {balance.endDate && ` em ${formatCalendarDate(balance.endDate)}`} ·
+            calculado pelo extrato da locação; pagar nela diminui sozinho
+          </Text>
+        </Box>
+        <Text weight="semibold" className="shrink-0 tabular-nums">
+          {formatCurrency(balance.balance)}
+        </Text>
+      </Box>
+      <Box className="flex flex-wrap gap-1">
+        <TransferRentBalanceDialog customerId={customerId} balance={balance} />
+        <Button asChild variant="ghost" size="sm">
+          <Link to={rentalStatementHref(balance.rentalId)}>
+            <CalendarRange />
+            Extrato
+          </Link>
+        </Button>
+      </Box>
+    </ListItem>
   );
 }
 
@@ -107,6 +164,17 @@ function CustomerDebtRow({
               ` · à vista ${formatCurrency(debt.paidDirect)}`}
             ) · abate desde {formatCalendarDate(debt.startsAt)}
           </Text>
+          {debt.transferredFrom && (
+            <Text size="xs" tone="muted">
+              Saldo transferido da{" "}
+              <Link
+                to={routeTo.rental(debt.transferredFrom.rentalId)}
+                className="underline underline-offset-2"
+              >
+                {debt.transferredFrom.code}
+              </Link>
+            </Text>
+          )}
           {debt.notes && (
             <Text size="xs" tone="muted" className="whitespace-pre-line break-words">
               {debt.notes}
@@ -196,7 +264,11 @@ function CustomerDebtRow({
             </Button>
           }
           title="Excluir débito?"
-          description="O débito some, com os anexos e os pagamentos à vista. A parte da diária deixa de abatê-lo."
+          description={
+            debt.transferredFrom
+              ? `O débito some, com os anexos e os pagamentos à vista, e o saldo volta para a ${debt.transferredFrom.code}.`
+              : "O débito some, com os anexos e os pagamentos à vista. A parte da diária deixa de abatê-lo."
+          }
           confirmLabel="Excluir débito"
           isPending={remove.isPending}
           onConfirm={() =>

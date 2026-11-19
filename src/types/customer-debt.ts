@@ -28,6 +28,19 @@ export type CustomerDebt = {
   documents: DocumentFile[];
   /** "~N semanas para quitar": only the first open debt of the queue. */
   weeksToPayOff?: number | null;
+  /** The ended rental whose open rent became this debt (null = by hand). */
+  transferredFrom?: { rentalId: string; code: string } | null;
+};
+
+/**
+ * Open rent of an ENDED rental — computed from its ledger, never stored:
+ * paying on the rental lowers it by itself.
+ */
+export type RentBalance = {
+  rentalId: string;
+  code: string;
+  endDate: string | null;
+  balance: number;
 };
 
 /**
@@ -39,7 +52,16 @@ export type CustomerDebtsView = {
   totalBalance: number;
   /** Part of the rent set aside for debts, per week (0 = none). */
   weeklyShare: number;
+  /** Debts + the open rent of ended rentals. */
+  totalOwed?: number;
+  rentBalances?: RentBalance[];
   items: CustomerDebt[];
+};
+
+export type TransferRentBalanceInput = {
+  /** yyyy-mm-dd: the new debt is paid down from this day. */
+  startsAt: string;
+  notes: string | null;
 };
 
 export type CustomerDebtInput = {

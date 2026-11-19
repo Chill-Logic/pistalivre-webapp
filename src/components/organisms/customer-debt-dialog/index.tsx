@@ -154,6 +154,12 @@ export function CustomerDebtDialog({
                   setErrors({});
                 }}
                 error={errors.amount}
+                disabled={Boolean(debt?.transferredFrom)}
+                hint={
+                  debt?.transferredFrom
+                    ? `Saldo da ${debt.transferredFrom.code}: não muda`
+                    : undefined
+                }
               />
             </Col>
             <Col lg={6}>

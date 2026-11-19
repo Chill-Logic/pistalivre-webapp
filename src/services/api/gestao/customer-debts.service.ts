@@ -3,6 +3,7 @@ import type {
   CustomerDebtInput,
   CustomerDebtPaymentInput,
   CustomerDebtsView,
+  TransferRentBalanceInput,
 } from "@/types/customer-debt";
 
 /**
@@ -43,6 +44,14 @@ export const customerDebtsService = {
       { headers: { "Idempotency-Key": key } },
     );
     return data;
+  },
+  /** Moves an ended rental's open rent into a customer debt (and zeroes the rental). */
+  async transferRentBalance(rentalId: string, input: TransferRentBalanceInput) {
+    const { data } = await http.post<{ debtId: string; debts: CustomerDebtsView }>(
+      `/rentals/${rentalId}/transfer-balance`,
+      input,
+    );
+    return data.debts;
   },
   async removePayment(paymentId: string) {
     const { data } = await http.delete<CustomerDebtsView>(
