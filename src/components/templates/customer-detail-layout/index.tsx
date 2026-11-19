@@ -27,6 +27,8 @@ type CustomerDetailLayoutProps = {
   notifications?: ReactNode;
   /** Signature requests over the customer's PDFs. */
   signatures?: ReactNode;
+  /** Staff notes: the customer's and those of his rentals. */
+  notes?: ReactNode;
 };
 
 /** Grid shared by the customer page and its skeleton. */
@@ -45,6 +47,7 @@ export function CustomerDetailLayout({
   wallet,
   notifications,
   signatures,
+  notes,
 }: CustomerDetailLayoutProps) {
   // From `lg` up: two independent columns (no hole beside a short card).
   const wide = useMediaQuery(WIDE_MEDIA_QUERY);
@@ -69,6 +72,7 @@ export function CustomerDetailLayout({
           <Box className="space-y-6">
             {license}
             {contact}
+            {notes}
             {flags}
             {billing}
             {wallet}
@@ -82,6 +86,7 @@ export function CustomerDetailLayout({
       <Col>{summary}</Col>
       <Col>{license}</Col>
       <Col>{contact}</Col>
+      {notes && <Col>{notes}</Col>}
       {flags && <Col>{flags}</Col>}
       <Col>{rentals}</Col>
       {billing && <Col>{billing}</Col>}

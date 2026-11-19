@@ -33,6 +33,7 @@ import {
   RentalMoneyStripSkeleton,
 } from "@/components/organisms/rental-money-strip";
 import { RentalPaymentLinksCard } from "@/components/organisms/rental-payment-links-card";
+import { NotesCard, NotesCardSkeleton } from "@/components/organisms/notes-card";
 import {
   RentalSummary,
   RentalSummarySkeleton,
@@ -176,6 +177,7 @@ export function RentalDetailPage() {
             summary={<RentalSummarySkeleton />}
             money={<RentalMoneyStripSkeleton />}
             status={<RentalStatusCardSkeleton />}
+            notes={<NotesCardSkeleton />}
             billing={<RentalBillingCardSkeleton />}
             charges={<RentalChargesSkeleton />}
             caution={<RentalCautionCardSkeleton />}
@@ -211,6 +213,9 @@ export function RentalDetailPage() {
             money={<RentalMoneyStrip rentalId={rental.data.id} />}
             paymentLinks={<RentalPaymentLinksCard rentalId={rental.data.id} />}
             status={<RentalStatusCard rental={rental.data} />}
+            notes={
+              <NotesCard owner={{ type: "RENTAL", id: rental.data.id }} />
+            }
             billing={<RentalBillingCard rental={rental.data} />}
             charges={
               <RentalCharges

@@ -20,7 +20,7 @@ type FilePickerProps = {
 };
 
 const DEFAULT_ACCEPT =
-  "application/pdf,image/*,.doc,.docx,.xls,.xlsx,.odt,.ods";
+  "application/pdf,image/*,audio/*,.ogg,.opus,.doc,.docx,.xls,.xlsx,.odt,.ods";
 
 /**
  * "Anexar arquivos" + the chosen files, each removable. Besides the button,

@@ -1,10 +1,12 @@
-import { Download, Eye, FileText, Image as ImageIcon } from "lucide-react";
+import { Download, Eye, FileText, Image as ImageIcon, Mic } from "lucide-react";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Checkbox } from "@/components/atoms/checkbox";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
+import { AudioPlayer } from "@/components/molecules/audio-player";
 import { SignatureStatusBadge } from "@/components/molecules/signature-status-badge";
+import { isAudioFile } from "@/helpers/files";
 import { TextLink } from "@/components/molecules/text-link";
 import { routeTo } from "@/constants/routes";
 import type { ReactNode } from "react";
@@ -46,9 +48,12 @@ export function DocumentItem({
   badge,
   selection,
 }: DocumentItemProps) {
-  const Icon = document.contentType?.startsWith("image/")
-    ? ImageIcon
-    : FileText;
+  const audio = isAudioFile(document);
+  const Icon = audio
+    ? Mic
+    : document.contentType?.startsWith("image/")
+      ? ImageIcon
+      : FileText;
   const meta = [
     document.category?.name,
     document.size !== undefined && formatFileSize(document.size),
@@ -80,6 +85,7 @@ export function DocumentItem({
         <Text size="xs" tone="muted" truncate>
           {subtitle ?? meta.join(" · ")}
         </Text>
+        {audio && <AudioPlayer file={document} className="mt-1 max-w-sm" />}
         {(badge || document.signature) && (
           <Box className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
             {badge}

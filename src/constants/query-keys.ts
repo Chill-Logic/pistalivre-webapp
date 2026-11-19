@@ -2,6 +2,7 @@ import type { LeadFilters } from "@/types/crm";
 import type { CustomerFilters } from "@/types/customer";
 import type { InspectionFilters } from "@/types/inspection";
 import type { MaintenanceFilters } from "@/types/maintenance";
+import type { NoteOwner } from "@/types/note";
 import type { MaintenanceAnalysisFilters } from "@/types/maintenance-analysis";
 import type { RentalFilters } from "@/types/rental";
 import type { StatementFilters } from "@/types/statement";
@@ -69,6 +70,11 @@ export const queryKeys = {
   },
   labels: {
     all: ["labels"] as const,
+  },
+  notes: {
+    all: ["notes"] as const,
+    byOwner: (owner: NoteOwner) =>
+      [...queryKeys.notes.all, owner.type, owner.id] as const,
   },
   maintenances: {
     all: ["maintenances"] as const,

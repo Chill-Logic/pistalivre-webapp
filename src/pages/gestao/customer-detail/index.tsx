@@ -37,6 +37,7 @@ import {
 } from "@/components/organisms/customer-invoices-card";
 import { QueryError } from "@/components/organisms/query-error";
 import { CustomerAsaasChargesCard } from "@/components/organisms/customer-asaas-charges-card";
+import { NotesCard, NotesCardSkeleton } from "@/components/organisms/notes-card";
 import {
   CustomerChargesCard,
   CustomerChargesCardSkeleton,
@@ -99,6 +100,7 @@ export function CustomerDetailPage() {
             summary={<CustomerSummarySkeleton />}
             license={<CustomerLicenseCardSkeleton />}
             contact={<CustomerContactCardSkeleton />}
+            notes={<NotesCardSkeleton />}
             rentals={<CustomerRentalsSkeleton />}
             billing={<CustomerBillingCardSkeleton />}
             invoices={<CustomerInvoicesCardSkeleton />}
@@ -134,6 +136,9 @@ export function CustomerDetailPage() {
           }
           license={<CustomerLicenseCard customer={customer.data} />}
           contact={<CustomerContactCard customer={customer.data} />}
+          notes={
+            <NotesCard owner={{ type: "CUSTOMER", id: customer.data.id }} />
+          }
           rentals={<CustomerRentals rentals={customer.data.rentals} />}
           billing={
             <CustomerBillingCard

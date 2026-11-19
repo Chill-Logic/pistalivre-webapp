@@ -1,9 +1,11 @@
-import { Download, Eye, Paperclip } from "lucide-react";
+import { Download, Eye, Mic, Paperclip } from "lucide-react";
 import type { ReactNode } from "react";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
+import { AudioPlayer } from "@/components/molecules/audio-player";
+import { isAudioFile } from "@/helpers/files";
 import type { DocumentAttachment } from "@/types/document";
 
 type AttachmentChipProps = {
@@ -25,25 +27,31 @@ export function AttachmentChip({
   isDownloading,
   actions,
 }: AttachmentChipProps) {
+  const audio = isAudioFile(attachment);
+  const Icon = audio ? Mic : Paperclip;
   return (
-    <Box className="inline-flex max-w-full items-center gap-0.5 rounded-md border bg-muted/40 py-0.5 pl-2 pr-0.5">
-      <Paperclip
+    <Box className="inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-md border bg-muted/40 py-0.5 pl-2 pr-0.5">
+      <Icon
         className="mr-1 size-3.5 shrink-0 text-muted-foreground"
         aria-hidden
       />
       <Text size="xs" truncate title={attachment.fileName} className="min-w-0">
         {attachment.fileName}
       </Text>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="size-8 shrink-0"
-        onClick={onView}
-        disabled={isViewing}
-        aria-label={`Visualizar ${attachment.fileName}`}
-      >
-        {isViewing ? <Spinner /> : <Eye />}
-      </Button>
+      {audio ? (
+        <AudioPlayer file={attachment} className="w-56 max-w-full" />
+      ) : (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-8 shrink-0"
+          onClick={onView}
+          disabled={isViewing}
+          aria-label={`Visualizar ${attachment.fileName}`}
+        >
+          {isViewing ? <Spinner /> : <Eye />}
+        </Button>
+      )}
       <Button
         variant="ghost"
         size="icon"

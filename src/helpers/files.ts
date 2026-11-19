@@ -31,3 +31,26 @@ export async function openBlobInNewTab(load: () => Promise<Blob>) {
     throw error;
   }
 }
+
+const AUDIO_EXTENSIONS = [
+  ".mp3",
+  ".ogg",
+  ".oga",
+  ".opus",
+  ".m4a",
+  ".aac",
+  ".wav",
+  ".webm",
+  ".amr",
+  ".3gp",
+];
+
+/** An audio attachment (by type, or by name when the type did not come). */
+export function isAudioFile(file: {
+  contentType?: string | null;
+  fileName: string;
+}) {
+  if (file.contentType?.startsWith("audio/")) return true;
+  const name = file.fileName.toLowerCase();
+  return AUDIO_EXTENSIONS.some((ext) => name.endsWith(ext));
+}

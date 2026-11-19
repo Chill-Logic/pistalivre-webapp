@@ -30,7 +30,8 @@ export type DocumentFile = {
 export type DocumentAttachment = Pick<
   DocumentFile,
   "id" | "category" | "fileName" | "url" | "signature"
->;
+> &
+  Partial<Pick<DocumentFile, "contentType">>;
 
 /**
  * Enough of a file to open/download it. Some lists (a charge's attachments)
@@ -67,7 +68,9 @@ export type DocumentOwnerType =
   | "EXPENSE"
   | "PARTNER_CONTRACT"
   | "USER"
-  | "PARTNER";
+  | "PARTNER"
+  /** Files of a staff note. */
+  | "NOTE";
 
 export type DocumentOwner = { type: DocumentOwnerType; id: string };
 

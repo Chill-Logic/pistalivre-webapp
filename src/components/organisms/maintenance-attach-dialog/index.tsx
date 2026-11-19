@@ -25,7 +25,7 @@ import { useAttachMaintenanceDocument } from "@/hooks/api/cliente/rentals/useAtt
 import { useMyDocumentCategories } from "@/hooks/api/cliente/rentals/useMyDocumentCategories";
 import type { DocumentCategory } from "@/types/document";
 
-const ACCEPT = "application/pdf,image/*,.doc,.docx,.xls,.xlsx,.odt,.ods";
+const ACCEPT = "application/pdf,image/*,audio/*,.ogg,.opus,.doc,.docx,.xls,.xlsx,.odt,.ods";
 /** The kind most files here are (what a refused refund usually misses). */
 const DEFAULT_CATEGORY_SLUG = "recibo";
 

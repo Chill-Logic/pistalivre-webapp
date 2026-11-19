@@ -25,7 +25,7 @@ import { useDocumentCategories } from "@/hooks/api/gestao/documents/useDocumentC
 import { useDocumentMutations } from "@/hooks/api/gestao/documents/useDocumentMutations";
 import type { DocumentOwner } from "@/types/document";
 
-const ACCEPT = "application/pdf,image/*,.doc,.docx,.xls,.xlsx,.odt,.ods";
+const ACCEPT = "application/pdf,image/*,audio/*,.ogg,.opus,.doc,.docx,.xls,.xlsx,.odt,.ods";
 
 type Row = {
   key: string;
