@@ -23,6 +23,7 @@ export const companyFormSchema = z.object({
     ),
   phone: z.string().refine(isPhone, "Telefone inválido"),
   whatsapp: z.string().refine(isPhone, "WhatsApp inválido"),
+  pixKey: optional(140),
   zip: optional(12),
   addressLine: optional(200),
   addressNumber: optional(20),
@@ -68,6 +69,7 @@ export function companyFormDefaults(company: Company): CompanyFormValues {
     email: company.email ?? "",
     phone: maskPhone(company.phone ?? ""),
     whatsapp: maskPhone(localWhatsapp(company.whatsapp)),
+    pixKey: company.pixKey ?? "",
     zip: maskCep(address.zip ?? ""),
     addressLine: address.line ?? "",
     addressNumber: address.number ?? "",
@@ -89,6 +91,7 @@ export function toCompanyInput(values: CompanyFormValues): CompanyInput {
     email: orNull(values.email),
     phone: orNull(values.phone),
     whatsapp: orNull(onlyDigits(values.whatsapp)),
+    pixKey: orNull(values.pixKey),
     address: {
       line: orNull(values.addressLine),
       number: orNull(values.addressNumber),

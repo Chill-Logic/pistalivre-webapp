@@ -20,6 +20,8 @@ export type Company = {
   phone: string | null;
   /** Digits with country code. */
   whatsapp: string | null;
+  /** The company's PIX key, as typed. */
+  pixKey: string | null;
   address: {
     line: string | null;
     number: string | null;
@@ -45,6 +47,7 @@ export type CompanyInput = {
   phone: string | null;
   /** Digits; the API adds the country code (55) to a 10/11-digit number. */
   whatsapp: string | null;
+  pixKey: string | null;
   address: Company["address"];
 };
 

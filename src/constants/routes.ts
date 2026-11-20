@@ -101,6 +101,7 @@ export const ROUTES = {
   integrations: `${GESTAO}/integracoes`,
   integrationsPermissions: `${GESTAO}/integracoes/permissoes`,
   integrationsApps: `${GESTAO}/integracoes/aplicativos`,
+  integrationsWhatsApp: `${GESTAO}/integracoes/whatsapp`,
   audit: `${GESTAO}/auditoria`,
   auditGaps: `${GESTAO}/auditoria/lacunas`,
   aiConsent: `${GESTAO}/autorizar-ia`,

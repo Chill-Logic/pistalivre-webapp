@@ -143,6 +143,21 @@ export const aiService = {
     const { data } = await http.get<{ items: AiClient[] }>("/ai/clients");
     return data.items;
   },
+  /** A service app (WhatsApp bot). The token comes back ONCE. */
+  async createServiceClient(name: string) {
+    const { data } = await http.post<{ client: AiClient; token: string }>(
+      "/ai/clients",
+      { name },
+    );
+    return data;
+  },
+  /** New token for a service app: the old one stops working at once. */
+  async rotateServiceSecret(id: string) {
+    const { data } = await http.post<{ token: string }>(
+      `/ai/clients/${id}/secret`,
+    );
+    return data.token;
+  },
   async setClientBlocked(id: string, blocked: boolean) {
     const { data } = await http.patch<{ items: AiClient[] }>(
       `/ai/clients/${id}`,

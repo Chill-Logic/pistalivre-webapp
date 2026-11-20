@@ -168,6 +168,10 @@ export const IntegrationsAppsPage = lazyPage(
   () => import("@/pages/gestao/integrations-apps"),
   "IntegrationsAppsPage",
 );
+export const IntegrationsWhatsAppPage = lazyPage(
+  () => import("@/pages/gestao/integrations-whatsapp"),
+  "IntegrationsWhatsAppPage",
+);
 export const PartnerContractNewPage = lazyPage(
   () => import("@/pages/gestao/partner-contract-new"),
   "PartnerContractNewPage",

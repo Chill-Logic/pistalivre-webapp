@@ -148,6 +148,25 @@ export function useBlockAiClient() {
   });
 }
 
+/** Creates a service app (WhatsApp bot); the token is shown once by the caller. */
+export function useCreateServiceClient() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => aiService.createServiceClient(name),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.ai.clients() }),
+    onError: (error) => toast.error(errorMessage(error)),
+  });
+}
+
+/** New token for a service app (the old one stops at once). */
+export function useRotateServiceSecret() {
+  return useMutation({
+    mutationFn: (id: string) => aiService.rotateServiceSecret(id),
+    onError: (error) => toast.error(errorMessage(error)),
+  });
+}
+
 /** Lacunas: unanswered questions by reason and the refused tools, in a period. */
 export function useAiGaps(de: string, ate: string) {
   const query = useQuery({

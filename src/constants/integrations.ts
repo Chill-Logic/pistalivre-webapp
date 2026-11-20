@@ -6,6 +6,7 @@ export const INTEGRATION_TABS: (SectionTab & { adminOnly?: boolean })[] = [
   { label: "Conectar", to: ROUTES.integrations, end: true },
   { label: "Permissões", to: ROUTES.integrationsPermissions, adminOnly: true },
   { label: "Aplicativos", to: ROUTES.integrationsApps, adminOnly: true },
+  { label: "WhatsApp", to: ROUTES.integrationsWhatsApp, adminOnly: true },
 ];
 
 export type AiProviderKey = "claude" | "chatgpt" | "gemini" | "other";
@@ -199,6 +200,12 @@ export const AI_AUDIT_METHOD_LABELS: Record<string, string> = {
   "gap.report": "Pergunta sem resposta",
   "action.confirm": "Ação confirmada",
   "action.cancel": "Ação cancelada",
+  "client.create_service": "App de serviço criado",
+  "client.rotate_secret": "Token do app de serviço trocado",
+  "whatsapp.connect": "WhatsApp: ponte ligada ao sistema",
+  "whatsapp.settings": "WhatsApp: grupos e gatilho",
+  "whatsapp.new_number": "WhatsApp: número trocado",
+  "whatsapp.logout": "WhatsApp: número desconectado",
 };
 
 /** Why the AI couldn't answer (registrar_pergunta_sem_resposta). */

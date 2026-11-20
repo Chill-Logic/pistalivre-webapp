@@ -145,6 +145,12 @@ export type AiPermissions = {
 export type AiClient = {
   id: string;
   name: string;
+  /**
+   * oauth: an AI someone connected through the MCP (grants = who authorized it).
+   * service: an interface the admin created (the WhatsApp bot) that answers as
+   * whoever talks to it, identified by the phone in their user.
+   */
+  kind: "oauth" | "service";
   redirectUris: string[];
   blocked: boolean;
   createdAt: string;

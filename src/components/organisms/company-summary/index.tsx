@@ -36,6 +36,9 @@ export function CompanySummary({ company }: { company: Company }) {
           <InfoItem span={6} md={4} label="WhatsApp">
             {company.whatsapp ? `+${company.whatsapp}` : null}
           </InfoItem>
+          <InfoItem md={6} label="Chave PIX">
+            {company.pixKey}
+          </InfoItem>
           <InfoItem label="Endereço">
             {address.length > 0
               ? address.map((line) => (

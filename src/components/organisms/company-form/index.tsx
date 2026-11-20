@@ -185,6 +185,14 @@ export function CompanyForm({ company, cancelTo, onSaved }: CompanyFormProps) {
                   placeholder: "(00) 00000-0000",
                 })}
               </Col>
+              <Col md={6}>
+                <FormField
+                  label="Chave PIX — opcional"
+                  placeholder="CNPJ, e-mail, telefone ou chave aleatória"
+                  error={errors.pixKey?.message}
+                  {...register("pixKey")}
+                />
+              </Col>
               <Col>
                 <Text size="xs" tone="muted">
                   O WhatsApp de atendimento recebe a mensagem do cliente ao

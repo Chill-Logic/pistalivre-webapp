@@ -195,6 +195,12 @@ export const queryKeys = {
     gaps: (de: string, ate: string) =>
       [...queryKeys.ai.all, "gaps", de, ate] as const,
   },
+  whatsapp: {
+    all: ["whatsapp"] as const,
+    status: () => [...queryKeys.whatsapp.all, "status"] as const,
+    qr: () => [...queryKeys.whatsapp.all, "qr"] as const,
+    groups: () => [...queryKeys.whatsapp.all, "groups"] as const,
+  },
   aiUsage: {
     all: ["ai-usage"] as const,
     summary: (month: string) =>

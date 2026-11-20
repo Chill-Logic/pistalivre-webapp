@@ -44,6 +44,7 @@ import {
   AuditPage,
   AuditSectionPage,
   IntegrationsAppsPage,
+  IntegrationsWhatsAppPage,
   IntegrationsPage,
   IntegrationsPermissionsPage,
   IntegrationsSectionPage,
@@ -359,6 +360,7 @@ const gestaoRoutes: RouteObject[] = [
               IntegrationsPage.preload,
               IntegrationsPermissionsPage.preload,
               IntegrationsAppsPage.preload,
+              IntegrationsWhatsAppPage.preload,
             ]}
           />
         ),
@@ -369,6 +371,7 @@ const gestaoRoutes: RouteObject[] = [
             element: <IntegrationsPermissionsPage />,
           },
           { path: ROUTES.integrationsApps, element: <IntegrationsAppsPage /> },
+          { path: ROUTES.integrationsWhatsApp, element: <IntegrationsWhatsAppPage /> },
         ],
       },
       {
