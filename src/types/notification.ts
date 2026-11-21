@@ -17,6 +17,19 @@ export type NotificationList = {
 
 export type NotificationGroup = "Dinheiro" | "Operação" | "Comercial" | "Resumo";
 
+/** Which notices also go to a WhatsApp group (Integrações › WhatsApp). */
+export type GroupNoticeSettings = {
+  groupId: string | null;
+  types: string[];
+  dueSoonMonthlyDays: number;
+  dueSoonWeeklyDays: number;
+};
+
+export type GroupNoticeOverview = {
+  settings: GroupNoticeSettings;
+  types: NotificationTypeInfo[];
+};
+
 export type NotificationTypeInfo = {
   type: string;
   group: NotificationGroup;

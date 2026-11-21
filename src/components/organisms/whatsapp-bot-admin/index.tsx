@@ -1,10 +1,22 @@
+import { WhatsAppGroupNotices } from "@/components/organisms/whatsapp-group-notices";
 import { useEffect, useState } from "react";
-import { Link2, LogOut, MessageCircle, RefreshCw, Smartphone } from "lucide-react";
+import {
+  Link2,
+  LogOut,
+  MessageCircle,
+  RefreshCw,
+  Smartphone,
+} from "lucide-react";
 import { Alert } from "@/components/atoms/alert";
 import { Badge } from "@/components/atoms/badge";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/atoms/card";
 import {
   Dialog,
   DialogClose,
@@ -39,7 +51,8 @@ import type { WhatsAppBot, WhatsAppStatus } from "@/types/whatsapp";
 import { formatPhone } from "@/utils/document";
 
 /** WhatsApp numbers come with the country code: show the Brazilian ones like the rest of the app. */
-const showPhone = (phone: string) => (phone.startsWith("55") ? formatPhone(phone.slice(2)) : `+${phone}`);
+const showPhone = (phone: string) =>
+  phone.startsWith("55") ? formatPhone(phone.slice(2)) : `+${phone}`;
 
 /**
  * Integrações › WhatsApp: the Livrinho in a WhatsApp group. Link the bridge to
@@ -66,6 +79,7 @@ export function WhatsAppBotAdmin({ status }: { status: WhatsAppStatus }) {
       <Col span={12} lg={7} className="space-y-4">
         <LinkCard linked={status.linked} />
         <SettingsCard bot={bot} />
+        <WhatsAppGroupNotices connected={bot.state === "open"} />
       </Col>
     </Row>
   );
@@ -82,7 +96,9 @@ function NumberCard({ bot }: { bot: WhatsAppBot }) {
           <Smartphone className="size-4" aria-hidden />
           Número do bot
         </CardTitle>
-        <Badge variant={connected ? "success" : "warning"}>{connected ? "Conectado" : "Desconectado"}</Badge>
+        <Badge variant={connected ? "success" : "warning"}>
+          {connected ? "Conectado" : "Desconectado"}
+        </Badge>
       </CardHeader>
       <CardContent className="space-y-4">
         {connected ? (
@@ -92,12 +108,16 @@ function NumberCard({ bot }: { bot: WhatsAppBot }) {
         ) : (
           <Box className="space-y-3">
             <Text size="sm" tone="muted">
-              No celular do bot: WhatsApp › Dispositivos conectados › Conectar dispositivo, e leia o QR abaixo. Ele
-              se renova sozinho.
+              No celular do bot: WhatsApp › Dispositivos conectados › Conectar
+              dispositivo, e leia o QR abaixo. Ele se renova sozinho.
             </Text>
             <Box className="flex justify-center rounded-lg border bg-white p-3">
               {qr.data?.qr ? (
-                <Image src={qr.data.qr} alt="QR code para conectar o número do bot" className="size-64" />
+                <Image
+                  src={qr.data.qr}
+                  alt="QR code para conectar o número do bot"
+                  className="size-64"
+                />
               ) : qr.isError ? (
                 <Text size="sm" tone="destructive">
                   Não consegui gerar o QR agora. Tente de novo em instantes.
@@ -150,8 +170,8 @@ function SwapNumberDialog() {
       <DialogContent size="sm">
         <DialogTitle>Trocar o número do bot?</DialogTitle>
         <DialogDescription>
-          Gera um QR para outro celular. Grupos, gatilho e a ligação com o sistema continuam; só falta colocar o
-          número novo nos grupos.
+          Gera um QR para outro celular. Grupos, gatilho e a ligação com o
+          sistema continuam; só falta colocar o número novo nos grupos.
         </DialogDescription>
         <CheckboxField
           label="Desconectar também o número atual (troca planejada)"
@@ -164,7 +184,9 @@ function SwapNumberDialog() {
           </DialogClose>
           <Button
             disabled={swap.isPending}
-            onClick={() => swap.mutate(logoutPrevious, { onSuccess: () => setOpen(false) })}
+            onClick={() =>
+              swap.mutate(logoutPrevious, { onSuccess: () => setOpen(false) })
+            }
           >
             Trocar número
           </Button>
@@ -183,7 +205,9 @@ function LinkCard({ linked }: { linked: boolean }) {
           <Link2 className="size-4" aria-hidden />
           Ligação com o sistema
         </CardTitle>
-        <Badge variant={linked ? "success" : "warning"}>{linked ? "Ligada" : "Não ligada"}</Badge>
+        <Badge variant={linked ? "success" : "warning"}>
+          {linked ? "Ligada" : "Não ligada"}
+        </Badge>
       </CardHeader>
       <CardContent className="space-y-3">
         <Text size="sm" tone="muted">
@@ -206,7 +230,11 @@ function LinkCard({ linked }: { linked: boolean }) {
             isPending={connect.isPending}
           />
         ) : (
-          <Button size="sm" onClick={() => connect.mutate()} disabled={connect.isPending}>
+          <Button
+            size="sm"
+            onClick={() => connect.mutate()}
+            disabled={connect.isPending}
+          >
             <Link2 />
             Conectar
           </Button>
@@ -234,7 +262,8 @@ function SettingsCard({ bot }: { bot: WhatsAppBot }) {
     value: g.id,
     label: g.size ? `${g.subject} (${g.size} pessoas)` : g.subject,
   }));
-  const sameList = (a: string[], b: string[]) => a.length === b.length && a.every((x) => b.includes(x));
+  const sameList = (a: string[], b: string[]) =>
+    a.length === b.length && a.every((x) => b.includes(x));
   const dirty =
     !sameList(triggers, bot.triggers) ||
     active !== bot.active ||
@@ -252,14 +281,19 @@ function SettingsCard({ bot }: { bot: WhatsAppBot }) {
       </CardHeader>
       <CardContent className="space-y-5">
         {bot.state !== "open" ? (
-          <Alert variant="info">Conecte o número para escolher os grupos.</Alert>
+          <Alert variant="info">
+            Conecte o número para escolher os grupos.
+          </Alert>
         ) : groups.isPending ? (
           <Box className="space-y-2">
             <Skeleton className="h-4 w-40" />
             <Skeleton className="h-4 w-56" />
           </Box>
         ) : options.length === 0 ? (
-          <Alert variant="info">O número ainda não está em nenhum grupo. Adicione-o ao grupo pelo celular.</Alert>
+          <Alert variant="info">
+            O número ainda não está em nenhum grupo. Adicione-o ao grupo pelo
+            celular.
+          </Alert>
         ) : (
           <CheckboxGroupField
             label="Grupos em que o bot responde"
@@ -290,7 +324,14 @@ function SettingsCard({ bot }: { bot: WhatsAppBot }) {
         />
         <Box className="flex justify-end">
           <Button
-            onClick={() => save.mutate({ allowedGroupIds: allowed, triggers, active, directMessages: direct })}
+            onClick={() =>
+              save.mutate({
+                allowedGroupIds: allowed,
+                triggers,
+                active,
+                directMessages: direct,
+              })
+            }
             disabled={!dirty || save.isPending}
           >
             Salvar

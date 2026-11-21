@@ -1,5 +1,7 @@
 import { http } from "@/services/http/client";
 import type {
+  GroupNoticeOverview,
+  GroupNoticeSettings,
   MyNotificationSettings,
   NotificationAdminOverview,
   NotificationList,
@@ -27,6 +29,18 @@ export const notificationsService = {
   async saveSettings(types: NotificationPreferenceInput) {
     const { data } = await http.put<MyNotificationSettings>("/notifications/settings", { types });
     return data;
+  },
+  /** Integrações › WhatsApp › Avisos no grupo (ADMIN). */
+  async groupNotices() {
+    const { data } = await http.get<GroupNoticeOverview>("/notifications/admin/whatsapp");
+    return data;
+  },
+  async saveGroupNotices(settings: GroupNoticeSettings) {
+    const { data } = await http.put<{ settings: GroupNoticeSettings }>("/notifications/admin/whatsapp", settings);
+    return data.settings;
+  },
+  async testGroupNotice() {
+    await http.post("/notifications/admin/whatsapp/test");
   },
   async admin() {
     const { data } = await http.get<NotificationAdminOverview>("/notifications/admin");

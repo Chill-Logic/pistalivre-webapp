@@ -20,6 +20,7 @@ export const queryKeys = {
     list: () => [...queryKeys.notifications.all, "list"] as const,
     settings: () => [...queryKeys.notifications.all, "settings"] as const,
     admin: () => [...queryKeys.notifications.all, "admin"] as const,
+    groupNotices: () => [...queryKeys.notifications.all, "group-notices"] as const,
   },
   guide: {
     all: ["guide"] as const,
