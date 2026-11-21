@@ -184,6 +184,10 @@ export const AiAttachmentsPage = lazyPage(
   () => import("@/pages/gestao/ai-attachments"),
   "AiAttachmentsPage",
 );
+export const BillingRulesPage = lazyPage(
+  () => import("@/pages/gestao/billing-rules"),
+  "BillingRulesPage",
+);
 export const CardFeeSettingsPage = lazyPage(
   () => import("@/pages/gestao/card-fee-settings"),
   "CardFeeSettingsPage",

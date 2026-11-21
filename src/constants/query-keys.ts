@@ -109,6 +109,7 @@ export const queryKeys = {
   },
   publicPay: (token: string) => ["public-pay", token] as const,
   cardFees: () => ["card-fees"] as const,
+  billingRules: () => ["billing-rules"] as const,
   publicSite: {
     all: ["public-site"] as const,
     landing: () => [...queryKeys.publicSite.all, "landing"] as const,

@@ -36,6 +36,7 @@ import {
   NotificationSettingsPage,
   AsaasNotificationTemplatesPage,
   CardFeeSettingsPage,
+  BillingRulesPage,
   AiAttachmentsPage,
   PartnerContractNewPage,
   PartnerContractEditPage,
@@ -348,6 +349,7 @@ const gestaoRoutes: RouteObject[] = [
       { path: ROUTES.notificationSettings, element: <NotificationSettingsPage /> },
       { path: ROUTES.asaasNotifications, element: <AsaasNotificationTemplatesPage /> },
       { path: ROUTES.cardFeeSettings, element: <CardFeeSettingsPage /> },
+      { path: ROUTES.billingRules, element: <BillingRulesPage /> },
       { path: ROUTES.partnerContractNew, element: <PartnerContractNewPage /> },
       {
         path: ROUTES.partnerContractEdit,
