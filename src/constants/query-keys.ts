@@ -162,6 +162,7 @@ export const queryKeys = {
     transfers: () => [...queryKeys.finance.all, "transfers"] as const,
     /** Under finance: payments, bank and settle events already refresh it. */
     reconciliation: () => [...queryKeys.finance.all, "reconciliation"] as const,
+    fineReview: () => [...queryKeys.finance.all, "fine-review"] as const,
   },
   debts: {
     all: ["debts"] as const,

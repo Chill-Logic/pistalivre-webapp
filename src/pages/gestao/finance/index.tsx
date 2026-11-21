@@ -9,6 +9,7 @@ import {
   FinanceBalancesSkeleton,
 } from "@/components/organisms/finance-balances";
 import { FinanceSyncButton } from "@/components/organisms/finance-sync-button";
+import { FineReviewCard, FineReviewCardSkeleton } from "@/components/organisms/fine-review-card";
 import { ManualPaymentDialog } from "@/components/organisms/manual-payment-dialog";
 import { QueryBoundary } from "@/components/organisms/query-boundary";
 import {
@@ -29,6 +30,7 @@ import { FinanceLayout } from "@/components/templates/finance-layout";
 import { useFinanceBalances } from "@/hooks/api/gestao/finance/useFinanceBalances";
 import { useFinanceDelinquency } from "@/hooks/api/gestao/finance/useFinanceDelinquency";
 import { useFinanceToCollect } from "@/hooks/api/gestao/finance/useFinanceToCollect";
+import { useFineReview } from "@/hooks/api/gestao/fine-review/useFineReview";
 import { useReconciliationSuggestions } from "@/hooks/api/gestao/reconciliation/useReconciliation";
 import { useTransfers } from "@/hooks/api/gestao/finance/useTransfers";
 
@@ -43,6 +45,7 @@ export function FinancePage() {
   const delinquency = useFinanceDelinquency();
   const transfers = useTransfers();
   const reconciliation = useReconciliationSuggestions();
+  const fineReview = useFineReview();
 
   return (
     <Box className="space-y-4 md:space-y-6">
@@ -60,6 +63,13 @@ export function FinancePage() {
         {(data) => (
           <AiAnchor id="reconciliation">
             <ReconciliationCard view={data} />
+          </AiAnchor>
+        )}
+      </QueryBoundary>
+      <QueryBoundary query={fineReview} label="Procurando multas acima da regra…" skeleton={<FineReviewCardSkeleton />}>
+        {(data) => (
+          <AiAnchor id="fine-review">
+            <FineReviewCard items={data} />
           </AiAnchor>
         )}
       </QueryBoundary>
