@@ -32,8 +32,107 @@ const same = (a: GroupNoticeSettings, b: GroupNoticeSettings) =>
   a.groupId === b.groupId &&
   a.dueSoonMonthlyDays === b.dueSoonMonthlyDays &&
   a.dueSoonWeeklyDays === b.dueSoonWeeklyDays &&
+  a.dueSoonMonthlyEvery === b.dueSoonMonthlyEvery &&
+  a.dueSoonWeeklyEvery === b.dueSoonWeeklyEvery &&
   a.types.length === b.types.length &&
   a.types.every((t) => b.types.includes(t));
+
+const toDays = (value: string) => Math.max(1, Math.min(30, Number(value) || 1));
+const toEvery = (value: string) =>
+  value.trim() === "" || Number(value) <= 0
+    ? null
+    : Math.min(30, Number(value));
+
+/** "Vence em breve": from X days before, every Z days (empty = once), for monthly and weekly rent. */
+function DueSoonFields({
+  draft,
+  onChange,
+}: {
+  draft: GroupNoticeSettings;
+  onChange: (d: GroupNoticeSettings) => void;
+}) {
+  const preview = (start: number, every: number | null) => {
+    const days = every
+      ? Array.from({ length: start }, (_, i) => start - i).filter(
+          (d) => (start - d) % every === 0,
+        )
+      : [start];
+    const unit = days.length === 1 && days[0] === 1 ? "dia" : "dias";
+    return `Avisa com ${days.join(", ")} ${unit} de antecedência.`;
+  };
+  return (
+    <Box className="space-y-3 rounded-lg border bg-muted/40 p-3">
+      <Row className="gap-y-3">
+        <Col span={12} md={6}>
+          <FormField
+            label="Mensal: começar a avisar (dias antes)"
+            type="number"
+            min={1}
+            max={30}
+            value={String(draft.dueSoonMonthlyDays)}
+            onChange={(e) =>
+              onChange({ ...draft, dueSoonMonthlyDays: toDays(e.target.value) })
+            }
+          />
+        </Col>
+        <Col span={12} md={6}>
+          <FormField
+            label="Mensal: repetir a cada (dias, vazio = uma vez)"
+            type="number"
+            min={1}
+            max={30}
+            value={
+              draft.dueSoonMonthlyEvery ? String(draft.dueSoonMonthlyEvery) : ""
+            }
+            onChange={(e) =>
+              onChange({
+                ...draft,
+                dueSoonMonthlyEvery: toEvery(e.target.value),
+              })
+            }
+          />
+        </Col>
+      </Row>
+      <Text size="xs" tone="muted">
+        {preview(draft.dueSoonMonthlyDays, draft.dueSoonMonthlyEvery)}
+      </Text>
+      <Row className="gap-y-3">
+        <Col span={12} md={6}>
+          <FormField
+            label="Semanal: começar a avisar (dias antes)"
+            type="number"
+            min={1}
+            max={30}
+            value={String(draft.dueSoonWeeklyDays)}
+            onChange={(e) =>
+              onChange({ ...draft, dueSoonWeeklyDays: toDays(e.target.value) })
+            }
+          />
+        </Col>
+        <Col span={12} md={6}>
+          <FormField
+            label="Semanal: repetir a cada (dias, vazio = uma vez)"
+            type="number"
+            min={1}
+            max={30}
+            value={
+              draft.dueSoonWeeklyEvery ? String(draft.dueSoonWeeklyEvery) : ""
+            }
+            onChange={(e) =>
+              onChange({
+                ...draft,
+                dueSoonWeeklyEvery: toEvery(e.target.value),
+              })
+            }
+          />
+        </Col>
+      </Row>
+      <Text size="xs" tone="muted">
+        {preview(draft.dueSoonWeeklyDays, draft.dueSoonWeeklyEvery)}
+      </Text>
+    </Box>
+  );
+}
 
 export function WhatsAppGroupNoticesSkeleton() {
   return <Skeleton className="h-96 w-full" />;
@@ -116,38 +215,7 @@ export function WhatsAppGroupNotices({ connected }: { connected: boolean }) {
                   onChange={(on) => toggle(t.type, on)}
                 />
                 {t.type === DUE_SOON && draft.types.includes(DUE_SOON) && (
-                  <Row className="gap-y-3">
-                    <Col span={12} md={6}>
-                      <FormField
-                        label="Mensal: avisar quantos dias antes"
-                        type="number"
-                        min={1}
-                        max={15}
-                        value={String(draft.dueSoonMonthlyDays)}
-                        onChange={(e) =>
-                          setDraft({
-                            ...draft,
-                            dueSoonMonthlyDays: Number(e.target.value) || 1,
-                          })
-                        }
-                      />
-                    </Col>
-                    <Col span={12} md={6}>
-                      <FormField
-                        label="Semanal: avisar quantos dias antes"
-                        type="number"
-                        min={1}
-                        max={15}
-                        value={String(draft.dueSoonWeeklyDays)}
-                        onChange={(e) =>
-                          setDraft({
-                            ...draft,
-                            dueSoonWeeklyDays: Number(e.target.value) || 1,
-                          })
-                        }
-                      />
-                    </Col>
-                  </Row>
+                  <DueSoonFields draft={draft} onChange={setDraft} />
                 )}
               </Box>
             ))}

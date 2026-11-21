@@ -23,6 +23,9 @@ export type GroupNoticeSettings = {
   types: string[];
   dueSoonMonthlyDays: number;
   dueSoonWeeklyDays: number;
+  /** Repeat every Z days until due (null = only once). */
+  dueSoonMonthlyEvery: number | null;
+  dueSoonWeeklyEvery: number | null;
 };
 
 export type GroupNoticeOverview = {
