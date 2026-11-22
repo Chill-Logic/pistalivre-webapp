@@ -104,6 +104,8 @@ type PartnerContractFormProps = {
   onTermsChange?: (values: ContractFormValues) => void;
   /** The assistant's scenario for the calculator ("Preencher na tela"). */
   onCalculatorFill?: (fill: CalculatorFill) => void;
+  /** Starting values over the contract's (a simulation opened from a shared link). */
+  initialValues?: ContractFormValues;
 };
 
 /**
@@ -118,6 +120,7 @@ export function PartnerContractForm({
   onCancel,
   onTermsChange,
   onCalculatorFill,
+  initialValues,
 }: PartnerContractFormProps) {
   const { options, label } = useLabels();
   const create = useCreatePartnerContract(partnerId);
@@ -136,7 +139,7 @@ export function PartnerContractForm({
     formState: { errors },
   } = useForm<ContractFormValues>({
     resolver: zodResolver(contractFormSchema),
-    defaultValues: contractFormDefaults(contract),
+    defaultValues: { ...contractFormDefaults(contract), ...initialValues },
   });
   const values = useWatch({ control }) as ContractFormValues;
   const onTermsChangeRef = useRef(onTermsChange);

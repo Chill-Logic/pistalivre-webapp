@@ -135,7 +135,8 @@ for (const [tag, width, height] of viewports) {
       await new Promise((done) => setTimeout(done, 500));
     }
     await new Promise((done) => setTimeout(done, 800));
-    const name = `${path.replace(/^\//, "").replace(/\//g, "_") || "raiz"}-${tag}-${theme}.png`;
+    // The query (e.g. ?cenario=…) stays out of the file name (Windows refuses "?").
+    const name = `${path.split("?")[0].replace(/^\//, "").replace(/\//g, "_") || "raiz"}-${tag}-${theme}.png`;
     await page.screenshot({ path: `${out}/${name}`, fullPage: full });
     console.log(`${out}/${name}`);
   }
