@@ -115,10 +115,7 @@ export function PartnerAreaProposalCard({
             <>
               <List className="space-y-3 md:hidden">
                 {proposal.vehicles.map((vehicle) => {
-                  const offer = offerRateText(
-                    vehicle.offerRate,
-                    vehicle.offerRatePeriod,
-                  );
+                  const offer = offerRateText(vehicle);
                   return (
                     <ListItem
                       key={vehicle.vehicleId}
@@ -183,10 +180,7 @@ export function PartnerAreaProposalCard({
                             : "—"}
                         </TableCell>
                         <TableCell className="text-right tabular-nums">
-                          {offerRateText(
-                            vehicle.offerRate,
-                            vehicle.offerRatePeriod,
-                          ) ?? "—"}
+                          {offerRateText(vehicle) ?? "—"}
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {formatCalendarDate(vehicle.joinedAt)}

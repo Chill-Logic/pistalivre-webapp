@@ -61,7 +61,7 @@ export function PartnerContractTermPanel({
             ) : (
               <Plus />
             )}
-            Incluir termo de aporte
+            Incluir termo
           </Button>
         }
       />

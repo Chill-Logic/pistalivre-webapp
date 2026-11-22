@@ -24,7 +24,7 @@ export function PartnerAreaVehicleItem({
   vehicle: PartnerAreaContractVehicle;
 }) {
   const rental = vehicle.currentRental;
-  const offer = offerRateText(vehicle.offerRate, vehicle.offerRatePeriod);
+  const offer = offerRateText(vehicle);
   return (
     <Box className="overflow-hidden rounded-lg border bg-card">
       <Link to={routeTo.partnerAreaVehicle(vehicle.vehicleId)} className={LINK}>

@@ -26,27 +26,19 @@ import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { DateField } from "@/components/molecules/date-field";
 import { MoneyField } from "@/components/molecules/money-field";
-import { SegmentedField } from "@/components/molecules/segmented-field";
 import {
   RemoteCombobox,
   type RemoteOption,
 } from "@/components/molecules/remote-combobox";
 import { TextLink } from "@/components/molecules/text-link";
-import { LABEL_MAPS } from "@/constants/label-maps";
-import { PARTNER_OFFER_RATE_PERIODS } from "@/constants/partner";
 import { ROUTES, routeTo } from "@/constants/routes";
 import { toApiError } from "@/helpers/api-error";
 import { partnerVehicleName } from "@/helpers/partner";
 import { vehicleName } from "@/helpers/vehicle";
 import { usePartnerContractVehicles } from "@/hooks/api/gestao/partners/usePartnerContractMutations";
 import { useVehicle } from "@/hooks/api/gestao/vehicles/useVehicle";
-import { useLabels } from "@/hooks/ui/useLabels";
 import { useVehicleOptions } from "@/hooks/ui/useRemoteOptions";
-import type {
-  PartnerContract,
-  PartnerContractVehicle,
-  PartnerOfferRatePeriod,
-} from "@/types/partner";
+import type { PartnerContract, PartnerContractVehicle } from "@/types/partner";
 import { todayInBrasilia } from "@/utils/date";
 import { formatPlate } from "@/utils/plate";
 
@@ -56,8 +48,8 @@ type Mode = "add" | "edit" | "leave";
 type Errors = {
   vehicleId?: string;
   acquisitionValue?: string;
-  offerRate?: string;
-  offerRatePeriod?: string;
+  /** Weekly and/or monthly offer (one message for the pair). */
+  offer?: string;
   joinedAt?: string;
   leftAt?: string;
   form?: string;
@@ -97,15 +89,9 @@ export function PartnerContractVehicleDialog({
   const [open, setOpen] = useState(false);
   const [picked, setPicked] = useState<RemoteOption | null>(null);
   const [acquisitionValue, setAcquisitionValue] = useState<number | null>(null);
-  const [offerRate, setOfferRate] = useState<number | null>(null);
-  const [offerRatePeriod, setOfferRatePeriod] = useState<
-    PartnerOfferRatePeriod | ""
-  >("");
-  const { label } = useLabels();
-  const periodOptions = PARTNER_OFFER_RATE_PERIODS.map((period) => ({
-    value: period,
-    label: label(LABEL_MAPS.ratePeriod, period),
-  }));
+  // The offer per recurrence (one or both; reference values, adjustable).
+  const [offerWeekly, setOfferWeekly] = useState<number | null>(null);
+  const [offerMonthly, setOfferMonthly] = useState<number | null>(null);
   const [joinedAt, setJoinedAt] = useState("");
   const [leftAt, setLeftAt] = useState("");
   const [errors, setErrors] = useState<Errors>({});
@@ -140,9 +126,15 @@ export function PartnerContractVehicleDialog({
     const today = todayInBrasilia();
     setPicked(initial);
     setAcquisitionValue(link?.acquisitionValue ?? null);
-    setOfferRate(link?.offerRate ?? null);
-    // Motofrete rents by the week: the common case when nothing was saved.
-    setOfferRatePeriod(link?.offerRatePeriod ?? "WEEKLY");
+    // Older links only have the single pair: it is the value of its recurrence.
+    setOfferWeekly(
+      link?.offerWeekly ??
+        (link?.offerRatePeriod === "WEEKLY" ? link.offerRate : null),
+    );
+    setOfferMonthly(
+      link?.offerMonthly ??
+        (link?.offerRatePeriod === "MONTHLY" ? link.offerRate : null),
+    );
     setJoinedAt(
       link?.joinedAt ??
         (today < contract.startDate ? contract.startDate : today),
@@ -168,23 +160,23 @@ export function PartnerContractVehicleDialog({
     if (mode === "add" && apiError.status === 422 && !fields.vehicleId) {
       const other =
         fields.acquisitionValue ||
+        fields.offerWeekly ||
+        fields.offerMonthly ||
         fields.offerRate ||
-        fields.offerRatePeriod ||
         fields.joinedAt;
       if (!other) fields.vehicleId = apiError.message;
     }
+    const offer = fields.offerWeekly || fields.offerMonthly || fields.offerRate;
     const placed =
       fields.vehicleId ||
       fields.acquisitionValue ||
-      fields.offerRate ||
-      fields.offerRatePeriod ||
+      offer ||
       fields.joinedAt ||
       fields.leftAt;
     setErrors({
       vehicleId: fields.vehicleId,
       acquisitionValue: fields.acquisitionValue,
-      offerRate: fields.offerRate,
-      offerRatePeriod: fields.offerRatePeriod,
+      offer,
       joinedAt: fields.joinedAt,
       leftAt: fields.leftAt,
       form: placed ? undefined : apiError.message,
@@ -195,13 +187,9 @@ export function PartnerContractVehicleDialog({
     event.preventDefault();
     const found: Errors = {
       vehicleId: mode === "add" && !picked ? "Escolha o veículo" : undefined,
-      offerRate:
-        mode !== "leave" && !offerRate
-          ? "Informe por quanto a locação será oferecida"
-          : undefined,
-      offerRatePeriod:
-        mode !== "leave" && !offerRatePeriod
-          ? "Escolha a recorrência"
+      offer:
+        mode !== "leave" && !offerWeekly && !offerMonthly
+          ? "Informe o valor semanal, o mensal ou os dois"
           : undefined,
       joinedAt: !joinedAt
         ? "Informe a entrada"
@@ -217,8 +205,7 @@ export function PartnerContractVehicleDialog({
     };
     if (
       found.vehicleId ||
-      found.offerRate ||
-      found.offerRatePeriod ||
+      found.offer ||
       found.joinedAt ||
       found.leftAt
     ) {
@@ -236,8 +223,8 @@ export function PartnerContractVehicleDialog({
         {
           vehicleId: picked?.value ?? "",
           acquisitionValue,
-          offerRate: offerRate ?? 0,
-          offerRatePeriod: offerRatePeriod || "WEEKLY",
+          offerWeekly,
+          offerMonthly,
           joinedAt,
         },
         { onSuccess: () => setOpen(false), onError },
@@ -249,9 +236,9 @@ export function PartnerContractVehicleDialog({
         linkId: link?.id ?? "",
         input: {
           acquisitionValue,
-          // "Registrar saída" resends what is saved (old links may lack it).
-          offerRate: offerRate ?? 0,
-          offerRatePeriod: offerRatePeriod || "WEEKLY",
+          // "Registrar saída" resends what is saved.
+          offerWeekly,
+          offerMonthly,
           joinedAt,
           leftAt: leftAt || null,
         },
@@ -330,35 +317,33 @@ export function PartnerContractVehicleDialog({
             )}
             {mode !== "leave" && (
               <>
-                <Col md={6} lg={3}>
+                <Col md={6} lg={4}>
                   <MoneyField
-                    label="Locação oferecida"
-                    value={offerRate}
+                    label="Locação semanal"
+                    value={offerWeekly}
                     onChange={(value) => {
-                      setOfferRate(value);
-                      setErrors((current) => ({
-                        ...current,
-                        offerRate: undefined,
-                      }));
+                      setOfferWeekly(value);
+                      setErrors((current) => ({ ...current, offer: undefined }));
                     }}
-                    error={errors.offerRate}
+                    error={errors.offer}
                   />
                 </Col>
-                {/* Three segments need the room: narrower cuts "Semanal". */}
-                <Col md={6} lg={5}>
-                  <SegmentedField
-                    label="Recorrência"
-                    value={offerRatePeriod}
-                    options={periodOptions}
+                <Col md={6} lg={4}>
+                  <MoneyField
+                    label="Locação mensal"
+                    value={offerMonthly}
                     onChange={(value) => {
-                      setOfferRatePeriod(value as PartnerOfferRatePeriod);
-                      setErrors((current) => ({
-                        ...current,
-                        offerRatePeriod: undefined,
-                      }));
+                      setOfferMonthly(value);
+                      setErrors((current) => ({ ...current, offer: undefined }));
                     }}
-                    error={errors.offerRatePeriod}
                   />
+                </Col>
+                <Col span={12}>
+                  <Text size="sm" tone="muted">
+                    Preencha um ou os dois. São valores de referência: o
+                    contrato diz que podem ser reajustados, qualquer que seja a
+                    recorrência.
+                  </Text>
                 </Col>
                 <Col md={6} lg={4}>
                   <MoneyField
@@ -395,10 +380,8 @@ export function PartnerContractVehicleDialog({
             )}
           </Row>
           {mode === "leave" &&
-            (errors.joinedAt || errors.offerRate || errors.offerRatePeriod) && (
-              <Alert>
-                {errors.joinedAt || errors.offerRate || errors.offerRatePeriod}
-              </Alert>
+            (errors.joinedAt || errors.offer) && (
+              <Alert>{errors.joinedAt || errors.offer}</Alert>
             )}
           {errors.form && <Alert>{errors.form}</Alert>}
           <DialogFooter>

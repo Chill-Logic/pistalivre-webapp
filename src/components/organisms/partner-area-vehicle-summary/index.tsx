@@ -21,7 +21,7 @@ import { formatPlate } from "@/utils/plate";
 type PartnerAreaVehicleSummaryProps = {
   detail: PartnerAreaVehicleDetail;
   /** The vehicle's link in the contract (GET /partner): the offered rent. */
-  link?: Pick<PartnerAreaContractVehicle, "offerRate" | "offerRatePeriod">;
+  link?: Pick<PartnerAreaContractVehicle, "offerRate" | "offerRatePeriod" | "offerWeekly" | "offerMonthly">;
 };
 
 /**
@@ -34,7 +34,7 @@ export function PartnerAreaVehicleSummary({
 }: PartnerAreaVehicleSummaryProps) {
   const { vehicle, windows } = detail;
   const offer = link
-    ? offerRateText(link.offerRate, link.offerRatePeriod)
+    ? offerRateText(link)
     : null;
   return (
     <Card>

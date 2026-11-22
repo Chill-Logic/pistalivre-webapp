@@ -58,7 +58,7 @@ const COLUMNS: DataTableColumn<PartnerAreaVehicleRow>[] = [
     header: "Locação oferecida",
     align: "right",
     cell: (vehicle) =>
-      offerRateText(vehicle.offerRate, vehicle.offerRatePeriod) ?? "—",
+      offerRateText(vehicle) ?? "—",
     skeleton: "ml-auto w-28",
   },
   {

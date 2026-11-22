@@ -216,7 +216,7 @@ export function useSavePartnerCalculator(contractId: string) {
 }
 
 
-/** "Incluir termo de aporte": the document goes with the contract from now on. */
+/** "Incluir termo": the document goes with the contract from now on. */
 export function useAddPartnerInstrument(contractId: string) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -224,7 +224,7 @@ export function useAddPartnerInstrument(contractId: string) {
       partnersService.addInstrument(contractId, kind),
     onSuccess: (list) => {
       queryClient.setQueryData(queryKeys.partners.contractInstruments(contractId), list);
-      toast.success("Termo de aporte incluído no contrato");
+      toast.success("Termo incluído no contrato");
     },
     onError: (error) => toast.error(errorMessage(error)),
   });

@@ -66,6 +66,9 @@ export type PartnerContractVehicle = {
   /** What the company intends to rent it for (null only on old links). */
   offerRate: number | null;
   offerRatePeriod: PartnerOfferRatePeriod | null;
+  /** The offer per recurrence (one or both; reference values, adjustable). */
+  offerWeekly: number | null;
+  offerMonthly: number | null;
   /** YYYY-MM-DD */
   joinedAt: string;
   leftAt: string | null;
@@ -185,15 +188,15 @@ export type PartnerContractInput = {
 export type PartnerVehicleInput = {
   vehicleId: string;
   acquisitionValue: number | null;
-  offerRate: number;
-  offerRatePeriod: PartnerOfferRatePeriod;
+  offerWeekly: number | null;
+  offerMonthly: number | null;
   joinedAt: string;
 };
 
 export type PartnerVehicleUpdate = {
   acquisitionValue: number | null;
-  offerRate: number;
-  offerRatePeriod: PartnerOfferRatePeriod;
+  offerWeekly: number | null;
+  offerMonthly: number | null;
   joinedAt: string;
   leftAt: string | null;
 };

@@ -135,17 +135,18 @@ export function PartnerContractDocumentCard({
             editTo={isDraft ? `${editorUrl}?aba=termo-de-aporte` : null}
           />
         ))}
-        {isDraft &&
-          instruments.data?.items.length === 0 &&
-          instruments.data.available.some((a) => a.kind === "CONTRIBUTION_TERM") && (
-            <Text size="sm" tone="muted">
-              O parceiro pagou veículos que estão no nome da empresa?{" "}
-              <TextLink to={`${editorUrl}?aba=termo-de-aporte`}>
-                Incluir o termo de aporte
-              </TextLink>
-              : ele vai junto com o contrato.
-            </Text>
-          )}
+        {isDraft && (instruments.data?.available.length ?? 0) > 0 && (
+          <Text size="sm" tone="muted">
+            <TextLink to={`${editorUrl}?aba=termo-de-aporte`}>
+              Incluir termo
+            </TextLink>
+            : documento que vai junto com o contrato, como o{" "}
+            {instruments.data?.available
+              .map((a) => a.title.charAt(0).toLowerCase() + a.title.slice(1))
+              .join(" ou o ")}
+            .
+          </Text>
+        )}
       </CardContent>
     </Card>
   );

@@ -92,7 +92,7 @@ export function PartnerContractVehiclesCard({
               const plate = link.plate
                 ? formatPlate(link.plate)
                 : "Veículo removido";
-              const offer = offerRateText(link.offerRate, link.offerRatePeriod);
+              const offer = offerRateText(link);
               return (
                 <ListItem
                   key={link.id}

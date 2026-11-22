@@ -161,10 +161,7 @@ export function PartnerAreaContractCard({
                             : "—"}
                         </TableCell>
                         <TableCell className="text-right tabular-nums">
-                          {offerRateText(
-                            vehicle.offerRate,
-                            vehicle.offerRatePeriod,
-                          ) ?? "—"}
+                          {offerRateText(vehicle) ?? "—"}
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {periodText(vehicle.joinedAt, vehicle.leftAt)}

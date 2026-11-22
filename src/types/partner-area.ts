@@ -50,6 +50,8 @@ export type PartnerAreaContractVehicle = {
   /** What the company intends to rent it for (null only on old links). */
   offerRate: number | null;
   offerRatePeriod: PartnerOfferRatePeriod | null;
+  offerWeekly?: number | null;
+  offerMonthly?: number | null;
   joinedAt: string;
   leftAt: string | null;
   currentRental: PartnerAreaCurrentRental | null;
@@ -111,6 +113,8 @@ export type PartnerAreaProposalVehicle = {
   acquisitionValue: number | null;
   offerRate: number | null;
   offerRatePeriod: PartnerOfferRatePeriod | null;
+  offerWeekly?: number | null;
+  offerMonthly?: number | null;
   joinedAt: string;
 };
 

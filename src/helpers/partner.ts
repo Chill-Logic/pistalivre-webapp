@@ -164,14 +164,30 @@ export function payoutText(contract: Payout, label: LabelFn) {
   return weekday ? `${frequency}, ${weekday}` : frequency;
 }
 
-/** "R$ 480,00 / semana" — the rent the company intends to offer. */
-export function offerRateText(
-  rate: number | null,
-  period: PartnerOfferRatePeriod | null,
-) {
-  if (rate === null) return null;
-  const money = formatCurrency(rate);
-  return period ? `${money} / ${ratePeriodSuffix(period)}` : money;
+/**
+ * "R$ 450,00 / semana ou R$ 1.800,00 / mês" — the rent the company intends to
+ * offer, per recurrence (older links only have the single pair).
+ */
+export function offerRateText(vehicle: {
+  offerRate: number | null;
+  offerRatePeriod: PartnerOfferRatePeriod | null;
+  offerWeekly?: number | null;
+  offerMonthly?: number | null;
+}) {
+  const parts = [
+    vehicle.offerWeekly != null
+      ? `${formatCurrency(vehicle.offerWeekly)} / ${ratePeriodSuffix("WEEKLY")}`
+      : null,
+    vehicle.offerMonthly != null
+      ? `${formatCurrency(vehicle.offerMonthly)} / ${ratePeriodSuffix("MONTHLY")}`
+      : null,
+  ].filter((part): part is string => part !== null);
+  if (parts.length) return parts.join(" ou ");
+  if (vehicle.offerRate === null) return null;
+  const money = formatCurrency(vehicle.offerRate);
+  return vehicle.offerRatePeriod
+    ? `${money} / ${ratePeriodSuffix(vehicle.offerRatePeriod)}`
+    : money;
 }
 
 /** Who pays each expense, in the contract's order (label and payer). */
