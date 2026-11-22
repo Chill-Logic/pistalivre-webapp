@@ -260,6 +260,11 @@ export function PartnerContractCalculator({
   // (Karina wants to simulate both while the contract is made).
   const otherMode =
     input?.maintenanceMode === "COST_PLUS_FEE" ? "COST_SHARE" : "COST_PLUS_FEE";
+  // 0% of the shop = the company pays the shop alone: nothing to compare
+  // ("0% da oficina" × "oficina + 0%" only repeated the same line).
+  const companyPaysShop =
+    input?.maintenanceMode !== "COST_PLUS_FEE" &&
+    (parsePercentInput(terms?.maintenanceFeePercent ?? "") ?? 0) === 0;
   const other = usePartnerSimulation(
     validPercents && fixedPayout && input
       ? { ...input, maintenanceMode: otherMode }
@@ -276,6 +281,7 @@ export function PartnerContractCalculator({
     if (!terms) return undefined;
     if (!fixedPayout) return `Paga: ${payer(key)}`;
     if (key === "maintenance") {
+      if (companyPaysShop) return "Paga: Empresa";
       const pct = terms.maintenanceFeePercent || "0";
       return terms.maintenanceMode === "COST_PLUS_FEE"
         ? `${who} paga a conta + ${pct}%`
@@ -408,6 +414,7 @@ export function PartnerContractCalculator({
                 )}
               </Box>
               {fixedPayout &&
+                !companyPaysShop &&
                 (data.maintenanceCost === 0 ? (
                   <Text size="sm" tone="muted">
                     Para comparar as duas formas de cobrar a oficina, coloque um
