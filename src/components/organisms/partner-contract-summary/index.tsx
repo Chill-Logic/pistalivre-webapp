@@ -85,10 +85,12 @@ export function PartnerContractSummary({
                     )}`
                   : "—"}
               </InfoItem>
-              <InfoItem span={6} lg={4} label="Taxa de manutenção">
-                {contract.maintenanceFeePercent !== null
-                  ? `${formatPercent(contract.maintenanceFeePercent)} do repasse`
-                  : "—"}
+              <InfoItem span={6} lg={4} label="Conta da oficina no repasse">
+                {contract.maintenanceMode === "COST_PLUS_FEE"
+                  ? `A conta inteira + ${formatPercent(contract.maintenanceFeePercent ?? 0)}`
+                  : contract.maintenanceFeePercent
+                    ? `${formatPercent(contract.maintenanceFeePercent)} da conta da oficina`
+                    : "A empresa paga a oficina"}
               </InfoItem>
             </>
           ) : isInvestment ? (
