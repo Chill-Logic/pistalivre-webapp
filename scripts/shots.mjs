@@ -95,7 +95,9 @@ for (const [tag, width, height] of viewports) {
       }
     }
     const reads = ["GET", "HEAD", "OPTIONS"].includes(request.method());
-    if (reads || url.includes("/auth/")) return request.continue();
+    // The calculator's simulation is a POST that only computes (nothing saved).
+    const pureCompute = /\/partner-contracts\/simulate(\?|$)/.test(url);
+    if (reads || pureCompute || url.includes("/auth/")) return request.continue();
     return request.respond({ status: 204, body: "" });
   });
 

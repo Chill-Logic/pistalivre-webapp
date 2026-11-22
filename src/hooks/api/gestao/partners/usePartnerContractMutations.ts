@@ -9,6 +9,7 @@ import type {
   PartnerContract,
   PartnerContractDetail,
   PartnerContractInput,
+  PartnerInstrumentKind,
   PartnerVehicleInput,
   PartnerVehicleUpdate,
 } from "@/types/partner";
@@ -214,3 +215,47 @@ export function useSavePartnerCalculator(contractId: string) {
   });
 }
 
+
+/** "Incluir termo de aporte": the document goes with the contract from now on. */
+export function useAddPartnerInstrument(contractId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (kind: PartnerInstrumentKind) =>
+      partnersService.addInstrument(contractId, kind),
+    onSuccess: (list) => {
+      queryClient.setQueryData(queryKeys.partners.contractInstruments(contractId), list);
+      toast.success("Termo de aporte incluído no contrato");
+    },
+    onError: (error) => toast.error(errorMessage(error)),
+  });
+}
+
+/** Takes a document out of the contract (its text goes with it). */
+export function useRemovePartnerInstrument(contractId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (instrumentId: string) =>
+      partnersService.removeInstrument(contractId, instrumentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.partners.contractInstruments(contractId),
+      });
+      toast.success("Termo removido do contrato");
+    },
+    onError: (error) => toast.error(errorMessage(error)),
+  });
+}
+
+/** "Visualizar PDF" of a document that goes with the contract, nothing saved. */
+export function usePartnerInstrumentPreview(contractId: string, instrumentId: string) {
+  return useMutation({
+    mutationFn: (html: string) =>
+      openBlobInNewTab(() =>
+        partnersService.previewInstrument(contractId, instrumentId, html),
+      ),
+    onError: (error) =>
+      toast.error(
+        `Não foi possível gerar a prévia do PDF: ${errorMessage(error)}`,
+      ),
+  });
+}

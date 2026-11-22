@@ -38,6 +38,8 @@ export type PartnerSimulation = {
   maintenanceFee: number;
   /** Fixed payout: what the shop cost in the month (the company pays it). */
   maintenanceCost: number;
+  /** Fixed payout: the company's fee taken off the payout (0 otherwise; absent on an older API). */
+  payoutFee?: number;
   /** Fixed payout: deductions above the payout, carried to the next one. */
   carryOver: number;
   /** The owner's costs that come off their part (fixed payout: without the taxes they pay directly). */

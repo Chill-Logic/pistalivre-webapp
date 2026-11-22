@@ -32,7 +32,7 @@ import type {
 } from "@/types/partner-simulation";
 import type { RatePeriod } from "@/types/rental";
 import { formatCurrency } from "@/utils/format";
-import { parsePercentInput } from "@/utils/percent";
+import { formatPercent, parsePercentInput } from "@/utils/percent";
 import { cn } from "@/utils/cn";
 
 /** The contract terms the calculator follows (the form's values, as typed). */
@@ -251,7 +251,11 @@ export function PartnerContractCalculator({
   const data = simulation.data;
   const isInvestment = terms?.type === "INVESTMENT";
   const profit = isInvestment && terms?.shareBase === "PROFIT";
-  const fixedPayout = !isInvestment && terms?.payoutMode === "FIXED";
+  // Fixed payout (management or, since 22/11, investment): a cap per vehicle
+  // minus the company's fee on it and the partner's part of the maintenance.
+  const fixedPayout = terms?.payoutMode === "FIXED";
+  const who = isInvestment ? "Parceiro" : "Dono";
+  const feePercent = parsePercentInput(terms?.adminFeePercent ?? "") ?? 0;
   // Fixed payout: the same month under the OTHER maintenance rule, to compare
   // (Karina wants to simulate both while the contract is made).
   const otherMode =
@@ -274,8 +278,8 @@ export function PartnerContractCalculator({
     if (key === "maintenance") {
       const pct = terms.maintenanceFeePercent || "0";
       return terms.maintenanceMode === "COST_PLUS_FEE"
-        ? `Dono paga a conta + ${pct}%`
-        : `Dono paga ${pct}% da conta`;
+        ? `${who} paga a conta + ${pct}%`
+        : `${who} paga ${pct}% da conta`;
     }
     return terms.costs[key] === "PARTNER"
       ? "Sai inteiro do repasse"
@@ -338,21 +342,18 @@ export function PartnerContractCalculator({
                     muted
                   />
                 )}
-                {isInvestment ? (
-                  <Line
-                    term={
-                      profit
-                        ? "Lucro (base da divisão)"
-                        : "Base da divisão (faturamento)"
-                    }
-                    value={data.base}
-                  />
-                ) : fixedPayout ? (
+                {fixedPayout ? (
                   <>
                     <Line
                       term="Repasse (teto proporcional aos dias)"
-                      value={data.partnerGross}
+                      value={data.partnerGross + (data.payoutFee ?? 0)}
                     />
+                    {(data.payoutFee ?? 0) > 0 && (
+                      <Line
+                        term={`Taxa da empresa (${formatPercent(feePercent)})`}
+                        value={-(data.payoutFee ?? 0)}
+                      />
+                    )}
                     {data.maintenanceFee > 0 && (
                       <Line
                         term={`Oficina (conta de ${formatCurrency(data.maintenanceCost)})`}
@@ -361,11 +362,20 @@ export function PartnerContractCalculator({
                     )}
                     {data.partnerDeductions > 0 && (
                       <Line
-                        term="Seguro e despesas do proprietário"
+                        term={`Seguro e despesas do ${isInvestment ? "parceiro" : "proprietário"}`}
                         value={-data.partnerDeductions}
                       />
                     )}
                   </>
+                ) : isInvestment ? (
+                  <Line
+                    term={
+                      profit
+                        ? "Lucro (base da divisão)"
+                        : "Base da divisão (faturamento)"
+                    }
+                    value={data.base}
+                  />
                 ) : (
                   <Line term="Taxa da empresa" value={data.adminFee} />
                 )}
@@ -425,8 +435,8 @@ export function PartnerContractCalculator({
                             <Box key={mode} className={cn("text-sm", !chosen && "text-muted-foreground")}>
                               <Text size="sm" weight={chosen ? "semibold" : "normal"}>
                                 {mode === "COST_SHARE"
-                                  ? `Dono paga ${pct}% da oficina`
-                                  : `Dono paga a oficina + ${pct}%`}
+                                  ? `${who} paga ${pct}% da oficina`
+                                  : `${who} paga a oficina + ${pct}%`}
                                 {chosen ? " (a escolhida)" : ""}
                               </Text>
                               <Text size="sm" className="tabular-nums">

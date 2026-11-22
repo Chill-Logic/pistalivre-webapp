@@ -5,14 +5,19 @@ import { errorMessage } from "@/helpers/api-error";
 import { openBlobInNewTab } from "@/helpers/files";
 import { partnerAreaService } from "@/services/api/parceiro/partner-area.service";
 
-type VersionRef = { contractId: string; versionId: string };
+type VersionRef = {
+  contractId: string;
+  versionId: string;
+  /** Another document of the version (its kind), instead of the contract. */
+  attachment?: string;
+};
 
 /** Opens the PDF of a proposal's version (Bearer → blob) in a new tab. */
 export function usePartnerProposalDocument() {
   return useMutation({
-    mutationFn: ({ contractId, versionId }: VersionRef) =>
+    mutationFn: ({ contractId, versionId, attachment }: VersionRef) =>
       openBlobInNewTab(() =>
-        partnerAreaService.proposalDocument(contractId, versionId),
+        partnerAreaService.proposalDocument(contractId, versionId, attachment),
       ),
     onError: (error) => toast.error(errorMessage(error)),
   });

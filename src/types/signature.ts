@@ -49,6 +49,8 @@ export type SignatureDetail = SignatureListItem & {
   /** Only for DRAFT: what still prevents sending. */
   blockers: string[];
   signers: Signer[];
+  /** Other PDFs in the same envelope (e.g. the contribution term); absent on an older API. */
+  attachments?: DocumentFile[];
 };
 
 export type SignatureFilters = {

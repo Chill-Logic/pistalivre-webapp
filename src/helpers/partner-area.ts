@@ -59,17 +59,40 @@ export function servicesText(services: string[], label: LabelFn) {
  */
 export function contractTerms(contract: PartnerAreaTerms, label: LabelFn) {
   const terms: { label: string; value: string }[] = [];
-  if (contract.type === "INVESTMENT") {
-    if (contract.contributionType) {
-      const parts = [
-        label(LABEL_MAPS.partnerContributionType, contract.contributionType),
-      ];
-      if (contract.contributionAmount !== null)
-        parts.push(formatCurrency(contract.contributionAmount));
-      if (contract.contributionDate)
-        parts.push(`em ${formatCalendarDate(contract.contributionDate)}`);
-      terms.push({ label: "Aporte", value: parts.join(" · ") });
+  const fixed = contract.payoutMode === "FIXED";
+  if (contract.type === "INVESTMENT" && contract.contributionType) {
+    const parts = [
+      label(LABEL_MAPS.partnerContributionType, contract.contributionType),
+    ];
+    if (contract.contributionAmount !== null)
+      parts.push(formatCurrency(contract.contributionAmount));
+    if (contract.contributionDate)
+      parts.push(`em ${formatCalendarDate(contract.contributionDate)}`);
+    terms.push({ label: "Aporte", value: parts.join(" · ") });
+  }
+  if (fixed) {
+    terms.push({
+      label: "Seu repasse",
+      value: `${formatCurrency(contract.fixedPayout ?? 0)} por veículo/mês, proporcional aos dias alugados`,
+    });
+    if (contract.adminFeePercent) {
+      // Display only: the cap minus the fee per vehicle (the month is the server's).
+      const net =
+        (contract.fixedPayout ?? 0) * (1 - contract.adminFeePercent / 100);
+      terms.push({
+        label: "Taxa da locadora",
+        value: `${formatPercent(contract.adminFeePercent)} do repasse: você recebe até ${formatCurrency(net)} por veículo/mês`,
+      });
     }
+    if (contract.maintenanceMode === "COST_PLUS_FEE" || contract.maintenanceFeePercent)
+      terms.push({
+        label: "Manutenção",
+        value:
+          contract.maintenanceMode === "COST_PLUS_FEE"
+            ? `O custo do mês + ${formatPercent(contract.maintenanceFeePercent ?? 0)}, descontado do repasse`
+            : `${formatPercent(contract.maintenanceFeePercent ?? 0)} do custo do mês, descontado do repasse`,
+      });
+  } else if (contract.type === "INVESTMENT") {
     if (contract.sharePercent !== null) {
       const base = contract.shareBase
         ? ` do ${label(LABEL_MAPS.partnerShareBase, contract.shareBase).toLowerCase()}`
@@ -79,19 +102,6 @@ export function contractTerms(contract: PartnerAreaTerms, label: LabelFn) {
         value: `${formatPercent(contract.sharePercent)}${base}`,
       });
     }
-  } else if (contract.payoutMode === "FIXED") {
-    terms.push({
-      label: "Seu repasse",
-      value: `${formatCurrency(contract.fixedPayout ?? 0)} por veículo/mês, proporcional aos dias alugados`,
-    });
-    if (contract.maintenanceMode === "COST_PLUS_FEE" || contract.maintenanceFeePercent)
-      terms.push({
-        label: "Manutenção",
-        value:
-          contract.maintenanceMode === "COST_PLUS_FEE"
-            ? `O custo do mês + ${formatPercent(contract.maintenanceFeePercent ?? 0)}, descontado do repasse`
-            : `${formatPercent(contract.maintenanceFeePercent ?? 0)} do custo do mês, descontado do repasse`,
-      });
   } else {
     const fee = [
       contract.adminFeePercent !== null

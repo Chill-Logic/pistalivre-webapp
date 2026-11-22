@@ -60,6 +60,8 @@ export type ContractDraftState = {
   rentalId: string | null;
   templateId: string | null;
   partnerContractId?: string | null;
+  /** A document that goes with a partner contract (e.g. the contribution term). */
+  partnerInstrumentId?: string | null;
   html: string;
   version: number;
   updatedVia: ContractDraftVia;

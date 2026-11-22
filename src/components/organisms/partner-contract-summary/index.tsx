@@ -50,7 +50,7 @@ export function PartnerContractSummary({
               {contract.partner.name}
             </TextLink>
           </InfoItem>
-          {isInvestment ? (
+          {isInvestment && (
             <>
               <InfoItem span={6} lg={4} label="Aporte">
                 {contract.contributionType
@@ -69,19 +69,21 @@ export function PartnerContractSummary({
                     ` em ${formatCalendarDate(contract.contributionDate)}`}
                 </InfoItem>
               )}
-              <InfoItem span={6} lg={4} label="Parte do parceiro">
-                {contract.sharePercent !== null
-                  ? formatPercent(contract.sharePercent)
-                  : none}
-                {contract.shareBase &&
-                  ` do ${label(LABEL_MAPS.partnerShareBase, contract.shareBase).toLowerCase()}`}
-              </InfoItem>
             </>
-          ) : contract.payoutMode === "FIXED" ? (
+          )}
+          {contract.payoutMode === "FIXED" ? (
             <>
               <InfoItem span={6} lg={4} label="Repasse fixo por veículo (mês)">
                 {formatCurrency(contract.fixedPayout ?? 0)}
                 {" · proporcional aos dias alugados"}
+              </InfoItem>
+              <InfoItem span={6} lg={4} label="Taxa da empresa sobre o repasse">
+                {contract.adminFeePercent
+                  ? `${formatPercent(contract.adminFeePercent)} · recebe até ${formatCurrency(
+                      (contract.fixedPayout ?? 0) *
+                        (1 - contract.adminFeePercent / 100),
+                    )}`
+                  : "—"}
               </InfoItem>
               <InfoItem span={6} lg={4} label="Taxa de manutenção">
                 {contract.maintenanceFeePercent !== null
@@ -89,6 +91,14 @@ export function PartnerContractSummary({
                   : "—"}
               </InfoItem>
             </>
+          ) : isInvestment ? (
+            <InfoItem span={6} lg={4} label="Parte do parceiro">
+              {contract.sharePercent !== null
+                ? formatPercent(contract.sharePercent)
+                : none}
+              {contract.shareBase &&
+                ` do ${label(LABEL_MAPS.partnerShareBase, contract.shareBase).toLowerCase()}`}
+            </InfoItem>
           ) : (
             <>
               <InfoItem span={6} lg={4} label="Taxa da empresa (%)">

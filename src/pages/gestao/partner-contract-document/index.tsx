@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Car, FileText, Lock } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Alert } from "@/components/atoms/alert";
@@ -16,8 +17,10 @@ import { isNotFound } from "@/helpers/api-error";
 import { currentVehicles } from "@/helpers/partner";
 import {
   usePartnerContract,
+  usePartnerContractInstruments,
   usePartnerContractProposals,
   usePartnerContractTextDraft,
+  usePartnerInstrumentTextDraft,
 } from "@/hooks/api/gestao/partners/usePartners";
 import { formatDateTime } from "@/utils/format";
 
@@ -29,6 +32,8 @@ import { formatDateTime } from "@/utils/format";
  */
 export function PartnerContractDocumentPage() {
   const { id = "" } = useParams();
+  const [shownId, setShownId] = useState<string | null>(null);
+  const shown = shownId === id;
   const contract = usePartnerContract(id);
   const isDraft = contract.data?.status === "DRAFT";
   const hasVehicles = contract.data
@@ -39,6 +44,18 @@ export function PartnerContractDocumentPage() {
   const editable = isDraft;
   const draft = usePartnerContractTextDraft(id, editable);
   const proposals = usePartnerContractProposals(editable ? id : "");
+  // Investment: the contribution term, a document of its own (third tab).
+  const isInvestment = contract.data?.type === "INVESTMENT";
+  const instruments = usePartnerContractInstruments(id, editable && isInvestment);
+  const instrument =
+    instruments.data?.items.find((item) => item.kind === "CONTRIBUTION_TERM") ??
+    null;
+  const termDraft = usePartnerInstrumentTextDraft(id, instrument?.id);
+  // The workbench opens with the term's text already loaded (no remount after).
+  const termSettled =
+    !isInvestment ||
+    instruments.isError ||
+    (instruments.isSuccess && (!instrument || !termDraft.isPending));
   const contractUrl = routeTo.partnerContract(id);
   const versions = proposals.data?.items ?? [];
   const pending = versions.find((version) => version.status === "PROPOSED");
@@ -55,13 +72,22 @@ export function PartnerContractDocumentPage() {
       <PageHeader title="Montar o contrato" />
     </Box>
   );
-  const ready = editable && draft.data?.workable && contract.data;
+  const ready = Boolean(
+    editable && draft.data?.workable && contract.data && (termSettled || shown),
+  );
+  // Once open, it stays open (including the term later doesn't go back to the skeleton).
+  if (ready && !shown) setShownId(id);
 
   if (ready && contract.data && draft.data) {
     return (
       <PartnerContractWorkbench
         contract={contract.data}
         textDraft={draft.data}
+        term={
+          isInvestment && instruments.data
+            ? { instrument, textDraft: termDraft.data ?? null }
+            : undefined
+        }
         header={header}
         notices={
           <>
@@ -94,7 +120,9 @@ export function PartnerContractDocumentPage() {
     <Box className="space-y-4">
       {header}
 
-      {(contract.isPending || (editable && draft.isPending)) && (
+      {(contract.isPending ||
+        (editable && draft.isPending) ||
+        (editable && draft.data?.workable && !termSettled && !shown)) && (
         <SkeletonRegion label="Montando o contrato…">
           <PartnerContractEditorSkeleton />
         </SkeletonRegion>

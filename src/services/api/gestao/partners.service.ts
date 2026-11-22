@@ -15,6 +15,8 @@ import type {
   PartnerContractDocumentDraft,
   PartnerContractTextDraft,
   PartnerContractInput,
+  PartnerContractInstruments,
+  PartnerInstrumentKind,
   PartnerDetail,
   PartnerFilters,
   PartnerInput,
@@ -174,6 +176,42 @@ export const partnersService = {
     const { data } = await http
       .post<Blob>(
         `/partner-contracts/${id}/document/preview`,
+        { html },
+        { responseType: "blob", timeout: 120_000 },
+      )
+      .catch(rethrowBlobError);
+    return data;
+  },
+  /** The contract's other documents (the investment's contribution term). */
+  async instruments(id: string) {
+    const { data } = await http.get<PartnerContractInstruments>(
+      `/partner-contracts/${id}/instruments`,
+    );
+    return data;
+  },
+  /** Adds a document to the contract (409 when locked); answers the list. */
+  async addInstrument(id: string, kind: PartnerInstrumentKind) {
+    const { data } = await http.post<PartnerContractInstruments>(
+      `/partner-contracts/${id}/instruments`,
+      { kind },
+    );
+    return data;
+  },
+  async removeInstrument(id: string, instrumentId: string) {
+    await http.delete(`/partner-contracts/${id}/instruments/${instrumentId}`);
+  },
+  /** The document's LIVING text (edited through /contract-drafts/:id, like the contract's). */
+  async instrumentTextDraft(id: string, instrumentId: string) {
+    const { data } = await http.get<PartnerContractTextDraft>(
+      `/partner-contracts/${id}/instruments/${instrumentId}/text-draft`,
+    );
+    return data;
+  },
+  /** The document's PDF from the edited text, nothing saved. */
+  async previewInstrument(id: string, instrumentId: string, html: string) {
+    const { data } = await http
+      .post<Blob>(
+        `/partner-contracts/${id}/instruments/${instrumentId}/document/preview`,
         { html },
         { responseType: "blob", timeout: 120_000 },
       )

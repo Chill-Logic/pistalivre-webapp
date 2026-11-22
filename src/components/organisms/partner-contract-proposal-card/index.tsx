@@ -17,7 +17,11 @@ import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
 import { PartnerProposalStatusBadge } from "@/components/molecules/partner-proposal-status-badge";
 import { QueryError } from "@/components/organisms/query-error";
 import { routeTo } from "@/constants/routes";
-import { currentVehicles, proposalDecisionText } from "@/helpers/partner";
+import {
+  currentVehicles,
+  instrumentShortLabel,
+  proposalDecisionText,
+} from "@/helpers/partner";
 import { useFileActions } from "@/hooks/api/comum/files/useFileActions";
 import {
   useRequestPartnerProposalSignature,
@@ -120,6 +124,8 @@ function ProposalVersionItem({
   const decision = proposalDecisionText(version);
   const file = version.document;
   const viewing = view.isPending && view.variables?.url === file?.url;
+  // The other documents frozen with this version (the contribution term).
+  const attachments = (version.attachments ?? []).filter((a) => a.document);
 
   const requestSignature = () =>
     signature.mutate(version.id, {
@@ -162,9 +168,27 @@ function ProposalVersionItem({
             aria-label={`PDF da versão ${version.number}`}
           >
             {viewing ? <Spinner /> : <FileText />}
-            PDF
+            {attachments.length ? "Contrato" : "PDF"}
           </Button>
         )}
+        {attachments.map((attachment) => {
+          const doc = attachment.document;
+          if (!doc) return null;
+          const busy = view.isPending && view.variables?.url === doc.url;
+          return (
+            <Button
+              key={attachment.kind}
+              variant="ghost"
+              size="sm"
+              disabled={busy}
+              onClick={() => view.mutate(doc)}
+              aria-label={`${attachment.title} da versão ${version.number} (PDF)`}
+            >
+              {busy ? <Spinner /> : <FileText />}
+              {instrumentShortLabel(attachment.kind, attachment.title)}
+            </Button>
+          );
+        })}
         {version.status === "PROPOSED" && (
           <ConfirmDialog
             destructive

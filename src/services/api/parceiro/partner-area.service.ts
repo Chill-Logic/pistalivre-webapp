@@ -37,10 +37,11 @@ export const partnerAreaService = {
     return data;
   },
   /** The PDF of a proposal's version (the text the partner decides on). */
-  async proposalDocument(contractId: string, versionId: string) {
+  async proposalDocument(contractId: string, versionId: string, attachment?: string) {
     const { data } = await http.get<Blob>(
       `/partner/contracts/${encodeURIComponent(contractId)}/proposals/${encodeURIComponent(versionId)}/document`,
-      { responseType: "blob" },
+      // Another document of the version (e.g. the contribution term): ?anexo=<kind>.
+      { responseType: "blob", params: attachment ? { anexo: attachment } : undefined },
     );
     return data;
   },

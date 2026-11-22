@@ -45,26 +45,45 @@ import { useAiFormFill, type AiFillStep } from "@/hooks/ui/useAiFormFill";
 import type { CalculatorFill } from "@/components/organisms/partner-contract-calculator";
 import type { RatePeriod } from "@/types/rental";
 import { formatCurrency } from "@/utils/format";
-import { percentInputOf } from "@/utils/percent";
+import { parsePercentInput, percentInputOf } from "@/utils/percent";
 import { dayToBrDate } from "@/utils/date";
 import type { PartnerContract } from "@/types/partner";
 
-/** How a management contract pays the owner. */
-const PAYOUT_MODE_OPTIONS = [
-  { value: "SHARE", label: "Taxa da empresa" },
-  { value: "FIXED", label: "Repasse fixo por veículo" },
-];
+/** How the contract pays the partner (each type names its SHARE way). */
+const PAYOUT_MODE_OPTIONS = {
+  MANAGEMENT: [
+    { value: "SHARE", label: "Taxa da empresa" },
+    { value: "FIXED", label: "Repasse fixo por veículo" },
+  ],
+  INVESTMENT: [
+    { value: "SHARE", label: "Participação nos resultados" },
+    { value: "FIXED", label: "Repasse fixo por veículo" },
+  ],
+};
+
+function payoutModeOptions(type: unknown) {
+  return type === "INVESTMENT"
+    ? PAYOUT_MODE_OPTIONS.INVESTMENT
+    : PAYOUT_MODE_OPTIONS.MANAGEMENT;
+}
 
 /**
  * Fixed payout: how the month's real maintenance reaches the owner, said with
  * the % typed ("Dono paga 10% da oficina" / "Dono paga a oficina + 10%").
  */
-function maintenanceModeOptions(percent: string) {
+function maintenanceModeOptions(percent: string, who = "Dono") {
   const p = percent.trim() || "X";
   return [
-    { value: "COST_SHARE", label: `Dono paga ${p}% da oficina` },
-    { value: "COST_PLUS_FEE", label: `Dono paga a oficina + ${p}%` },
+    { value: "COST_SHARE", label: `${who} paga ${p}% da oficina` },
+    { value: "COST_PLUS_FEE", label: `${who} paga a oficina + ${p}%` },
   ];
+}
+
+/** Fixed payout minus the company's fee on it, for the helper line only. */
+function netPayoutOf(fixedPayout: number | null, feePercent: string) {
+  if (!fixedPayout) return null;
+  const pct = parsePercentInput(feePercent) ?? 0;
+  return fixedPayout * (1 - pct / 100);
 }
 
 const PAYOUT_DAYS = [
@@ -130,14 +149,28 @@ export function PartnerContractForm({
   const isMonthly = watch("payoutFrequency") === "MONTHLY";
   const isFixed = watch("payoutMode") === "FIXED";
   const costPlusFee = watch("maintenanceMode") === "COST_PLUS_FEE";
-  const maintenanceOptions = maintenanceModeOptions(watch("maintenanceFeePercent") ?? "");
-  // Fixed payout: the company does and pays the maintenance (the owner's part
-  // follows the rule above); taxes with the owner are paid by them directly.
-  const fixedManagement = !isInvestment && isFixed;
+  const who = isInvestment ? "Parceiro" : "Dono";
+  const maintenanceOptions = maintenanceModeOptions(
+    watch("maintenanceFeePercent") ?? "",
+    who,
+  );
+  // Fixed payout (both types): the company does and pays the maintenance (the
+  // partner's part follows the rule above); taxes with them they pay directly.
   const shareBase = watch("shareBase");
-  const profitShare = isProfitShare(watch("type"), shareBase);
+  const profitShare = isProfitShare(
+    watch("type"),
+    shareBase,
+    watch("payoutMode"),
+  );
+  const netPayout = netPayoutOf(
+    watch("fixedPayout"),
+    watch("adminFeePercent") ?? "",
+  );
+  const feeTyped = (parsePercentInput(watch("adminFeePercent") ?? "") ?? 0) > 0;
   const costHint =
-    isInvestment && (shareBase === "PROFIT" || shareBase === "REVENUE")
+    isInvestment &&
+    !isFixed &&
+    (shareBase === "PROFIT" || shareBase === "REVENUE")
       ? PARTNER_COST_RULE_HINT[shareBase]
       : null;
   // Whether the person chose an expense (then the defaults stop following).
@@ -149,7 +182,7 @@ export function PartnerContractForm({
    * default of its type and base.
    */
   const syncCosts = (type: string, base: string) => {
-    if (isProfitShare(type, base)) {
+    if (isProfitShare(type, base, getValues("payoutMode"))) {
       setValue("costs", costsWithoutPartner(getValues("costs")));
     } else if (!contract && !costsTouched.current) {
       setValue("costs", defaultCostsFor(type, base));
@@ -199,18 +232,62 @@ export function PartnerContractForm({
         label(LABEL_MAPS.partnerContributionType, String(v.contributionType)),
       );
       add(
-        "Parte do parceiro sobre o",
-        "shareBase",
-        v.shareBase,
-        () => set("shareBase", v.shareBase),
-        label(LABEL_MAPS.partnerShareBase, String(v.shareBase)),
-      );
-      add(
         "Valor do aporte",
         "contributionAmount",
         v.contributionAmount,
         () => set("contributionAmount", Number(v.contributionAmount)),
         money(v.contributionAmount),
+      );
+    }
+    add(
+      "Forma de repasse",
+      "payoutMode",
+      v.payoutMode,
+      () => set("payoutMode", v.payoutMode),
+      pick(payoutModeOptions(v.type), v.payoutMode),
+    );
+    if (v.payoutMode === "FIXED") {
+      add(
+        "Repasse por veículo (mês)",
+        "fixedPayout",
+        v.fixedPayout,
+        () => set("fixedPayout", Number(v.fixedPayout)),
+        money(v.fixedPayout),
+      );
+      add(
+        "Taxa da empresa sobre o repasse (%)",
+        "adminFeePercent",
+        v.adminFeePercent,
+        () => set("adminFeePercent", pct(v.adminFeePercent)),
+        `${pct(v.adminFeePercent)}%`,
+      );
+      add(
+        "Conta da oficina no repasse",
+        "maintenanceMode",
+        v.maintenanceMode,
+        () => set("maintenanceMode", v.maintenanceMode),
+        pick(
+          maintenanceModeOptions(
+            pct(v.maintenanceFeePercent),
+            investment ? "Parceiro" : "Dono",
+          ),
+          v.maintenanceMode,
+        ),
+      );
+      add(
+        "Percentual da manutenção (%)",
+        "maintenanceFeePercent",
+        v.maintenanceFeePercent,
+        () => set("maintenanceFeePercent", pct(v.maintenanceFeePercent)),
+        `${pct(v.maintenanceFeePercent)}%`,
+      );
+    } else if (investment) {
+      add(
+        "Parte do parceiro sobre o",
+        "shareBase",
+        v.shareBase,
+        () => set("shareBase", v.shareBase),
+        label(LABEL_MAPS.partnerShareBase, String(v.shareBase)),
       );
       add(
         "Percentual do parceiro (%)",
@@ -221,50 +298,19 @@ export function PartnerContractForm({
       );
     } else {
       add(
-        "Forma de repasse",
-        "payoutMode",
-        v.payoutMode,
-        () => set("payoutMode", v.payoutMode),
-        pick(PAYOUT_MODE_OPTIONS, v.payoutMode),
+        "Taxa da empresa (%)",
+        "adminFeePercent",
+        v.adminFeePercent,
+        () => set("adminFeePercent", pct(v.adminFeePercent)),
+        `${pct(v.adminFeePercent)}%`,
       );
-      if (v.payoutMode === "FIXED") {
-        add(
-          "Repasse por veículo (mês)",
-          "fixedPayout",
-          v.fixedPayout,
-          () => set("fixedPayout", Number(v.fixedPayout)),
-          money(v.fixedPayout),
-        );
-        add(
-          "Conta da oficina no repasse",
-          "maintenanceMode",
-          v.maintenanceMode,
-          () => set("maintenanceMode", v.maintenanceMode),
-          pick(maintenanceModeOptions(pct(v.maintenanceFeePercent)), v.maintenanceMode),
-        );
-        add(
-          "Percentual da manutenção (%)",
-          "maintenanceFeePercent",
-          v.maintenanceFeePercent,
-          () => set("maintenanceFeePercent", pct(v.maintenanceFeePercent)),
-          `${pct(v.maintenanceFeePercent)}%`,
-        );
-      } else {
-        add(
-          "Taxa da empresa (%)",
-          "adminFeePercent",
-          v.adminFeePercent,
-          () => set("adminFeePercent", pct(v.adminFeePercent)),
-          `${pct(v.adminFeePercent)}%`,
-        );
-        add(
-          "Taxa fixa por mês (opcional)",
-          "adminFeeFixed",
-          v.adminFeeFixed,
-          () => set("adminFeeFixed", Number(v.adminFeeFixed)),
-          money(v.adminFeeFixed),
-        );
-      }
+      add(
+        "Taxa fixa por mês (opcional)",
+        "adminFeeFixed",
+        v.adminFeeFixed,
+        () => set("adminFeeFixed", Number(v.adminFeeFixed)),
+        money(v.adminFeeFixed),
+      );
     }
     add(
       "Início",
@@ -375,7 +421,7 @@ export function PartnerContractForm({
             )}
           />
         </Col>
-        {isInvestment ? (
+        {isInvestment && (
           <>
             <Col>
               <Controller
@@ -388,24 +434,6 @@ export function PartnerContractForm({
                     options={options(LABEL_MAPS.partnerContributionType)}
                     onChange={field.onChange}
                     error={errors.contributionType?.message}
-                  />
-                )}
-              />
-            </Col>
-            <Col>
-              <Controller
-                control={control}
-                name="shareBase"
-                render={({ field }) => (
-                  <SegmentedField
-                    label="Parte do parceiro sobre o"
-                    value={field.value}
-                    options={options(LABEL_MAPS.partnerShareBase)}
-                    onChange={(next) => {
-                      field.onChange(next);
-                      syncCosts(getValues("type"), next);
-                    }}
-                    error={errors.shareBase?.message}
                   />
                 )}
               />
@@ -443,6 +471,115 @@ export function PartnerContractForm({
                 </Col>
               </>
             )}
+          </>
+        )}
+        <Col>
+          <Controller
+            control={control}
+            name="payoutMode"
+            render={({ field }) => (
+              <SegmentedField
+                label="Forma de repasse"
+                value={field.value}
+                options={payoutModeOptions(watch("type"))}
+                onChange={field.onChange}
+                error={errors.payoutMode?.message}
+              />
+            )}
+          />
+        </Col>
+        {isFixed ? (
+          <>
+            <Col sm={6} lg={4}>
+              <Controller
+                control={control}
+                name="fixedPayout"
+                render={({ field }) => (
+                  <MoneyField
+                    label="Repasse por veículo (mês)"
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={errors.fixedPayout?.message}
+                  />
+                )}
+              />
+            </Col>
+            <Col sm={6} lg={4}>
+              <FormField
+                label="Taxa da empresa sobre o repasse (%)"
+                inputMode="decimal"
+                placeholder="Opcional. Ex.: 5"
+                error={errors.adminFeePercent?.message}
+                {...register("adminFeePercent")}
+              />
+            </Col>
+            <Col sm={6} lg={4}>
+              <FormField
+                label="Percentual da manutenção (%)"
+                inputMode="decimal"
+                placeholder="Ex.: 10"
+                error={errors.maintenanceFeePercent?.message}
+                {...register("maintenanceFeePercent")}
+              />
+            </Col>
+            {netPayout !== null && (
+              <Col>
+                <Text size="sm">
+                  {isInvestment ? "O parceiro" : "O dono"} recebe até{" "}
+                  {formatCurrency(netPayout)} por veículo
+                  {feeTyped ? ", já sem a taxa da empresa" : ""}.
+                </Text>
+              </Col>
+            )}
+            <Col>
+              <Controller
+                control={control}
+                name="maintenanceMode"
+                render={({ field }) => (
+                  <SegmentedField
+                    label="Conta da oficina no repasse"
+                    value={field.value}
+                    options={maintenanceOptions}
+                    onChange={field.onChange}
+                    error={errors.maintenanceMode?.message}
+                  />
+                )}
+              />
+            </Col>
+            <Col>
+              <Text size="xs" tone="muted">
+                A empresa leva o veículo na oficina e paga a conta. No fim do
+                mês, do repasse do {isInvestment ? "parceiro" : "dono"} sai{" "}
+                {costPlusFee
+                  ? "a conta inteira da oficina, mais o percentual de taxa"
+                  : "só o percentual da conta da oficina; o resto a empresa assume"}
+                . O seguro também sai do repasse, inteiro. O repasse por
+                veículo é o máximo, proporcional aos dias alugado; se os
+                descontos passarem dele, a diferença fica para o mês
+                seguinte.
+              </Text>
+            </Col>
+          </>
+        ) : isInvestment ? (
+          <>
+            <Col>
+              <Controller
+                control={control}
+                name="shareBase"
+                render={({ field }) => (
+                  <SegmentedField
+                    label="Parte do parceiro sobre o"
+                    value={field.value}
+                    options={options(LABEL_MAPS.partnerShareBase)}
+                    onChange={(next) => {
+                      field.onChange(next);
+                      syncCosts(getValues("type"), next);
+                    }}
+                    error={errors.shareBase?.message}
+                  />
+                )}
+              />
+            </Col>
             <Col sm={6}>
               <FormField
                 label="Percentual do parceiro (%)"
@@ -455,102 +592,29 @@ export function PartnerContractForm({
           </>
         ) : (
           <>
-            <Col>
+            <Col sm={6}>
+              <FormField
+                label="Taxa da empresa (%)"
+                inputMode="decimal"
+                placeholder="Ex.: 15"
+                error={errors.adminFeePercent?.message}
+                {...register("adminFeePercent")}
+              />
+            </Col>
+            <Col sm={6}>
               <Controller
                 control={control}
-                name="payoutMode"
+                name="adminFeeFixed"
                 render={({ field }) => (
-                  <SegmentedField
-                    label="Forma de repasse"
+                  <MoneyField
+                    label="Taxa fixa por mês (opcional)"
                     value={field.value}
-                    options={PAYOUT_MODE_OPTIONS}
                     onChange={field.onChange}
-                    error={errors.payoutMode?.message}
+                    error={errors.adminFeeFixed?.message}
                   />
                 )}
               />
             </Col>
-            {isFixed ? (
-              <>
-                <Col sm={6}>
-                  <Controller
-                    control={control}
-                    name="fixedPayout"
-                    render={({ field }) => (
-                      <MoneyField
-                        label="Repasse por veículo (mês)"
-                        value={field.value}
-                        onChange={field.onChange}
-                        error={errors.fixedPayout?.message}
-                      />
-                    )}
-                  />
-                </Col>
-                <Col sm={6}>
-                  <FormField
-                    label="Percentual da manutenção (%)"
-                    inputMode="decimal"
-                    placeholder="Ex.: 10"
-                    error={errors.maintenanceFeePercent?.message}
-                    {...register("maintenanceFeePercent")}
-                  />
-                </Col>
-                <Col>
-                  <Controller
-                    control={control}
-                    name="maintenanceMode"
-                    render={({ field }) => (
-                      <SegmentedField
-                        label="Conta da oficina no repasse"
-                        value={field.value}
-                        options={maintenanceOptions}
-                        onChange={field.onChange}
-                        error={errors.maintenanceMode?.message}
-                      />
-                    )}
-                  />
-                </Col>
-                <Col>
-                  <Text size="xs" tone="muted">
-                    A empresa leva o veículo na oficina e paga a conta. No fim do
-                    mês, do repasse do dono sai{" "}
-                    {costPlusFee
-                      ? "a conta inteira da oficina, mais o percentual de taxa"
-                      : "só o percentual da conta da oficina; o resto a empresa assume"}
-                    . O seguro também sai do repasse, inteiro. O repasse por
-                    veículo é o máximo, proporcional aos dias alugado; se os
-                    descontos passarem dele, a diferença fica para o mês
-                    seguinte.
-                  </Text>
-                </Col>
-              </>
-            ) : (
-              <>
-                <Col sm={6}>
-                  <FormField
-                    label="Taxa da empresa (%)"
-                    inputMode="decimal"
-                    placeholder="Ex.: 15"
-                    error={errors.adminFeePercent?.message}
-                    {...register("adminFeePercent")}
-                  />
-                </Col>
-                <Col sm={6}>
-                  <Controller
-                    control={control}
-                    name="adminFeeFixed"
-                    render={({ field }) => (
-                      <MoneyField
-                        label="Taxa fixa por mês (opcional)"
-                        value={field.value}
-                        onChange={field.onChange}
-                        error={errors.adminFeeFixed?.message}
-                      />
-                    )}
-                  />
-                </Col>
-              </>
-            )}
           </>
         )}
         <Col sm={6}>
@@ -646,14 +710,15 @@ export function PartnerContractForm({
             Quem paga cada despesa
           </Heading>
           <Box className="space-y-3">
-            {fixedManagement && (
+            {isFixed && (
               <Text size="sm" tone="muted">
-                Manutenção: a empresa faz e paga; o proprietário participa
-                pela regra do repasse acima.
+                Manutenção: a empresa faz e paga; o{" "}
+                {isInvestment ? "parceiro" : "proprietário"} participa pela
+                regra do repasse acima.
               </Text>
             )}
             {PARTNER_COST_KEYS.filter(
-              (key) => !(fixedManagement && key === "maintenance"),
+              (key) => !(isFixed && key === "maintenance"),
             ).map((key) => (
               <Controller
                 key={key}

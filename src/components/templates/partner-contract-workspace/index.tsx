@@ -2,14 +2,29 @@ import type { ReactNode } from "react";
 import { Box } from "@/components/atoms/box";
 import { Col, Row } from "@/components/atoms/grid";
 import { SegmentedControl } from "@/components/atoms/segmented-control";
+import { Text } from "@/components/atoms/text";
 import { cn } from "@/utils/cn";
 
-export type PartnerContractTab = "termos" | "contrato";
+export type PartnerContractTab = "termos" | "contrato" | "termo-de-aporte";
 
-const TABS = [
-  { value: "termos" as const, label: "Termos" },
-  { value: "contrato" as const, label: "Contrato" },
+const TABS: { value: PartnerContractTab; label: ReactNode }[] = [
+  { value: "termos", label: "Termos" },
+  { value: "contrato", label: "Contrato" },
 ];
+// Phone: three tabs side by side leave no room for the whole name.
+const TERM_TAB = {
+  value: "termo-de-aporte" as const,
+  label: (
+    <>
+      <Text inline size={null} className="sm:hidden">
+        Aporte
+      </Text>
+      <Text inline size={null} className="hidden sm:inline">
+        Termo de aporte
+      </Text>
+    </>
+  ),
+};
 
 type PartnerContractWorkspaceProps = {
   header: ReactNode;
@@ -23,6 +38,8 @@ type PartnerContractWorkspaceProps = {
   calculator: ReactNode;
   /** "Contrato": the text (a preview before saving, the living draft after). */
   contract: ReactNode;
+  /** "Termo de aporte" (investment only): the third tab, absent otherwise. */
+  term?: ReactNode;
   /** The Livrinho, the SAME on both tabs (absent without AI). */
   chat?: ReactNode;
 };
@@ -42,8 +59,10 @@ export function PartnerContractWorkspace({
   form,
   calculator,
   contract,
+  term,
   chat,
 }: PartnerContractWorkspaceProps) {
+  const tabs = term ? [...TABS, TERM_TAB] : TABS;
   return (
     <Box className="space-y-4">
       {header}
@@ -51,9 +70,9 @@ export function PartnerContractWorkspace({
       <SegmentedControl
         value={tab}
         onValueChange={onTabChange}
-        options={TABS}
+        options={tabs}
         aria-label="Parte do contrato"
-        className="w-full sm:w-80"
+        className={cn("w-full", term ? "sm:w-[30rem]" : "sm:w-80")}
       />
       <Row className="items-start gap-y-4">
         <Col lg={chat ? 8 : 12} className="order-2 lg:order-1">
@@ -66,6 +85,9 @@ export function PartnerContractWorkspace({
             </Row>
           </Box>
           <Box className={cn(tab !== "contrato" && "hidden")}>{contract}</Box>
+          {term && (
+            <Box className={cn(tab !== "termo-de-aporte" && "hidden")}>{term}</Box>
+          )}
         </Col>
         {chat && (
           // Stretched to the row's height: the chat card sticks while the page scrolls

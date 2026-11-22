@@ -86,6 +86,30 @@ export function usePartnerContractDocumentDraft(id: string, enabled: boolean) {
   });
 }
 
+/** The contract's other documents (the investment's contribution term). */
+export function usePartnerContractInstruments(id: string, enabled = true) {
+  return useQuery({
+    queryKey: queryKeys.partners.contractInstruments(id),
+    queryFn: () => partnersService.instruments(id),
+    enabled: enabled && Boolean(id),
+  });
+}
+
+/**
+ * A document's living text, opened once per visit (like the contract's):
+ * after that the editor keeps it in step (autosave + realtime).
+ */
+export function usePartnerInstrumentTextDraft(id: string, instrumentId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.partners.instrumentTextDraft(id, instrumentId ?? ""),
+    queryFn: () => partnersService.instrumentTextDraft(id, instrumentId as string),
+    enabled: Boolean(id) && Boolean(instrumentId),
+    staleTime: Infinity,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
+  });
+}
+
 /** One contract with its vehicles and its partner. */
 export function usePartnerContract(id: string) {
   return useQuery({

@@ -77,7 +77,11 @@ export function PartnerAreaProposalAccept({ proposal }: DecisionProps) {
         </DialogDescription>
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
           <CheckboxField
-            label="Li o contrato e concordo com os termos"
+            label={
+              proposal.version.attachments?.length
+                ? "Li e concordo com o contrato e o termo de aporte"
+                : "Li o contrato e concordo com os termos"
+            }
             checked={agreed}
             onChange={(value) => {
               setAgreed(value);

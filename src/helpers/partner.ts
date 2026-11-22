@@ -52,15 +52,15 @@ export function contractTerms(
   contract: PartnerContract,
   shareBaseLabel: (code: string) => string,
 ) {
+  if (contract.payoutMode === "FIXED") {
+    return `${fixedPayoutText(contract)}${maintenanceRuleSuffix(contract)}`;
+  }
   if (contract.type === "INVESTMENT") {
     if (contract.sharePercent === null) return "Participação não informada";
     const base = contract.shareBase
       ? ` do ${shareBaseLabel(contract.shareBase).toLowerCase()}`
       : "";
     return `${formatPercent(contract.sharePercent)}${base} para o parceiro`;
-  }
-  if (contract.payoutMode === "FIXED") {
-    return `Repasse de até ${formatCurrency(contract.fixedPayout ?? 0)} por veículo/mês${maintenanceRuleSuffix(contract)}`;
   }
   const fee = [
     contract.adminFeePercent !== null &&
@@ -70,6 +70,23 @@ export function contractTerms(
   return fee.length
     ? `Taxa de ${fee.join(" + ")} para a empresa`
     : "Taxa não informada";
+}
+
+/**
+ * The fixed payout restated: "Repasse de até R$ 1.000,00 por veículo/mês" and,
+ * with the company's fee on it, ", menos 5% da empresa (R$ 950,00)" — the net
+ * per vehicle is only the cap minus the fee (the month's math is the server's).
+ */
+export function fixedPayoutText(contract: {
+  fixedPayout?: number | null;
+  adminFeePercent?: number | null;
+}) {
+  const cap = contract.fixedPayout ?? 0;
+  const base = `Repasse de até ${formatCurrency(cap)} por veículo/mês`;
+  const fee = contract.adminFeePercent ?? 0;
+  if (!fee) return base;
+  const net = cap * (1 - fee / 100);
+  return `${base}, menos ${formatPercent(fee)} da empresa (${formatCurrency(net)})`;
 }
 
 /**
@@ -187,4 +204,9 @@ export function proposalDecisionText(
   if (version.status === "PROPOSED" || !version.decidedAt) return null;
   const label = PARTNER_PROPOSAL_STATUS_LABELS[version.status].toLowerCase();
   return `${label} em ${formatDateTime(version.decidedAt)}`;
+}
+
+/** A document that goes with the contract, short for a button ("Termo de aporte"). */
+export function instrumentShortLabel(kind: string, title: string) {
+  return kind === "CONTRIBUTION_TERM" ? "Termo de aporte" : title;
 }

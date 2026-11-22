@@ -97,11 +97,20 @@ export function SignatureDetailPage() {
             )
           }
           document={
-            <DocumentsCard
-              title="Documento a assinar"
-              documents={data.document ? [data.document] : []}
-              empty="O PDF deste pedido não existe mais."
-            />
+            <Box className="space-y-4">
+              <DocumentsCard
+                title="Documento a assinar"
+                documents={data.document ? [data.document] : []}
+                empty="O PDF deste pedido não existe mais."
+              />
+              {/* Other PDFs in the same envelope (e.g. the contribution term). */}
+              {data.attachments && data.attachments.length > 0 && (
+                <DocumentsCard
+                  title="Também vai no envelope"
+                  documents={data.attachments}
+                />
+              )}
+            </Box>
           }
         />
       )}

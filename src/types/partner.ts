@@ -85,8 +85,9 @@ export type PartnerContract = {
   adminFeePercent: number | null;
   adminFeeFixed: number | null;
   /**
-   * Management: SHARE = the company keeps its fee and the owner gets the rest;
-   * FIXED = the owner gets `fixedPayout` per vehicle per month, pro rata of the
+   * SHARE: management = the company keeps its fee and the owner gets the rest;
+   * investment = the partner's % of the base. FIXED (both types) = the partner
+   * gets `fixedPayout` per vehicle per month, pro rata of the
    * days rented (a cap), minus their part of the month's real maintenance
    * (`maintenanceMode`: X% of the cost, or the cost + X%) and their costs.
    */
@@ -162,8 +163,9 @@ export type PartnerContractInput = {
   adminFeePercent: number | null;
   adminFeeFixed: number | null;
   /**
-   * Management: SHARE = the company keeps its fee and the owner gets the rest;
-   * FIXED = the owner gets `fixedPayout` per vehicle per month, pro rata of the
+   * SHARE: management = the company keeps its fee and the owner gets the rest;
+   * investment = the partner's % of the base. FIXED (both types) = the partner
+   * gets `fixedPayout` per vehicle per month, pro rata of the
    * days rented (a cap), minus their part of the month's real maintenance
    * (`maintenanceMode`) and their costs.
    */
@@ -255,6 +257,37 @@ export type PartnerProposalVersion = {
   signatureRequestId: string | null;
   /** The version's PDF. */
   document: DocumentFile | null;
+  /** The contract's other documents frozen with this version (e.g. the contribution term). */
+  attachments?: PartnerProposalAttachment[];
+};
+
+/** A document that goes with a proposal version (its own PDF). */
+export type PartnerProposalAttachment = {
+  kind: PartnerInstrumentKind;
+  title: string;
+  document: DocumentFile | null;
+};
+
+/** The contract's other documents (today only the investment's contribution term). */
+export type PartnerInstrumentKind = "CONTRIBUTION_TERM";
+
+/** One of the contract's other documents, with its latest PDF. */
+export type PartnerContractInstrument = {
+  id: string;
+  kind: PartnerInstrumentKind;
+  title: string;
+  /** Whether it still fits the contract (e.g. the term needs an investment). */
+  allowed: boolean;
+  document: DocumentFile | null;
+  generatedAt: string | null;
+  createdAt: string;
+};
+
+/** GET /partner-contracts/:id/instruments */
+export type PartnerContractInstruments = {
+  items: PartnerContractInstrument[];
+  /** Kinds the contract could still have. */
+  available: { kind: PartnerInstrumentKind; title: string }[];
 };
 
 /** GET /partner-contracts/:id/proposals (newest first). */

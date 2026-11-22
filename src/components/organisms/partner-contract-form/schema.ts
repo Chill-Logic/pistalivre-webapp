@@ -71,17 +71,22 @@ export const contractFormSchema = z
     if (c.endDate && c.startDate && c.endDate < c.startDate) {
       issue("endDate", "O fim vem antes do início");
     }
+    const fixed = c.payoutMode === "FIXED";
     if (c.type === "INVESTMENT") {
       if (!c.contributionType)
         issue("contributionType", "Escolha o tipo de aporte");
       if (c.contributionType === "CASH" && !c.contributionAmount) {
         issue("contributionAmount", "Informe o valor do aporte");
       }
+    }
+    if (fixed) {
+      if (!c.fixedPayout) issue("fixedPayout", "Informe o repasse por veículo");
+    } else if (c.type === "INVESTMENT") {
       if (!c.shareBase) issue("shareBase", "Escolha a base");
       if (parsePercentInput(c.sharePercent) === null) {
         issue("sharePercent", "Informe o percentual");
       }
-      if (isProfitShare(c.type, c.shareBase)) {
+      if (isProfitShare(c.type, c.shareBase, c.payoutMode)) {
         for (const key of PARTNER_COST_KEYS) {
           if (c.costs[key] !== "PARTNER") continue;
           ctx.addIssue({
@@ -91,8 +96,6 @@ export const contractFormSchema = z
           });
         }
       }
-    } else if (c.payoutMode === "FIXED") {
-      if (!c.fixedPayout) issue("fixedPayout", "Informe o repasse por veículo");
     } else if (
       parsePercentInput(c.adminFeePercent) === null &&
       c.adminFeeFixed === null
@@ -169,8 +172,10 @@ export function toContractInput(
   const investment = values.type === "INVESTMENT";
   const cash = investment && values.contributionType === "CASH";
   const monthly = values.payoutFrequency === "MONTHLY";
-  // One way of paying the owner at a time: the fixed payout replaces the fee.
-  const fixed = !investment && values.payoutMode === "FIXED";
+  // Fixed payout (management or investment): `adminFeePercent` is then the
+  // company's fee ON the payout; the share and the fixed fee don't apply.
+  const fixed = values.payoutMode === "FIXED";
+  const share = investment && !fixed;
   return {
     type: values.type,
     ...(contract ? { status: contract.status } : {}),
@@ -179,12 +184,12 @@ export function toContractInput(
       : null,
     contributionAmount: cash ? values.contributionAmount : null,
     contributionDate: cash ? values.contributionDate || null : null,
-    shareBase: investment
+    shareBase: share
       ? ((values.shareBase || null) as PartnerShareBase | null)
       : null,
-    sharePercent: investment ? parsePercentInput(values.sharePercent) : null,
+    sharePercent: share ? parsePercentInput(values.sharePercent) : null,
     adminFeePercent:
-      investment || fixed ? null : parsePercentInput(values.adminFeePercent),
+      share ? null : parsePercentInput(values.adminFeePercent),
     adminFeeFixed: investment || fixed ? null : values.adminFeeFixed,
     payoutMode: fixed ? "FIXED" : "SHARE",
     fixedPayout: fixed ? values.fixedPayout : null,
@@ -211,8 +216,12 @@ export function toContractInput(
  * Investment on the PROFIT: the expenses come off before the split, so none
  * may be the partner's (the API refuses it with 422 `costs.*`).
  */
-export function isProfitShare(type: string, shareBase: string) {
-  return type === "INVESTMENT" && shareBase === "PROFIT";
+export function isProfitShare(
+  type: string,
+  shareBase: string,
+  payoutMode: string = "SHARE",
+) {
+  return type === "INVESTMENT" && payoutMode !== "FIXED" && shareBase === "PROFIT";
 }
 
 /** The same expenses with the partner's ones moved to the company. */

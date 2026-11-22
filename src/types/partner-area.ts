@@ -123,6 +123,8 @@ export type PartnerAreaProposalVersion = {
   decidedAt: string | null;
   /** Their reason, when they refused. */
   decisionNote: string | null;
+  /** Other documents that go with it (PDF at …/document?anexo=<kind>; absent on an older API). */
+  attachments?: { kind: string; title: string }[];
 };
 
 /** A draft contract sent to the partner, with the terms it proposes. */

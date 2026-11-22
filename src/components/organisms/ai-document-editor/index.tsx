@@ -47,8 +47,9 @@ type AiDocumentEditorProps = {
   chat?: Omit<AiChatPanelProps, "html" | "onApply" | "className">;
   onPreview: (html: string) => void;
   previewing: boolean;
-  onSave: (html: string) => void;
-  saving: boolean;
+  /** The main action; none = only "Visualizar PDF" (e.g. a document that goes with the contract). */
+  onSave?: (html: string) => void;
+  saving?: boolean;
   /** The main action (default "Gerar PDF e salvar"). */
   saveLabel?: string;
   /** While it runs (default "Gerando PDF…"). */
@@ -89,7 +90,7 @@ export function AiDocumentEditor({
   onPreview,
   previewing,
   onSave,
-  saving,
+  saving = false,
   extraAction,
   aside,
   saveLabel = "Gerar PDF e salvar",
@@ -157,18 +158,20 @@ export function AiDocumentEditor({
               {extraAction.label}
             </Button>
           )}
-          <Button
-            type="button"
-            onClick={() => onSave(html)}
-            disabled={saving || empty}
-          >
-            {saving ? (
-              <Spinner className="text-primary-foreground" />
-            ) : (
-              saveIcon
-            )}
-            {saving ? savingLabel : saveLabel}
-          </Button>
+          {onSave && (
+            <Button
+              type="button"
+              onClick={() => onSave(html)}
+              disabled={saving || empty}
+            >
+              {saving ? (
+                <Spinner className="text-primary-foreground" />
+              ) : (
+                saveIcon
+              )}
+              {saving ? savingLabel : saveLabel}
+            </Button>
+          )}
         </Box>
       </CardContent>
     </Card>
