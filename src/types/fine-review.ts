@@ -1,6 +1,13 @@
 /** Financeiro › Multas acima da regra (GET /finance/fine-review). */
 export type FineReview =
-  | { kind: "open"; finePercent: number; ruleFinePercent: number; overdue: boolean }
+  | {
+      kind: "open";
+      finePercent: number;
+      ruleFinePercent: number;
+      overdue: boolean;
+      /** Principal × (fee − rule): what an overdue one can already give back. */
+      excess: number;
+    }
   | {
       kind: "paid";
       finePercent: number;

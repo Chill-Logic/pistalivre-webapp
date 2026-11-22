@@ -47,3 +47,24 @@ export function useDiscountFine() {
     onSettled: refresh,
   });
 }
+
+/**
+ * Every discount the card offers, one after another (several can lower the
+ * same next charge, so never in parallel). Stops at the first error.
+ */
+export function useDiscountAllFines() {
+  const refresh = useRefresh();
+  return useMutation({
+    mutationFn: async (paymentIds: string[]) => {
+      let total = 0;
+      for (const id of paymentIds) total += (await fineReviewService.discount(id)).amount;
+      return { count: paymentIds.length, total };
+    },
+    onSuccess: (r) =>
+      toast.success(
+        `${r.count} descontos dados, ${formatCurrency(r.total)} no total, na próxima cobrança de cada locação`,
+      ),
+    onError: (error) => toast.error(toApiError(error).message),
+    onSettled: refresh,
+  });
+}

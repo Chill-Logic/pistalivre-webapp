@@ -14,6 +14,7 @@ import { TextLink } from "@/components/molecules/text-link";
 import { routeTo } from "@/constants/routes";
 import {
   useAdjustFine,
+  useDiscountAllFines,
   useDiscountFine,
 } from "@/hooks/api/gestao/fine-review/useFineReview";
 import type { FineReviewItem } from "@/types/fine-review";
@@ -41,9 +42,46 @@ function Who({ item }: { item: FineReviewItem }) {
   );
 }
 
+/** What a row can still give back now (paid, or overdue in advance). */
+function toDiscount(item: FineReviewItem): number {
+  if (item.discount) return 0;
+  const r = item.review;
+  if (r.kind === "paid") return r.excess;
+  return r.overdue ? r.excess : 0;
+}
+
+/** Already discounted (badge) or the one-click discount. */
+function DiscountAction({
+  item,
+  description,
+}: {
+  item: FineReviewItem;
+  description: string;
+}) {
+  const discount = useDiscountFine();
+  if (item.discount) {
+    return (
+      <Badge variant="outline">
+        {item.discount.status === "APPLIED"
+          ? "Descontado na próxima cobrança"
+          : "Vai na próxima cobrança"}
+      </Badge>
+    );
+  }
+  return (
+    <ConfirmDialog
+      trigger={<Button variant="outline">Descontar na próxima cobrança</Button>}
+      title="Descontar a multa a mais?"
+      description={description}
+      confirmLabel="Descontar"
+      isPending={discount.isPending}
+      onConfirm={() => discount.mutate(item.paymentId)}
+    />
+  );
+}
+
 /** A paid charge: charged × rule × to give back, and the one-click discount. */
 function PaidRow({ item }: { item: FineReviewItem }) {
-  const discount = useDiscountFine();
   if (item.review.kind !== "paid") return null;
   const r = item.review;
   return (
@@ -62,24 +100,10 @@ function PaidRow({ item }: { item: FineReviewItem }) {
           </Text>
         </Text>
       </Box>
-      {item.discount ? (
-        <Badge variant="outline">
-          {item.discount.status === "APPLIED"
-            ? "Descontado na próxima cobrança"
-            : "Vai na próxima cobrança"}
-        </Badge>
-      ) : (
-        <ConfirmDialog
-          trigger={
-            <Button variant="outline">Descontar na próxima cobrança</Button>
-          }
-          title="Descontar a multa a mais?"
-          description={`${formatCurrency(r.excess)} saem da próxima cobrança de aluguel de ${item.customerName ?? "cliente"}. Se ela já foi emitida, o valor cai agora (no Asaas também); senão, ela sai com o desconto. O desconto aparece no extrato como "Ajuste da multa de ${day(item.dueDate)} (${pct(r.ruleFinePercent)})".`}
-          confirmLabel="Descontar"
-          isPending={discount.isPending}
-          onConfirm={() => discount.mutate(item.paymentId)}
-        />
-      )}
+      <DiscountAction
+        item={item}
+        description={`${formatCurrency(r.excess)} saem da próxima cobrança de aluguel de ${item.customerName ?? "cliente"}. Se ela já foi emitida, o valor cai agora (no Asaas também); senão, ela sai com o desconto. O desconto aparece no extrato como "Ajuste da multa de ${day(item.dueDate)} (${pct(r.ruleFinePercent)})".`}
+      />
     </Box>
   );
 }
@@ -97,13 +121,20 @@ function OpenRow({ item }: { item: FineReviewItem }) {
           {formatCurrency(item.amount)} · vence {day(item.dueDate)} · multa de{" "}
           {pct(r.finePercent)} (regra: {pct(r.ruleFinePercent)})
         </Text>
+        {r.overdue && (
+          <Text size="sm">
+            Vencida: o Asaas não deixa mudar a multa ·{" "}
+            <Text inline weight="semibold">
+              a descontar {formatCurrency(r.excess)}
+            </Text>
+          </Text>
+        )}
       </Box>
       {r.overdue ? (
-        <Text size="sm" tone="muted" className="md:max-w-xs md:text-right">
-          Vencida: o Asaas não deixa mudar a multa. Se for paga com{" "}
-          {pct(r.finePercent)}, a diferença aparece aqui para descontar na
-          próxima cobrança.
-        </Text>
+        <DiscountAction
+          item={item}
+          description={`A multa desta cobrança vencida não muda mais no Asaas, então a diferença (${pct(r.finePercent)} − ${pct(r.ruleFinePercent)} de ${formatCurrency(item.amount)} = ${formatCurrency(r.excess)}) sai já da próxima cobrança de aluguel de ${item.customerName ?? "cliente"}. Os juros de 1% ao mês continuam sobre o valor original. Quando ela for paga, aparece como já descontada.`}
+        />
       ) : (
         <ConfirmDialog
           trigger={
@@ -141,23 +172,39 @@ export function FineReviewCardSkeleton() {
  * rendered when there is nothing to act on; already applied discounts leave.
  */
 export function FineReviewCard({ items }: { items: FineReviewItem[] }) {
+  const discountAll = useDiscountAllFines();
   const paid = items.filter(
     (i) => i.review.kind === "paid" && i.discount?.status !== "APPLIED",
   );
-  const open = items.filter((i) => i.review.kind === "open");
+  const open = items.filter(
+    (i) => i.review.kind === "open" && i.discount?.status !== "APPLIED",
+  );
   if (paid.length === 0 && open.length === 0) return null;
-  const toGive = paid
-    .filter((i) => !i.discount)
-    .reduce((s, i) => s + (i.review.kind === "paid" ? i.review.excess : 0), 0);
+  const givable = [...paid, ...open].filter((i) => toDiscount(i) > 0);
+  const toGive = givable.reduce((s, i) => s + toDiscount(i), 0);
   return (
     <Card>
       <CardHeader>
         <Box className="flex flex-wrap items-baseline justify-between gap-2">
           <CardTitle className="text-base">Multas acima da regra</CardTitle>
-          <Text tone="muted">
-            {pluralize(paid.length + open.length, "cobrança", "cobranças")}
-            {toGive > 0 ? ` · ${formatCurrency(toGive)} a devolver` : ""}
-          </Text>
+          <Box className="flex flex-wrap items-center gap-3">
+            <Text tone="muted">
+              {pluralize(paid.length + open.length, "cobrança", "cobranças")}
+              {toGive > 0 ? ` · ${formatCurrency(toGive)} a devolver` : ""}
+            </Text>
+            {givable.length > 1 && (
+              <ConfirmDialog
+                trigger={<Button size="sm">Descontar todos</Button>}
+                title={`Dar os ${givable.length} descontos?`}
+                description={`${formatCurrency(toGive)} saem das próximas cobranças de aluguel de cada locação (as já emitidas caem agora, no Asaas também; as outras saem com o desconto). Inclui a diferença da multa das cobranças vencidas, adiantada.`}
+                confirmLabel="Descontar todos"
+                isPending={discountAll.isPending}
+                onConfirm={() =>
+                  discountAll.mutate(givable.map((i) => i.paymentId))
+                }
+              />
+            )}
+          </Box>
         </Box>
       </CardHeader>
       <CardContent>
