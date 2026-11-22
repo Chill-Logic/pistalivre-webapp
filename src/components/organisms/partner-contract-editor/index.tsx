@@ -17,10 +17,10 @@ type PartnerContractEditorProps = {
   draft: ContractDraftSync;
   aiEnabled: boolean;
   cancelTo: string;
-  /** Other texts that go with the contract (the term): saved before sending too. */
+  /** Other texts that go with the contract (its terms): saved before sending too. */
   alsoFlush?: () => Promise<unknown>;
-  /** The contract has the contribution term: it goes along (said in the texts). */
-  withTerm?: boolean;
+  /** How many terms go along with the contract (said in the texts). */
+  termCount?: number;
   onSent: (version: PartnerProposalVersion) => void;
   /** Sent straight to signature: the signature request to finish (company signers). */
   onSentToSignature: (signatureRequestId: string) => void;
@@ -39,7 +39,7 @@ export function PartnerContractEditor({
   aiEnabled,
   cancelTo,
   alsoFlush,
-  withTerm = false,
+  termCount = 0,
   onSent,
   onSentToSignature,
 }: PartnerContractEditorProps) {
@@ -49,6 +49,8 @@ export function PartnerContractEditor({
   const toSignature = useSendPartnerToSignature(contractId);
   const [error, setError] = useState<string | null>(null);
   const [confirmSignature, setConfirmSignature] = useState(false);
+  const together =
+    termCount > 1 ? "O contrato e os termos vão juntos" : termCount === 1 ? "O contrato e o termo vão juntos" : null;
 
   /** Whatever is typed goes to the server first: the server freezes ITS text. */
   const flushed = async () => {
@@ -86,7 +88,7 @@ export function PartnerContractEditor({
         initialHtml={draft.html}
         draft={draft}
         aiEnabled={aiEnabled}
-        intro={`Rascunho vivo: converse com o Livrinho ao lado (cole o combinado, peça ajustes) que ele atualiza o texto, os termos e a calculadora na hora. Nada sai daqui até alguém enviar: para a revisão do parceiro (ele aceita ou recusa na área dele) ou direto para assinatura, quando tudo já foi combinado por fora.${withTerm ? " O contrato e o termo de aporte vão juntos." : ""}`}
+        intro={`Rascunho vivo: converse com o Livrinho ao lado (cole o combinado, peça ajustes) que ele atualiza o texto, os termos e a calculadora na hora. Nada sai daqui até alguém enviar: para a revisão do parceiro (ele aceita ou recusa na área dele) ou direto para assinatura, quando tudo já foi combinado por fora.${together ? ` ${together}.` : ""}`}
         label="Texto do contrato"
         cancelTo={cancelTo}
         onPreview={(html) => preview.mutate(html)}
@@ -108,7 +110,7 @@ export function PartnerContractEditor({
         open={confirmSignature}
         onOpenChange={setConfirmSignature}
         title="Enviar direto para assinatura?"
-        description={`O combinado já foi fechado por fora: esta versão fica registrada como aceita pela locadora, sem a revisão do parceiro na área dele, e o pedido de assinatura abre com ele como signatário. Depois disso o texto e os termos não mudam mais.${withTerm ? " O contrato e o termo de aporte vão juntos, no mesmo envelope." : ""}`}
+        description={`O combinado já foi fechado por fora: esta versão fica registrada como aceita pela locadora, sem a revisão do parceiro na área dele, e o pedido de assinatura abre com ele como signatário. Depois disso o texto e os termos não mudam mais.${together ? ` ${together}, no mesmo envelope.` : ""}`}
         confirmLabel="Enviar para assinatura"
         onConfirm={() => void sendToSignature()}
       />

@@ -226,3 +226,21 @@ export function proposalDecisionText(
 export function instrumentShortLabel(kind: string, title: string) {
   return kind === "CONTRIBUTION_TERM" ? "Termo de aporte" : title;
 }
+
+/** Even shorter, for a tab on the phone ("Aporte"); a custom name stays (it gets truncated). */
+export function instrumentTabLabel(kind: string, title: string) {
+  return kind === "CONTRIBUTION_TERM" ? "Aporte" : title;
+}
+
+/**
+ * The documents that go with the contract, said after "o contrato e …":
+ * "o termo de aporte", "o documento “Aditivo”" or, several, "os termos que vão junto".
+ */
+export function attachmentsPhrase(attachments: { kind: string; title: string }[]) {
+  if (attachments.length > 1) return "os termos que vão junto";
+  const [only] = attachments;
+  if (!only) return null;
+  return only.kind === "CONTRIBUTION_TERM"
+    ? "o termo de aporte"
+    : `o documento “${only.title}”`;
+}

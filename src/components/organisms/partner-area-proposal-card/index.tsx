@@ -34,7 +34,11 @@ import {
   PartnerAreaProposalReject,
 } from "@/components/organisms/partner-area-proposal-decision";
 import { LABEL_MAPS } from "@/constants/label-maps";
-import { instrumentShortLabel, offerRateText } from "@/helpers/partner";
+import {
+  attachmentsPhrase,
+  instrumentShortLabel,
+  offerRateText,
+} from "@/helpers/partner";
 import { contractTerms, periodText } from "@/helpers/partner-area";
 import { usePartnerProposalDocument } from "@/hooks/api/parceiro/area/usePartnerProposals";
 import { useLabels } from "@/hooks/ui/useLabels";
@@ -205,8 +209,10 @@ export function PartnerAreaProposalCard({
         {pending && (
           <Text size="xs" tone="muted">
             Recebida em {formatDateTime(version.createdAt)}. Leia o contrato
-            {version.attachments?.length ? " e o termo de aporte" : ""} antes de
-            responder: o aceite vale para esta versão.
+            {attachmentsPhrase(version.attachments ?? [])
+              ? ` e ${attachmentsPhrase(version.attachments ?? [])}`
+              : ""}{" "}
+            antes de responder: o aceite vale para esta versão.
           </Text>
         )}
 
@@ -229,28 +235,40 @@ export function PartnerAreaProposalCard({
             )}
             Ver contrato (PDF)
           </Button>
-          {(version.attachments ?? []).map((attachment) => (
-            <Button
-              key={attachment.kind}
-              variant={pending ? "ghost" : "outline"}
-              className="w-full sm:w-auto"
-              disabled={pdf.isPending}
-              onClick={() =>
-                pdf.mutate({
-                  contractId: proposal.contractId,
-                  versionId: version.id,
-                  attachment: attachment.kind,
-                })
-              }
-            >
-              {pdf.isPending && pdf.variables?.attachment === attachment.kind ? (
-                <Spinner />
-              ) : (
-                <FileText />
-              )}
-              Ver {instrumentShortLabel(attachment.kind, attachment.title).toLowerCase()} (PDF)
-            </Button>
-          ))}
+          {(version.attachments ?? []).map((attachment, at) => {
+            // ?anexo=<index>: several "Outro termo" share a kind (older API: the kind).
+            const ref = attachment.index ?? attachment.kind;
+            const label = instrumentShortLabel(attachment.kind, attachment.title);
+            return (
+              <Button
+                key={`${ref}-${at}`}
+                variant={pending ? "ghost" : "outline"}
+                className="w-full sm:w-auto sm:max-w-72"
+                disabled={pdf.isPending}
+                title={attachment.title}
+                onClick={() =>
+                  pdf.mutate({
+                    contractId: proposal.contractId,
+                    versionId: version.id,
+                    attachment: ref,
+                  })
+                }
+              >
+                {pdf.isPending && pdf.variables?.attachment === ref ? (
+                  <Spinner />
+                ) : (
+                  <FileText />
+                )}
+                <Text inline size={null} className="min-w-0 truncate">
+                  Ver{" "}
+                  {attachment.kind === "CONTRIBUTION_TERM"
+                    ? label.toLowerCase()
+                    : `“${label}”`}{" "}
+                  (PDF)
+                </Text>
+              </Button>
+            );
+          })}
           {pending && (
             <>
               <PartnerAreaProposalReject proposal={proposal} />

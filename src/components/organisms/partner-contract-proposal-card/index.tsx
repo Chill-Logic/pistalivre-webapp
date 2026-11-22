@@ -124,7 +124,7 @@ function ProposalVersionItem({
   const decision = proposalDecisionText(version);
   const file = version.document;
   const viewing = view.isPending && view.variables?.url === file?.url;
-  // The other documents frozen with this version (the contribution term).
+  // The other documents frozen with this version (contribution term, "Outro termo").
   const attachments = (version.attachments ?? []).filter((a) => a.document);
 
   const requestSignature = () =>
@@ -177,15 +177,19 @@ function ProposalVersionItem({
           const busy = view.isPending && view.variables?.url === doc.url;
           return (
             <Button
-              key={attachment.kind}
+              key={doc.url}
               variant="ghost"
               size="sm"
               disabled={busy}
               onClick={() => view.mutate(doc)}
+              title={attachment.title}
               aria-label={`${attachment.title} da versão ${version.number} (PDF)`}
+              className="max-w-full sm:max-w-60"
             >
               {busy ? <Spinner /> : <FileText />}
-              {instrumentShortLabel(attachment.kind, attachment.title)}
+              <Text inline size={null} className="min-w-0 truncate">
+                {instrumentShortLabel(attachment.kind, attachment.title)}
+              </Text>
             </Button>
           );
         })}

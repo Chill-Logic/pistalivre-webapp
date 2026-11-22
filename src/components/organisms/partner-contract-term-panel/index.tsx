@@ -1,4 +1,6 @@
-import { FileSignature, Plus, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Alert } from "@/components/atoms/alert";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { Card, CardContent } from "@/components/atoms/card";
@@ -6,78 +8,114 @@ import { Skeleton } from "@/components/atoms/skeleton";
 import { Spinner } from "@/components/atoms/spinner";
 import { Text } from "@/components/atoms/text";
 import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
-import { EmptyState } from "@/components/molecules/empty-state";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
 import { AiDocumentEditor } from "@/components/organisms/ai-document-editor";
-import type { ContractDraftSync } from "@/hooks/api/gestao/contracts/useContractDraftSync";
+import { QueryError } from "@/components/organisms/query-error";
 import {
-  useAddPartnerInstrument,
+  useContractDraftSync,
+  type ContractDraftSync,
+} from "@/hooks/api/gestao/contracts/useContractDraftSync";
+import {
   usePartnerInstrumentPreview,
   useRemovePartnerInstrument,
 } from "@/hooks/api/gestao/partners/usePartnerContractMutations";
+import { usePartnerInstrumentTextDraft } from "@/hooks/api/gestao/partners/usePartners";
+import type { ContractDraftState } from "@/types/contract";
 import type { PartnerContractInstrument } from "@/types/partner";
+
+/** What the page needs of a term's living text (sending, the chat beside it). */
+export type PartnerTermDraftHandle = Pick<ContractDraftSync, "id" | "flush" | "apply" | "replace">;
 
 type PartnerContractTermPanelProps = {
   contractId: string;
-  /** The term, once included (none = the explanation and "Incluir"). */
-  instrument: PartnerContractInstrument | null;
-  /** Its living text, synced with the server (null while it opens). */
-  draft: ContractDraftSync | null;
+  instrument: PartnerContractInstrument;
+  /** This term's tab is the one open (the chat edits it). */
+  active: boolean;
+  /** Its text, once open (null = gone): flushed on sending, the chat's answers go to it. */
+  onRegister: (instrumentId: string, handle: PartnerTermDraftHandle | null) => void;
+  /** The open term's current text, for the chat. */
+  onActiveHtml: (instrumentId: string, draftId: string, html: string) => void;
+  /** Removed: the page goes back to the contract's tab. */
+  onRemoved: () => void;
   aiEnabled: boolean;
   cancelTo: string;
 };
 
 /**
- * "Termo de aporte" (investment only): the partner paid for the vehicles that
- * are in the company's name; at the end they get the vehicles back, not the
- * money. A document of its own, with a living text like the contract's, that
- * goes with it to the partner's review and in the same signature envelope.
+ * One document that goes with the partner contract — the contribution term
+ * (the partner paid for the vehicles in the company's name) or an "Outro
+ * termo" named by the staff — with a living text like the contract's. It goes
+ * with the contract to the partner's review and in the same signature envelope.
  */
-export function PartnerContractTermPanel({
-  contractId,
-  instrument,
-  draft,
-  aiEnabled,
-  cancelTo,
-}: PartnerContractTermPanelProps) {
-  const add = useAddPartnerInstrument(contractId);
-  const remove = useRemovePartnerInstrument(contractId);
-  const preview = usePartnerInstrumentPreview(contractId, instrument?.id ?? "");
+export function PartnerContractTermPanel(props: PartnerContractTermPanelProps) {
+  const { contractId, instrument } = props;
+  const query = usePartnerInstrumentTextDraft(contractId, instrument.id);
 
-  if (!instrument) {
-    return (
-      <EmptyState
-        icon={FileSignature}
-        title="Termo de aporte"
-        description="Para quando o parceiro pagou os veículos que estão no nome da empresa: o termo reconhece o aporte e diz que, no fim do contrato, ele recebe os próprios veículos, e não o dinheiro de volta. Vai junto com o contrato na revisão do parceiro e no mesmo envelope de assinatura."
-        action={
-          <Button
-            type="button"
-            onClick={() => add.mutate("CONTRIBUTION_TERM")}
-            disabled={add.isPending}
-          >
-            {add.isPending ? (
-              <Spinner className="text-primary-foreground" />
-            ) : (
-              <Plus />
-            )}
-            Incluir termo
-          </Button>
-        }
-      />
-    );
-  }
-
-  if (!draft) {
+  if (query.isPending) {
     return (
       <SkeletonRegion label="Abrindo o termo…">
         <PartnerContractTermPanelSkeleton />
       </SkeletonRegion>
     );
   }
+  if (query.isError) {
+    return <QueryError error={query.error} onRetry={() => query.refetch()} />;
+  }
+  return (
+    // The text keeps its own sync, keyed by its draft (removed and included again = a new text).
+    <TermEditor
+      key={query.data.draft.id}
+      {...props}
+      initial={query.data.draft}
+      aiEnabled={query.data.aiEnabled ?? props.aiEnabled}
+    />
+  );
+}
 
+function TermEditor({
+  contractId,
+  instrument,
+  active,
+  onRegister,
+  onActiveHtml,
+  onRemoved,
+  aiEnabled,
+  cancelTo,
+  initial,
+}: PartnerContractTermPanelProps & { initial: ContractDraftState }) {
+  const sync = useContractDraftSync(initial);
+  const remove = useRemovePartnerInstrument(contractId);
+  const preview = usePartnerInstrumentPreview(contractId, instrument.id);
+  // `replace` is rebuilt every render: the page calls the latest one.
+  const replace = useRef(sync.replace);
+  useEffect(() => {
+    replace.current = sync.replace;
+  });
+
+  const { id, flush, apply, html } = sync;
+  useEffect(() => {
+    onRegister(instrument.id, {
+      id,
+      flush,
+      apply,
+      replace: (next) => replace.current(next),
+    });
+    return () => onRegister(instrument.id, null);
+  }, [onRegister, instrument.id, id, flush, apply]);
+
+  useEffect(() => {
+    if (active) onActiveHtml(instrument.id, id, html);
+  }, [active, onActiveHtml, instrument.id, id, html]);
+
+  const isContribution = instrument.kind === "CONTRIBUTION_TERM";
   return (
     <Box className="space-y-3">
+      {!instrument.allowed && (
+        <Alert variant="info" role="note">
+          Este termo não combina mais com o tipo do contrato. Remova-o se ele
+          não deve ir junto.
+        </Alert>
+      )}
       <Box className="flex flex-wrap items-center justify-between gap-2">
         <Text size="sm" tone="muted">
           Vai junto com o contrato na revisão do parceiro e na assinatura.
@@ -89,22 +127,22 @@ export function PartnerContractTermPanel({
               Remover termo
             </Button>
           }
-          title="Remover o termo de aporte?"
-          description="O texto do termo sai do contrato e não vai mais junto na revisão nem na assinatura. Dá para incluir de novo depois, a partir do texto padrão."
+          title={isContribution ? "Remover o termo de aporte?" : `Remover “${instrument.title}”?`}
+          description={`O texto do termo sai do contrato e não vai mais junto na revisão nem na assinatura.${isContribution ? " Dá para incluir de novo depois, a partir do texto padrão." : ""}`}
           confirmLabel="Remover termo"
           destructive
           isPending={remove.isPending}
-          onConfirm={() => remove.mutate(instrument.id)}
+          onConfirm={() => remove.mutate(instrument.id, { onSuccess: onRemoved })}
         />
       </Box>
       <AiDocumentEditor
-        initialHtml={draft.html}
-        draft={draft}
+        initialHtml={sync.html}
+        draft={sync}
         aiEnabled={aiEnabled}
-        intro="Rascunho vivo, como o do contrato: edite aqui ou peça ao Livrinho ao lado (com esta aba aberta, ele mexe no termo). Ele é enviado junto com o contrato."
-        label="Texto do termo de aporte"
+        intro="Rascunho vivo, como o do contrato: edite aqui ou peça ao Livrinho ao lado (com esta aba aberta, ele mexe neste termo). Ele é enviado junto com o contrato."
+        label={`Texto de “${instrument.title}”`}
         cancelTo={cancelTo}
-        onPreview={(html) => preview.mutate(html)}
+        onPreview={(text) => preview.mutate(text)}
         previewing={preview.isPending}
       />
     </Box>

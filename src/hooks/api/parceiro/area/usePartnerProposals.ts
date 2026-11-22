@@ -8,8 +8,8 @@ import { partnerAreaService } from "@/services/api/parceiro/partner-area.service
 type VersionRef = {
   contractId: string;
   versionId: string;
-  /** Another document of the version (its kind), instead of the contract. */
-  attachment?: string;
+  /** Another document of the version (its index; its kind on an older API), instead of the contract. */
+  attachment?: number | string;
 };
 
 /** Opens the PDF of a proposal's version (Bearer → blob) in a new tab. */

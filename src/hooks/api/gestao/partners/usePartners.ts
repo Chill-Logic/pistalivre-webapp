@@ -86,7 +86,7 @@ export function usePartnerContractDocumentDraft(id: string, enabled: boolean) {
   });
 }
 
-/** The contract's other documents (the investment's contribution term). */
+/** The contract's other documents (contribution term, "Outro termo"). */
 export function usePartnerContractInstruments(id: string, enabled = true) {
   return useQuery({
     queryKey: queryKeys.partners.contractInstruments(id),

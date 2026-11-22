@@ -37,9 +37,12 @@ export function PartnerContractDocumentCard({
   contract: PartnerContract;
 }) {
   const query = usePartnerContractDocument(contract.id);
-  const isInvestment = contract.type === "INVESTMENT";
-  // Investment: the contribution term goes with the contract (its own PDF).
-  const instruments = usePartnerContractInstruments(contract.id, isInvestment);
+  // The documents that go with the contract (contribution term, "Outro termo"), each with its own PDF.
+  const instruments = usePartnerContractInstruments(contract.id);
+  const items = instruments.data?.items ?? [];
+  const canHaveContribution = Boolean(
+    instruments.data?.available.some((a) => a.kind === "CONTRIBUTION_TERM"),
+  );
   const { view } = useFileActions();
   const editorUrl = routeTo.partnerContractDocument(contract.id);
   const hasVehicles = currentVehicles(contract).length > 0;
@@ -54,7 +57,7 @@ export function PartnerContractDocumentCard({
     <Card>
       <CardHeader>
         <CardTitle className="text-base">
-          {isInvestment ? "Documentos do contrato" : "Documento do contrato"}
+          {items.length ? "Documentos do contrato" : "Documento do contrato"}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -128,22 +131,21 @@ export function PartnerContractDocumentCard({
             </Button>
           </>
         )}
-        {instruments.data?.items.map((instrument) => (
+        {items.map((instrument) => (
           <PartnerInstrumentRow
             key={instrument.id}
             instrument={instrument}
-            editTo={isDraft ? `${editorUrl}?aba=termo-de-aporte` : null}
+            editTo={isDraft ? `${editorUrl}?aba=termo-${instrument.id}` : null}
           />
         ))}
         {isDraft && (instruments.data?.available.length ?? 0) > 0 && (
           <Text size="sm" tone="muted">
-            <TextLink to={`${editorUrl}?aba=termo-de-aporte`}>
-              Incluir termo
-            </TextLink>
-            : documento que vai junto com o contrato, como o{" "}
-            {instruments.data?.available
-              .map((a) => a.title.charAt(0).toLowerCase() + a.title.slice(1))
-              .join(" ou o ")}
+            {/* Opens the editor with the "Incluir termo" dialog. */}
+            <TextLink to={`${editorUrl}?incluir=1`}>Incluir termo</TextLink>:
+            documento que vai junto com o contrato, como{" "}
+            {canHaveContribution
+              ? "o termo de reconhecimento de aporte ou outro termo com o nome que você der"
+              : "um aditivo ou um termo de entrega, com o nome que você der"}
             .
           </Text>
         )}
@@ -168,7 +170,9 @@ function PartnerInstrumentRow({
       <Box className="flex items-start gap-3">
         <FileText className="mt-0.5 size-5 shrink-0 text-muted-foreground" aria-hidden />
         <Box className="min-w-0 space-y-0.5">
-          <Text weight="medium">{instrument.title}</Text>
+          <Text weight="medium" className="break-words">
+            {instrument.title}
+          </Text>
           <Text size="xs" tone="muted">
             {file && generatedAt
               ? `Da última proposta, gerado em ${formatDateTime(generatedAt)}`

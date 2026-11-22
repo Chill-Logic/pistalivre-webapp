@@ -20,7 +20,6 @@ import {
   usePartnerContractInstruments,
   usePartnerContractProposals,
   usePartnerContractTextDraft,
-  usePartnerInstrumentTextDraft,
 } from "@/hooks/api/gestao/partners/usePartners";
 import { formatDateTime } from "@/utils/format";
 
@@ -44,18 +43,10 @@ export function PartnerContractDocumentPage() {
   const editable = isDraft;
   const draft = usePartnerContractTextDraft(id, editable);
   const proposals = usePartnerContractProposals(editable ? id : "");
-  // Investment: the contribution term, a document of its own (third tab).
-  const isInvestment = contract.data?.type === "INVESTMENT";
-  const instruments = usePartnerContractInstruments(id, editable && isInvestment);
-  const instrument =
-    instruments.data?.items.find((item) => item.kind === "CONTRIBUTION_TERM") ??
-    null;
-  const termDraft = usePartnerInstrumentTextDraft(id, instrument?.id);
-  // The workbench opens with the term's text already loaded (no remount after).
-  const termSettled =
-    !isInvestment ||
-    instruments.isError ||
-    (instruments.isSuccess && (!instrument || !termDraft.isPending));
+  // The documents that go with it (contribution term, "Outro termo"): one tab
+  // each, so the workbench opens once the list is known (each tab loads its text).
+  const instruments = usePartnerContractInstruments(id, editable);
+  const termSettled = instruments.isError || instruments.isSuccess;
   const contractUrl = routeTo.partnerContract(id);
   const versions = proposals.data?.items ?? [];
   const pending = versions.find((version) => version.status === "PROPOSED");
@@ -75,7 +66,7 @@ export function PartnerContractDocumentPage() {
   const ready = Boolean(
     editable && draft.data?.workable && contract.data && (termSettled || shown),
   );
-  // Once open, it stays open (including the term later doesn't go back to the skeleton).
+  // Once open, it stays open (a term included later doesn't go back to the skeleton).
   if (ready && !shown) setShownId(id);
 
   if (ready && contract.data && draft.data) {
@@ -83,11 +74,7 @@ export function PartnerContractDocumentPage() {
       <PartnerContractWorkbench
         contract={contract.data}
         textDraft={draft.data}
-        term={
-          isInvestment && instruments.data
-            ? { instrument, textDraft: termDraft.data ?? null }
-            : undefined
-        }
+        instruments={instruments.data ?? null}
         header={header}
         notices={
           <>

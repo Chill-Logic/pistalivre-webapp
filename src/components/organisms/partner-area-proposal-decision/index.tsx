@@ -17,6 +17,7 @@ import { Spinner } from "@/components/atoms/spinner";
 import { CheckboxField } from "@/components/molecules/checkbox-field";
 import { TextareaField } from "@/components/molecules/textarea-field";
 import { toApiError } from "@/helpers/api-error";
+import { attachmentsPhrase } from "@/helpers/partner";
 import { usePartnerProposalDecision } from "@/hooks/api/parceiro/area/usePartnerProposals";
 import type { PartnerAreaProposal } from "@/types/partner-area";
 
@@ -78,8 +79,8 @@ export function PartnerAreaProposalAccept({ proposal }: DecisionProps) {
         <Form onSubmit={onSubmit} noValidate className="space-y-4">
           <CheckboxField
             label={
-              proposal.version.attachments?.length
-                ? "Li e concordo com o contrato e o termo de aporte"
+              attachmentsPhrase(proposal.version.attachments ?? [])
+                ? `Li e concordo com o contrato e ${attachmentsPhrase(proposal.version.attachments ?? [])}`
                 : "Li o contrato e concordo com os termos"
             }
             checked={agreed}

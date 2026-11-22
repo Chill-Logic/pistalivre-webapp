@@ -216,17 +216,19 @@ export function useSavePartnerCalculator(contractId: string) {
 }
 
 
-/** "Incluir termo": the document goes with the contract from now on. */
+/**
+ * "Incluir termo": the document goes with the contract from now on. The
+ * caller shows the error (a repeated name comes back on the `title` field).
+ */
 export function useAddPartnerInstrument(contractId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (kind: PartnerInstrumentKind) =>
-      partnersService.addInstrument(contractId, kind),
+    mutationFn: ({ kind, title }: { kind: PartnerInstrumentKind; title?: string }) =>
+      partnersService.addInstrument(contractId, kind, title),
     onSuccess: (list) => {
       queryClient.setQueryData(queryKeys.partners.contractInstruments(contractId), list);
       toast.success("Termo incluído no contrato");
     },
-    onError: (error) => toast.error(errorMessage(error)),
   });
 }
 

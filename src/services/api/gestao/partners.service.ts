@@ -182,18 +182,21 @@ export const partnersService = {
       .catch(rethrowBlobError);
     return data;
   },
-  /** The contract's other documents (the investment's contribution term). */
+  /** The contract's other documents (contribution term, "Outro termo"). */
   async instruments(id: string) {
     const { data } = await http.get<PartnerContractInstruments>(
       `/partner-contracts/${id}/instruments`,
     );
     return data;
   },
-  /** Adds a document to the contract (409 when locked); answers the list. */
-  async addInstrument(id: string, kind: PartnerInstrumentKind) {
+  /**
+   * Adds a document to the contract (409 when locked; 422 with `title` when
+   * the name repeats); answers the list. CUSTOM needs its `title`.
+   */
+  async addInstrument(id: string, kind: PartnerInstrumentKind, title?: string) {
     const { data } = await http.post<PartnerContractInstruments>(
       `/partner-contracts/${id}/instruments`,
-      { kind },
+      title ? { kind, title } : { kind },
     );
     return data;
   },

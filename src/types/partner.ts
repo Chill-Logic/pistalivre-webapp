@@ -271,8 +271,11 @@ export type PartnerProposalAttachment = {
   document: DocumentFile | null;
 };
 
-/** The contract's other documents (today only the investment's contribution term). */
-export type PartnerInstrumentKind = "CONTRIBUTION_TERM";
+/**
+ * The contract's other documents: the investment's contribution term (one per
+ * contract) or "Outro termo" (named by the staff, as many as needed).
+ */
+export type PartnerInstrumentKind = "CONTRIBUTION_TERM" | "CUSTOM";
 
 /** One of the contract's other documents, with its latest PDF. */
 export type PartnerContractInstrument = {
@@ -289,8 +292,8 @@ export type PartnerContractInstrument = {
 /** GET /partner-contracts/:id/instruments */
 export type PartnerContractInstruments = {
   items: PartnerContractInstrument[];
-  /** Kinds the contract could still have. */
-  available: { kind: PartnerInstrumentKind; title: string }[];
+  /** Kinds the contract could still have (CUSTOM always, named on adding: `needsTitle`). */
+  available: { kind: PartnerInstrumentKind; title: string; needsTitle?: boolean }[];
 };
 
 /** GET /partner-contracts/:id/proposals (newest first). */
