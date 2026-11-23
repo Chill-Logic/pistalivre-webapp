@@ -27,3 +27,23 @@ export function useTestGroupNotice() {
     onError: (error) => toast.error(toApiError(error).message),
   });
 }
+
+/** Notices the group should have got but didn't (ADMIN). */
+export function useFailedGroupNotices() {
+  return useQuery({
+    queryKey: queryKeys.notifications.failedGroupNotices(),
+    queryFn: notificationsService.failedGroupNotices,
+    refetchInterval: 60_000,
+  });
+}
+
+/** "Reenviar": the bot sends a failed notice again, as written, to the group set now. */
+export function useResendGroupNotice() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (key: string) => notificationsService.resendGroupNotice(key),
+    onSuccess: () => toast.success("Aviso reenviado ao grupo"),
+    onError: (error) => toast.error(toApiError(error).message),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.notifications.failedGroupNotices() }),
+  });
+}

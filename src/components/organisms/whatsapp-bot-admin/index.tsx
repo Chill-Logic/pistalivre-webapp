@@ -1,3 +1,4 @@
+import { WhatsAppFailedNotices } from "@/components/organisms/whatsapp-failed-notices";
 import { WhatsAppGroupNotices } from "@/components/organisms/whatsapp-group-notices";
 import { useEffect, useState } from "react";
 import {
@@ -80,6 +81,7 @@ export function WhatsAppBotAdmin({ status }: { status: WhatsAppStatus }) {
         <LinkCard linked={status.linked} />
         <SettingsCard bot={bot} />
         <WhatsAppGroupNotices connected={bot.state === "open"} />
+        <WhatsAppFailedNotices />
       </Col>
     </Row>
   );

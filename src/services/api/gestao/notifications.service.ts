@@ -1,5 +1,6 @@
 import { http } from "@/services/http/client";
 import type {
+  FailedGroupNotice,
   GroupNoticeOverview,
   GroupNoticeSettings,
   MyNotificationSettings,
@@ -41,6 +42,13 @@ export const notificationsService = {
   },
   async testGroupNotice() {
     await http.post("/notifications/admin/whatsapp/test");
+  },
+  async failedGroupNotices() {
+    const { data } = await http.get<{ notices: FailedGroupNotice[] }>("/notifications/admin/whatsapp/failed");
+    return data.notices;
+  },
+  async resendGroupNotice(key: string) {
+    await http.post("/notifications/admin/whatsapp/failed/resend", { key });
   },
   async admin() {
     const { data } = await http.get<NotificationAdminOverview>("/notifications/admin");

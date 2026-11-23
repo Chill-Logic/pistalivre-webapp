@@ -28,6 +28,18 @@ export type GroupNoticeSettings = {
   dueSoonWeeklyEvery: number | null;
 };
 
+/** A notice the WhatsApp group should have got but didn't (admin can send it again). */
+export type FailedGroupNotice = {
+  key: string;
+  type: string;
+  title: string;
+  /** The message as it would have gone. */
+  text: string;
+  attempts: number;
+  lastError: string | null;
+  failedAt: string;
+};
+
 export type GroupNoticeOverview = {
   settings: GroupNoticeSettings;
   types: NotificationTypeInfo[];
