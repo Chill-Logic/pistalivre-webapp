@@ -176,6 +176,8 @@ export const queryKeys = {
   reimbursements: {
     all: ["reimbursements"] as const,
     staff: () => [...queryKeys.reimbursements.all, "staff"] as const,
+    candidates: (id: string) =>
+      [...queryKeys.reimbursements.all, "candidates", id] as const,
   },
   suppliers: {
     all: ["suppliers"] as const,

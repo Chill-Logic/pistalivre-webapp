@@ -9,6 +9,7 @@ import {
   StaffReimbursementCard,
   StaffReimbursementCardSkeleton,
 } from "@/components/molecules/staff-reimbursement-card";
+import { ReimbursementApproveDialog } from "@/components/organisms/reimbursement-approve-dialog";
 import { ReimbursementPaidDialog } from "@/components/organisms/reimbursement-paid-dialog";
 import { ReimbursementRejectDialog } from "@/components/organisms/reimbursement-reject-dialog";
 import type {
@@ -21,7 +22,7 @@ type ReimbursementQueueProps = {
   reimbursements: StaffReimbursement[];
   emptyIcon: LucideIcon;
   emptyTitle: string;
-  /** Checklist for rejecting; present = pending requests can be rejected. */
+  /** Checklist for rejecting; present = pending/approved requests can be rejected. */
   missingItems?: ReimbursementMissingItem[];
 };
 
@@ -51,25 +52,10 @@ export function ReimbursementQueue({
               <StaffReimbursementCard
                 reimbursement={reimbursement}
                 actions={
-                  reimbursement.status === "PENDING" ||
-                  reimbursement.status === "FAILED" ? (
-                    <>
-                      {missingItems && reimbursement.status === "PENDING" && (
-                        <ReimbursementRejectDialog
-                          reimbursementId={reimbursement.id}
-                          customerName={reimbursement.customer.name}
-                          amount={reimbursement.amount}
-                          missingItems={missingItems}
-                        />
-                      )}
-                      <ReimbursementPaidDialog
-                        reimbursementId={reimbursement.id}
-                        customerName={reimbursement.customer.name}
-                        amount={reimbursement.amount}
-                        pixKey={reimbursement.destination.pixKey}
-                      />
-                    </>
-                  ) : undefined
+                  <ReimbursementActions
+                    reimbursement={reimbursement}
+                    missingItems={missingItems}
+                  />
                 }
               />
             </Col>
@@ -77,6 +63,47 @@ export function ReimbursementQueue({
         </Row>
       )}
     </Box>
+  );
+}
+
+/**
+ * What each stage allows: pending → reject | approve; approved (no transfer
+ * in flight) → reject | mark as paid; failed transfer (legacy) → mark as paid.
+ */
+function ReimbursementActions({
+  reimbursement,
+  missingItems,
+}: {
+  reimbursement: StaffReimbursement;
+  missingItems?: ReimbursementMissingItem[];
+}) {
+  const { status } = reimbursement;
+  const awaitingPayment = status === "APPROVED" && !reimbursement.transferId;
+  if (status !== "PENDING" && status !== "FAILED" && !awaitingPayment) {
+    return null;
+  }
+  const reject = missingItems && status !== "FAILED" && (
+    <ReimbursementRejectDialog
+      reimbursementId={reimbursement.id}
+      customerName={reimbursement.customer.name}
+      amount={reimbursement.amount}
+      missingItems={missingItems}
+    />
+  );
+  return (
+    <>
+      {reject}
+      {status === "PENDING" ? (
+        <ReimbursementApproveDialog reimbursement={reimbursement} />
+      ) : (
+        <ReimbursementPaidDialog
+          reimbursementId={reimbursement.id}
+          customerName={reimbursement.customer.name}
+          amount={reimbursement.amount}
+          pixKey={reimbursement.destination.pixKey}
+        />
+      )}
+    </>
   );
 }
 

@@ -1,4 +1,4 @@
-import { History, Inbox } from "lucide-react";
+import { Banknote, History, Inbox } from "lucide-react";
 import { Box } from "@/components/atoms/box";
 import { PageHeader } from "@/components/molecules/page-header";
 import { SkeletonRegion } from "@/components/molecules/skeleton-region";
@@ -10,8 +10,9 @@ import {
 import { useStaffReimbursements } from "@/hooks/api/gestao/reimbursements/useStaffReimbursements";
 
 /**
- * Review queue: rejecting is available (a record the customer sees). There
- * is no "approve/pay" — money never leaves through the system.
+ * Review queue: approve (saying which maintenance it pays) or reject, then
+ * mark as paid once the pix was sent by hand — money never leaves through
+ * the system.
  */
 export function ReimbursementsPage() {
   const reimbursements = useStaffReimbursements();
@@ -22,6 +23,7 @@ export function ReimbursementsPage() {
       {reimbursements.isPending && (
         <SkeletonRegion label="Carregando reembolsos…" className="space-y-8">
           <ReimbursementQueueSkeleton />
+          <ReimbursementQueueSkeleton rows={1} />
           <ReimbursementQueueSkeleton rows={2} />
         </SkeletonRegion>
       )}
@@ -38,6 +40,13 @@ export function ReimbursementsPage() {
             reimbursements={reimbursements.data.pending}
             emptyIcon={Inbox}
             emptyTitle="Nenhum pedido aguardando análise"
+            missingItems={reimbursements.data.missingItems}
+          />
+          <ReimbursementQueue
+            title="Aprovados · aguardando pagamento"
+            reimbursements={reimbursements.data.toPay ?? []}
+            emptyIcon={Banknote}
+            emptyTitle="Nenhum reembolso aprovado esperando o pix"
             missingItems={reimbursements.data.missingItems}
           />
           <ReimbursementQueue

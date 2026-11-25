@@ -21,14 +21,15 @@ import {
 
 /**
  * A refund request with what the reviewer needs: who, how much, why, where
- * the pix would go (and whether that key was validated) and the receipts.
+ * the pix would go (and whether that key was checked), the maintenance it
+ * pays (or why it is none) and the receipts.
  */
 export function StaffReimbursementCard({
   reimbursement,
   actions,
 }: {
   reimbursement: StaffReimbursement;
-  /** Review buttons (pending: reject/paid; failed: paid). */
+  /** Review buttons (pending: reject/approve; approved: reject/paid; failed: paid). */
   actions?: ReactNode;
 }) {
   const { label } = useLabels();
@@ -74,15 +75,32 @@ export function StaffReimbursementCard({
 
         <Text className="break-words">{reimbursement.reason}</Text>
 
-        {maintenance && (
-          <Text size="xs" tone="muted">
-            Manutenção de {formatCalendarDate(maintenance.performedAt)} ·{" "}
-            {label(LABEL_MAPS.maintenanceType, maintenance.type)}
-            {maintenance.cost != null &&
-              ` · custo ${formatCurrency(maintenance.cost)}`}
-            {maintenance.description && ` · ${maintenance.description}`}
+        {maintenance ? (
+          <Text size="xs" tone="muted" className="break-words">
+            <TextLink
+              to={routeTo.maintenance(maintenance.id)}
+              className="font-normal"
+            >
+              Manutenção de {formatCalendarDate(maintenance.performedAt)}
+            </TextLink>
+            {" · "}
+            {maintenance.services.length > 0
+              ? maintenance.services
+                  .map((code) => label(LABEL_MAPS.maintenanceService, code))
+                  .join(", ")
+              : label(LABEL_MAPS.maintenanceType, maintenance.type)}
+            {maintenance.cost != null && ` · ${formatCurrency(maintenance.cost)}`}
+            {maintenance.provider && ` · ${maintenance.provider}`}
           </Text>
-        )}
+        ) : reimbursement.notMaintenanceReason ? (
+          <Text size="xs" tone="muted" className="break-words">
+            Não é manutenção: {reimbursement.notMaintenanceReason}
+          </Text>
+        ) : reimbursement.status === "PENDING" ? (
+          <Box>
+            <Badge variant="outline">Sem manutenção vinculada</Badge>
+          </Box>
+        ) : null}
 
         <Box className="flex flex-wrap items-center gap-2 rounded-md bg-muted px-3 py-2">
           <Text size="xs">
@@ -98,10 +116,10 @@ export function StaffReimbursementCard({
           {destination.validated ? (
             <Badge variant="success" className="gap-1">
               <BadgeCheck className="size-3.5" aria-hidden />
-              Validado
+              Chave conferida
             </Badge>
           ) : (
-            <Badge variant="warning">Não validado</Badge>
+            <Badge variant="warning">Chave não conferida</Badge>
           )}
         </Box>
 
@@ -131,10 +149,19 @@ export function StaffReimbursementCard({
             {reimbursement.staffNote}
           </Text>
         )}
-        {reimbursement.reviewedAt && (
+        {reimbursement.approvedAt ? (
           <Text size="xs" tone="muted">
-            Analisado em {formatDateTime(reimbursement.reviewedAt)}
+            Aprovado
+            {reimbursement.approvedByName &&
+              ` por ${reimbursement.approvedByName}`}{" "}
+            em {formatDateTime(reimbursement.approvedAt)}
           </Text>
+        ) : (
+          reimbursement.reviewedAt && (
+            <Text size="xs" tone="muted">
+              Analisado em {formatDateTime(reimbursement.reviewedAt)}
+            </Text>
+          )
         )}
 
         {documents.length > 0 && (
