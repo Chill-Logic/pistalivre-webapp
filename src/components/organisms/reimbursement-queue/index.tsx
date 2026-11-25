@@ -9,9 +9,11 @@ import {
   StaffReimbursementCard,
   StaffReimbursementCardSkeleton,
 } from "@/components/molecules/staff-reimbursement-card";
+import { AttachButton } from "@/components/organisms/record-attachments";
 import { ReimbursementApproveDialog } from "@/components/organisms/reimbursement-approve-dialog";
 import { ReimbursementPaidDialog } from "@/components/organisms/reimbursement-paid-dialog";
 import { ReimbursementRejectDialog } from "@/components/organisms/reimbursement-reject-dialog";
+import { queryKeys } from "@/constants/query-keys";
 import type {
   ReimbursementMissingItem,
   StaffReimbursement,
@@ -69,6 +71,8 @@ export function ReimbursementQueue({
 /**
  * What each stage allows: pending → reject | approve; approved (no transfer
  * in flight) → reject | mark as paid; failed transfer (legacy) → mark as paid.
+ * Attaching is open at every stage: the receipt the customer sent by
+ * WhatsApp goes into the request without rejecting it.
  */
 function ReimbursementActions({
   reimbursement,
@@ -79,8 +83,15 @@ function ReimbursementActions({
 }) {
   const { status } = reimbursement;
   const awaitingPayment = status === "APPROVED" && !reimbursement.transferId;
+  const attach = (
+    <AttachButton
+      owner={{ type: "REIMBURSEMENT", id: reimbursement.id }}
+      invalidate={queryKeys.reimbursements.all}
+      label="Anexar"
+    />
+  );
   if (status !== "PENDING" && status !== "FAILED" && !awaitingPayment) {
-    return null;
+    return attach;
   }
   const reject = missingItems && status !== "FAILED" && (
     <ReimbursementRejectDialog
@@ -92,6 +103,7 @@ function ReimbursementActions({
   );
   return (
     <>
+      {attach}
       {reject}
       {status === "PENDING" ? (
         <ReimbursementApproveDialog reimbursement={reimbursement} />
