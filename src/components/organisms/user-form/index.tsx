@@ -14,6 +14,7 @@ import { Spinner } from "@/components/atoms/spinner";
 import { FormField } from "@/components/molecules/form-field";
 import { MaskedField } from "@/components/molecules/masked-field";
 import { SelectField } from "@/components/molecules/select-field";
+import { UserExtraPhonesField } from "@/components/organisms/user-extra-phones-field";
 import { LABEL_MAPS } from "@/constants/label-maps";
 import { applyApiErrors } from "@/helpers/form";
 import { useSaveUser } from "@/hooks/api/gestao/users/useUserMutations";
@@ -30,6 +31,13 @@ const baseSchema = z.object({
   phone: z
     .string()
     .refine((value) => onlyDigits(value) === "" || isValidPhone(value), "Telefone inválido"),
+  extraPhones: z.array(
+    z.object({
+      value: z
+        .string()
+        .refine((value) => onlyDigits(value) === "" || isValidPhone(value), "Telefone inválido"),
+    }),
+  ),
   birthDate: z.string().refine((value) => {
     if (!value) return true;
     const day = brDateToDay(value);
@@ -56,13 +64,15 @@ const createSchema = baseSchema.superRefine((values, ctx) => {
   }
 });
 
-type Values = z.infer<typeof baseSchema>;
+export type UserFormValues = z.infer<typeof baseSchema>;
+type Values = UserFormValues;
 
 const API_FIELDS = [
   "name",
   "email",
   "cpf",
   "phone",
+  "extraPhones",
   "birthDate",
   "role",
   "password",
@@ -71,7 +81,10 @@ const API_FIELDS = [
 type UserFormProps = {
   /** Present = edit; absent = create (admin only). */
   user?: StaffUserDetail;
-  /** Agents editing themselves can't change the role (the API ignores it). */
+  /**
+   * Agents editing themselves can't change the role nor the other phones (the
+   * API ignores both): only an admin sees those fields.
+   */
   canEditRole: boolean;
   cancelTo: string;
   onSaved: (user: StaffUserDetail) => void;
@@ -102,6 +115,9 @@ export function UserForm({
       email: user?.email ?? "",
       cpf: user?.cpf ? maskCpf(user.cpf) : "",
       phone: user?.phone ? maskPhone(user.phone) : "",
+      extraPhones: (user?.extraPhones ?? []).map((value) => ({
+        value: maskPhone(value),
+      })),
       birthDate: user?.birthDate ? dayToBrDate(user.birthDate) : "",
       role: (user?.role ?? "AGENT") as UserRole,
       password: "",
@@ -117,6 +133,13 @@ export function UserForm({
         email: values.email,
         cpf: onlyDigits(values.cpf),
         phone: phoneDigits(values.phone) || null,
+        ...(canEditRole
+          ? {
+              extraPhones: values.extraPhones
+                .map((item) => phoneDigits(item.value))
+                .filter(Boolean),
+            }
+          : {}),
         birthDate: values.birthDate ? brDateToDay(values.birthDate) : null,
         role: canEditRole ? values.role : (user?.role ?? "AGENT"),
         ...(isNew ? { password: values.password } : {}),
@@ -221,6 +244,11 @@ export function UserForm({
                     />
                   )}
                 />
+              </Col>
+            )}
+            {canEditRole && (
+              <Col md={6}>
+                <UserExtraPhonesField control={control} errors={errors} />
               </Col>
             )}
             {isNew && (

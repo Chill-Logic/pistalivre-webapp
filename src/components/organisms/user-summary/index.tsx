@@ -33,6 +33,11 @@ export function UserSummary({ user }: { user: StaffUserDetail }) {
           <InfoItem md={6} label="Telefone">
             {user.phone ? formatPhone(user.phone) : null}
           </InfoItem>
+          {user.extraPhones.length > 0 && (
+            <InfoItem md={6} label="Outros telefones">
+              {user.extraPhones.map(formatPhone).join(" · ")}
+            </InfoItem>
+          )}
           <InfoItem span={6} md={3} label="CPF" mono>
             {user.cpf ? formatCpf(user.cpf) : null}
           </InfoItem>

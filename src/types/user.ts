@@ -17,6 +17,11 @@ export type StaffUserDetail = StaffUser & {
   cpf: string | null;
   /** Digits only (area code + number). */
   phone: string | null;
+  /**
+   * Other numbers of the same person (the company mobile they use), digits
+   * only: the WhatsApp bot answers them as this user.
+   */
+  extraPhones: string[];
   /** Calendar date. */
   birthDate: string | null;
   updatedAt: string;
@@ -39,6 +44,8 @@ export type UserInput = {
   cpf: string;
   /** Digits only; null = none. */
   phone: string | null;
+  /** Digits only. Only an admin's value is stored; left out = kept as is. */
+  extraPhones?: string[];
   /** yyyy-mm-dd or null. */
   birthDate: string | null;
   /** Ignored by the API when an agent edits themselves. */
