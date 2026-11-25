@@ -48,8 +48,8 @@ type Mode = ReimbursementApprovalLink["mode"];
 
 const MODE_OPTIONS: { value: Mode; label: string }[] = [
   { value: "EXISTING", label: "Já registrada" },
-  { value: "NEW", label: "Registrar agora" },
-  { value: "NONE", label: "Não é manutenção" },
+  { value: "NEW", label: "Criar nova" },
+  { value: "NONE", label: "Outro gasto" },
 ];
 
 type NewMaintenance = {
