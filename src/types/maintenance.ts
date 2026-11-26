@@ -36,6 +36,25 @@ export type MaintenanceDetail = Omit<MaintenanceListItem, "rental"> & {
     customer: { id: string; name: string };
   } | null;
   documents: DocumentFile[];
+  /** The vehicle's rentals: what the edit may link this maintenance to. */
+  rentalOptions?: MaintenanceRentalOption[];
+  /** Debts launched to a customer from this maintenance (cost passed on). */
+  customerDebts?: {
+    id: string;
+    origin: string;
+    amount: number;
+    incurredAt: string;
+    customer: { id: string; name: string };
+  }[];
+};
+
+export type MaintenanceRentalOption = {
+  id: string;
+  code: string;
+  status: string;
+  startDate: string;
+  endDate: string | null;
+  customer: { id: string; name: string };
 };
 
 export type MaintenanceFilters = {
@@ -48,7 +67,7 @@ export type MaintenanceFilters = {
   rentalId?: string;
 };
 
-/** Body of POST/PUT /maintenances (PUT ignores vehicle/rental). */
+/** Body of POST/PUT /maintenances (PUT ignores the vehicle; rentalId: same vehicle, null = none). */
 export type MaintenanceInput = {
   vehicleId?: string;
   rentalId?: string | null;

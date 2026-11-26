@@ -1,8 +1,11 @@
-import { Check, Pencil } from "lucide-react";
+import { Check, HandCoins, Pencil } from "lucide-react";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
 import { DebtListPaymentDialog } from "@/components/organisms/debt-payment-dialog";
 import { ExpenseDialog } from "@/components/organisms/expense-dialog";
+import { PassOnCostDialog } from "@/components/organisms/pass-on-cost-dialog";
+import { queryKeys } from "@/constants/query-keys";
+import { calendarDay } from "@/utils/date";
 import type { MonthItem } from "@/types/expense";
 
 /**
@@ -29,7 +32,28 @@ export function MonthItemAction({ item }: { item: MonthItem }) {
     );
   }
   return (
-    <Box onClick={(event) => event.stopPropagation()}>
+    <Box className="flex gap-1" onClick={(event) => event.stopPropagation()}>
+      {item.expense && (
+        <PassOnCostDialog
+          source={{ expenseId: item.expense.id }}
+          defaults={{
+            amount: item.amount,
+            description: item.description,
+            incurredAt: calendarDay(item.paidAt ?? `${item.month}-01`),
+            origin: "OTHER",
+          }}
+          invalidate={queryKeys.expenses.all}
+          trigger={
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={`Cobrar ${item.description} de um cliente`}
+            >
+              <HandCoins />
+            </Button>
+          }
+        />
+      )}
       <ExpenseDialog
         target={{ kind: "item", item }}
         trigger={

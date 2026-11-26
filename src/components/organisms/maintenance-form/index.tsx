@@ -36,6 +36,10 @@ import { useMaintenanceProviders } from "@/hooks/api/gestao/maintenances/useMain
 import { useLabels } from "@/hooks/ui/useLabels";
 import { useVehicleOptions } from "@/hooks/ui/useRemoteOptions";
 import type { MaintenanceDetail } from "@/types/maintenance";
+import { formatCalendarDate } from "@/utils/format";
+
+/** Radix Select reserves "" — "no rental" travels as this sentinel. */
+const NO_RENTAL = "__none__";
 
 type MaintenanceFormProps = {
   /** Present = edit (replaces); absent = create. */
@@ -120,7 +124,7 @@ export function MaintenanceForm({
                       Veículo
                     </Text>
                     <Text>{vehicleLabel}</Text>
-                    {rentalCode && (
+                    {rentalCode && isNew && (
                       <Text size="xs" tone="muted">
                         Locação {rentalCode}
                       </Text>
@@ -171,6 +175,31 @@ export function MaintenanceForm({
                   )}
                 />
               </Col>
+              {!isNew && (
+                <Col md={6}>
+                  <Controller
+                    control={control}
+                    name="rentalId"
+                    render={({ field }) => (
+                      <SelectField
+                        label="Locação / cliente (opcional)"
+                        value={field.value || NO_RENTAL}
+                        onChange={(value) =>
+                          field.onChange(value === NO_RENTAL ? "" : value)
+                        }
+                        options={[
+                          { value: NO_RENTAL, label: "Nenhuma (custo da empresa)" },
+                          ...(maintenance?.rentalOptions ?? []).map((r) => ({
+                            value: r.id,
+                            label: `${r.code} · ${r.customer.name} · ${formatCalendarDate(r.startDate)}${r.endDate ? ` a ${formatCalendarDate(r.endDate)}` : ""}`,
+                          })),
+                        ]}
+                        error={errors.rentalId?.message}
+                      />
+                    )}
+                  />
+                </Col>
+              )}
               <Col md={4}>
                 <Controller
                   control={control}

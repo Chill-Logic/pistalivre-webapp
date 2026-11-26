@@ -1,4 +1,4 @@
-import { Pencil, Wrench } from "lucide-react";
+import { HandCoins, Pencil, Wrench } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Box } from "@/components/atoms/box";
 import { Button } from "@/components/atoms/button";
@@ -14,6 +14,10 @@ import {
   MaintenanceSummarySkeleton,
 } from "@/components/organisms/maintenance-summary";
 import { MaintenanceDeleteButton } from "@/components/organisms/maintenance-delete-button";
+import { PassOnCostDialog } from "@/components/organisms/pass-on-cost-dialog";
+import { Text } from "@/components/atoms/text";
+import { formatCurrency } from "@/utils/format";
+import { calendarDay } from "@/utils/date";
 import { QueryError } from "@/components/organisms/query-error";
 import { MaintenanceDetailLayout } from "@/components/templates/maintenance-detail-layout";
 import { ROUTES, routeTo } from "@/constants/routes";
@@ -33,6 +37,22 @@ export function MaintenanceDetailPage() {
         <BackLink to={backTo} label="Manutenções" />
         {maintenance.data && (
           <Box className="flex gap-2">
+            <PassOnCostDialog
+              source={{ maintenanceId: maintenance.data.id }}
+              defaults={{
+                amount: maintenance.data.cost,
+                description: "Manutenção do veículo",
+                incurredAt: calendarDay(maintenance.data.performedAt),
+                customer: maintenance.data.rental?.customer ?? null,
+              }}
+              invalidate={queryKeys.maintenances.detail(maintenance.data.id)}
+              trigger={
+                <Button variant="ghost" size="sm">
+                  <HandCoins />
+                  Cobrar do cliente
+                </Button>
+              }
+            />
             <Button asChild variant="ghost" size="sm">
               <Link to={routeTo.editMaintenance(maintenance.data.id)}>
                 <Pencil />
@@ -64,6 +84,18 @@ export function MaintenanceDetailPage() {
             onRetry={() => maintenance.refetch()}
           />
         ))}
+      {maintenance.data?.customerDebts?.map((debt) => (
+        <Text key={debt.id} size="sm" tone="muted">
+          Cobrada de{" "}
+          <Link
+            to={routeTo.customer(debt.customer.id)}
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+          >
+            {debt.customer.name}
+          </Link>{" "}
+          como débito de {formatCurrency(debt.amount)}.
+        </Text>
+      ))}
       {maintenance.data && (
         <MaintenanceDetailLayout
           summary={<MaintenanceSummary maintenance={maintenance.data} />}

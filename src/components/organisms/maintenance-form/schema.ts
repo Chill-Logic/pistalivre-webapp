@@ -90,7 +90,7 @@ export function toMaintenanceInput(
   return {
     ...(isNew
       ? { vehicleId: values.vehicleId, rentalId: values.rentalId || null }
-      : {}),
+      : { rentalId: values.rentalId || null }),
     type: values.type,
     performedAt: values.performedAt,
     services: values.services,
